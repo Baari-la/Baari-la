@@ -16,6 +16,7 @@ use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\MarketIntelligenceController;
 
 /*
 
@@ -61,14 +62,8 @@ Route::get('/v/{nomor_anggota}', [CompanyController::class, 'publicVerify'])->na
 Route::middleware(['auth', 'verified'])->group(function () {
     
     // Dashboard Utama User
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard', [
-            'cottonPrice' => '71.31',
-            'exportValue' => '11.9',
-            'memberStatus' => auth()->user()->is_premium ? 'Premium Member' : 'Regular Member'
-        ]);
-    })->name('dashboard');
-
+    Route::get('/dashboard', [MarketIntelligenceController::class, 'getDashboardData'])->name('dashboard');
+   
     // Profil Akun
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');

@@ -1,4 +1,6 @@
 import { AlertCircle, Download } from "lucide-react";
+import StockTicker from "@/Components/StockTicker";
+
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
 import html2canvas from "html2canvas";
@@ -40,7 +42,14 @@ const labels = {
     },
 };
 
-export default function Dashboard({cottonPrice, exportValue, memberStatus }) {
+export default function Dashboard({
+    marketHistory,
+    cottonTrend,
+    usd_idr,
+    cottonPrice,
+    exportValue,
+    memberStatus,
+}) {
     // FUNGSI CAPTURE LAPORAN
     const { auth } = usePage().props;
     const exportAsImage = async (elementId, fileName) => {
@@ -65,58 +74,97 @@ export default function Dashboard({cottonPrice, exportValue, memberStatus }) {
         >
             <Head title="Dashboard" />
 
-
             <div className="py-12 bg-gray-50">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                   
- 
-            {/* Selamat datang */}
-<div className="bg-gradient-to-r from-blue-700 to-indigo-900 rounded-3xl p-8 mb-8 text-white shadow-2xl relative overflow-hidden">
-    <div className="relative z-10">
-        <h2 className="text-3xl font-black italic tracking-tighter mb-2">
-            WELCOME BACK, {auth.user.name.toUpperCase()}!
-        </h2>
-        <p className="text-blue-100 opacity-80 font-medium">
-            Intelligence system is active. Your encrypted data stream is ready.
-        </p>
-    </div>
-    {/* Dekorasi Abstract di background */}
-    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
-</div>
+                    {/* Selamat datang */}
 
-            {/* Batas Selamat Datang */}                  
-                   
-                   
-                    {/* STATS CARDS */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-yellow-500 text-gray-900">
-                            <p className="text-xs font-bold text-gray-400 uppercase">
-                                Cotton Price
+                    <div className="bg-gradient-to-r from-blue-700 to-indigo-900 rounded-3xl p-8 mb-8 text-white shadow-2xl relative overflow-hidden">
+                        <div className="relative z-10">
+                            <h2 className="text-3xl font-black italic tracking-tighter mb-2">
+                                WELCOME BACK, {auth.user.name.toUpperCase()}!
+                            </h2>
+                            <p className="text-blue-100 opacity-80 font-medium">
+                                Intelligence system is active. Your encrypted
+                                data stream is ready.
                             </p>
-                            <h3 className="text-2xl font-black">
+                        </div>
+                        {/* Dekorasi Abstract di background */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+                    </div>
+                    <div className="mt-8">
+                        <StockTicker topStocks={[]} />
+                    </div>
+                    {/* Batas Selamat Datang */}
+
+                    {/* STATS CARDS */}
+                    {/* STATS CARDS */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        {/* 1. COTTON PRICE - Dengan Indikator Naik/Turun */}
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-yellow-500 text-gray-900 group hover:shadow-md transition-all">
+                            <div className="flex justify-between items-start">
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    Cotton Price
+                                </p>
+                                <span
+                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${parseFloat(cottonTrend) >= 0 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+                                >
+                                    {cottonTrend}
+                                </span>
+                            </div>
+                            <h3 className="text-2xl font-black mt-1">
                                 {cottonPrice}{" "}
-                                <span className="text-sm font-normal">
+                                <span className="text-sm font-normal text-gray-400">
                                     USD/lb
                                 </span>
                             </h3>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-600 text-gray-900">
-                            <p className="text-xs font-bold text-gray-400 uppercase">
+
+                        {/* 2. EXCHANGE RATE - Data dari Python (usd_idr) */}
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 text-gray-900 group hover:shadow-md transition-all">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Kurs USD / IDR
+                            </p>
+                            <h3 className="text-2xl font-black mt-1">
+                                Rp {parseFloat(usd_idr).toLocaleString("id-ID")}
+                            </h3>
+                            <p className="text-[9px] text-gray-400 font-bold italic mt-1 uppercase">
+                                Bursa Live Data
+                            </p>
+                        </div>
+
+                        {/* 3. NATIONAL EXPORT */}
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-600 text-gray-900 group hover:shadow-md transition-all">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                 National Export
                             </p>
-                            <h3 className="text-2xl font-black">
-                                ${exportValue} B
+                            <h3 className="text-2xl font-black mt-1">
+                                ${exportValue}{" "}
+                                <span className="text-sm font-normal text-gray-400">
+                                    B
+                                </span>
                             </h3>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-green-500 text-gray-900">
-                            <p className="text-xs font-bold text-gray-400 uppercase">
-                                Status
+
+                        {/* 4. USER STATUS */}
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-indigo-500 text-gray-900 group hover:shadow-md transition-all">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Account Status
                             </p>
-                            <h3 className="text-lg font-bold text-green-600">
-                                {memberStatus}
-                            </h3>
+                            <div className="flex items-center gap-2 mt-1">
+                                <h3
+                                    className={`text-lg font-black uppercase italic ${memberStatus.includes("Premium") ? "text-indigo-600" : "text-gray-600"}`}
+                                >
+                                    {memberStatus}
+                                </h3>
+                                {memberStatus.includes("Premium") && (
+                                    <span className="animate-pulse text-yellow-500">
+                                        ⭐
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
+
                     {/* Link Cepat menuju Intelligence */}
                     <Link
                         href={route("intelligence.center")} // Sesuaikan dengan nama route Bapak
