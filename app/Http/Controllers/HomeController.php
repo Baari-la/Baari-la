@@ -11,6 +11,10 @@ class HomeController extends Controller
 {
     public function index()
     {
+ // Ambil data harga kapas dan nilai tukar 7 hari terakhir saja
+    $history = MarketHistory::orderBy('date', 'desc')->take(7)->get()->reverse()->values();
+    $latest = $history->last();
+
         // Data Ticker & Bursa (Ringan)
         $latestMarket = MarketHistory::orderBy('date', 'desc')->first();
         
@@ -34,6 +38,7 @@ class HomeController extends Controller
 
         return Inertia::render('Home', [
             'currentCotton' => $latestMarket->cotton_price ?? 0,
+            
             'currentExchange' => $latestMarket->usd_idr ?? 0,
             'topStocks' => $topStocks,
             'latestNews' => News::latest()->take(3)->get(),

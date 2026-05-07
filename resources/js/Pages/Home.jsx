@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 // import { useState } from "react";
 import { Head, router, Link, usePage } from "@inertiajs/react";
+import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
 import AdsBanner from "@/Components/AdsBanner";
@@ -23,6 +24,7 @@ import PremiumCountdown from "@/Components/PremiumCountdown";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import InaugurationPopup from "@/Components/InaugurationPopup";
+import CottonCurrencyTrendChart from "@/Components/CottonCurrencyTrendChart";
 
 export default function Home({
     marketHistory = [],
@@ -163,59 +165,9 @@ export default function Home({
             </div>
 
             <div className="flex flex-col lg:flex-row">
-                {/* 2. SIDEBAR - FIXED ON LEFT */}
-                <aside className="hidden lg:block w-72 h-screen sticky top-8 bg-[#0a192f] border-r border-white/5 p-6 space-y-10 overflow-y-auto">
-                    <div className="mb-10">
-                        <img
-                            src="/images/logo_api_digestex2.png"
-                            className="h-12 w-auto mb-4"
-                            alt="Logo"
-                        />
-                        <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest block">
-                            {isEn
-                                ? "Premium Intelligence"
-                                : "Intelijen Premium"}
-                        </span>
-                    </div>
-
-                    <nav className="space-y-8">
-                        <div>
-                            <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">
-                                {isEn ? "Main Console" : "Konsol Utama"}
-                            </p>
-                            <ul className="space-y-4">
-                                <Link
-                                    href={route("home")}
-                                    className="flex items-center gap-3 text-sm font-bold text-white hover:text-yellow-500 transition group"
-                                >
-                                    <i className="fas fa-chart-line w-5 text-yellow-500/50 group-hover:text-yellow-500"></i>
-                                    {isEn ? "Market Radar" : "Radar Pasar"}
-                                </Link>
-                                <Link
-                                    href={route("companies.index")}
-                                    className="flex items-center gap-3 text-sm font-bold text-gray-400 hover:text-white transition group"
-                                >
-                                    <i className="fas fa-industry w-5 text-gray-500 group-hover:text-yellow-500"></i>
-                                    {isEn
-                                        ? "Industrial Directory"
-                                        : "Direktori Industri"}
-                                </Link>
-                                <li className="flex items-center gap-3 text-sm font-bold text-gray-400 cursor-not-allowed opacity-50">
-                                    <i className="fas fa-shopping-cart w-5"></i>
-                                    {isEn ? "Material Bursa" : "Bursa Bahan"}
-                                </li>
-                            </ul>
-                        </div>
-                    </nav>
-
-                    <div className="pt-10 border-t border-white/5">
-                        <div className="p-4 rounded-3xl bg-white/5 italic text-[10px] text-gray-400 leading-relaxed border border-white/5">
-                            {isEn
-                                ? '"Supporting Indonesia\'s Textile Digital Transformation with Centric PLM."'
-                                : '"Mendukung Transformasi Digital Tekstil Indonesia bersama Centric PLM."'}
-                        </div>
-                    </div>
-                </aside>
+                <div className="bg-[#0a192f] p-6 rounded-3xl shadow-xl mt-8">
+                    <div className="h-40 w-full"></div>
+                </div>
 
                 {/* 3. MAIN CONTENT AREA */}
                 <main className="flex-1 overflow-hidden relative">
@@ -223,45 +175,46 @@ export default function Home({
                     <InaugurationPopup isEn={isEn} />
                     <StockTicker topStocks={topStocks} />
                     {/* Tes tampilan tabel */}
-                    
-                    {/* Di bawah pemanggilan tabel topProducts */}
-<div className="mt-6 relative">
-    {/* Tabel hanya tampil 5 baris */}
-    <div className="overflow-hidden rounded-xl border border-gray-100">
-        {/* ... render tabel topProducts ... */}
-    </div>
 
-    {/* Pesan Premium (Paywall) */}
-    {!auth.user && (
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/90 to-transparent flex flex-col items-center justify-center p-6 text-center">
-            <p className="text-sm font-bold text-gray-900 mb-3">
-                Ingin melihat 1.200+ HS Code lainnya & Analisis Mendalam?
-            </p>
-            <Link 
-                href={route('login')}
-                className="bg-[#0a192f] text-white px-8 py-2 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-blue-900 transition-all shadow-xl"
-            >
-                Buka Data Premium Sekarang
-            </Link>
-        </div>
-    )}
-</div>
-                    
-                    
-                    
-                    
+                    {/* Di bawah pemanggilan tabel topProducts */}
+
+                    <div className="mt-6 relative">
+                        {/* Tabel hanya tampil 5 baris */}
+                        <div className="overflow-hidden rounded-xl border border-gray-100">
+                            {/* ... render tabel topProducts ... */}
+                        </div>
+
+                        {/* Pesan Premium (Paywall) */}
+                        {!auth.user && (
+                            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/90 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                                <p className="text-sm font-bold text-gray-900 mb-3">
+                                    Ingin melihat 1.200+ HS Code lainnya &
+                                    Analisis Mendalam?
+                                </p>
+                                <Link
+                                    href={route("login")}
+                                    className="bg-[#0a192f] text-white px-8 py-2 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-blue-900 transition-all shadow-xl"
+                                >
+                                    Buka Data Premium Sekarang
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="mt-20">
-                        <PremiumCountdown isEn={isEn} />
+                        {/* <PremiumCountdown isEn={isEn} />
                         <GarmentExportTable
                             topProducts={topProducts}
                             totalGarment={totalGarment}
                             garmentTrade={garmentTrade}
                             auth={auth}
                             isEn={isEn}
+                        /> */}
+                        <CottonCurrencyTrendChart
+                            data={marketHistory}
+                            isEn={isEn}
                         />
                     </div>
-
-
 
                     <PartnerSponsorship isEn={isEn} />
                     <SponsorSlider />

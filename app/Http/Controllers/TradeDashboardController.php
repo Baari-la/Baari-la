@@ -61,6 +61,14 @@ class TradeDashboardController extends Controller
         // 5. Spesifikasi Garmen untuk Kalkulator
         $garmenSpecs = config('garmen_specs');
 
+ // Ambil data harga kapas dan nilai Tukar 30 hari terakhir untuk member
+$history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->values();
+    $latest = $history->last();
+
+ 
+    $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->values();
+    $latest = $history->last();
+        
         // Kirim data ke React (Dashboard.jsx)
         return Inertia::render('Dashboard', [
             // Data Analitik Perdagangan
@@ -70,20 +78,38 @@ class TradeDashboardController extends Controller
             'fullTradeData' => $fullTradeData,
             
             // Data Market Intelligence (Sesuai props Dashboard.jsx)
-            'marketHistory' => $history->map(fn($item) => [
-                'month' => date('d M', strtotime($item->date)),
-                'price' => (float)$item->cotton_price,
-            ]),
+             'marketHistory' => $history->map(fn($item) => [
+            'month' => date('d M', strtotime($item->date)),
+            'price' => (float)$item->cotton_price,
+            'rate' => (float)$item->usd_idr,
+        ]),
             'cottonPrice' => $latestMarket->cotton_price ?? 71.31,
             'cottonTrend' => round($cottonChange, 2) . '%',
             'usd_idr' => $latestMarket->usd_idr ?? 16000,
-            
+            'cottonPrice' => $latest->cotton_price ?? 0,
+        'usd_idr' => $latest->usd_idr ?? 0,
             // Data Pendukung
+             'annualTrend' => $this->getAnnualTrendData(), 
             'memberStatus' => auth()->user()->is_premium ? 'Premium Member' : 'Regular Member',
             'exportValue' => '11.9', // Nanti bisa dihitung dinamis dari $annualTrend
             'lastUpdate' => now()->format('d M Y')
         ]);
     }
+
+private function getAnnualTrendData()
+{
+    return DB::table('trade_master_annual_hscode')
+        ->selectRaw("
+            tipe_arus,
+            SUM(val_2021) as '2021',
+            SUM(val_2022) as '2022',
+            SUM(val_2023) as '2023',
+            SUM(val_2024) as '2024',
+            SUM(val_2025) as '2025'
+        ")
+        ->groupBy('tipe_arus')
+        ->get();
+}
 
     public function calculate(Request $request)
     {
