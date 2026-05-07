@@ -32,6 +32,9 @@ Route::post('/language/{locale}', function ($locale) {
     return back();
 })->name('language.switch');
 
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/about', [HomeController::class, 'about'])->name('about');
+
 // Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/login', function () {
     return Inertia::render('Auth/Login'); // Sesuaikan dengan lokasi file Login.jsx Anda
@@ -64,8 +67,10 @@ Route::get('/v/{nomor_anggota}', [CompanyController::class, 'publicVerify'])->na
 Route::middleware(['auth', 'verified'])->group(function () {
     
     // Dashboard Utama User
-    Route::get('/dashboard', [MarketIntelligenceController::class, 'getDashboardData'])->name('dashboard');
- 
+    // Route::get('/dashboard', [MarketIntelligenceController::class, 'getDashboardData'])->name('dashboard');
+    Route::get('/dashboard', [TradeDashboardController::class, 'index'])->name('dashboard');
+    // Jika ada dashboard admin khusus
+    Route::get('/admin/dashboard', [HomeController::class, 'adminDashboard'])->name('admin.dashboard');
     // Profil Akun
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');

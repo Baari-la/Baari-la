@@ -223,6 +223,33 @@ export default function Home({
                     <InaugurationPopup isEn={isEn} />
                     <StockTicker topStocks={topStocks} />
                     {/* Tes tampilan tabel */}
+                    
+                    {/* Di bawah pemanggilan tabel topProducts */}
+<div className="mt-6 relative">
+    {/* Tabel hanya tampil 5 baris */}
+    <div className="overflow-hidden rounded-xl border border-gray-100">
+        {/* ... render tabel topProducts ... */}
+    </div>
+
+    {/* Pesan Premium (Paywall) */}
+    {!auth.user && (
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/90 to-transparent flex flex-col items-center justify-center p-6 text-center">
+            <p className="text-sm font-bold text-gray-900 mb-3">
+                Ingin melihat 1.200+ HS Code lainnya & Analisis Mendalam?
+            </p>
+            <Link 
+                href={route('login')}
+                className="bg-[#0a192f] text-white px-8 py-2 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-blue-900 transition-all shadow-xl"
+            >
+                Buka Data Premium Sekarang
+            </Link>
+        </div>
+    )}
+</div>
+                    
+                    
+                    
+                    
                     <div className="mt-20">
                         <PremiumCountdown isEn={isEn} />
                         <GarmentExportTable
@@ -233,6 +260,9 @@ export default function Home({
                             isEn={isEn}
                         />
                     </div>
+
+
+
                     <PartnerSponsorship isEn={isEn} />
                     <SponsorSlider />
                     {/* DASHBOARD WIDGETS */}

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MarketHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -35,22 +36,56 @@ class TradeDashboardController extends Controller
             ->groupBy('tipe_arus')
             ->get();
 
-             // 3. Ambil data spesifikasi garmen untuk fitur kalkulator
+        // 3. Ambil Riwayat Market 30 Hari (Untuk Grafik Recharts)
+        $history = MarketHistory::orderBy('date', 'desc')
+            ->take(30)
+            ->get()
+            ->reverse()
+            ->values();
+
+        $latestMarket = $history->last();
+        $previousMarket = $history->get($history->count() - 2);
+
+        $fullTradeData = DB::table('trade_master_annual_hscode')
+        ->where('tipe_arus', 'ekspor')
+        ->orderBy('val_2025', 'desc')
+        ->get();
+
+
+        // 4. Hitung Cotton Trend (Persentase)
+        $cottonChange = 0;
+        if ($latestMarket && $previousMarket && $previousMarket->cotton_price > 0) {
+            $cottonChange = (($latestMarket->cotton_price - $previousMarket->cotton_price) / $previousMarket->cotton_price) * 100;
+        }
+
+        // 5. Spesifikasi Garmen untuk Kalkulator
         $garmenSpecs = config('garmen_specs');
 
- $latestMarket = \App\Models\MarketHistory::orderBy('date', 'desc')->first();
- 
-        // Kirim data ke React (Halaman: resources/js/Pages/Dashboard/Trade.jsx)
-        return Inertia::render('Dashboard/Trade', [
+        // Kirim data ke React (Dashboard.jsx)
+        return Inertia::render('Dashboard', [
+            // Data Analitik Perdagangan
             'annualTrend' => $annualTrend,
             'monthlyCompare' => $monthlyCompare,
             'garmenSpecs' => $garmenSpecs,
-              'currentCotton' => $latestMarket->cotton_price ?? 71.31,
-        'currentExchange' => $latestMarket->usd_idr ?? 16000,
+            'fullTradeData' => $fullTradeData,
+            
+            // Data Market Intelligence (Sesuai props Dashboard.jsx)
+            'marketHistory' => $history->map(fn($item) => [
+                'month' => date('d M', strtotime($item->date)),
+                'price' => (float)$item->cotton_price,
+            ]),
+            'cottonPrice' => $latestMarket->cotton_price ?? 71.31,
+            'cottonTrend' => round($cottonChange, 2) . '%',
+            'usd_idr' => $latestMarket->usd_idr ?? 16000,
+            
+            // Data Pendukung
+            'memberStatus' => auth()->user()->is_premium ? 'Premium Member' : 'Regular Member',
+            'exportValue' => '11.9', // Nanti bisa dihitung dinamis dari $annualTrend
             'lastUpdate' => now()->format('d M Y')
         ]);
     }
-public function calculate(Request $request)
+
+    public function calculate(Request $request)
     {
         $request->validate([
             'hs_code' => 'required',
@@ -73,5 +108,4 @@ public function calculate(Request $request)
 
         return response()->json($result);
     }
-    
 }
