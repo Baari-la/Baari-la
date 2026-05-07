@@ -24,25 +24,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import InaugurationPopup from "@/Components/InaugurationPopup";
 
-
-
 export default function Home({
     marketHistory = [],
     latestMarket,
     latestNews = [],
-    cottonPrice,
+    // cottonPrice,
+    currentCotton,
     topProducts,
     topStocks,
+    currentExchange,
     totalGarment,
     garmentTrade,
     industrialData,
-   }) {
-    
+}) {
     const { props } = usePage();
     const auth = props.auth;
     const isEn = props.locale === "en" || auth?.locale === "en";
 
-    const currentCotton = latestMarket?.cotton_price || cottonPrice || "71.31";
+    // const currentCotton = latestMarket?.cotton_price || cottonPrice || "71.31";
     const [keyword, setKeyword] = useState("");
 
     // REDIRECT KE DIREKTORI DENGAN PARAMETER PENCARIAN
@@ -55,13 +54,13 @@ export default function Home({
     useEffect(() => {
         // 1. Check if user is now logged in
         // 2. Check if there is a saved URL in sessionStorage
-        const intendedUrl = sessionStorage.getItem('intended_url');
+        const intendedUrl = sessionStorage.getItem("intended_url");
 
         if (auth.user && intendedUrl) {
             // Remove it immediately so it doesn't trigger again
-            sessionStorage.removeItem('intended_url');
+            sessionStorage.removeItem("intended_url");
 
-            // Small delay (300ms) makes the transition feel smoother 
+            // Small delay (300ms) makes the transition feel smoother
             // after the page loads
             const timeout = setTimeout(() => {
                 router.get(intendedUrl);
@@ -82,15 +81,85 @@ export default function Home({
             />
 
             {/* 1. TICKER - STICKY TOP */}
-            <div className="bg-yellow-500 py-1 overflow-hidden sticky top-0 z-[60]">
-                <marquee className="font-bold text-[#0a192f] text-[10px] uppercase">
-                    {isEn
-                        ? "Live Market Intelligence"
-                        : "Intelijen Pasar Langsung"}
-                    : NY/ICE Cotton {currentCotton} USD/LB |
-                    {isEn ? " National Export Value" : " Nilai Ekspor Nasional"}{" "}
-                    : $11.9 Billion
-                </marquee>
+            {/* 1. TICKER - STICKY TOP */}
+            <div className="bg-[#0a192f] border-b border-white/5 py-1.5 overflow-hidden sticky top-0 z-[60] backdrop-blur-md">
+                <div className="flex animate-marquee whitespace-nowrap">
+                    {/* Teks Berjalan */}
+                    <div className="flex items-center">
+                        <span className="flex items-center gap-2 font-black text-yellow-500 text-[10px] uppercase mx-8">
+                            <span className="h-1.5 w-1.5 rounded-full bg-yellow-500 animate-ping"></span>
+                            {isEn
+                                ? "LIVE MARKET INTELLIGENCE"
+                                : "INTELIJEN PASAR LANGSUNG"}
+                        </span>
+
+                        <span className="font-bold text-white text-[10px] uppercase mx-8">
+                            NY/ICE COTTON:{" "}
+                            <span className="text-yellow-500">
+                                ${currentCotton}
+                            </span>{" "}
+                            USD/LB
+                        </span>
+
+                        <span className="font-bold text-white text-[10px] uppercase mx-8">
+                            {isEn ? "EXCHANGE RATE" : "KURS USD/IDR"}:{" "}
+                            <span className="text-emerald-400">
+                                Rp{" "}
+                                {parseFloat(currentExchange).toLocaleString(
+                                    "id-ID",
+                                )}
+                            </span>
+                        </span>
+
+                        <span className="font-bold text-white text-[10px] uppercase mx-8">
+                            {isEn ? "EST. POLYESTER" : "EST. POLIESTER"}:{" "}
+                            <span className="text-blue-400">$1,120</span>
+                        </span>
+                    </div>
+
+                    {/* Duplikat Teks (Agar Loop tidak putus) */}
+                    <div className="flex items-center">
+                        <span className="flex items-center gap-2 font-black text-yellow-500 text-[10px] uppercase mx-8">
+                            <span className="h-1.5 w-1.5 rounded-full bg-yellow-500 animate-ping"></span>
+                            {isEn
+                                ? "LIVE MARKET INTELLIGENCE"
+                                : "INTELIJEN PASAR LANGSUNG"}
+                        </span>
+                        <span className="font-bold text-white text-[10px] uppercase mx-8">
+                            NY/ICE COTTON:{" "}
+                            <span className="text-yellow-500">
+                                ${currentCotton}
+                            </span>{" "}
+                            USD/LB
+                        </span>
+                        <span className="font-bold text-white text-[10px] uppercase mx-8">
+                            {isEn ? "EXCHANGE RATE" : "KURS USD/IDR"}:{" "}
+                            <span className="text-emerald-400">
+                                Rp{" "}
+                                {parseFloat(currentExchange).toLocaleString(
+                                    "id-ID",
+                                )}
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                {/* Nyawa Animasi Marquee */}
+                <style
+                    dangerouslySetInnerHTML={{
+                        __html: `
+            @keyframes marquee-home {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+            }
+            .animate-marquee {
+                display: flex;
+                animation: marquee-home 30s linear infinite;
+                min-width: 200%;
+            }
+        `,
+                    }}
+                />
             </div>
 
             <div className="flex flex-col lg:flex-row">

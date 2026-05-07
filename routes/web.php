@@ -32,10 +32,12 @@ Route::post('/language/{locale}', function ($locale) {
     return back();
 })->name('language.switch');
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/login', function () {
     return Inertia::render('Auth/Login'); // Sesuaikan dengan lokasi file Login.jsx Anda
 })->name('login');
+Route::get('/', [MarketIntelligenceController::class, 'getHomeData'])->name('home');
+
 Route::inertia('/join-us', 'Company/JoinUs')->name('join.us');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/partnership', fn() => Inertia::render('Partnership/Index'))->name('partnership');
@@ -63,7 +65,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Dashboard Utama User
     Route::get('/dashboard', [MarketIntelligenceController::class, 'getDashboardData'])->name('dashboard');
-   
+ 
     // Profil Akun
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');

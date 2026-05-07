@@ -38,12 +38,15 @@ class TradeDashboardController extends Controller
              // 3. Ambil data spesifikasi garmen untuk fitur kalkulator
         $garmenSpecs = config('garmen_specs');
 
-
+ $latestMarket = \App\Models\MarketHistory::orderBy('date', 'desc')->first();
+ 
         // Kirim data ke React (Halaman: resources/js/Pages/Dashboard/Trade.jsx)
         return Inertia::render('Dashboard/Trade', [
             'annualTrend' => $annualTrend,
             'monthlyCompare' => $monthlyCompare,
             'garmenSpecs' => $garmenSpecs,
+              'currentCotton' => $latestMarket->cotton_price ?? 71.31,
+        'currentExchange' => $latestMarket->usd_idr ?? 16000,
             'lastUpdate' => now()->format('d M Y')
         ]);
     }
