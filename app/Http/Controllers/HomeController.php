@@ -12,40 +12,39 @@ class HomeController extends Controller
     public function index()
     {
  // Ambil data harga kapas dan nilai tukar 7 hari terakhir saja
-    $history = MarketHistory::orderBy('date', 'desc')->take(7)->get()->reverse()->values();
-    $latest = $history->last();
+    // Ambil data paling terbaru untuk Ticker (currentCotton & currentExchange)
+    $latestMarket = \App\Models\MarketHistory::orderBy('date', 'desc')->first();
+// app/Http/Controllers/HomeController.php
+$marketHistory = \App\Models\MarketHistory::orderBy('date', 'desc')
+    ->take(7)
+    ->get()
+    ->reverse()
+    ->values()
+    ->map(fn($item) => [
+        'month' => date('d M', strtotime($item->date)),
+        // Tambahkan (float) dan pastikan tidak ada karakter non-angka
+        'price' => (float) str_replace(',', '', $item->cotton_price), 
+    ]);
 
-        // Data Ticker & Bursa (Ringan)
-        $latestMarket = MarketHistory::orderBy('date', 'desc')->first();
-        
-        $topStocks = DB::table('companies')
-            ->where('stock_qty', '>', 0)
-            ->selectRaw('id as company_id, stock_ready_caption as product_name, SUM(stock_qty) as total_qty, stock_unit as unit')
-            ->groupBy('company_id', 'product_name', 'unit')
-            ->orderBy('total_qty', 'desc')
-            ->take(10)->get();
-
-
-    // Ambil hanya 5 Produk Garmen Teratas untuk Home (Teaser)
+    // Data 5 Produk Garmen Teratas (Sudah benar)
     $topProducts = DB::table('trade_master_annual_hscode')
         ->selectRaw("TRIM(hs_code) as hs_code, uraian_hs, vol_2025, val_2025")
         ->where('tipe_arus', 'ekspor')
         ->whereRaw("(TRIM(hs_code) LIKE '61%' OR TRIM(hs_code) LIKE '62%')")
         ->orderBy('val_2025', 'desc')
-        ->take(5) // Cukup tampilkan 5 saja di Home
+        ->take(5)
         ->get();
 
 
         return Inertia::render('Home', [
-            'currentCotton' => $latestMarket->cotton_price ?? 0,
-            
-            'currentExchange' => $latestMarket->usd_idr ?? 0,
-            'topStocks' => $topStocks,
-            'latestNews' => News::latest()->take(3)->get(),
-            'topProducts' => $topProducts,
-        'isLoggedIn' => auth()->check(), // Untuk cek apakah user perlu diarahkan login
-            // Badge admin tetap dikirim jika user login adalah admin
-            'pendingCount' => auth()->check() ? Company::where('status_verifikasi', 'pending')->count() : 0,
+            'currentCotton' => $latestMarket->cotton_price ?? 71.31, // Gunakan variabel yang baru dibuat
+        'marketHistory' => $marketHistory,
+        'currentExchange' => $latestMarket->usd_idr ?? 16000, // Gunakan variabel yang baru dibuat
+        'topStocks' => DB::table('companies')->where('stock_qty', '>', 0)->take(10)->get(),
+        'latestNews' => News::latest()->take(3)->get(),
+        'topProducts' => $topProducts,
+        'isLoggedIn' => auth()->check(),
+        'pendingCount' => auth()->check() ? Company::where('status_verifikasi', 'pending')->count() : 0,
         ]);
     }
 

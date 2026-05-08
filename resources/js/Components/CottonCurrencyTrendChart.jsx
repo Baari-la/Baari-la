@@ -9,9 +9,21 @@ import {
     YAxis,
 } from "recharts";
 
-const CottonCurrencyTrendChart = ({ data, isEn = false }) => {
+const CottonCurrencyTrendChart = ({ data = [], isEn = false }) => {
+    // Memastikan 'price' benar-benar angka dan tidak bernilai NaN
+    const safeData =
+        data && data.length > 0
+            ? data.map((item) => ({
+                  ...item,
+                  // Jika parseFloat gagal, berikan angka 0 agar tidak NaN
+                  price: isNaN(parseFloat(item.price))
+                      ? 0
+                      : parseFloat(item.price),
+              }))
+            : [{ month: "N/A", price: 0 }];
+
     return (
-        <div className="bg-[#0a192f] p-8 rounded-[40px] shadow-2xl border border-white/5 relative overflow-hidden group">
+        <div className="bg-[#0a192f] p-8 rounded-[40px] shadow-2xl border border-white/5 relative overflow-hidden">
             {/* Dekorasi Background */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
 
@@ -32,9 +44,17 @@ const CottonCurrencyTrendChart = ({ data, isEn = false }) => {
                 </div>
             </div>
 
-            <div className="h-64 w-full relative z-10">
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data}>
+            {/* Container Utama - Kita paksa tinggi 300px di sini */}
+            <div
+                className="w-full relative z-10"
+                style={{ height: "300px", minHeight: "300px" }}
+            >
+                {/* Tambahkan minHeight di dalam props ResponsiveContainer */}
+                <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+                    <AreaChart
+                        data={safeData}
+                        margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+                    >
                         <defs>
                             <linearGradient
                                 id="colorCotton"
@@ -55,11 +75,13 @@ const CottonCurrencyTrendChart = ({ data, isEn = false }) => {
                                 />
                             </linearGradient>
                         </defs>
+
                         <CartesianGrid
                             strokeDasharray="3 3"
                             vertical={false}
                             stroke="#ffffff10"
                         />
+
                         <XAxis
                             dataKey="month"
                             axisLine={false}
@@ -71,8 +93,9 @@ const CottonCurrencyTrendChart = ({ data, isEn = false }) => {
                             }}
                             dy={10}
                         />
-                        {/* YAxis disembunyikan agar tampilan lebih minimalis & bersih */}
+
                         <YAxis hide domain={["auto", "auto"]} />
+
                         <Tooltip
                             contentStyle={{
                                 backgroundColor: "#0f172a",
@@ -80,7 +103,6 @@ const CottonCurrencyTrendChart = ({ data, isEn = false }) => {
                                 borderRadius: "16px",
                                 fontSize: "11px",
                                 color: "#fff",
-                                boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.3)",
                             }}
                             itemStyle={{ color: "#ebb308", fontWeight: "bold" }}
                             formatter={(value) => [
@@ -88,6 +110,7 @@ const CottonCurrencyTrendChart = ({ data, isEn = false }) => {
                                 isEn ? "Price" : "Harga",
                             ]}
                         />
+
                         <Area
                             type="monotone"
                             dataKey="price"
@@ -95,14 +118,15 @@ const CottonCurrencyTrendChart = ({ data, isEn = false }) => {
                             strokeWidth={4}
                             fillOpacity={1}
                             fill="url(#colorCotton)"
-                            animationDuration={2500}
+                            animationDuration={2000}
+                            isAnimationActive={true}
                         />
                     </AreaChart>
                 </ResponsiveContainer>
             </div>
 
             <div className="mt-6 flex justify-between items-center border-t border-white/5 pt-6">
-                <p className="text-[9px] text-gray-500 font-bold tracking-widest uppercase italic">
+                <p className="text-[9px] text-gray-500 font-bold tracking-widest uppercase italic text-shadow-sm">
                     {isEn
                         ? "Source: NY/ICE Global Exchange"
                         : "Sumber: Bursa Global NY/ICE"}
