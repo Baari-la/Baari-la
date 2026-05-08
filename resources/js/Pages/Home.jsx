@@ -25,15 +25,17 @@ export default function Home(props) {
         topProducts = [],
         topStocks = [],
         latestNews = [],
-        garmentTrade = {},
-        totalGarment = 0,
+       
         locale,
     } = props;
-
+   // 3. Tes Alert lagi
+    alert("Tes Baru: " + totalGarment);
     // 2. States & Localization
+      const garmentTrade = props.garmentTrade || { export_pcs: 0, import_pcs: 0 };
     const [keyword, setKeyword] = useState("");
     const isEn = locale === "en" || auth?.user?.locale === "en";
-
+ // TAMBAHKAN INI: Agar totalGarment tidak nol
+    const totalGarment = garmentTrade?.export_pcs || 0;
     // 3. Handle intended URL redirect after login
     useEffect(() => {
         const intendedUrl = sessionStorage.getItem("intended_url");
@@ -50,6 +52,7 @@ export default function Home(props) {
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route("companies.index"), { search: keyword });
+       
     };
 
     return (
