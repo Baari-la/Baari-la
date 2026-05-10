@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Head, router, Link, usePage } from "@inertiajs/react";
+
+// Perbaikan: Gunakan PascalCase untuk semua import komponen
 import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
 import NewsSection from "@/Components/Home/NewsSection";
@@ -16,27 +18,29 @@ import GarmentExportTable from "@/Components/Home/GarmentExportTable";
 import CottonCurrencyTrendChart from "@/Components/CottonCurrencyTrendChart";
 
 export default function Home(props) {
-    // 1. Destructuring Props dari HomeController
+    // 1. Ambil data dari props
+    console.log("CEK PROPS:", props);
+
+    const garmentTrade = props.garmentTrade || { export_pcs: 0, import_pcs: 0 };
+    const totalGarment = garmentTrade.export_pcs || 0;
+    const totalImport = garmentTrade.import_pcs || 0;
+    const tradeSurplus = totalGarment - totalImport;
+
     const {
         auth,
         marketHistory = [],
-        currentCotton = "0.00",
-        currentExchange = "0",
         topProducts = [],
         topStocks = [],
-        latestNews = [],
-       
+        currentCotton = "0.00",
+        currentExchange = "0",
+        latestNews,
         locale,
     } = props;
-   // 3. Tes Alert lagi
-    alert("Tes Baru: " + totalGarment);
-    // 2. States & Localization
-      const garmentTrade = props.garmentTrade || { export_pcs: 0, import_pcs: 0 };
-    const [keyword, setKeyword] = useState("");
+
     const isEn = locale === "en" || auth?.user?.locale === "en";
- // TAMBAHKAN INI: Agar totalGarment tidak nol
-    const totalGarment = garmentTrade?.export_pcs || 0;
-    // 3. Handle intended URL redirect after login
+    const [keyword, setKeyword] = useState("");
+
+    // 2. Auth redirect logic
     useEffect(() => {
         const intendedUrl = sessionStorage.getItem("intended_url");
         if (auth.user && intendedUrl) {
@@ -48,11 +52,10 @@ export default function Home(props) {
         }
     }, [auth.user]);
 
-    // 4. Handle Search Function
+    // 3. Search handler
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route("companies.index"), { search: keyword });
-       
     };
 
     return (
@@ -92,7 +95,7 @@ export default function Home(props) {
                             </span>
                         </span>
                     </div>
-                    {/* Duplikat untuk Loop tanpa putus */}
+                    {/* Duplicate for Seamless Loop */}
                     <div className="flex items-center">
                         <span className="flex items-center gap-2 font-black text-yellow-500 text-[10px] uppercase mx-8">
                             <span className="h-1.5 w-1.5 rounded-full bg-yellow-500 animate-ping"></span>
@@ -111,7 +114,10 @@ export default function Home(props) {
                 </div>
                 <style
                     dangerouslySetInnerHTML={{
-                        __html: `@keyframes marquee-home { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .animate-marquee { display: flex; animation: marquee-home 30s linear infinite; min-width: 200%; }`,
+                        __html: `
+                        @keyframes marquee-home { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+                        .animate-marquee { display: flex; animation: marquee-home 30s linear infinite; min-width: 200%; }
+                    `,
                     }}
                 />
             </div>
@@ -122,7 +128,7 @@ export default function Home(props) {
                 <InaugurationPopup isEn={isEn} />
                 <StockTicker topStocks={topStocks} />
 
-                {/* --- SECTION: MARKET CHART (7 DAYS) --- */}
+                {/* --- MARKET CHART --- */}
                 <div
                     className="mt-20 block w-full"
                     style={{ minHeight: "350px" }}
@@ -135,7 +141,7 @@ export default function Home(props) {
                     </div>
                 </div>
 
-                {/* --- SECTION: HERO & SEARCH --- */}
+                {/* --- HERO & SEARCH --- */}
                 <div className="px-6 pt-20 pb-16 text-center relative overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
                     <h1 className="text-6xl md:text-8xl font-black mb-6 leading-none uppercase tracking-tighter italic relative z-10">
@@ -169,14 +175,17 @@ export default function Home(props) {
                                         : "Cari 1.982+ industri & berita..."
                                 }
                             />
-                            <button className="bg-yellow-500 text-[#0a192f] font-black px-10 py-4 rounded-[22px] text-[10px] uppercase tracking-widest shadow-xl hover:bg-yellow-400 transition-all">
+                            <button
+                                type="submit"
+                                className="bg-yellow-500 text-[#0a192f] font-black px-10 py-4 rounded-[22px] text-[10px] uppercase tracking-widest shadow-xl hover:bg-yellow-400 transition-all"
+                            >
                                 {isEn ? "EXPLORE" : "JELAJAHI"}
                             </button>
                         </div>
                     </form>
                 </div>
 
-                {/* --- SECTION: TOP PRODUCTS & PAYWALL --- */}
+                {/* --- TOP PRODUCTS & PAYWALL --- */}
                 <div className="px-6 mb-24">
                     <div className="max-w-7xl mx-auto relative">
                         <div
@@ -191,7 +200,6 @@ export default function Home(props) {
                             />
                         </div>
 
-                        {/* Paywall Overlay */}
                         {!auth.user && (
                             <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-[#0a192f]/80 to-transparent flex flex-col items-center justify-end pb-20 p-6 text-center z-20">
                                 <div className="bg-[#0f172a]/90 backdrop-blur-2xl p-10 rounded-[40px] border border-white/10 shadow-2xl max-w-lg">
@@ -222,6 +230,7 @@ export default function Home(props) {
                     </div>
                 </div>
 
+                {/* --- SECTIONS --- */}
                 <PartnerSponsorship isEn={isEn} />
                 <SponsorSlider />
                 <PartnerLogo />

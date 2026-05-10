@@ -39,8 +39,8 @@ Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/login', function () {
     return Inertia::render('Auth/Login'); // Sesuaikan dengan lokasi file Login.jsx Anda
 })->name('login');
-Route::get('/', [MarketIntelligenceController::class, 'getHomeData'])->name('home');
-
+// Route::get('/', [MarketIntelligenceController::class, 'getHomeData'])->name('home');
+Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::inertia('/join-us', 'Company/JoinUs')->name('join.us');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/partnership', fn() => Inertia::render('Partnership/Index'))->name('partnership');

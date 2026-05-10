@@ -24,28 +24,28 @@ $marketHistory = \App\Models\MarketHistory::orderBy('date', 'desc')
         'month' => date('d M', strtotime($item->date)),
         // Tambahkan (float) dan pastikan tidak ada karakter non-angka
         'price' => (float) str_replace(',', '', $item->cotton_price), 
-    ]);
+    'exchange' => (float) $item->usd_idr,
+        ]);
 
-    $garmentTrade = DB::table('trade_master_annual_hscode')
-    ->selectRaw("
-        SUM(CASE WHEN tipe_arus = 'ekspor' THEN 
-            CASE 
-                WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 * 5.5
-                WHEN TRIM(hs_code) LIKE '6110%' THEN vol_2025 * 2.5
-                WHEN TRIM(hs_code) LIKE '6203%' OR TRIM(hs_code) LIKE '6204%' THEN vol_2025 * 1.8
-                ELSE vol_2025 * 4.0
-            END ELSE 0 END) as export_pcs,
-        SUM(CASE WHEN tipe_arus = 'impor' THEN 
-            CASE 
-                WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 * 5.5
-                ELSE vol_2025 * 4.0
-            END ELSE 0 END) as import_pcs
-    ")
-    ->where(function($q) {
-        $q->whereRaw("TRIM(hs_code) LIKE '61%'")
-          ->orWhereRaw("TRIM(hs_code) LIKE '62%'");
-    })
-    ->first();
+     // Gunakan kueri normal Anda yang sudah terbukti jalan
+    $garmentTradeData = DB::table('trade_master_annual_hscode')
+        ->selectRaw("
+            SUM(CASE WHEN tipe_arus = 'ekspor' THEN 
+                CASE 
+                    WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 * 5.5
+                    WHEN TRIM(hs_code) LIKE '6110%' THEN vol_2025 * 2.5
+                    WHEN TRIM(hs_code) LIKE '6203%' OR TRIM(hs_code) LIKE '6204%' THEN vol_2025 * 1.8
+                    WHEN TRIM(hs_code) LIKE '6111%' OR TRIM(hs_code) LIKE '6209%' THEN vol_2025 * 8.0
+                    ELSE vol_2025 * 4.0
+                END ELSE 0 END) as export_pcs,
+            SUM(CASE WHEN tipe_arus = 'impor' THEN 
+                CASE 
+                    WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 * 5.5
+                    ELSE vol_2025 * 4.0
+                END ELSE 0 END) as import_pcs
+        ")
+        ->whereRaw("(TRIM(hs_code) LIKE '61%' OR TRIM(hs_code) LIKE '62%')")
+        ->first();
 
 // 3. Ambil 5 Komoditas Teratas
 $topProducts = DB::table('trade_master_annual_hscode')
@@ -59,25 +59,34 @@ $topProducts = DB::table('trade_master_annual_hscode')
     ->take(5)
     ->get();
 
+     // 2. Data Bursa Stok (Pindahan dari HomeController)
+        $topStocks = DB::table('companies')
+            ->where('stock_qty', '>', 0)
+            ->selectRaw('
+                id as company_id, 
+                stock_ready_caption as product_name, 
+                SUM(stock_qty) as total_qty, 
+                stock_unit as unit
+            ')
+            ->groupBy('company_id', 'product_name', 'unit')
+            ->orderBy('total_qty', 'desc')
+            ->take(10)
+            ->get();
 
-        return Inertia::render('Home', [
 
- [
-            'currentCotton'   => $latestMarket->cotton_price ?? 71.31,
-            'marketHistory'   => $marketHistory,
-            'currentExchange' => $latestMarket->usd_idr ?? 16000,
-            'topStocks'       => DB::table('companies')->where('stock_qty', '>', 0)->take(10)->get(),
-            'latestNews'      => News::latest()->take(3)->get(),
-            'topProducts'     => $topProducts,
-            'isLoggedIn'      => auth()->check(),
-            'pendingCount'    => auth()->check() ? Company::where('status_verifikasi', 'pending')->count() : 0,
-            // Perbaikan struktur di sini:
-            'garmentTrade'    => [
-                'export_pcs' => (float) ($garmentTrade->export_pcs ?? 0),
-                'import_pcs' => (float) ($garmentTrade->import_pcs ?? 0),
-            ], // Tutup array ga
-    ],
-        ]);
+  return Inertia::render('Home', [
+    // 'marketHistory' => MarketHistory::orderBy('date', 'asc')->take(30)->get(),
+     'marketHistory' => $marketHistory,
+    'topStocks'     => $topStocks,
+    'latestNews'    => News::latest()->take(3)->get(),
+    'topProducts'   => $topProducts,
+      'currentCotton'   => $latestMarket->cotton_price ?? 71.31,
+    'currentExchange' => $latestMarket->usd_idr ?? 16000,
+    'garmentTrade'    => $garmentTradeData,
+     // TAMBAHKAN BARIS INI:
+    'totalGarment'  => (float) ($garmentTrade->export_pcs ?? 0),
+    'pendingCount'  => auth()->check() ? Company::where('status_verifikasi', 'pending')->count() : 0,
+]);
     }
 
 
