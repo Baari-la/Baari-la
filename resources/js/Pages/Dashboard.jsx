@@ -1,6 +1,6 @@
 import { AlertCircle, Download } from "lucide-react";
 import StockTicker from "@/Components/StockTicker";
-
+import CottonCurrencyTrendChart from "@/Components/CottonCurrencyTrendChart";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
 import html2canvas from "html2canvas";
@@ -50,8 +50,9 @@ export default function Dashboard({
     exportValue,
     memberStatus,
 }) {
-    // FUNGSI CAPTURE LAPORAN
-    const { auth } = usePage().props;
+    // AMBIL SEMUA DATA DARI usePage
+    const { auth, locale } = usePage().props;
+    const isEn = locale === "en" || auth?.user?.locale === "en";
     const exportAsImage = async (elementId, fileName) => {
         const element = document.getElementById(elementId);
         const canvas = await html2canvas(element, {
@@ -77,6 +78,50 @@ export default function Dashboard({
             <div className="py-12 bg-gray-50">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {/* Selamat datang */}
+                    {/* Tombol Update Profil Perusahaan */}
+                    {/* Section: Update Data Perusahaan */}
+                    <div className="mb-10 bg-gradient-to-r from-[#0f172a] to-[#1e293b] p-8 rounded-[40px] border border-white/10 shadow-2xl flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div className="flex items-center gap-6">
+                            <div className="bg-yellow-500/20 w-16 h-16 rounded-3xl flex items-center justify-center border border-yellow-500/30">
+                                <i className="fas fa-building text-yellow-500 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">
+                                    {isEn
+                                        ? "Corporate Data Integrity"
+                                        : "Integritas Data Perusahaan"}
+                                </h2>
+                                <p className="text-gray-400 text-xs mt-1 max-w-md">
+                                    {isEn
+                                        ? "Keep your industrial profile updated to ensure Big Data accuracy for the national textile ecosystem."
+                                        : "Pastikan profil industri Anda mutakhir untuk akurasi Big Data ekosistem pertekstilan nasional."}
+                                </p>
+                            </div>
+                        </div>
+                        {auth.user.company_id && (
+                            <Link
+                                href={route(
+                                    "companies.edit",
+                                    auth.user.company_id,
+                                )}
+                                className="group bg-yellow-500 text-[#0a192f] px-10 py-4 rounded-full font-black text-[11px] uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-xl shadow-yellow-500/10 flex items-center gap-3 whitespace-nowrap"
+                            >
+                                <i className="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-500"></i>
+                                {isEn
+                                    ? "Update Corporate Profile"
+                                    : "Update Profil Perusahaan"}
+                            </Link>
+                        )}
+
+                        {/* OPSIONAL: TAMPILKAN PESAN JIKA TIDAK ADA COMPANY ID */}
+                        {!auth.user.company_id && (
+                            <p className="text-amber-500 text-[10px] font-bold italic">
+                                *Data profil belum terhubung. Hubungi Admin API.
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Batas tombol Update */}
 
                     <div className="bg-gradient-to-r from-blue-700 to-indigo-900 rounded-3xl p-8 mb-8 text-white shadow-2xl relative overflow-hidden">
                         <div className="relative z-10">
@@ -205,54 +250,12 @@ export default function Dashboard({
                     <div id="capture-area" className="p-4 rounded-3xl">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {/* GRAFIK HARGA KAPAS */}
-                            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                                <h4 className="font-bold text-gray-800 text-lg mb-6 italic">
-                                    Cotton Price Analysis
-                                </h4>
-                                <div className="h-64 w-full">
-                                    <ResponsiveContainer
-                                        width="100%"
-                                        height="100%"
-                                    >
-                                        <AreaChart data={data}>
-                                            <defs>
-                                                <linearGradient
-                                                    id="colorPrice"
-                                                    x1="0"
-                                                    y1="0"
-                                                    x2="0"
-                                                    y2="1"
-                                                >
-                                                    <stop
-                                                        offset="5%"
-                                                        stopColor="#ebb308"
-                                                        stopOpacity={0.2}
-                                                    />
-                                                    <stop
-                                                        offset="95%"
-                                                        stopColor="#ebb308"
-                                                        stopOpacity={0}
-                                                    />
-                                                </linearGradient>
-                                            </defs>
-                                            <Tooltip
-                                                contentStyle={{
-                                                    borderRadius: "12px",
-                                                    border: "none",
-                                                }}
-                                            />
-                                            <Area
-                                                type="monotone"
-                                                dataKey="price"
-                                                stroke="#ebb308"
-                                                strokeWidth={3}
-                                                fill="url(#colorPrice)"
-                                            />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
-                                </div>
+                            <div className="bg-white rounded-[40px] shadow-sm overflow-hidden border border-gray-100">
+                                <CottonCurrencyTrendChart
+                                    data={marketHistory} // Pastikan variabel ini dikirim dari Controller
+                                    isEn={isEn}
+                                />
                             </div>
-
                             {/* GRAFIK TUJUAN EKSPOR */}
                             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-gray-900">
                                 <h4 className="font-bold text-gray-800 text-lg mb-6 italic">

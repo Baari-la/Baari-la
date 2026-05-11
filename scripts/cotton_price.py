@@ -8,16 +8,24 @@ def update_market_data():
     try:
         print("🔄 Mengambil data bursa harian...")
         
-        # 1. AMBIL DATA
-        cotton = yf.Ticker("CT=F").history(period="2d")
-        forex = yf.Ticker("IDR=X").history(period="2d")
+        # 1. AMBIL DATA (Gunakan period 5d untuk memastikan index -2 selalu ada)
+        cotton_ticker = yf.Ticker("CT=F")
+        forex_ticker = yf.Ticker("IDR=X")
         
-        c_price = round(cotton['Close'].iloc[-1], 2)
-        c_prev = cotton['Close'].iloc[-2]
+        cotton_hist = cotton_ticker.history(period="5d")
+        forex_hist = forex_ticker.history(period="5d")
+        
+        if cotton_hist.empty or forex_hist.empty:
+            print("⚠️ Data bursa tidak ditemukan hari ini.")
+            return
+
+        # Ambil harga penutupan terbaru
+        c_price = round(float(cotton_hist['Close'].iloc[-1]), 2)
+        c_prev = float(cotton_hist['Close'].iloc[-2])
         c_change = round(((c_price - c_prev) / c_prev) * 100, 2)
 
-        f_price = round(forex['Close'].iloc[-1], 2)
-        f_prev = forex['Close'].iloc[-2]
+        f_price = round(float(forex_hist['Close'].iloc[-1]), 2)
+        f_prev = float(forex_hist['Close'].iloc[-2])
         f_change = round(f_price - f_prev, 2)
 
         # 2. SIMPAN KE DATABASE (digestex_v2)
@@ -31,6 +39,7 @@ def update_market_data():
                  VALUES (%s, %s, %s, %s, %s)
                  ON DUPLICATE KEY UPDATE 
                  cotton_price = VALUES(cotton_price), usd_idr = VALUES(usd_idr), updated_at = VALUES(updated_at)"""
+        
         cursor.execute(sql, (current_date, c_price, f_price, datetime.now(), datetime.now()))
         db.commit()
         db.close()
@@ -44,12 +53,12 @@ def update_market_data():
         output_path = "C:/XAMPP/htdocs/digestex_v2/public/data/market_live.json"
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         with open(output_path, "w") as f:
-            json.dump(result, f)
+            json.dump(result, f, indent=4)
             
         print(f"✅ Berhasil! Kapas: ${c_price} | Kurs: Rp {f_price}")
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"❌ Error Detail: {e}")
 
 if __name__ == "__main__":
     update_market_data()

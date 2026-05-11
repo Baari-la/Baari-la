@@ -51,7 +51,7 @@ class AuthenticatedSessionController extends Controller
     $request->session()->regenerate();
 
     // Arahkan ke Intelligence Center sesuai keinginan Bapak
-    return redirect()->intended('/intelligence-center'); 
+    return redirect()->intended('/dashboard'); 
 }
 
 

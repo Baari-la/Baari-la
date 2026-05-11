@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\CompanyController;
@@ -16,104 +15,89 @@ use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\MarketIntelligenceController;
 
 /*
 
 |--------------------------------------------------------------------------
-| LEVEL 1: PUBLIK (Akses Tanpa Login)
+| LEVEL 1: PUBLIK (Tanpa Login)
 |--------------------------------------------------------------------------
 */
-Route::post('/language/{locale}', function ($locale) {
-    if (in_array($locale, ['en', 'id'])) {
-        session()->put('locale', $locale);
-        App::setLocale($locale);
-    }
-    return back();
-})->name('language.switch');
-
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
-
-// Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/login', function () {
-    return Inertia::render('Auth/Login'); // Sesuaikan dengan lokasi file Login.jsx Anda
-})->name('login');
-// Route::get('/', [MarketIntelligenceController::class, 'getHomeData'])->name('home');
+Route::get('/login', fn() => Inertia::render('Auth/Login'))->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-Route::inertia('/join-us', 'Company/JoinUs')->name('join.us');
-Route::get('/about', [HomeController::class, 'about'])->name('about');
-Route::get('/partnership', fn() => Inertia::render('Partnership/Index'))->name('partnership');
-Route::get('/pricing', fn() => Inertia::render('Auth/PricingPage'))->name('pricing.index');
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+// LEVEL 1: PUBLIK
 Route::get('/regulation', fn() => inertia('Regulation/Index'))->name('regulation.index');
 Route::get('/matchmaking', fn() => inertia('Matchmaking/Index'))->name('matchmaking.index');
 
-// News - Akses Umum (Filter Premium dilakukan di dalam Controller)
 Route::get('/news/{news:slug}', [NewsController::class, 'show'])->name('news.show');
+Route::get('/partnership', fn() => Inertia::render('Partnership/Index'))->name('partnership');
+Route::get('/pricing', fn() => Inertia::render('Auth/PricingPage'))->name('pricing.index');
+Route::get('/v/{nomor_anggota}', [CompanyController::class, 'publicVerify'])->name('companies.public_verify');
 
 // Google Auth
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
-// Verifikasi Publik (QR Scan)
-Route::get('/v/{nomor_anggota}', [CompanyController::class, 'publicVerify'])->name('companies.public_verify');
+// Language Switch
+Route::post('/language/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'id'])) {
+        session()->put('locale', $locale);
+    }
+    return back();
+})->name('language.switch');
 
 /*
 
 |--------------------------------------------------------------------------
-| LEVEL 2: MEMBER (Wajib Login - Free, API, Premium)
+| LEVEL 2: MEMBER (Login Google / Free)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->group(function () {
     
-    // Dashboard Utama User
-    // Route::get('/dashboard', [MarketIntelligenceController::class, 'getDashboardData'])->name('dashboard');
+    // Akses Dashboard Dasar
     Route::get('/dashboard', [TradeDashboardController::class, 'index'])->name('dashboard');
-    // Jika ada dashboard admin khusus
-    Route::get('/admin/dashboard', [HomeController::class, 'adminDashboard'])->name('admin.dashboard');
-    // Profil Akun
+    
+    // Profil User
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');
         Route::patch('/profile', 'update')->name('profile.update');
         Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
 
-    // Perusahaan & Direktori
+    // Direktori Perusahaan & Join Us
     Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
     Route::get('/companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
-    Route::get('/members', function (Request $request) {
-        return Inertia::render('Members/Index', [
-            'members' => Member::all(),
-            'initialSearch' => $request->query('search')
-        ]);
-    })->name('members.list');
-
-    // Trade & Inventory Dasar
-    Route::get('/trade-dashboard', [TradeDashboardController::class, 'index'])->name('trade.dashboard');
-    Route::get('/inventory', [TradeIntelligenceController::class, 'indexInventory'])->name('inventory.index');
+    Route::inertia('/join-us', 'Company/JoinUs')->name('join.us');
+    Route::post('/companies', [CompanyController::class, 'store'])->name('companies.store');
     Route::post('/premium-request', [CompanyController::class, 'requestPremium'])->name('premium.request');
 });
 
 /*
 
 |--------------------------------------------------------------------------
-| LEVEL 3: KHUSUS ANGGOTA API & PREMIUM (High-Level Access)
+| LEVEL 3: ANGGOTA API & PREMIUM (High-Level Data)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
+    
+    // Fitur Update Data Perusahaan (Tombol Update di Dashboard)
+    Route::get('/my-company/edit', [CompanyController::class, 'edit'])->name('companies.edit_self');
+    Route::get('/companies/{company}/edit', [CompanyController::class, 'edit'])->name('companies.edit');
+    Route::post('/companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
+
     // Intelligence & Radar
-     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
     Route::get('/intelligence-center', [AnalyticsController::class, 'deepAnalysis'])->name('intelligence.center');
     Route::get('/trade-radar', [TradeIntelligenceController::class, 'index'])->name('trade.radar');
-    
-    // Inventory Management
     Route::get('/inventory/create', [TradeIntelligenceController::class, 'create'])->name('inventory.create');
     Route::post('/inventory', [TradeIntelligenceController::class, 'storeInventory'])->name('inventory.store');
-
-    // Tools & Sertifikat
+    // Inventory & Tools
+    Route::get('/inventory', [TradeIntelligenceController::class, 'indexInventory'])->name('inventory.index');
     Route::get('/industrial-tools/calculator', fn() => Inertia::render('Tools/GarmentCalculatorPage'))->name('tools.calculator');
+    
+    // QR & Sertifikat
     Route::get('/my-company/certificate', [CompanyController::class, 'downloadMyCertificate'])->name('companies.my_certificate');
-    Route::get('/companies/{company}/download-qr', [CompanyController::class, 'downloadQrCode'])->name('companies.download_qr');
 });
 
 /*
@@ -123,20 +107,7 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard Admin
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::post('/approve-update/{id}', [AdminDashboardController::class, 'approveUpdate'])->name('approve-update');
-    
-    // Gallery Management
-    Route::resource('gallery', GalleryController::class)->names('gallery');
-
-    // News Management (Internal Admin)
-    Route::controller(NewsController::class)->group(function () {
-        Route::get('/news/create', 'create')->name('news.create');
-        Route::post('/news', 'store')->name('news.store');
-        Route::get('/news/{news}/edit', 'edit')->name('news.edit');
-        Route::put('/news/{news}', 'update')->name('news.update');
-        Route::delete('/news/{news}', 'destroy')->name('news.destroy');
-        Route::post('/news/translate', 'translate')->name('news.translate');
-    });
+    Route::resource('gallery', GalleryController::class);
+    Route::post('/companies/{company}/verify', [CompanyController::class, 'verify'])->name('companies.verify');
 });

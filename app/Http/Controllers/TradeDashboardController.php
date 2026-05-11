@@ -68,11 +68,21 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
  
     $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->values();
     $latest = $history->last();
+
+     $marketHistory = \App\Models\MarketHistory::orderBy('date', 'desc')
+        ->take(7)->get()->reverse()->values()
+        ->map(fn($item) => [
+            'month'    => date('d M', strtotime($item->date)),
+            'price'    => (float) $item->cotton_price,
+            'exchange' => (float) $item->usd_idr,
+        ]);
+    
         
         // Kirim data ke React (Dashboard.jsx)
         return Inertia::render('Dashboard', [
             // Data Analitik Perdagangan
             'annualTrend' => $annualTrend,
+            'marketHistory' => $marketHistory,
             'monthlyCompare' => $monthlyCompare,
             'garmenSpecs' => $garmenSpecs,
             'fullTradeData' => $fullTradeData,
