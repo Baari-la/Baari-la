@@ -30,6 +30,8 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 // LEVEL 1: PUBLIK
 Route::get('/regulation', fn() => inertia('Regulation/Index'))->name('regulation.index');
 Route::get('/matchmaking', fn() => inertia('Matchmaking/Index'))->name('matchmaking.index');
+Route::post('/companies/register-umum', [CompanyController::class, 'publicRegister'])->name('companies.public_register');
+
 
 Route::get('/news/{news:slug}', [NewsController::class, 'show'])->name('news.show');
 Route::get('/partnership', fn() => Inertia::render('Partnership/Index'))->name('partnership');
@@ -67,6 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Direktori Perusahaan & Join Us
+     Route::get('/company/create', [CompanyController::class, 'create'])->name('companies.create');
     Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
     Route::get('/companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
     Route::inertia('/join-us', 'Company/JoinUs')->name('join.us');
@@ -108,6 +111,10 @@ Route::middleware(['auth'])->group(function () {
 */
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/pending-updates', [AdminDashboardController::class, 'pendingUpdates'])->name('pending-updates');
+    Route::post('/approve-update/{id}', [AdminDashboardController::class, 'approveUpdate'])->name('approve-update');
+    Route::post('/reject-update/{id}', [AdminDashboardController::class, 'rejectUpdate'])->name('reject-update');
     Route::resource('gallery', GalleryController::class);
     Route::post('/companies/{company}/verify', [CompanyController::class, 'verify'])->name('companies.verify');
+    
 });

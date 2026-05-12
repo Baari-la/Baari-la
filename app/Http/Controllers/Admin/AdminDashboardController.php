@@ -88,30 +88,28 @@ class AdminDashboardController extends Controller
 
         
         // 4. Render ke Inertia
-        return Inertia::render('Admin/Dashboard', [
+       return Inertia::render('Admin/Dashboard', [
     'stats' => [
         'total_companies' => $totalCompanies,
-        'gold_members' => Company::where('membership_type', 'gold_member')->count(),
+        'gold_members'    => Company::where('membership_type', 'gold_member')->count(),
         'premium_requests' => DB::table('premium_requests')->where('status', 'pending')->count(),
+        // Tambahkan hitungan angka untuk badge notifikasi
+        'pending_updates_count' => \App\Models\CompanyUpdate::where('status', 'pending')->count(),
     ],
     
-    // Perbaikan: Jangan gunakan kurung siku tambahan di sini
-    'pendingUpdates' => CompanyUpdate::with(['company', 'user'])
+    // Data list untuk tabel audit admin
+    'pendingUpdates'  => \App\Models\CompanyUpdate::with(['company', 'user'])
                         ->where('status', 'pending')
                         ->latest()
                         ->get(),
 
-    'recentCompanies' => Company::latest()->take(10)->get(), // Gunakan satu nama variabel yang konsisten
-     'stockOverview' => $stockOverview,
-    'healthStats' => $healthStats,
-    'industrialData' => $industrialData,
-    'pendingCount' => Company::where('status_verifikasi', 'pending')->count(),
-    
-    'pendingUpdates' => \App\Models\CompanyUpdate::with(['company', 'user'])
-                            ->where('status', 'pending')
-                            ->latest()
-        ->get()
+    'recentCompanies' => Company::latest()->take(10)->get(),
+    'stockOverview'   => $stockOverview,
+    'healthStats'     => $healthStats,
+    'industrialData'  => $industrialData, // Data hulu-hilir
+    'pendingCount'    => Company::where('status_verifikasi', 'pending')->count(), // Registrasi baru
 ]);
+
 
     }
 

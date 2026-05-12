@@ -288,5 +288,50 @@ public function downloadMyCertificate()
     return $this->downloadCertificate($company); // Panggil fungsi downloadCertificate yang kita buat tadi
 }
 
+public function publicRegister(Request $request)
+
+{
+$cleanName = trim($request->nama_perusahaan);
+$existingCompany = \App\Models\Company::where('nama_perusahaan', 'LIKE', '%' . $cleanName . '%')->first();
+
+    if ($existingCompany) {
+        // Jika sudah ada, jangan izinkan daftar lagi
+        return back()->with('error', "Perusahaan '{$cleanName}' sudah terdaftar dalam sistem. Silakan login atau hubungi Admin API untuk akses akun.");
+    }
+
+    $request->validate([
+        'nama_perusahaan' => 'required|string|max:255',
+        'email'           => 'required|email|unique:users,email',
+        'password'        => 'required|min:8',
+    ]);
+
+    // 1. Buat 'Cangkang' Perusahaan di tabel Utama (Status: Pending)
+    $company = \App\Models\Company::create([
+        'nama_perusahaan'   => $request->nama_perusahaan,
+        'status_verifikasi' => 'pending',
+        'membership_type'   => 'free', // Status untuk umum
+    ]);
+
+    // 2. Buat User & Hubungkan ke Company tersebut
+    $user = \App\Models\User::create([
+        'name'       => $request->nama_perusahaan,
+        'email'      => $request->email,
+        'password'   => bcrypt($request->password),
+        'role'       => 'member',
+        'company_id' => $company->id,
+    ]);
+
+    // 3. Masukkan ke Antrean Audit (CompanyUpdate) agar Admin bisa periksa
+    \App\Models\CompanyUpdate::create([
+        'company_id'    => $company->id,
+        'user_id'       => $user->id,
+        'proposed_data' => json_encode($request->only('nama_perusahaan')),
+        'status'        => 'pending'
+    ]);
+
+    return redirect()->route('login')->with('success', 'Registrasi berhasil! Data Anda sedang diaudit oleh Admin.');
+}
+
+
 
 }
