@@ -11,6 +11,32 @@ class TradeDashboardController extends Controller
 {
     public function index()
     {
+
+// Mapping kategori sesuai dengan isi kolom 'produk' di tabel Anda
+    $categories = [
+        'Garment'  => 'Pakaian Jadi (Garmen)',
+        'Yarn'     => 'Benang',
+        'Fabric'   => 'Kain',
+        'Fiber'    => 'Serat Kapas dan serat alam lainnya',
+        'Synthetic'=> 'Serat sintetik',
+        'Various'  => 'Berbagai produk teksti' // Sesuaikan typo 'teksti' jika memang begitu di DB
+    ];
+
+    $topDestinations = [];
+
+    foreach ($categories as $key => $productName) {
+        $topDestinations[$key] = DB::table('trade_master_annual_country')
+            ->selectRaw("TRIM(nama_negara) as name, SUM(val_2025) as value")
+            ->where('produk', 'LIKE', '%' . $productName . '%')
+            ->where('tipe_arus', 'ekspor')
+            ->groupBy('nama_negara')
+            ->orderBy('value', 'desc')
+            ->take(5)
+            ->get();
+    }
+
+
+
         // 1. Ambil Data Tren 5 Tahun (Annual)
         $annualTrend = DB::table('trade_master_annual_hscode')
             ->selectRaw("
@@ -76,16 +102,16 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
             'price'    => (float) $item->cotton_price,
             'exchange' => (float) $item->usd_idr,
         ]);
-    
         
         // Kirim data ke React (Dashboard.jsx)
         return Inertia::render('Dashboard', [
             // Data Analitik Perdagangan
             'annualTrend' => $annualTrend,
-            'marketHistory' => $marketHistory,
+            // 'marketHistory' => $marketHistory,
             'monthlyCompare' => $monthlyCompare,
             'garmenSpecs' => $garmenSpecs,
             'fullTradeData' => $fullTradeData,
+             'topDestinations' => $topDestinations,
             
             // Data Market Intelligence (Sesuai props Dashboard.jsx)
              'marketHistory' => $history->map(fn($item) => [
@@ -96,10 +122,10 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
             'cottonPrice' => $latestMarket->cotton_price ?? 71.31,
             'cottonTrend' => round($cottonChange, 2) . '%',
             'usd_idr' => $latestMarket->usd_idr ?? 16000,
-            'cottonPrice' => $latest->cotton_price ?? 0,
-        'usd_idr' => $latest->usd_idr ?? 0,
+            // 'cottonPrice' => $latest->cotton_price ?? 0,
+        // 'usd_idr' => $latest->usd_idr ?? 0,
             // Data Pendukung
-             'annualTrend' => $this->getAnnualTrendData(), 
+            //  'annualTrend' => $this->getAnnualTrendData(), 
             'memberStatus' => auth()->user()->is_premium ? 'Premium Member' : 'Regular Member',
             'exportValue' => '11.9', // Nanti bisa dihitung dinamis dari $annualTrend
             'lastUpdate' => now()->format('d M Y')
