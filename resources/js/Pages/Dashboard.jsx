@@ -5,6 +5,7 @@ import CottonCurrencyTrendChart from "@/Components/CottonCurrencyTrendChart";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
 import html2canvas from "html2canvas";
+
 import {
     XAxis,
     YAxis,
@@ -66,6 +67,7 @@ export default function Dashboard({
         downloadLink.download = fileName;
         downloadLink.click();
     };
+
 
     return (
         <AuthenticatedLayout
@@ -352,6 +354,8 @@ export default function Dashboard({
                         >
                             CAPTURE & SHARE TO WHATSAPP
                         </button>
+
+    
                     </div>
                 </div>
             </div>

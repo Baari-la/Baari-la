@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import html2pdf from "html2pdf.js";
 import {
     BarChart,
     Bar,
@@ -32,7 +33,11 @@ const calculateTotal = (dataArray) => {
     );
 };
 
-export default function TopMarketChart({ data = {}, isEn = false }) {
+
+/* PERBAIKAN SINTAKS UTAMA: Menangkap props dengan bersih */
+export default function TopMarketChart({ data = {}, isEn = false, memberStatus = "Free" }) {
+    
+    // Satukan deklarasi state (Hapus duplikasi baris penulisan yang rusak)
     const [activeTab, setActiveTab] = useState("Garment");
 
     const categories = [
@@ -40,22 +45,39 @@ export default function TopMarketChart({ data = {}, isEn = false }) {
         { id: "Yarn", label: isEn ? "Yarn" : "Benang", color: "#eab308" },
         { id: "Fabric", label: isEn ? "Fabric" : "Kain", color: "#10b981" },
         { id: "Fiber", label: isEn ? "Fiber" : "Serat Alam", color: "#f59e0b" },
-        {
-            id: "Synthetic",
-            label: isEn ? "Synthetic" : "Sintetik",
-            color: "#8b5cf6",
-        },
+        { id: "Synthetic", label: isEn ? "Synthetic" : "Sintetik", color: "#8b5cf6" },
         { id: "Various", label: isEn ? "Misc" : "Berbagai", color: "#ec4899" },
     ];
-
     const currentData = data[activeTab] || { export: [], import: [] };
 
     // Hitung total untuk Ekspor dan Impor
     const totalExport = calculateTotal(currentData.export || []);
     const totalImport = calculateTotal(currentData.import || []);
 
+      /* PERBAIKAN 2: Fungsi Pintar Ekspor PDF Beresolusi Tinggi Khusus Grafik Ini */
+    const handleDownloadPDF = () => {
+        const element = document.getElementById("radar-chart-area");
+        
+        const options = {
+            margin:       [0.4, 0.4, 0.4, 0.4], 
+            filename:     `Digestex_Market_Radar_${activeTab}_2025.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { 
+                scale: 2.5, // Resolusi super tajam saat dicetak kertas
+                useCORS: true,
+                backgroundColor: "#0b1329" // Memaksa background gelap premium di PDF
+            },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+        };
+
+        html2pdf().set(options).from(element).save();
+    };
+
+    // Cek apakah user adalah Premium Member
+    const isPremium = memberStatus.includes("Premium");
+
     return (
-        <div className="w-full bg-white/5 border border-white/10 p-4 md:p-10 rounded-[40px] shadow-2xl">
+        <div id="radar-chart-area"  className="w-full bg-white/5 border border-white/10 p-4 md:p-10 rounded-[40px] shadow-2xl">
             {/* Header & Kategori - Dibuat Responsive */}
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-10 gap-6">
                 <div className="border-l-4 border-yellow-500 pl-4">
@@ -179,6 +201,8 @@ export default function TopMarketChart({ data = {}, isEn = false }) {
                     </div>
                 </div>
 
+
+
                 {/* GRAFIK IMPOR */}
                 <div className="bg-white/5 p-6 rounded-[30px] border border-white/5">
                     <h4 className="text-rose-400 text-xs font-black uppercase mb-8 flex items-center gap-3">
@@ -259,7 +283,23 @@ export default function TopMarketChart({ data = {}, isEn = false }) {
                         </ResponsiveContainer>
                     </div>
                 </div>
-            </div>
+                       </div>
+        
+            {/* --- FOOTER & PREMIUM TOMBOL DOWNLOAD PDF (SELALU MUNCUL) --- */}
+<div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 data-html2pdf-ignore">
+    <p className="text-[8px] text-gray-500 font-bold uppercase tracking-widest">
+        {isEn ? "Trade Intelligence Report Stream" : "Aliran Data Laporan Intelijen Perdagangan"}
+    </p>
+    
+    {/* Tombol PDF Emas Selalu Ditampilkan untuk Publik */}
+    <button
+        onClick={handleDownloadPDF}
+        className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-[#0a192f] px-6 py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest hover:from-amber-400 hover:to-yellow-400 transition-all shadow-lg hover:scale-105 duration-300 cursor-pointer"
+    >
+        <i className="fas fa-file-pdf"></i>
+        {isEn ? "Download PDF Report" : "Unduh Laporan PDF"}
+    </button>
+</div>
         </div>
     );
 }
