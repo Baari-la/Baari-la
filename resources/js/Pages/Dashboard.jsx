@@ -250,16 +250,14 @@ export default function Dashboard({
 
                     {/* AREA YANG AKAN DI-CAPTURE (id="capture-area") */}
                     <div id="capture-area" className="p-4 rounded-3xl">
-                            {/* GRAFIK HARGA KAPAS */}                        
+                        {/* GRAFIK HARGA KAPAS */}
                         <div className="bg-white rounded-[40px] shadow-sm overflow-hidden border border-gray-100">
-                                <CottonCurrencyTrendChart
-                                    data={marketHistory} // Pastikan variabel ini dikirim dari Controller
-                                    isEn={isEn}
-                                />
-                            </div>
+                            <CottonCurrencyTrendChart
+                                data={marketHistory} // Pastikan variabel ini dikirim dari Controller
+                                isEn={isEn}
+                            />
+                        </div>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-                            
                             {/* GRAFIK TUJUAN EKSPOR */}
                             {/* <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-gray-900">
                                 <h4 className="font-bold text-gray-800 text-lg mb-6 italic">
@@ -305,7 +303,13 @@ export default function Dashboard({
                                     </ResponsiveContainer>
                                 </div>
                             </div> */}
-<TopMarketChart data={topDestinations} isEn={isEn} />
+                            {/* Gunakan max-w-none agar grafik bisa melebar penuh ke pinggir layar PC */}
+                        </div>
+                        <div className="mx-auto max-w-none px-4 sm:px-6 lg:px-10">
+                            <TopMarketChart
+                                data={topDestinations}
+                                isEn={isEn}
+                            />
                         </div>
                     </div>
 

@@ -22,18 +22,31 @@ class TradeDashboardController extends Controller
         'Various'  => 'Berbagai produk teksti' // Sesuaikan typo 'teksti' jika memang begitu di DB
     ];
 
-    $topDestinations = [];
+    
+$topDestinations = [];
 
-    foreach ($categories as $key => $productName) {
-        $topDestinations[$key] = DB::table('trade_master_annual_country')
+foreach ($categories as $key => $productName) {
+    // Kita bungkus ekspor dan impor dalam satu array per kategori
+    $topDestinations[$key] = [
+        'export' => DB::table('trade_master_annual_country')
             ->selectRaw("TRIM(nama_negara) as name, SUM(val_2025) as value")
             ->where('produk', 'LIKE', '%' . $productName . '%')
             ->where('tipe_arus', 'ekspor')
             ->groupBy('nama_negara')
             ->orderBy('value', 'desc')
             ->take(5)
-            ->get();
-    }
+            ->get(),
+
+        'import' => DB::table('trade_master_annual_country')
+            ->selectRaw("TRIM(nama_negara) as name, SUM(val_2025) as value")
+            ->where('produk', 'LIKE', '%' . $productName . '%')
+            ->where('tipe_arus', 'impor')
+            ->groupBy('nama_negara')
+            ->orderBy('value', 'desc')
+            ->take(5)
+            ->get(),
+    ];
+}
 
 
 
@@ -112,6 +125,7 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
             'garmenSpecs' => $garmenSpecs,
             'fullTradeData' => $fullTradeData,
              'topDestinations' => $topDestinations,
+              'fiberIntelligence' => $this->getFiberIntelligence(), // Panggil fungsi baru di sini
             
             // Data Market Intelligence (Sesuai props Dashboard.jsx)
              'marketHistory' => $history->map(fn($item) => [
@@ -131,6 +145,43 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
             'lastUpdate' => now()->format('d M Y')
         ]);
     }
+private function getFiberIntelligence() 
+{
+    $years = ['2019', '2020', '2021', '2022', '2023', '2024', '2025'];
+    $trendData = [];
+    $prevCotton = 0;
+    $prevSyn = 0;
+
+    foreach ($years as $year) {
+        $cotton = (float) DB::table('trade_master_annual_hscode')
+            ->where('hs_code', 'LIKE', '5201%')
+            ->where('tipe_arus', 'impor')
+            ->sum("vol_$year");
+
+        $synthetic = (float) DB::table('trade_master_annual_hscode')
+            ->where(function($q) {
+                $q->where('hs_code', 'LIKE', '5402%')->orWhere('hs_code', 'LIKE', '5503%');
+            })->where('tipe_arus', 'impor')
+            ->sum("vol_$year");
+
+        // Hitung selisih persen dibanding tahun sebelumnya
+        $cottonGrowth = ($prevCotton > 0) ? (($cotton - $prevCotton) / $prevCotton) * 100 : 0;
+        $synGrowth = ($prevSyn > 0) ? (($synthetic - $prevSyn) / $prevSyn) * 100 : 0;
+
+        $trendData[] = [
+            'year' => $year,
+            'cotton' => $cotton,
+            'synthetic' => $synthetic,
+            'cotton_growth' => round($cottonGrowth, 1),
+            'syn_growth' => round($synGrowth, 1),
+        ];
+
+        $prevCotton = $cotton;
+        $prevSyn = $synthetic;
+    }
+
+    return $trendData;
+}
 
 private function getAnnualTrendData()
 {
@@ -170,4 +221,5 @@ private function getAnnualTrendData()
 
         return response()->json($result);
     }
+    
 }

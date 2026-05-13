@@ -14,18 +14,18 @@ import StockTicker from "@/Components/StockTicker";
 import InaugurationPopup from "@/Components/InaugurationPopup";
 import GarmentExportTable from "@/Components/Home/GarmentExportTable";
 import CottonCurrencyTrendChart from "@/Components/CottonCurrencyTrendChart";
+import FiberComparisonChart from "@/Components/FiberComparisonChart";
 
 export default function Home(props) {
-    // 1. Ambil data mentah langsung dari props DULU
+    // 1. Ambil data trade mentah
     const garmentTrade = props.garmentTrade || { export_pcs: 0, import_pcs: 0 };
-    
-    // 2. Definisikan totalGarment SETELAH garmentTrade siap
     const totalGarment = garmentTrade?.export_pcs || 0;
 
-    // 3. Destructuring Props lainnya dari HomeController
+    // 2. Satukan semua destructuring agar tidak tumpang tindih
     const {
         auth,
         marketHistory = [],
+        fiberIntelligence = [], // <--- Pastikan ini satu grup di sini
         currentCotton = "0.00",
         currentExchange = "0",
         topProducts = [],
@@ -37,6 +37,11 @@ export default function Home(props) {
     // 4. States & Localization
     const [keyword, setKeyword] = useState("");
     const isEn = locale === "en" || auth?.user?.locale === "en";
+
+    // Di dalam Home.jsx
+    useEffect(() => {
+        console.log("Cek Data Serat:", props.fiberIntelligence);
+    }, [props.fiberIntelligence]);
 
     // 5. Hooks
     useEffect(() => {
@@ -72,15 +77,24 @@ export default function Home(props) {
                     <div className="flex items-center">
                         <span className="flex items-center gap-2 font-black text-yellow-500 text-[10px] uppercase mx-8">
                             <span className="h-1.5 w-1.5 rounded-full bg-yellow-500 animate-ping"></span>
-                            {isEn ? "LIVE MARKET INTELLIGENCE" : "INTELIJEN PASAR LANGSUNG"}
+                            {isEn
+                                ? "LIVE MARKET INTELLIGENCE"
+                                : "INTELIJEN PASAR LANGSUNG"}
                         </span>
                         <span className="font-bold text-white text-[10px] uppercase mx-8">
-                            NY/ICE COTTON: <span className="text-yellow-500">${currentCotton}</span> USD/LB
+                            NY/ICE COTTON:{" "}
+                            <span className="text-yellow-500">
+                                ${currentCotton}
+                            </span>{" "}
+                            USD/LB
                         </span>
                         <span className="font-bold text-white text-[10px] uppercase mx-8 border-l border-white/10 pl-8">
                             {isEn ? "EXCHANGE RATE" : "KURS USD/IDR"}:
                             <span className="text-emerald-400 ml-2">
-                                Rp {parseFloat(currentExchange).toLocaleString("id-ID")}
+                                Rp{" "}
+                                {parseFloat(currentExchange).toLocaleString(
+                                    "id-ID",
+                                )}
                             </span>
                         </span>
                     </div>
@@ -88,10 +102,16 @@ export default function Home(props) {
                     <div className="flex items-center">
                         <span className="flex items-center gap-2 font-black text-yellow-500 text-[10px] uppercase mx-8">
                             <span className="h-1.5 w-1.5 rounded-full bg-yellow-500 animate-ping"></span>
-                            {isEn ? "LIVE MARKET INTELLIGENCE" : "INTELIJEN PASAR LANGSUNG"}
+                            {isEn
+                                ? "LIVE MARKET INTELLIGENCE"
+                                : "INTELIJEN PASAR LANGSUNG"}
                         </span>
                         <span className="font-bold text-white text-[10px] uppercase mx-8">
-                            NY/ICE COTTON: <span className="text-yellow-500">${currentCotton}</span> USD/LB
+                            NY/ICE COTTON:{" "}
+                            <span className="text-yellow-500">
+                                ${currentCotton}
+                            </span>{" "}
+                            USD/LB
                         </span>
                     </div>
                 </div>
@@ -107,11 +127,24 @@ export default function Home(props) {
                 <InaugurationPopup isEn={isEn} />
                 <StockTicker topStocks={topStocks} />
 
-                <div className="mt-20 block w-full" style={{ minHeight: "350px" }}>
+                <div
+                    className="mt-20 block w-full"
+                    style={{ minHeight: "350px" }}
+                >
                     <div className="max-w-7xl mx-auto">
-                        <CottonCurrencyTrendChart data={marketHistory} isEn={isEn} />
+                        <CottonCurrencyTrendChart
+                            data={marketHistory}
+                            isEn={isEn}
+                        />
                     </div>
                 </div>
+                {/* Perbandingan Impor Kapas dan Sintetis */}
+                <FiberComparisonChart
+                    data={fiberIntelligence}
+                    isEn={isEn}
+                    isLoggedIn={props.isLoggedIn} // <--- Kirim status login di sini
+                />
+
                 {/* --- SECTION: HERO & SEARCH --- */}
                 <div className="px-6 pt-20 pb-16 text-center relative overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
