@@ -31,12 +31,28 @@ export default function Home(props) {
         topProducts = [],
         topStocks = [],
         latestNews = [],
+        latestRegulations = [],
+        isLoggedIn,
         locale,
     } = props;
 
     // 4. States & Localization
     const [keyword, setKeyword] = useState("");
     const isEn = locale === "en" || auth?.user?.locale === "en";
+    const memberStatus = auth?.user?.member_status || "Free";
+
+    // Fungsi pengaman klik unduh dokumen di halaman depan
+    const handleDownload = (fileUrl, tier, title) => {
+        if (tier === "Premium" && !memberStatus.includes("Premium")) {
+            alert(
+                isEn
+                    ? `❌ Premium Tier Required for: ${title}`
+                    : `❌ Akun Premium Diperlukan untuk: ${title}`,
+            );
+            return;
+        }
+        window.open(`/storage/${fileUrl}`, "_blank");
+    };
 
     // Di dalam Home.jsx
     useEffect(() => {
@@ -237,7 +253,14 @@ export default function Home(props) {
                 <PartnerLogo />
                 <NewsSection latestNews={latestNews} isEn={isEn} />
                 <EventSpotlight />
-                <LocalSolutions />
+                <LocalSolutions
+                    materials={props.regulations || []}
+                    inventoryItems={props.inventoryItems || []} // <--- TERUSKAN DATA BURSA DI SINI
+                    isLoggedIn={props.isLoggedIn}
+                    partnershipItems={props.partnershipItems || []}
+                    memberStatus={auth?.user?.member_status || "Free"}
+                    isEn={isEn}
+                />
                 <VissionMission />
                 <BenefitsSection isEn={isEn} />
 

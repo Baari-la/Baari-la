@@ -87,6 +87,15 @@ if (!auth()->check()) {
     })->all();
         } /* PERBAIKAN 1: Menutup blok penyeleksian data publik */
 
+        // Untuk data regulasi / presentasi Ambil 3 dokumen regulasi/materi terbaru untuk ditampilkan di halaman depan
+$regulations = \DB::table('regulations')
+    ->orderBy('event_date', 'desc')
+    ->get();
+$inventoryItems = \DB::table('inventories')->orderBy('created_at', 'desc')->get();
+
+// Ambil seluruh daftar kemitraan B2B multi-sektor dari database
+$partnershipItems = \DB::table('partnerships')->orderBy('match_percentage', 'desc')->get();
+
         // 7. Render Seluruh Payload ke Halaman Depan
         return Inertia::render('Home', [
             'marketHistory'     => $marketHistory,
@@ -100,6 +109,10 @@ if (!auth()->check()) {
             'garmentTrade'      => $garmentTradeData,
             'totalGarment'      => (float) ($garmentTradeData->export_pcs ?? 0), /* PERBAIKAN 3: Memperbaiki nama variabel bursa garmen */
             'pendingCount'      => auth()->check() ? Company::where('status_verifikasi', 'pending')->count() : 0,
+            'regulations' => $regulations,
+            'partnershipItems' => $partnershipItems,
+             'inventoryItems' => $inventoryItems,
+    'isLoggedIn'  => auth()->check(),
         ]);
     }
 
