@@ -31,7 +31,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 Route::get('/regulation', fn() => inertia('Regulation/Index'))->name('regulation.index');
 Route::get('/matchmaking', fn() => inertia('Matchmaking/Index'))->name('matchmaking.index');
 Route::post('/companies/register-umum', [CompanyController::class, 'publicRegister'])->name('companies.public_register');
-
+  Route::get('/matchmaking/create', [TradeIntelligenceController::class, 'createMatchmaking'])->name('matchmaking.create');
 
 Route::get('/news/{news:slug}', [NewsController::class, 'show'])->name('news.show');
 Route::get('/partnership', fn() => Inertia::render('Partnership/Index'))->name('partnership');
@@ -61,6 +61,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Akses Dashboard Dasar
     Route::get('/dashboard', [TradeDashboardController::class, 'index'])->name('dashboard');
     
+    // Matchmaking
+Route::get('/matchmaking/create', [TradeIntelligenceController::class, 'createMatchmaking'])->name('matchmaking.create');
+    Route::post('/matchmaking', [TradeIntelligenceController::class, 'storeMatchmaking'])->name('matchmaking.store');
+    // Rute Edit untuk MODAL 1: Toko Digital Bahan
+    Route::get('/admin/inventory/{id}/edit', [TradeIntelligenceController::class, 'editInventory'])->name('inventory.edit');
+    
+    // Rute Edit untuk MODAL 2: Pusat Data & Regulasi
+    Route::get('/admin/regulations/{id}/edit', [TradeIntelligenceController::class, 'editRegulation'])->name('regulation.edit');
+    
+    // Rute Edit untuk MODAL 3: Matchmaking Kemitraan
+    // Di dalam routes/web.php (grup middleware auth)
+Route::get('/admin/partnerships/{id}/edit', [TradeIntelligenceController::class, 'editMatchmaking'])->name('partnership.edit');
+ Route::put('/admin/inventory/{id}', [TradeIntelligenceController::class, 'updateInventory'])->name('inventory.update');
+    Route::put('/admin/regulations/{id}', [TradeIntelligenceController::class, 'updateRegulation'])->name('regulation.update');
+    Route::put('/admin/partnerships/{id}', [TradeIntelligenceController::class, 'updateMatchmaking'])->name('partnership.update');
+
+
     // Profil User
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');

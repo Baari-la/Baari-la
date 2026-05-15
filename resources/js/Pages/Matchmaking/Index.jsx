@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, usePage, router } from "@inertiajs/react";
+import { Head, usePage, router, Link } from "@inertiajs/react";
 import React, { useState } from "react";
 
 export default function Index({ partners = [], filters = {} }) {
@@ -31,7 +31,7 @@ export default function Index({ partners = [], filters = {} }) {
             return;
         }
         window.open(
-            `wa.me{whatsappNumber}?text=Halo%20${encodeURIComponent(partnerName)},%20kami%20tertarik%20untuk%20menjajaki%20B2B%20Partnership%20melalui%20sistem%20Matchmaking%20Digestex%20V2.`,
+            `https://wa.me{whatsappNumber}?text=Halo%20${encodeURIComponent(partnerName)},%20kami%20tertarik%20untuk%20menjajaki%20B2B%20Partnership%20melalui%20sistem%20Matchmaking%20Digestex%20V2.`,
             "_blank",
         );
     };
@@ -48,22 +48,39 @@ export default function Index({ partners = [], filters = {} }) {
 
             <div className="py-12 bg-[#0a192f] min-h-screen text-white">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    {/* --- HEADER SECTION --- */}
-                    <div className="mb-12">
-                        <span className="text-yellow-500 text-[10px] font-black uppercase tracking-[0.4em] mb-4 block">
-                            {isEn
-                                ? "Advanced B2B Synergy Ecosystem"
-                                : "Ekosistem Sinergi B2B Tingkat Lanjut"}
-                        </span>
-                        <h1 className="text-5xl font-black uppercase tracking-tighter italic">
-                            Business{" "}
-                            <span className="text-yellow-500">Matchmaking</span>
-                        </h1>
-                        <p className="text-gray-400 mt-4 max-w-2xl leading-relaxed text-sm">
-                            {isEn
-                                ? "Intelligent gateway connecting local textile manufacturers with global technology, premium machinery suppliers, and top-tier raw material vendors."
-                                : "Gerbang cerdas menghubungkan manufaktur tekstil lokal dengan teknologi global, penyuplai mesin/sparepart premium, dan vendor bahan baku utama."}
-                        </p>
+                    {/* --- HEADER SECTION DENGAN SINKRONISASI TOMBOL DAFTAR VENDOR --- */}
+                    <div className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/5 pb-6">
+                        <div>
+                            <span className="text-yellow-500 text-[10px] font-black uppercase tracking-[0.4em] mb-4 block">
+                                {isEn
+                                    ? "Advanced B2B Synergy Ecosystem"
+                                    : "Ekosistem Sinergi B2B Tingkat Lanjut"}
+                            </span>
+                            <h1 className="text-5xl font-black uppercase tracking-tighter italic">
+                                Business{" "}
+                                <span className="text-yellow-500">
+                                    Matchmaking
+                                </span>
+                            </h1>
+                            <p className="text-gray-400 mt-4 max-w-2xl leading-relaxed text-sm">
+                                {isEn
+                                    ? "Intelligent gateway connecting local textile manufacturers with global technology, premium machinery suppliers, and top-tier raw material vendors."
+                                    : "Gerbang cerdas menghubungkan manufaktur tekstil lokal dengan teknologi global, penyuplai mesin/sparepart premium, dan vendor bahan baku utama."}
+                            </p>
+                        </div>
+
+                        {/* Tombol Akses Pintas Menuju Formulir Input Baru */}
+                        <div className="w-full md:w-auto">
+                            <Link
+                                href={route("matchmaking.create")}
+                                className="w-full md:w-auto bg-gradient-to-r from-amber-500 to-yellow-500 text-[#0a192f] font-black px-6 py-4 rounded-xl uppercase text-[9px] tracking-widest hover:from-amber-400 hover:to-yellow-400 transition-all shadow-lg shadow-yellow-500/10 hover:scale-105 duration-300 text-center block whitespace-nowrap"
+                            >
+                                <i className="fas fa-plus-circle mr-2"></i>
+                                {isEn
+                                    ? "List Partnership / Machinery"
+                                    : "Daftarkan Kemitraan / Mesin"}
+                            </Link>
+                        </div>
                     </div>
 
                     {/* --- INTERACTIVE DYNAMIC FILTERS --- */}
@@ -152,14 +169,16 @@ export default function Index({ partners = [], filters = {} }) {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* --- POTONGAN PERBAIKAN CARD MATCHING DENGAN SPEK LENGKAP VENDOR --- */}
                             {partners.map((partner) => (
                                 <div
                                     key={partner.id}
                                     className="group bg-white/5 border border-white/10 p-10 rounded-[50px] hover:border-yellow-500/40 transition-all duration-500 flex flex-col justify-between"
                                 >
                                     <div>
+                                        {/* Bagian Atas: Logo & % Match */}
                                         <div className="flex justify-between items-start mb-6">
-                                            <div className="p-4 bg-white rounded-2xl border border-white/10 w-24 h-16 flex items-center justify-center overflow-hidden">
+                                            <div className="p-4 bg-white rounded-2xl border border-white/10 w-24 h-16 flex items-center justify-center overflow-hidden shadow-inner">
                                                 {partner.logo_path ? (
                                                     <img
                                                         src={partner.logo_path}
@@ -175,11 +194,13 @@ export default function Index({ partners = [], filters = {} }) {
                                                     </span>
                                                 )}
                                             </div>
-                                            <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider font-mono">
+                                            <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider font-mono shadow-md">
                                                 {partner.match_percentage}%
                                                 Match
                                             </span>
                                         </div>
+
+                                        {/* Judul & Deskripsi Utama */}
                                         <span className="text-[8px] text-gray-500 font-mono uppercase tracking-[0.2em]">
                                             {partner.category} •{" "}
                                             {partner.region}
@@ -190,10 +211,68 @@ export default function Index({ partners = [], filters = {} }) {
                                         <p className="text-[11px] text-yellow-500/80 uppercase font-bold tracking-wider mb-3">
                                             {partner.tagline}
                                         </p>
-                                        <p className="text-xs text-gray-400 mb-8 leading-relaxed font-medium">
+                                        <p className="text-xs text-gray-400 mb-6 leading-relaxed font-medium">
                                             {partner.description}
                                         </p>
+
+                                        {/* --- DETIL PANEL VALIDASI TEKNIS B2B (KOLOM BARU) --- */}
+                                        <div className="mt-6 pt-6 border-t border-white/5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px] mb-8 bg-black/20 p-5 rounded-3xl border border-white/5">
+                                            <div className="space-y-1">
+                                                <p className="text-gray-500 text-[8px] font-black uppercase tracking-widest">
+                                                    {isEn
+                                                        ? "Minimum Order (MOQ)"
+                                                        : "Batas Minimum Order (MOQ)"}
+                                                </p>
+                                                <p className="text-gray-300 font-bold">
+                                                    <i className="fas fa-shopping-bag text-yellow-500/30 mr-1.5"></i>
+                                                    {partner.moq_info ||
+                                                        (isEn
+                                                            ? "Contact for details"
+                                                            : "Nego langsung")}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-gray-500 text-[8px] font-black uppercase tracking-widest">
+                                                    {isEn
+                                                        ? "Supply Capacity"
+                                                        : "Kapasitas Pasokan Maksimal"}
+                                                </p>
+                                                <p className="text-gray-300 font-bold">
+                                                    <i className="fas fa-chart-line text-emerald-500/30 mr-1.5"></i>
+                                                    {partner.capacity_info ||
+                                                        (isEn
+                                                            ? "High Capacity Grade"
+                                                            : "Skala Industri Besar")}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-1 sm:col-span-2 pt-2 border-t border-white/5">
+                                                <p className="text-gray-500 text-[8px] font-black uppercase tracking-widest">
+                                                    {isEn
+                                                        ? "Track Record Portfolio"
+                                                        : "Rekam Jejak Klien Utama"}
+                                                </p>
+                                                <p className="text-gray-300 font-bold leading-normal">
+                                                    <i className="fas fa-check-circle text-blue-500/30 mr-1.5"></i>
+                                                    {partner.clients_portfolio ||
+                                                        "Mitra Resmi Jaringan API"}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-1 sm:col-span-2 pt-2 border-t border-white/5">
+                                                <p className="text-gray-500 text-[8px] font-black uppercase tracking-widest">
+                                                    {isEn
+                                                        ? "After-Sales & Warranty Support"
+                                                        : "Jaminan Purnajual & Garansi"}
+                                                </p>
+                                                <p className="text-yellow-500/90 font-black italic">
+                                                    <i className="fas fa-shield-alt text-amber-500/30 mr-1.5"></i>
+                                                    {partner.after_sales_sla ||
+                                                        "SLA Terjamin Korporasi"}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    {/* Tombol Kontak WA */}
                                     <button
                                         onClick={() =>
                                             handleConnect(
@@ -201,7 +280,7 @@ export default function Index({ partners = [], filters = {} }) {
                                                 partner.name,
                                             )
                                         }
-                                        className="bg-white/10 text-white w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest group-hover:bg-yellow-500 group-hover:text-[#0a192f] transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                                        className="bg-white/10 text-white w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest group-hover:bg-yellow-500 group-hover:text-[#0a192f] transition-all duration-300 hover:scale-[1.02] cursor-pointer shadow-lg"
                                     >
                                         {isEn
                                             ? "Request Partnership Connection"

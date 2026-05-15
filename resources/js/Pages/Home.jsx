@@ -255,11 +255,13 @@ export default function Home(props) {
                 <EventSpotlight />
                 <LocalSolutions
                     materials={props.regulations || []}
-                    inventoryItems={props.inventoryItems || []} // <--- TERUSKAN DATA BURSA DI SINI
-                    isLoggedIn={props.isLoggedIn}
+                    inventoryItems={props.inventoryItems || []}
                     partnershipItems={props.partnershipItems || []}
-                    memberStatus={auth?.user?.member_status || "Free"}
+                    isLoggedIn={props.isLoggedIn}
+                    memberStatus={props.auth?.user?.member_status || "Free"}
                     isEn={isEn}
+                    /* PERBAIKAN UTAMA: Teruskan objek auth ke dalam komponen */
+                    auth={props.auth}
                 />
                 <VissionMission />
                 <BenefitsSection isEn={isEn} />

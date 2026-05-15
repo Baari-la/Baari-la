@@ -106,11 +106,108 @@ $category = $request->input('category');
     }
 
     public function create()
-    {
-        return Inertia::render('Inventory/Create'); // Membuka form tambah bahan
+{
+    // Membuka form tambah bahan baku di folder resources/js/Pages/Inventory/Create.jsx
+    return inertia('Inventory/Create', [
+        'isLoggedIn' => auth()->check(),
+        'company'    => auth()->user() ? \DB::table('companies')->where('id', auth()->user()->company_id)->first() : null
+    ]);
+}
+
+// Tambahkan fungsi ini di dalam class TradeIntelligenceController
+
+public function editInventory($id)
+{
+    // Mengambil data spesifik barang berdasarkan ID yang diklik admin
+    $item = \DB::table('inventories')->where('id', $id)->first();
+
+    if (!$item) {
+        abort(404, 'Data komoditas tidak ditemukan.');
     }
 
-    /* PERBAIKAN 2: Menyelaraskan logika penyimpanan data pengisi material baru */
+    // Lempar data ke file view resources/js/Pages/Inventory/Edit.jsx
+    return Inertia::render('Inventory/Edit', [
+        'item' => $item,
+        'isLoggedIn' => auth()->check()
+    ]);
+}
+
+// 1. FUNGSI EDIT UNTUK MODAL 2: PUSAT DATA & REGULASI
+public function editRegulation($id)
+{
+    $regulation = \DB::table('regulations')->where('id', $id)->first();
+
+    if (!$regulation) {
+        abort(404, 'Data regulasi/materi tidak ditemukan.');
+    }
+
+    return Inertia::render('Regulation/Edit', [
+        'regulation' => $regulation,
+        'isLoggedIn' => auth()->check()
+    ]);
+}
+
+// 2. FUNGSI EDIT UNTUK MODAL 3: MATCHMAKING KEMITRAAN B2B
+public function editMatchmaking($id)
+{
+    $partnership = \DB::table('partnerships')->where('id', $id)->first();
+
+    if (!$partnership) {
+        abort(404, 'Data kemitraan/vendor tidak ditemukan.');
+    }
+
+    return Inertia::render('Matchmaking/Edit', [
+        'partnership' => $partnership,
+        'isLoggedIn' => auth()->check()
+    ]);
+}
+
+
+    
+   
+   public function createMatchmaking()
+{
+    return Inertia::render('Matchmaking/Create', [
+        'isLoggedIn' => auth()->check(),
+        'company'    => auth()->user() ? \DB::table('companies')->where('id', auth()->user()->company_id)->first() : null
+    ]);
+}
+
+public function storeMatchmaking(Request $request)
+{
+    // 1. Validasi Input Spesifikasi Lini Mesin
+    $request->validate([
+        'jenis_mesin' => 'required|min:3',
+        'kategori_proses' => 'required',
+        'kapasitas_bulanan' => 'required|numeric',
+        'satuan' => 'required',
+        'lokasi_pabrik' => 'required',
+        'whatsapp_contact' => 'required|numeric',
+    ]);
+
+    $user = auth()->user();
+    $company = \DB::table('companies')->where('id', $user->company_id)->first();
+
+    // 2. Suntik Data Langsung ke Tabel matchmakings Kontrol Riil Anda
+    \DB::table('matchmakings')->insert([
+        'nama_perusahaan' => $company->company_name ?? 'PT. Vendor Tekstil',
+        'jenis_mesin' => $request->jenis_mesin,
+        'kategori_proses' => $request->kategori_proses,
+        'kapasitas_bulanan' => $request->kapasitas_bulanan,
+        'satuan' => $request->satuan,
+        'sertifikasi' => $request->sertifikasi,
+        'lokasi_pabrik' => $request->lokasi_pabrik,
+        'whatsapp_contact' => $request->whatsapp_contact,
+        'spesifikasi_mesin' => $request->spesifikasi_mesin,
+        'created_at' => now(),
+        'updated_at' => now()
+    ]);
+
+    return redirect()->route('home')->with('message', 'Kapasitas lini mesin pabrik berhasil didaftarkan!');
+}
+
+
+    
     public function storeInventory(Request $request)
     {
         // 1. Validasi Input sesuai format kolom database asli Bapak
@@ -159,4 +256,83 @@ $category = $request->input('category');
 
         return redirect()->route('inventory.index')->with('message', 'Produk berhasil dipajang di Toko Digital!');
     }
+// 1. UPDATE DATA MODAL 1: TOKO DIGITAL BAHAN
+public function updateInventory(Request $request, $id)
+{
+    $request->validate([
+        'name' => 'required|min:3',
+        'category' => 'required',
+        'stock' => 'required|numeric',
+        'unit' => 'required',
+        'warehouse_location' => 'required',
+        'whatsapp_contact' => 'required|numeric',
+    ]);
+
+    \DB::table('inventories')->where('id', $id)->update([
+        'name' => $request->name,
+        'category' => $request->category,
+        'stock' => $request->stock,
+        'unit' => $request->unit,
+        'warehouse_location' => $request->warehouse_location,
+        'whatsapp_contact' => $request->whatsapp_contact,
+        'description' => $request->description,
+        'price' => $request->price ?? 0.00,
+        'nama_perusahaan' => $request->nama_perusahaan ?? 'PT. Vendor Utama',
+        'updated_at' => now()
+    ]);
+
+    return redirect()->route('home')->with('message', 'Data bursa bahan berhasil diperbarui!');
+}
+
+// 2. UPDATE DATA MODAL 2: PUSAT DATA & REGULASI
+public function updateRegulation(Request $request, $id)
+{
+    $request->validate([
+        'title' => 'required|min:5',
+        'speaker' => 'required',
+        'category' => 'required',
+        'event_date' => 'required|date',
+    ]);
+
+    \DB::table('regulations')->where('id', $id)->update([
+        'title' => $request->title,
+        'speaker' => $request->speaker,
+        'category' => $request->category,
+        'access_tier' => $request->access_tier,
+        'event_date' => $request->event_date,
+        'updated_at' => now()
+    ]);
+
+    return redirect()->route('home')->with('message', 'Dokumen regulasi berhasil diperbarui!');
+}
+
+// 3. UPDATE DATA MODAL 3: MATCHMAKING KEMITRAAN
+public function updateMatchmaking(Request $request, $id)
+{
+    $request->validate([
+        'name' => 'required|min:3',
+        'tagline' => 'required',
+        'category' => 'required',
+        'region' => 'required',
+        'description' => 'required',
+        'whatsapp_contact' => 'required|numeric',
+    ]);
+
+    \DB::table('partnerships')->where('id', $id)->update([
+        'name' => $request->name,
+        'tagline' => $request->tagline,
+        'category' => $request->category,
+        'region' => $request->region,
+        'description' => $request->description,
+        'moq_info' => $request->moq_info,
+        'after_sales_sla' => $request->after_sales_sla,
+        'whatsapp_contact' => $request->whatsapp_contact,
+        'updated_at' => now()
+    ]);
+
+    return redirect()->route('home')->with('message', 'Profil kemitraan B2B berhasil diperbarui!');
+}
+
+
+    
 }

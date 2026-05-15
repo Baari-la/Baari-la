@@ -1,12 +1,12 @@
 {
     "cotton": {
-        "price": 87.97,
-        "percent": 1.91,
-        "status": "up"
+        "price": 83.94,
+        "percent": -3.31,
+        "status": "down"
     },
     "kurs": {
         "price": "17,460.00",
-        "change": -89.0,
+        "change": -40.0,
         "status": "down"
     }
 }

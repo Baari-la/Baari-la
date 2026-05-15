@@ -6,6 +6,7 @@ export default function LocalSolutions({
     inventoryItems = [],
     partnershipItems = [], // <-- Tangkap props kemitraan baru
     isLoggedIn = false,
+    auth = null,
     memberStatus = "Free",
     isEn = false,
 }) {
@@ -13,6 +14,9 @@ export default function LocalSolutions({
     const [isBursaOpen, setIsBursaOpen] = useState(false);
     const [isRegulasiOpen, setIsRegulasiOpen] = useState(false);
     const [isMatchOpen, setIsMatchOpen] = useState(false); // <-- Modal Ke-3 Aktif
+
+    // --- SENSOR PINTAR LEVEL ADMIN (TRUE/FALSE) ---
+    const isAdmin = auth?.user?.role === "admin";
 
     // State Penyaringan Data masing-masing modal
     const [regSearch, setRegSearch] = useState("");
@@ -324,20 +328,37 @@ export default function LocalSolutions({
                                                     ? `Rp ${parseFloat(item.price).toLocaleString("id-ID")}`
                                                     : "Nego Serius"}
                                             </td>
-                                            <td className="py-4 text-right pr-4">
-                                                <button
-                                                    onClick={() =>
-                                                        handleContactOwner(
-                                                            item.whatsapp_contact,
-                                                            item.name,
-                                                            "Lapak",
-                                                        )
-                                                    }
-                                                    className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer"
-                                                >
-                                                    <i className="fab fa-whatsapp mr-1.5"></i>
-                                                    Hubungi
-                                                </button>
+                                            <td className="py-4 text-right pr-4 whitespace-nowrap">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {/* Tombol Edit Khusus Admin Toko Digital */}
+                                                    {isAdmin && (
+                                                        <a
+                                                            href={`/admin/inventory/${item.id}/edit`}
+                                                            className="bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer"
+                                                        >
+                                                            <i className="fas fa-edit mr-1"></i>
+                                                            {isEn
+                                                                ? "Edit"
+                                                                : "Ubah"}
+                                                        </a>
+                                                    )}
+
+                                                    <button
+                                                        onClick={() =>
+                                                            handleContactOwner(
+                                                                item.whatsapp_contact,
+                                                                item.name,
+                                                                "Lapak",
+                                                            )
+                                                        }
+                                                        className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer"
+                                                    >
+                                                        <i className="fab fa-whatsapp mr-1.5 text-xs"></i>
+                                                        {isEn
+                                                            ? "Chat Seller"
+                                                            : "Hubungi"}
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -427,19 +448,37 @@ export default function LocalSolutions({
                                                     {item.access_tier}
                                                 </span>
                                             </td>
-                                            <td className="p-4 text-right pr-4">
-                                                <button
-                                                    onClick={() =>
-                                                        handleDownloadReg(
-                                                            item.file_path,
-                                                            item.access_tier,
-                                                            item.title,
-                                                        )
-                                                    }
-                                                    className="bg-white/5 border border-white/10 text-white hover:bg-yellow-500 hover:text-[#0a192f] px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer"
-                                                >
-                                                    Unduh
-                                                </button>
+                                            {/* --- COL 4 MODAL 2: UNDUH DOKUMEN + SENSOR EDIT ADMIN --- */}
+                                            <td className="p-4 text-right pr-4 whitespace-nowrap">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {/* Tombol Edit Khusus Admin Regulasi (Materi BI, Permendag, dll) */}
+                                                    {isAdmin && (
+                                                        <a
+                                                            href={`/admin/regulations/${item.id}/edit`}
+                                                            className="bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer"
+                                                        >
+                                                            <i className="fas fa-edit mr-1"></i>
+                                                            {isEn
+                                                                ? "Edit"
+                                                                : "Ubah"}
+                                                        </a>
+                                                    )}
+
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDownloadReg(
+                                                                item.file_path,
+                                                                item.access_tier,
+                                                                item.title,
+                                                            )
+                                                        }
+                                                        className="bg-white/5 border border-white/10 text-white hover:bg-yellow-500 hover:text-[#0a192f] px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer"
+                                                    >
+                                                        {isEn
+                                                            ? "Download"
+                                                            : "Unduh"}
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -530,8 +569,9 @@ export default function LocalSolutions({
                                                 colSpan="5"
                                                 className="text-center py-10 text-gray-500 uppercase font-black tracking-wider text-[10px]"
                                             >
-                                                Belum ada mitra bisnis
-                                                terdaftar.
+                                                {isEn
+                                                    ? "No partnerships listed matching criteria"
+                                                    : "Belum ada mitra bisnis terdaftar."}
                                             </td>
                                         </tr>
                                     ) : (
@@ -540,7 +580,7 @@ export default function LocalSolutions({
                                                 key={item.id}
                                                 className="border-b border-white/5 hover:bg-white/5 transition duration-300"
                                             >
-                                                {/* DATA VENDOR & SOLUSI */}
+                                                {/* 1. KOLOM SPESIFIKASI VENDOR & SOLUSI (DATA UTAMA + DATA TAMBAHAN DISATUKAN DI SINI) */}
                                                 <td className="py-4 pl-4 font-bold text-white max-w-xs">
                                                     <div className="flex flex-col gap-0.5">
                                                         <span className="text-amber-400 text-sm">
@@ -552,35 +592,82 @@ export default function LocalSolutions({
                                                         <p className="text-[10px] text-gray-400 font-normal normal-case italic mt-1 font-sans">
                                                             "{item.description}"
                                                         </p>
+
+                                                        {/* DATA PELENGKAP BARU: Disuntikkan di bawah deskripsi agar rapi tanpa menambah kolom kesamping */}
+                                                        <div className="text-[10px] uppercase mt-3 flex flex-wrap gap-x-4 gap-y-1.5 bg-black/40 p-3 rounded-2xl border border-white/10 w-fit shadow-inner">
+                                                            <span className="whitespace-nowrap flex items-center text-gray-300 font-bold">
+                                                                <i className="fas fa-shopping-bag text-amber-500 mr-2 text-xs"></i>
+                                                                {isEn
+                                                                    ? "MOQ:"
+                                                                    : "Batas MOQ:"}{" "}
+                                                                <span className="text-white font-black bg-white/5 px-2 py-0.5 rounded ml-1 border border-white/5 font-mono">
+                                                                    {item.moq_info ||
+                                                                        "Nego"}
+                                                                </span>
+                                                            </span>
+                                                            <span className="whitespace-nowrap flex items-center text-gray-300 font-bold">
+                                                                <i className="fas fa-shield-alt text-emerald-500 mr-2 text-xs"></i>
+                                                                {isEn
+                                                                    ? "SLA Support:"
+                                                                    : "Garansi SLA:"}{" "}
+                                                                <span className="text-emerald-400 font-black italic bg-emerald-500/10 px-2 py-0.5 rounded ml-1 border border-emerald-500/20 font-mono">
+                                                                    {item.after_sales_sla ||
+                                                                        "Terjamin"}
+                                                                </span>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 uppercase font-black text-[9px] text-gray-400 font-mono">
+
+                                                {/* 2. KOLOM SEKTOR (Lurus dengan Header Sektor) */}
+                                                <td className="py-4 uppercase font-black text-[9px] text-gray-400 font-mono whitespace-nowrap">
                                                     {item.category}
                                                 </td>
-                                                <td className="py-4 uppercase font-bold text-[10px] text-gray-400">
+
+                                                {/* 3. KOLOM WILAYAH (Lurus dengan Header Wilayah) */}
+                                                <td className="py-4 uppercase font-bold text-[10px] text-gray-400 whitespace-nowrap">
                                                     <i className="fas fa-globe text-blue-500/30 mr-1.5"></i>
                                                     {item.region}
                                                 </td>
-                                                <td className="py-4 font-mono font-black text-sm text-emerald-400">
+
+                                                {/* 4. KOLOM KECOCOKAN AI (Lurus dengan Header Kecocokan) */}
+                                                <td className="py-4 font-mono font-black text-sm text-emerald-400 whitespace-nowrap">
                                                     {item.match_percentage}%
                                                     Match
                                                 </td>
-                                                <td className="py-4 text-right pr-4">
-                                                    <button
-                                                        onClick={() =>
-                                                            handleContactOwner(
-                                                                item.whatsapp_contact,
-                                                                item.name,
-                                                                "Kemitraan Vendor",
-                                                            )
-                                                        }
-                                                        className="bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-[#0a192f] px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer"
-                                                    >
-                                                        <i className="fas fa-handshake mr-1.5"></i>
-                                                        {isEn
-                                                            ? "Connect"
-                                                            : "Ajukan Sinergi"}
-                                                    </button>
+
+                                                {/* --- COL 5 MODAL 3: KONEKSI B2B + SENSOR EDIT ADMIN --- */}
+                                                <td className="py-4 text-right pr-4 whitespace-nowrap">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        {/* Tombol Edit Khusus Admin Vendor (Centric, Labda Tekstil, Indorama) */}
+                                                        {isAdmin && (
+                                                            <a
+                                                                href={`/admin/partnerships/${item.id}/edit`}
+                                                                className="bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer"
+                                                            >
+                                                                <i className="fas fa-edit mr-1"></i>
+                                                                {isEn
+                                                                    ? "Edit"
+                                                                    : "Ubah"}
+                                                            </a>
+                                                        )}
+
+                                                        <button
+                                                            onClick={() =>
+                                                                handleContactOwner(
+                                                                    item.whatsapp_contact,
+                                                                    item.name,
+                                                                    "Kemitraan Vendor",
+                                                                )
+                                                            }
+                                                            className="bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-[#0a192f] px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer"
+                                                        >
+                                                            <i className="fas fa-handshake mr-1.5"></i>
+                                                            {isEn
+                                                                ? "Connect"
+                                                                : "Ajukan Sinergi"}
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
