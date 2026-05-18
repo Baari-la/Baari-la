@@ -138,7 +138,22 @@ Route::middleware(['auth'])->group(function () {
     
     // QR & Sertifikat
     Route::get('/my-company/certificate', [CompanyController::class, 'downloadMyCertificate'])->name('companies.my_certificate');
-});
+// Logistic
+
+Route::get('/admin/logistics', function () {
+        return inertia('Logistics/Index', [
+            'locale' => app()->getLocale()
+        ]);
+    })->name('logistics.index');
+
+    // Rute halaman tracking live read-only JICT & NPCT1
+    Route::get('/admin/logistics/tracking', function () {
+        return inertia('Logistics/Tracking', [
+            'locale' => app()->getLocale()
+        ]);
+    })->name('logistics.tracking');
+
+    });
 
 /*
 
