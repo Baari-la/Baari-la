@@ -118,7 +118,8 @@ $partnershipItems = \DB::table('partnerships')->orderBy('match_percentage', 'des
             'id'            => auth()->user()->id,
             'name'          => auth()->user()->name,
             'email'         => auth()->user()->email,
-            'role'          => auth()->user()->role, // <--- PASTIKAN KOLOM ROLE INI ADA DI DATABASE ANDA
+            'role'          => auth()->user()->role, 
+            'company_id'    => auth()->user()->company_id ?? auth()->user()->company_id,
             'member_status' => auth()->user()->member_status ?? 'Free',
             'locale'        => auth()->user()->locale ?? 'id',
         ] : null,

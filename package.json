@@ -1,37 +1,35 @@
 {
-    "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
-    },
-    "devDependencies": {
-        "@headlessui/react": "^2.0.0",
-        "@inertiajs/react": "^2.0.0",
-        "@tailwindcss/forms": "^0.5.3",
-        "@tailwindcss/vite": "^4.0.0",
-        "@vitejs/plugin-react": "^4.2.0",
-        "autoprefixer": "^10.4.12",
-        "axios": "^1.11.0",
-        "concurrently": "^9.0.1",
-        "laravel-vite-plugin": "^2.0.0",
-        "postcss": "^8.4.31",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "tailwindcss": "^3.2.1",
-        "vite": "^7.0.7"
+        "dev": "vite",
+        "build": "vite build"
     },
     "dependencies": {
-        "@ckeditor/ckeditor5-build-classic": "^41.4.2",
-        "@ckeditor/ckeditor5-react": "^11.1.0",
-        "canvas-confetti": "^1.9.4",
-        "framer-motion": "^12.38.0",
+        "@ckeditor/ckeditor5-build-classic": "^34.0.0",
+        "@ckeditor/ckeditor5-react": "^9.3.0",
+        "@headlessui/react": "^2.1.2",
+        "canvas-confetti": "^1.9.3",
+        "@inertiajs/react": "^1.2.0",
+        "framer-motion": "^11.5.4",
         "html2canvas": "^1.4.1",
-        "html2pdf.js": "^0.14.0",
-        "jspdf": "^4.2.1",
-        "lucide-react": "^1.14.0",
-        "recharts": "^3.8.1",
+        "html2pdf.js": "^0.10.2",
+        "jspdf": "^2.5.1",
+        "jspdf-autotable": "^3.8.2",
+        "lucide-react": "^0.439.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "recharts": "^2.12.7",
         "xlsx": "^0.18.5"
+    },
+    "devDependencies": {
+        "@tailwindcss/forms": "^0.5.9",
+        "@vitejs/plugin-react": "^4.3.1",
+        "autoprefixer": "^10.4.20",
+        "axios": "^1.7.4",
+        "laravel-vite-plugin": "^1.1.1",
+        "postcss": "^8.4.47",
+        "tailwindcss": "^3.4.13",
+        "vite": "^5.4.8"
     }
 }

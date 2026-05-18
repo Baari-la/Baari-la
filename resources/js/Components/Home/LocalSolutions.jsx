@@ -38,6 +38,21 @@ export default function LocalSolutions({
         { id: "Fabric", label: isEn ? "Fabric" : "Kain" },
         { id: "Yarn", label: isEn ? "Yarn" : "Benang" },
         { id: "Accessories", label: isEn ? "Accessories" : "Aksesoris" },
+        {
+            id: "Footwear",
+            label: isEn ? "Footwear Materials" : "Bahan Alas Kaki",
+        },
+        {
+            id: "Bag",
+            label: isEn ? "Bag & Leather Materials" : "Bahan Tas & Kulit",
+        },
+        /* 🥊 EXPANSION: KULIT JADI & SARUNG TANGAN */
+        {
+            id: "Gloves-Leather",
+            label: isEn
+                ? "Gloves & Tanned Leather"
+                : "Sarung Tangan & Kulit Olahan",
+        },
     ];
 
     const matchCategories = [
@@ -45,42 +60,75 @@ export default function LocalSolutions({
         { id: "Technology", label: isEn ? "Technology" : "Teknologi" },
         { id: "Machinery", label: isEn ? "Machinery" : "Mesin & Suku Cadang" },
         { id: "Raw Material", label: isEn ? "Raw Material" : "Bahan Baku" },
+        {
+            id: "Footwear",
+            label: isEn ? "Footwear Assembly" : "Manufaktur Alas Kaki",
+        },
+        {
+            id: "Bag",
+            label: isEn
+                ? "Bag & Luggage Manufacturing"
+                : "Manufaktur Tas & Koper",
+        },
+        /* 🥊 EXPANSION: MANUFAKTUR SARUNG TANGAN & PENYAMAKAN KULIT */
+        {
+            id: "Gloves-Leather",
+            label: isEn
+                ? "Gloves & Leather Tanning"
+                : "Manufaktur Sarung Tangan & Penyamakan",
+        },
     ];
 
-    // 2. SISTEM FILTER CLIENT-SIDE (SANGAT CEPAT TANPA RELOAD)
+    // 2. SISTEM FILTER CLIENT-SIDE DENGAN OPTIONAL CHAINING (ANTI-CRASH)
     const filteredRegulations = materials.filter((item) => {
+        const titleMatch = (item?.title || "")
+            .toLowerCase()
+            .includes(regSearch.toLowerCase());
+        const speakerMatch = (item?.speaker || "")
+            .toLowerCase()
+            .includes(regSearch.toLowerCase());
         return (
-            (item.title.toLowerCase().includes(regSearch.toLowerCase()) ||
-                item.speaker.toLowerCase().includes(regSearch.toLowerCase())) &&
-            (regCategory === "" || item.category === regCategory)
+            (titleMatch || speakerMatch) &&
+            (regCategory === "" || item?.category === regCategory)
         );
     });
 
     const filteredInventory = inventoryItems.filter((item) => {
+        const nameMatch = (item?.name || "")
+            .toLowerCase()
+            .includes(bursaSearch.toLowerCase());
+        const locMatch = (item?.warehouse_location || "")
+            .toLowerCase()
+            .includes(bursaSearch.toLowerCase());
         return (
-            (item.name.toLowerCase().includes(bursaSearch.toLowerCase()) ||
-                item.warehouse_location
-                    .toLowerCase()
-                    .includes(bursaSearch.toLowerCase())) &&
+            (nameMatch || locMatch) &&
             (bursaCategory === "" ||
-                item.category.toLowerCase() === bursaCategory.toLowerCase())
+                (item?.category || "").toLowerCase() ===
+                    bursaCategory.toLowerCase())
         );
     });
 
     const filteredPartnerships = partnershipItems.filter((item) => {
+        const nameMatch = (item?.name || "")
+            .toLowerCase()
+            .includes(matchSearch.toLowerCase());
+        const taglineMatch = (item?.tagline || "")
+            .toLowerCase()
+            .includes(matchSearch.toLowerCase());
         return (
-            (item.name.toLowerCase().includes(matchSearch.toLowerCase()) ||
-                item.tagline
-                    .toLowerCase()
-                    .includes(matchSearch.toLowerCase())) &&
+            (nameMatch || taglineMatch) &&
             (matchCategory === "" ||
-                item.category.toLowerCase() === matchCategory.toLowerCase())
+                (item?.category || "").toLowerCase() ===
+                    matchCategory.toLowerCase())
         );
     });
 
     // 3. VALIDASI HAK AKSES PREMIUM HUBUNGI VENDOR
     const handleContactOwner = (whatsappNumber, title, context) => {
-        if (!memberStatus.includes("Premium")) {
+        if (
+            !memberStatus?.includes("Premium") &&
+            !auth?.user?.member_status?.includes("Premium")
+        ) {
             alert(
                 isEn
                     ? `🔒 Premium Access Restricted\nInitiating B2B connection for "${title}" requires an API Premium tier.`
@@ -88,14 +136,37 @@ export default function LocalSolutions({
             );
             return;
         }
+        // PERBAIKAN: Menggunakan sintaks template literal dan protokol https:// yang valid
         window.open(
-            `wa.me{whatsappNumber}?text=Halo%20${encodeURIComponent(title)},%20kami%20tertarik%20menjajaki%20B2B%20Partnership%20${context}%20melalui%20Digestex%20V2.`,
+            `https://wa.me{whatsappNumber}?text=Halo%20${encodeURIComponent(title)},%20kami%20tertarik%20menjajaki%20B2B%20Partnership%20${context}%20melalui%20Digestex%20V2.`,
             "_blank",
         );
     };
 
+    // 4. STRATEGI BYPASS ENKRIPSI PHP STREAMER (ANTI-404)
     const handleDownloadReg = (fileUrl, tier, title) => {
-        if (tier === "Premium" && !memberStatus.includes("Premium")) {
+        const userIsLoggedIn = isLoggedIn || auth?.user !== null;
+        const userMemberStatus =
+            memberStatus || auth?.user?.member_status || "Free";
+        const userRole = auth?.user?.role || "user";
+
+        if (userRole === "admin") {
+            if (!fileUrl) {
+                alert(
+                    isEn
+                        ? "⚠️ File path empty."
+                        : "⚠️ Berkas belum diunggah admin.",
+                );
+                return;
+            }
+            window.open(
+                `/download-file?path=${encodeURIComponent(fileUrl)}`,
+                "_blank",
+            );
+            return;
+        }
+
+        if (tier === "Premium" && !userMemberStatus.includes("Premium")) {
             alert(
                 isEn
                     ? `❌ Premium Tier Required for: ${title}`
@@ -103,7 +174,35 @@ export default function LocalSolutions({
             );
             return;
         }
-        window.open(`/storage/${fileUrl}`, "_blank");
+
+        if (
+            (tier === "Member" ||
+                tier === "Regulasi" ||
+                tier === "Sosialisasi") &&
+            !userIsLoggedIn
+        ) {
+            alert(
+                isEn
+                    ? `🔒 Google Login Required (Free Access)\nTo download "${title}", please sign in with Google for free promotional access.`
+                    : `🔒 Diperlukan Login Google (Akses Gratis)\nUntuk mengunduh "${title}", silakan masuk menggunakan akun Google Anda secara gratis sebagai langkah promosi.`,
+            );
+            window.location.href = route("google.login");
+            return;
+        }
+
+        if (!fileUrl) {
+            alert(
+                isEn
+                    ? "⚠️ Berkas tidak ditemukan."
+                    : "⚠️ Berkas dokumen tidak tersedia di server.",
+            );
+            return;
+        }
+
+        window.open(
+            `/download-file?path=${encodeURIComponent(fileUrl)}`,
+            "_blank",
+        );
     };
 
     return (
@@ -132,7 +231,7 @@ export default function LocalSolutions({
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full md:w-auto">
-                        {/* 1. TOKO DIGITAL BAHAN (BILINGUAL) */}
+                        {/* KARTU 1: TOKO DIGITAL BAHAN */}
                         <div
                             onClick={() => setIsBursaOpen(true)}
                             className="bg-[#0a192f] p-8 rounded-[35px] border border-white/5 hover:border-yellow-500/30 transition-all duration-500 group hover:-translate-y-2 text-left block cursor-pointer"
@@ -147,12 +246,12 @@ export default function LocalSolutions({
                             </h4>
                             <p className="text-[10px] text-gray-500 leading-relaxed font-medium">
                                 {isEn
-                                    ? "Marketplace for deadstock fabrics & yarns from warehouse clearance items."
-                                    : "Lapak komoditas kain & benang sisa produksi pengosongan gudang."}
+                                    ? "Marketplace for deadstock fabrics & yarns."
+                                    : "Lapak komoditas kain & benang sisa produksi."}
                             </p>
                         </div>
 
-                        {/* 2. PUSAT DATA & REGULASI (BILINGUAL) */}
+                        {/* KARTU 2: PUSAT DATA & REGULASI */}
                         <div
                             onClick={() => setIsRegulasiOpen(true)}
                             className="bg-[#0a192f] p-8 rounded-[35px] border border-white/5 hover:border-yellow-500/30 transition-all duration-500 group hover:-translate-y-2 text-left block cursor-pointer"
@@ -167,12 +266,12 @@ export default function LocalSolutions({
                             </h4>
                             <p className="text-[10px] text-gray-500 leading-relaxed font-medium">
                                 {isEn
-                                    ? "Industrial policy updates & official ministry presentation repository."
-                                    : "Update kebijakan industri & repositori materi presentasi kementerian resmi."}
+                                    ? "Industrial policy updates & repository."
+                                    : "Update kebijakan industri & repositori kementerian resmi."}
                             </p>
                         </div>
 
-                        {/* 3. MATCHMAKING KEMITRAAN MULTI-SEKTOR (BILINGUAL) */}
+                        {/* KARTU 3: MATCHMAKING KEMITRAAN */}
                         <div
                             onClick={() => setIsMatchOpen(true)}
                             className="bg-[#0a192f] p-8 rounded-[35px] border border-white/5 hover:border-yellow-500/30 transition-all duration-500 group hover:-translate-y-2 text-left block cursor-pointer"
@@ -187,14 +286,13 @@ export default function LocalSolutions({
                             </h4>
                             <p className="text-[10px] text-gray-500 leading-relaxed font-medium">
                                 {isEn
-                                    ? "Connect local factories with technology providers, machinery vendors, and upstream suppliers."
-                                    : "Hubungkan industri lokal dengan vendor teknologi, mesin, dan penyuplai hulu."}
+                                    ? "Connect local factories with suppliers."
+                                    : "Hubungkan industri lokal dengan penyuplai hulu."}
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-
             {/* ====================================================================== */}
             {/* 🛡️ MODAL POPUP 1: TOKO DIGITAL BAHAN */}
             {/* ====================================================================== */}
@@ -227,7 +325,14 @@ export default function LocalSolutions({
                                     <button
                                         key={cat.id}
                                         onClick={() => setBursaCategory(cat.id)}
-                                        className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase transition-all whitespace-nowrap ${bursaCategory.toLowerCase() === cat.id.toLowerCase() ? "bg-emerald-500 text-white shadow-md" : "bg-white/5 text-gray-400"}`}
+                                        className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase transition-all whitespace-nowrap ${
+                                            (
+                                                bursaCategory || ""
+                                            ).toLowerCase() ===
+                                            (cat.id || "").toLowerCase()
+                                                ? "bg-emerald-500 text-white shadow-md"
+                                                : "bg-white/5 text-gray-400"
+                                        }`}
                                     >
                                         {cat.label}
                                     </button>
@@ -238,130 +343,220 @@ export default function LocalSolutions({
                             <table className="w-full text-left border-collapse">
                                 <thead className="bg-[#0a192f] text-gray-400 uppercase text-[9px] tracking-widest border-b border-white/5">
                                     <tr>
+                                        {/* SINKRONISASI LABEL JUDUL TABEL BERDASARKAN LOCALE */}
                                         <th className="pb-4 pt-2 pl-4 w-20">
-                                            Foto
+                                            {isEn ? "Photo" : "Foto"}
                                         </th>
                                         <th className="pb-4 pt-2">
-                                            Nama Komoditas
+                                            {isEn
+                                                ? "Product Specification"
+                                                : "Nama Komoditas"}
                                         </th>
                                         <th className="pb-4 pt-2">
-                                            Perusahaan
-                                        </th>
-                                        <th className="pb-4 pt-2">Sisa Stok</th>
-                                        <th className="pb-4 pt-2">
-                                            Lokasi Gudang
+                                            {isEn ? "Company" : "Perusahaan"}
                                         </th>
                                         <th className="pb-4 pt-2">
-                                            Harga Lapak
+                                            {isEn
+                                                ? "Available Stock"
+                                                : "Sisa Stok"}
+                                        </th>
+                                        <th className="pb-4 pt-2">
+                                            {isEn
+                                                ? "Warehouse Location"
+                                                : "Lokasi Gudang"}
+                                        </th>
+                                        <th className="pb-4 pt-2">
+                                            {isEn
+                                                ? "Market Price"
+                                                : "Harga Lapak"}
                                         </th>
                                         <th className="pb-4 pt-2 text-right pr-4">
-                                            Action
+                                            {isEn ? "Action" : "Negosiasi"}
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-xs text-gray-300">
-                                    {filteredInventory.map((item) => (
-                                        <tr
-                                            key={item.id}
-                                            className="border-b border-white/5 hover:bg-white/5 transition duration-300"
-                                        >
-                                            <td className="py-4 pl-4 w-20">
-                                                <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-800 border border-white/10 shadow-md">
-                                                    {item.image ? (
-                                                        <img
-                                                            src={`/storage/${item.image}`}
-                                                            className="w-full h-full object-cover"
-                                                            alt={item.name}
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-gray-600">
-                                                            <i className="fas fa-box"></i>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="py-4 font-bold text-white">
-                                                <div className="flex flex-col gap-0.5">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-white text-xs">
-                                                            {item.name}
-                                                        </span>
-                                                        {item.is_api_member ? (
-                                                            <span className="bg-emerald-500/20 text-emerald-400 text-[7px] font-black uppercase px-1.5 py-0.5 rounded-md border border-emerald-500/30 tracking-widest">
-                                                                <i className="fas fa-check-circle"></i>{" "}
-                                                                API Member
-                                                            </span>
-                                                        ) : (
-                                                            <span className="bg-blue-500/10 text-blue-400 text-[7px] font-black uppercase px-1.5 py-0.5 rounded-md border border-blue-500/20 tracking-widest">
-                                                                Tenant Store
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <span className="text-[8px] text-gray-500 uppercase font-mono">
-                                                        {item.category}
-                                                    </span>
-                                                    {item.description && (
-                                                        <p className="text-[10px] text-gray-400 font-normal normal-case italic mt-1 font-sans">
-                                                            "{item.description}"
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="py-4 font-black text-gray-300 uppercase text-[10px] tracking-wide">
-                                                {item.nama_perusahaan ||
-                                                    "PT. Vendor Tekstil Utama"}
-                                            </td>
-                                            <td className="py-4 font-black text-emerald-400 font-mono text-sm whitespace-nowrap">
-                                                {parseFloat(
-                                                    item.stock,
-                                                ).toLocaleString("id-ID")}{" "}
-                                                <span className="text-[10px] font-normal text-gray-400">
-                                                    {item.unit}
-                                                </span>
-                                            </td>
-                                            <td className="py-4 font-medium uppercase text-[10px] tracking-wider text-gray-400 whitespace-nowrap">
-                                                <i className="fas fa-map-marker-alt text-rose-500/50 mr-1.5"></i>
-                                                {item.warehouse_location}
-                                            </td>
-                                            <td className="py-4 font-bold font-mono text-white whitespace-nowrap">
-                                                {parseFloat(item.price) > 0
-                                                    ? `Rp ${parseFloat(item.price).toLocaleString("id-ID")}`
-                                                    : "Nego Serius"}
-                                            </td>
-                                            <td className="py-4 text-right pr-4 whitespace-nowrap">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    {/* Tombol Edit Khusus Admin Toko Digital */}
-                                                    {isAdmin && (
-                                                        <a
-                                                            href={`/admin/inventory/${item.id}/edit`}
-                                                            className="bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer"
-                                                        >
-                                                            <i className="fas fa-edit mr-1"></i>
-                                                            {isEn
-                                                                ? "Edit"
-                                                                : "Ubah"}
-                                                        </a>
-                                                    )}
-
-                                                    <button
-                                                        onClick={() =>
-                                                            handleContactOwner(
-                                                                item.whatsapp_contact,
-                                                                item.name,
-                                                                "Lapak",
-                                                            )
-                                                        }
-                                                        className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer"
-                                                    >
-                                                        <i className="fab fa-whatsapp mr-1.5 text-xs"></i>
-                                                        {isEn
-                                                            ? "Chat Seller"
-                                                            : "Hubungi"}
-                                                    </button>
-                                                </div>
+                                    {filteredInventory.length === 0 ? (
+                                        <tr>
+                                            <td
+                                                colSpan="7"
+                                                className="text-center py-10 text-gray-500 uppercase font-black tracking-wider text-[10px]"
+                                            >
+                                                {isEn
+                                                    ? "No resources listed in digital store"
+                                                    : "Belum ada komoditas terdaftar di Toko Digital."}
                                             </td>
                                         </tr>
-                                    ))}
+                                    ) : (
+                                        filteredInventory.map((item) => (
+                                            <tr
+                                                key={item.id}
+                                                className="border-b border-white/5 hover:bg-white/5 transition duration-300"
+                                            >
+                                                {/* COL 1: FOTO MINI KOMODITAS */}
+                                                <td className="py-4 pl-4 w-20">
+                                                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-800 border border-white/10 shadow-md">
+                                                        {item.image ? (
+                                                            <img
+                                                                src={`/storage/${item.image}`}
+                                                                className="w-full h-full object-cover"
+                                                                alt={
+                                                                    isEn
+                                                                        ? item.name_en ||
+                                                                          item.name
+                                                                        : item.name
+                                                                }
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-gray-600 bg-slate-800">
+                                                                <i className="fas fa-box"></i>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
+
+                                                {/* COL 2: SPESIFIKASI PRODUK (DENGAN LOGIKA BILINGUAL JALUR GANDA) */}
+                                                <td className="py-4 font-bold text-white max-w-xs">
+                                                    <div className="flex flex-col gap-0.5">
+                                                        <div className="flex items-center gap-2">
+                                                            {/* Deteksi Nama Inggris Otomatis */}
+                                                            <span className="text-white text-xs">
+                                                                {isEn
+                                                                    ? item.name_en ||
+                                                                      item.name
+                                                                    : item.name}
+                                                            </span>
+                                                            {item.is_api_member ? (
+                                                                <span className="bg-emerald-500/20 text-emerald-400 text-[7px] font-black uppercase px-1.5 py-0.5 rounded-md border border-emerald-500/30 tracking-widest">
+                                                                    <i className="fas fa-check-circle"></i>{" "}
+                                                                    API Member
+                                                                </span>
+                                                            ) : (
+                                                                <span className="bg-blue-500/10 text-blue-400 text-[7px] font-black uppercase px-1.5 py-0.5 rounded-md border border-blue-500/20 tracking-widest">
+                                                                    Tenant Store
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <span className="text-[8px] text-gray-500 uppercase font-mono mt-0.5">
+                                                            {item.category}
+                                                        </span>
+                                                        {/* Deteksi Deskripsi Inggris Otomatis */}
+                                                        {(isEn
+                                                            ? item.description_en ||
+                                                              item.description
+                                                            : item.description) && (
+                                                            <p className="text-[10px] text-gray-400 font-normal normal-case italic mt-1 font-sans leading-normal">
+                                                                "
+                                                                {isEn
+                                                                    ? item.description_en ||
+                                                                      item.description
+                                                                    : item.description}
+                                                                "
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </td>
+
+                                                {/* COL 3: ENTITAS HUKUM PERUSAHAAN */}
+                                                <td className="py-4 font-black text-gray-300 uppercase text-[10px] tracking-wide">
+                                                    {item.nama_perusahaan ||
+                                                        "PT. Vendor Tekstil Utama"}
+                                                </td>
+
+                                                {/* COL 4: VOLUMETRIK GUDANG */}
+                                                <td className="py-4 font-black text-emerald-400 font-mono text-sm whitespace-nowrap">
+                                                    {parseFloat(
+                                                        item.stock || 0,
+                                                    ).toLocaleString(
+                                                        "id-ID",
+                                                    )}{" "}
+                                                    <span className="text-[10px] font-normal text-gray-400">
+                                                        {item.unit}
+                                                    </span>
+                                                </td>
+
+                                                {/* COL 5: KOORDINAT GEOGRAFIS */}
+                                                <td className="py-4 font-medium uppercase text-[10px] tracking-wider text-gray-400 whitespace-nowrap">
+                                                    <i className="fas fa-map-marker-alt text-rose-500/50 mr-1.5"></i>
+                                                    {item.warehouse_location}
+                                                </td>
+
+                                                {/* COL 6: NOMINAL HARGA LAPAK */}
+                                                <td className="py-4 font-bold font-mono text-white whitespace-nowrap">
+                                                    {parseFloat(
+                                                        item.price || 0,
+                                                    ) > 0
+                                                        ? `Rp ${parseFloat(item.price).toLocaleString("id-ID")}`
+                                                        : isEn
+                                                          ? "Serious Negotiation"
+                                                          : "Nego Serius"}
+                                                </td>
+                                                <td className="py-4 text-right pr-4 whitespace-nowrap">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        {/* 1. SENSOR EDIT MULTI-VENDOR: Hanya mengembang untuk Admin atau Akun Pemilik Toko Terkait */}
+                                                        {(isAdmin ||
+                                                            (auth?.user
+                                                                ?.company_id &&
+                                                                Number(
+                                                                    item.company_id,
+                                                                ) ===
+                                                                    Number(
+                                                                        auth
+                                                                            ?.user
+                                                                            ?.company_id,
+                                                                    ))) && (
+                                                            <a
+                                                                href={`/admin/inventory/${item.id}/edit`}
+                                                                className="bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer"
+                                                            >
+                                                                <i className="fas fa-edit mr-1"></i>
+                                                                {isEn
+                                                                    ? "Edit"
+                                                                    : "Ubah"}
+                                                            </a>
+                                                        )}
+
+                                                        {/* 2. TOMBOL UNDUH E-BROCHURE SPESIFIKASI TEKNIS KAIN */}
+                                                        {item.brochure && (
+                                                            <a
+                                                                href={`/storage/${item.brochure}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-[#0a192f] px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all inline-flex items-center gap-1.5"
+                                                            >
+                                                                <i className="fas fa-file-pdf"></i>{" "}
+                                                                {isEn
+                                                                    ? "Brochure"
+                                                                    : "Brosur"}
+                                                            </a>
+                                                        )}
+
+                                                        {/* 3. TOMBOL JALUR KOMUNIKASI WHATSAPP BUSINESS VENDOR */}
+                                                        <button
+                                                            onClick={() =>
+                                                                handleContactOwner(
+                                                                    item.whatsapp_contact,
+                                                                    isEn
+                                                                        ? item.name_en ||
+                                                                              item.name
+                                                                        : item.name,
+                                                                    isEn
+                                                                        ? "Product Storefront"
+                                                                        : "Lapak",
+                                                                )
+                                                            }
+                                                            className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer"
+                                                        >
+                                                            <i className="fab fa-whatsapp mr-1.5 text-xs"></i>
+                                                            {isEn
+                                                                ? "Chat Seller"
+                                                                : "Hubungi"}
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -448,14 +643,13 @@ export default function LocalSolutions({
                                                     {item.access_tier}
                                                 </span>
                                             </td>
-                                            {/* --- COL 4 MODAL 2: UNDUH DOKUMEN + SENSOR EDIT ADMIN --- */}
                                             <td className="p-4 text-right pr-4 whitespace-nowrap">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    {/* Tombol Edit Khusus Admin Regulasi (Materi BI, Permendag, dll) */}
+                                                    {/* PERBAIKAN: Rute edit singular '/admin/regulation/' agar sinkron tanpa memicu 404 */}
                                                     {isAdmin && (
                                                         <a
-                                                            href={`/admin/regulations/${item.id}/edit`}
-                                                            className="bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer"
+                                                            href={`/admin/regulation/${item.id}/edit`}
+                                                            className="bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300"
                                                         >
                                                             <i className="fas fa-edit mr-1"></i>
                                                             {isEn
@@ -463,7 +657,6 @@ export default function LocalSolutions({
                                                                 : "Ubah"}
                                                         </a>
                                                     )}
-
                                                     <button
                                                         onClick={() =>
                                                             handleDownloadReg(
@@ -490,13 +683,13 @@ export default function LocalSolutions({
             )}
 
             {/* ====================================================================== */}
-            {/* 🛡️ MODAL POPUP 3: MATCHMAKING KEMITRAAN B2B MULTI-SEKTOR (NEW) */}
+            {/* 🛡️ JENDELA MODAL POPUP 3: MATCHMAKING KEMITRAAN B2B MULTI-SEKTOR (FINAL) */}
             {/* ====================================================================== */}
             {isMatchOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
-                    <div className="bg-gradient-to-b from-[#0B192C] to-[#1E3E62] border border-amber-500/20 w-full max-w-5xl rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-                        {/* Header Modal */}
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-[#001F3F]/60">
+                    <div className="bg-gradient-to-b from-[#0B192C] to-[#1E3E62] border border-amber-500/20 w-full max-w-6xl rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+                        {/* PERBAIKAN 1: Header Modal Diletakkan di Luar Kontainer Area Gulir (Sticky Posisi Atas) */}
+                        <div className="p-6 border-b border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#001F3F]/60 gap-4">
                             <div className="border-l-4 border-amber-500 pl-4">
                                 <h3 className="text-white font-black uppercase text-sm tracking-tight italic">
                                     {isEn
@@ -504,15 +697,42 @@ export default function LocalSolutions({
                                         : "Konsol Perjodohan Kemitraan B2B Multi-Sektor"}
                                 </h3>
                             </div>
-                            <button
-                                onClick={() => setIsMatchOpen(false)}
-                                className="text-gray-400 hover:text-amber-500 text-sm font-black p-2 cursor-pointer focus:outline-none"
-                            >
-                                <i className="fas fa-times"></i>
-                            </button>
+
+                            <div className="flex items-center gap-3 ml-auto">
+                                {/* SENSOR UTAMA: Tombol Tambah Lini Mesin Hanya Terlihat oleh Admin ATAU Perusahaan Terdaftar */}
+                                {(isAdmin || auth?.user?.company_id) && (
+                                    <Link
+                                        href={route("matchmaking.create")}
+                                        className="bg-gradient-to-r from-amber-500 to-yellow-500 text-[#0a192f] px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-md hover:scale-105 duration-300"
+                                    >
+                                        <i className="fas fa-plus-circle mr-1.5"></i>
+                                        {isEn
+                                            ? "Add My Machine Capacity"
+                                            : "Daftarkan Lini Mesin Pabrik"}
+                                    </Link>
+                                )}
+
+                                {/* Tombol Tautan Pintas Menuju Makro Dashboard PLM */}
+                                <Link
+                                    href={route("matchmaking.index")}
+                                    className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-md"
+                                >
+                                    <i className="fas fa-robot mr-1.5"></i>{" "}
+                                    {isEn
+                                        ? "Go to AI Software"
+                                        : "Buka AI Software"}
+                                </Link>
+
+                                <button
+                                    onClick={() => setIsMatchOpen(false)}
+                                    className="text-gray-400 hover:text-amber-500 text-sm font-black p-2 cursor-pointer focus:outline-none"
+                                >
+                                    <i className="fas fa-times"></i>
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Search & Categories */}
+                        {/* Search & Categories Row */}
                         <div className="p-6 bg-[#001F3F]/30 border-b border-white/5 flex flex-col sm:flex-row gap-4 justify-between items-center">
                             <input
                                 type="text"
@@ -523,7 +743,7 @@ export default function LocalSolutions({
                                 }
                                 value={matchSearch}
                                 onChange={(e) => setMatchSearch(e.target.value)}
-                                className="w-full sm:w-72 bg-[#0A192F] border border-white/10 px-5 py-2.5 rounded-full text-[11px] text-white focus:outline-none focus:border-amber-500"
+                                className="w-full sm:w-72 bg-[#0A192F] border border-white/10 px-5 py-2.5 rounded-full text-[11px] text-white focus:outline-none focus:border-amber-500 shadow-inner"
                             />
                             <div className="flex gap-1.5 overflow-x-auto max-w-full scrollbar-hide">
                                 {matchCategories.map((cat) => (
@@ -538,11 +758,14 @@ export default function LocalSolutions({
                             </div>
                         </div>
 
-                        {/* Table Area */}
+                        {/* BODY UTAMA AREA GULIR TABEL (HANYA AREA INI YANG BERGULIR KE BAWAH) */}
                         <div className="overflow-y-auto p-6 flex-1 bg-black/10">
                             <table className="w-full text-left border-collapse">
                                 <thead className="bg-[#0a192f] text-gray-400 uppercase text-[9px] tracking-widest border-b border-white/5">
                                     <tr>
+                                        <th className="pb-4 pt-2 pl-4 w-20">
+                                            {isEn ? "Photo" : "Foto"}
+                                        </th>
                                         <th className="pb-4 pt-2 pl-4">
                                             {isEn
                                                 ? "Partner & Solution"
@@ -558,7 +781,7 @@ export default function LocalSolutions({
                                             {isEn ? "AI Match" : "Kecocokan"}
                                         </th>
                                         <th className="pb-4 pt-2 text-right pr-4">
-                                            {isEn ? "Synergy" : "Koneksi B2B"}
+                                            {isEn ? "Action" : "Sinergi B2B"}
                                         </th>
                                     </tr>
                                 </thead>
@@ -566,7 +789,7 @@ export default function LocalSolutions({
                                     {filteredPartnerships.length === 0 ? (
                                         <tr>
                                             <td
-                                                colSpan="5"
+                                                colSpan="6"
                                                 className="text-center py-10 text-gray-500 uppercase font-black tracking-wider text-[10px]"
                                             >
                                                 {isEn
@@ -580,7 +803,27 @@ export default function LocalSolutions({
                                                 key={item.id}
                                                 className="border-b border-white/5 hover:bg-white/5 transition duration-300"
                                             >
-                                                {/* 1. KOLOM SPESIFIKASI VENDOR & SOLUSI (DATA UTAMA + DATA TAMBAHAN DISATUKAN DI SINI) */}
+                                                {/* COL 1: FOTO MINI SUPPLIER / MESIN */}
+                                                <td className="py-4 pl-4 w-20">
+                                                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-800 border border-white/10 shadow-md relative group/img bg-white flex items-center justify-center p-1">
+                                                        {item.image_path ? (
+                                                            <img
+                                                                src={`/storage/${item.image_path}`}
+                                                                className="w-full h-full object-contain group-hover/img:scale-110 transition-transform duration-300"
+                                                                alt={item.name}
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex flex-col items-center justify-center text-gray-600 bg-slate-800">
+                                                                <i className="fas fa-industry text-xs"></i>
+                                                                <span className="text-[6px] font-black uppercase text-center text-gray-500 leading-none mt-1">
+                                                                    No Unit
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
+
+                                                {/* COL 2: SPESIFIKASI DAN KETERANGAN DATA (TERMASUK DETAIL BARU) */}
                                                 <td className="py-4 pl-4 font-bold text-white max-w-xs">
                                                     <div className="flex flex-col gap-0.5">
                                                         <span className="text-amber-400 text-sm">
@@ -593,54 +836,55 @@ export default function LocalSolutions({
                                                             "{item.description}"
                                                         </p>
 
-                                                        {/* DATA PELENGKAP BARU: Disuntikkan di bawah deskripsi agar rapi tanpa menambah kolom kesamping */}
-                                                        <div className="text-[10px] uppercase mt-3 flex flex-wrap gap-x-4 gap-y-1.5 bg-black/40 p-3 rounded-2xl border border-white/10 w-fit shadow-inner">
-                                                            <span className="whitespace-nowrap flex items-center text-gray-300 font-bold">
-                                                                <i className="fas fa-shopping-bag text-amber-500 mr-2 text-xs"></i>
-                                                                {isEn
-                                                                    ? "MOQ:"
-                                                                    : "Batas MOQ:"}{" "}
-                                                                <span className="text-white font-black bg-white/5 px-2 py-0.5 rounded ml-1 border border-white/5 font-mono">
-                                                                    {item.moq_info ||
-                                                                        "Nego"}
-                                                                </span>
+                                                        {/* Kotak Mini Detail MOQ & SLA */}
+                                                        <div className="text-[8px] text-gray-500 font-mono uppercase mt-3 flex flex-wrap gap-x-4 gap-y-1 bg-black/20 p-2 rounded-xl border border-white/5 w-fit">
+                                                            <span className="whitespace-nowrap">
+                                                                <i className="fas fa-shopping-bag text-yellow-500/40 mr-1"></i>
+                                                                MOQ:{" "}
+                                                                {item.moq_info ||
+                                                                    "Nego"}
                                                             </span>
-                                                            <span className="whitespace-nowrap flex items-center text-gray-300 font-bold">
-                                                                <i className="fas fa-shield-alt text-emerald-500 mr-2 text-xs"></i>
-                                                                {isEn
-                                                                    ? "SLA Support:"
-                                                                    : "Garansi SLA:"}{" "}
-                                                                <span className="text-emerald-400 font-black italic bg-emerald-500/10 px-2 py-0.5 rounded ml-1 border border-emerald-500/20 font-mono">
-                                                                    {item.after_sales_sla ||
-                                                                        "Terjamin"}
-                                                                </span>
+                                                            <span className="whitespace-nowrap">
+                                                                <i className="fas fa-shield-alt text-emerald-500/40 mr-1"></i>
+                                                                SLA:{" "}
+                                                                {item.after_sales_sla ||
+                                                                    "Terjamin"}
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </td>
 
-                                                {/* 2. KOLOM SEKTOR (Lurus dengan Header Sektor) */}
+                                                {/* COL 3: KATEGORI */}
                                                 <td className="py-4 uppercase font-black text-[9px] text-gray-400 font-mono whitespace-nowrap">
                                                     {item.category}
                                                 </td>
 
-                                                {/* 3. KOLOM WILAYAH (Lurus dengan Header Wilayah) */}
+                                                {/* COL 4: WILAYAH */}
                                                 <td className="py-4 uppercase font-bold text-[10px] text-gray-400 whitespace-nowrap">
                                                     <i className="fas fa-globe text-blue-500/30 mr-1.5"></i>
                                                     {item.region}
                                                 </td>
 
-                                                {/* 4. KOLOM KECOCOKAN AI (Lurus dengan Header Kecocokan) */}
+                                                {/* COL 5: PERSENTASE KECOCOKAN */}
                                                 <td className="py-4 font-mono font-black text-sm text-emerald-400 whitespace-nowrap">
                                                     {item.match_percentage}%
                                                     Match
                                                 </td>
 
-                                                {/* --- COL 5 MODAL 3: KONEKSI B2B + SENSOR EDIT ADMIN --- */}
+                                                {/* COL 6: KONEKSI WHATSAPP + SENSOR EDIT KHUSUS ADMIN & SUPPLIER RESMI */}
                                                 <td className="py-4 text-right pr-4 whitespace-nowrap">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        {/* Tombol Edit Khusus Admin Vendor (Centric, Labda Tekstil, Indorama) */}
-                                                        {isAdmin && (
+                                                        {(isAdmin ||
+                                                            (auth?.user
+                                                                ?.company_id &&
+                                                                Number(
+                                                                    item.company_id,
+                                                                ) ===
+                                                                    Number(
+                                                                        auth
+                                                                            ?.user
+                                                                            ?.company_id,
+                                                                    ))) && (
                                                             <a
                                                                 href={`/admin/partnerships/${item.id}/edit`}
                                                                 className="bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer"
@@ -651,7 +895,6 @@ export default function LocalSolutions({
                                                                     : "Ubah"}
                                                             </a>
                                                         )}
-
                                                         <button
                                                             onClick={() =>
                                                                 handleContactOwner(

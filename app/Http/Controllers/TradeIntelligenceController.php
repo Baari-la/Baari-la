@@ -118,13 +118,13 @@ $category = $request->input('category');
 
 public function editInventory($id)
 {
-    // Mengambil data spesifik barang berdasarkan ID yang diklik admin
-    $item = \DB::table('inventories')->where('id', $id)->first();
+   $item = \DB::table('inventories')->where('id', $id)->first();
+    if (!$item) abort(404);
 
-    if (!$item) {
-        abort(404, 'Data komoditas tidak ditemukan.');
+    // PROTEKSI: Tolak jika bukan admin DAN company_id tidak cocok
+    if (auth()->user()->role !== 'admin' && auth()->user()->company_id !== $item->company_id) {
+        abort(403, 'Anda tidak memiliki hak akses untuk mengubah produk ini.');
     }
-
     // Lempar data ke file view resources/js/Pages/Inventory/Edit.jsx
     return Inertia::render('Inventory/Edit', [
         'item' => $item,
@@ -154,7 +154,14 @@ public function editMatchmaking($id)
 
     if (!$partnership) {
         abort(404, 'Data kemitraan/vendor tidak ditemukan.');
+   
+    // PROTEKSI: Tolak jika bukan admin DAN company_id tidak cocok
+    if (auth()->user()->role !== 'admin' && auth()->user()->company_id !== $partnership->company_id) {
+        abort(403, 'Anda tidak memiliki hak akses untuk mengubah profil kemitraan ini.');
     }
+
+   
+        }
 
     return Inertia::render('Matchmaking/Edit', [
         'partnership' => $partnership,
@@ -162,8 +169,7 @@ public function editMatchmaking($id)
     ]);
 }
 
-
-    
+  
    
    public function createMatchmaking()
 {
@@ -189,7 +195,7 @@ public function storeMatchmaking(Request $request)
     $company = \DB::table('companies')->where('id', $user->company_id)->first();
 
     // 2. Suntik Data Langsung ke Tabel matchmakings Kontrol Riil Anda
-    \DB::table('matchmakings')->insert([
+    \DB::table('partnerships')->insert([
         'nama_perusahaan' => $company->company_name ?? 'PT. Vendor Tekstil',
         'jenis_mesin' => $request->jenis_mesin,
         'kategori_proses' => $request->kategori_proses,
@@ -209,79 +215,114 @@ public function storeMatchmaking(Request $request)
 
     
     public function storeInventory(Request $request)
-    {
-        // 1. Validasi Input sesuai format kolom database asli Bapak
-        $request->validate([
-            'name' => 'required|min:3',
-            'category' => 'required',
-            'stock' => 'required|numeric',
-            'unit' => 'required',
-            'warehouse_location' => 'required',
-            'whatsapp_contact' => 'required|numeric',
-        ]);
-
-        // 2. Ambil data profil user untuk mendapatkan company_id pengunggah
-        $user = auth()->user();
- $company = \DB::table('companies')->where('id', $user->company_id)->first();
-
-    if (!$company) {
-        return redirect()->back()->with('error', 'Profil perusahaan Anda tidak ditemukan.');
-    }
-
-    // 3. ATURAN BISNIS: Cek Hak Akses Unggah Toko Digital
-    $isApiMember = (bool) $company->is_api_member;
-    $hasActiveRental = $company->rental_expires_at && \Carbon\Carbon::parse($company->rental_expires_at)->isFuture();
-
-    // Jika BUKAN Anggota API DAN masa sewa bulanan sudah habis/tidak ada
-    if (!$isApiMember && !$hasActiveRental) {
-        return redirect()->back()->with('error', '⚠️ Akses Ditolak: Anda harus menjadi Anggota API atau memperpanjang sewa bulanan Toko Digital.');
-    }
-
-    // 4. Jalankan Penyimpanan jika Lolos Validasi Aturan Bisnis
-    
-        DB::table('inventories')->insert([
-            'name' => $request->name,
-            'category' => $request->category,
-            'stock' => $request->stock,
-            'unit' => $request->unit,
-            'warehouse_location' => $request->warehouse_location,
-            'whatsapp_contact' => $request->whatsapp_contact,
-            'description' => $request->description,
-            'price' => $request->price ?? 0.00,
-             'nama_perusahaan' => $company->company_name, 
-            'company_id' => $user->company_id ?? 1, // Otomatis mencatat ID perusahaan pemilik barang
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        return redirect()->route('inventory.index')->with('message', 'Produk berhasil dipajang di Toko Digital!');
-    }
-// 1. UPDATE DATA MODAL 1: TOKO DIGITAL BAHAN
-public function updateInventory(Request $request, $id)
 {
+    // 1. Validasi Input Produk + Validasi Gambar (Maksimal 2MB)
     $request->validate([
         'name' => 'required|min:3',
+        'name_en' => 'nullable|min:3',
         'category' => 'required',
         'stock' => 'required|numeric',
         'unit' => 'required',
         'warehouse_location' => 'required',
         'whatsapp_contact' => 'required|numeric',
-    ]);
+        'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Batasan file gambar
+         'brochure' => 'nullable|mimes:pdf|max:5120',
+        ]);
 
-    \DB::table('inventories')->where('id', $id)->update([
+        // Logika pemrosesan file PDF brosur toko digital
+$brochurePath = null;
+if ($request->hasFile('brochure')) {
+    $file = $request->file('brochure');
+    $filename = time() . '_brochure_' . $file->getClientOriginalName();
+    $file->storeAs('public/brochures', $filename);
+    $brochurePath = 'brochures/' . $filename;
+}
+
+    $user = auth()->user();
+    $company = \DB::table('companies')->where('id', $user->company_id)->first();
+
+    // 2. LOGIKA UPLOAD GAMBAR FISIK
+    $imagePath = null;
+    if ($request->hasFile('image')) {
+        // Simpan file ke dalam folder storage/app/public/news
+        $file = $request->file('image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->storeAs('public/news', $filename);
+        $imagePath = 'news/' . $filename; // Jalur yang akan dicatat di database
+    }
+
+    // 3. Simpan Seluruh Data ke Database
+    \DB::table('inventories')->insert([
         'name' => $request->name,
+        'name_en' => $request->name_en ?? $request->name,
         'category' => $request->category,
         'stock' => $request->stock,
         'unit' => $request->unit,
         'warehouse_location' => $request->warehouse_location,
         'whatsapp_contact' => $request->whatsapp_contact,
         'description' => $request->description,
+        'description_en' => $request->description_en,
         'price' => $request->price ?? 0.00,
-        'nama_perusahaan' => $request->nama_perusahaan ?? 'PT. Vendor Utama',
+        'nama_perusahaan' => $company->company_name ?? 'PT. Vendor Utama',
+        'company_id' => $company->id ?? 1,
+        'image' => $imagePath, // Mengamankan lokasi gambar baru
+        'created_at' => now(),
         'updated_at' => now()
     ]);
 
-    return redirect()->route('home')->with('message', 'Data bursa bahan berhasil diperbarui!');
+    return redirect()->route('home')->with('message', 'Material listed successfully with image!');
+}
+
+// 1. UPDATE DATA MODAL 1: TOKO DIGITAL BAHAN
+public function updateInventory(Request $request, $id)
+{
+    // 1. Validasi Input Produk + Validasi Gambar (Maksimal 2MB)
+    $request->validate([
+        'name' => 'required|min:3',
+                'category' => 'required',
+        'stock' => 'required|numeric',
+        'unit' => 'required',
+        'warehouse_location' => 'required',
+        'whatsapp_contact' => 'required|numeric',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
+
+    // Ambil data komoditas lama dari database
+    $oldItem = \DB::table('inventories')->where('id', $id)->first();
+    $imagePath = $oldItem->image; // Gunakan jalur foto lama sebagai nilai bawaan
+
+    // 2. LOGIKA SUBSTITUSI GAMBAR BARU
+    if ($request->hasFile('image')) {
+        // Hapus foto lama di storage jika file fisiknya terdeteksi
+        if ($oldItem->image && \Storage::exists('public/' . $oldItem->image)) {
+            \Storage::delete('public/' . $oldItem->image);
+        }
+
+        // Simpan file foto baru ke folder storage/app/public/news
+        $file = $request->file('image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->storeAs('public/news', $filename);
+        $imagePath = 'news/' . $filename;
+    }
+
+    // 3. Eksekusi Perintah SQL UPDATE ke Database Kantor/Rumah
+    \DB::table('inventories')->where('id', $id)->update([
+        'name' => $request->name,
+        'name_en' => $request->name_en ?? $request->name,
+        'category' => $request->category,
+        'stock' => $request->stock,
+        'unit' => $request->unit,
+        'warehouse_location' => $request->warehouse_location,
+        'whatsapp_contact' => $request->whatsapp_contact,
+        'description' => $request->description,
+        'description_en' => $request->description_en,
+        'price' => $request->price ?? 0.00,
+        'nama_perusahaan' => $request->nama_perusahaan ?? 'PT. Vendor Utama',
+        'image' => $imagePath, // Mengunci jalur gambar mutakhir
+        'updated_at' => now()
+    ]);
+
+    return redirect()->route('home')->with('message', 'Material updated successfully with new image!');
 }
 
 // 2. UPDATE DATA MODAL 2: PUSAT DATA & REGULASI
@@ -292,7 +333,27 @@ public function updateRegulation(Request $request, $id)
         'speaker' => 'required',
         'category' => 'required',
         'event_date' => 'required|date',
+        'file' => 'nullable|mimes:pdf|max:10240',
     ]);
+
+    $oldReg = \DB::table('regulations')->where('id', $id)->first();
+    $filePath = $oldReg->file_path;
+
+    if ($request->hasFile('file')) {
+        // Hapus dokumen PDF lama di server jika ada
+        if ($oldReg->file_path && \Storage::exists('public/' . $oldReg->file_path)) {
+            \Storage::delete('public/' . $oldReg->file_path);
+        }
+
+        $file = $request->file('file');
+        
+        /* PERBAIKAN UTAMA: Mengambil nama asli file murni tanpa tambahan angka */
+        $filename = $file->getClientOriginalName(); 
+        
+        // Simpan ke folder storage/app/public/regulations/
+        $file->storeAs('public/regulations', $filename);
+        $filePath = 'regulations/' . $filename;
+    }
 
     \DB::table('regulations')->where('id', $id)->update([
         'title' => $request->title,
@@ -300,10 +361,45 @@ public function updateRegulation(Request $request, $id)
         'category' => $request->category,
         'access_tier' => $request->access_tier,
         'event_date' => $request->event_date,
+        'file_path' => $filePath, // Mengunci jalur nama murni asli
         'updated_at' => now()
     ]);
 
-    return redirect()->route('home')->with('message', 'Dokumen regulasi berhasil diperbarui!');
+    return redirect()->route('home')->with('message', 'Dokumen regulasi berhasil diperbarui dengan nama asli!');
+}
+
+
+// 1. FUNGSI UNTUK MENYIMPAN REGULASI BARU
+public function storeRegulation(Request $request)
+{
+    $request->validate([
+        'title' => 'required|min:5',
+        'speaker' => 'required',
+        'category' => 'required',
+        'event_date' => 'required|date',
+        'file' => 'required|mimes:pdf|max:10240', // Wajib PDF, Maksimal 10MB
+    ]);
+
+    $filePath = null;
+    if ($request->hasFile('file')) {
+        $file = $request->file('file');
+        $filename = time() . '_doc_' . $file->getClientOriginalName();
+        $file->storeAs('public/regulations', $filename);
+        $filePath = 'regulations/' . $filename;
+    }
+
+    \DB::table('regulations')->insert([
+        'title' => $request->title,
+        'speaker' => $request->speaker,
+        'category' => $request->category,
+        'access_tier' => $request->access_tier ?? 'Member',
+        'event_date' => $request->event_date,
+        'file_path' => $filePath,
+        'created_at' => now(),
+        'updated_at' => now()
+    ]);
+
+    return redirect()->route('home')->with('message', 'Dokumen regulasi baru berhasil diunggah!');
 }
 
 // 3. UPDATE DATA MODAL 3: MATCHMAKING KEMITRAAN

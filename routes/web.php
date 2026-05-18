@@ -12,6 +12,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TradeDashboardController;
 use App\Models\Member;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -49,6 +50,25 @@ Route::post('/language/{locale}', function ($locale) {
     }
     return back();
 })->name('language.switch');
+
+// Untuk download materi
+// Taruh di luar middleware auth agar bisa diakses oleh pengunjung umum yang lolos sensor promosi
+Route::get('/download-file', function (Illuminate\Http\Request $request) {
+    $path = $request->query('path');
+    
+    // Validasi pencegahan hacker mengintip file sistem (.env)
+    if (!$path || str_contains($path, '..')) {
+        abort(403, 'Akses ilegal.');
+    }
+
+    // Cek file fisik di storage/app/public/
+    if (!Storage::disk('public')->exists($path)) {
+        abort(404, 'File presentasi/regulasi tidak ditemukan di server.');
+    }
+
+    // Ambil file dan paksa browser membuka/mengunduh (Bypass 403 Apache 100%)
+    return Storage::disk('public')->response($path);
+})->name('document.download');
 
 /*
 
