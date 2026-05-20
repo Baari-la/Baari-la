@@ -116,6 +116,10 @@ export default function Edit({ matchmaking = {} }) {
                                         Penyamakan Kulit Olahan (Leather
                                         Tanning)
                                     </option>
+                                    {/* 🌐 TIGA LACI BARU KHUSUS ENABLERS GLOBAL */}
+    <option value="Technology">Software & Digital PLM (Centric Software)</option>
+    <option value="Sertifikasi">Sertifikasi & Lab Pengujian (Testex)</option>
+    <option value="Raw Material">Bahan Baku & Aksesoris Penunjang (Coats)</option>
                                 </select>
                             </div>
 
