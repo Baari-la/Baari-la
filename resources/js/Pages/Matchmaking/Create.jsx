@@ -6,7 +6,7 @@ export default function Create({ company = {} }) {
     const { auth, locale } = usePage().props;
     const isEn = locale === "en" || auth?.user?.locale === "en";
 
-    // Reaktif Form Hook bawaan Inertia
+    // Reaktif Form Hook bawaan Inertia (Integrasi Bilingual)
     const { data, setData, post, processing, errors, reset } = useForm({
         jenis_mesin: "",
         kategori_proses: "Knitting",
@@ -16,6 +16,7 @@ export default function Create({ company = {} }) {
         lokasi_pabrik: company?.city || "", // Auto-fill kota pabrik
         whatsapp_contact: company?.phone_whatsapp || "", // Auto-fill WA pabrik
         spesifikasi_mesin: "",
+        spesifikasi_mesin_en: "", // <--- SUNTIKAN BARU: SPESIFIKASI VERSI INGGRIS
     });
 
     const handleSubmit = (e) => {
@@ -71,6 +72,7 @@ export default function Create({ company = {} }) {
                                 }
                                 placeholder="e.g., Circular Knitting Machine (Mayer & Cie)"
                                 className="bg-[#0f172a] border border-white/10 rounded-xl text-xs font-bold p-3.5 text-white focus:border-amber-500 focus:outline-none w-full shadow-inner"
+                                required
                             />
                             {errors.jenis_mesin && (
                                 <span className="text-xs text-red-400 font-bold">
@@ -80,7 +82,7 @@ export default function Create({ company = {} }) {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* 2. Sektor Proses */}
+                            {/* 2. Sektor Proses (Suntikan Ekspansi Multi-Sektor) */}
                             <div className="flex flex-col space-y-2">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">
                                     {isEn
@@ -104,7 +106,17 @@ export default function Create({ company = {} }) {
                                         Tenun (Weaving)
                                     </option>
                                     <option value="Garment">
-                                        Garmen / Jahit
+                                        Garmen / Jahit (Apparel)
+                                    </option>
+                                    <option value="Footwear">
+                                        Perakitan Alas Kaki (Footwear)
+                                    </option>
+                                    <option value="Bag">
+                                        Manufaktur Tas & Koper (Bag Line)
+                                    </option>
+                                    <option value="Leather">
+                                        Penyamakan Kulit Olahan (Leather
+                                        Tanning)
                                     </option>
                                 </select>
                             </div>
@@ -124,6 +136,7 @@ export default function Create({ company = {} }) {
                                     }
                                     placeholder="e.g., Sukoharjo, Jawa Tengah"
                                     className="bg-[#0f172a] border border-white/10 rounded-xl text-xs font-bold p-3.5 text-white focus:border-amber-500 focus:outline-none w-full"
+                                    required
                                 />
                                 {errors.lokasi_pabrik && (
                                     <span className="text-xs text-red-400 font-bold">
@@ -133,6 +146,7 @@ export default function Create({ company = {} }) {
                             </div>
                         </div>
 
+                        {/* 4. Jumlah Kapasitas, 5. Satuan Ukur, dan 6. Sertifikasi Pabrik */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* 4. Jumlah Kapasitas */}
                             <div className="flex flex-col space-y-2">
@@ -152,6 +166,7 @@ export default function Create({ company = {} }) {
                                     }
                                     placeholder="e.g., 150"
                                     className="bg-[#0f172a] border border-white/10 rounded-xl text-xs font-bold p-3.5 text-white focus:border-amber-500 focus:outline-none w-full"
+                                    required
                                 />
                                 {errors.kapasitas_bulanan && (
                                     <span className="text-xs text-red-400 font-bold">
@@ -175,6 +190,9 @@ export default function Create({ company = {} }) {
                                     <option value="Ton">Ton</option>
                                     <option value="Meter">Meter</option>
                                     <option value="Pcs">Pcs</option>
+                                    <option value="Pairs">
+                                        Pairs (Footwear)
+                                    </option>
                                 </select>
                             </div>
 
@@ -198,7 +216,7 @@ export default function Create({ company = {} }) {
                         </div>
 
                         {/* 7. Kontak WhatsApp Maklon */}
-                        <div className="flex flex-col space-y-2">
+                        <div className="flex flex-col space-y-2 border-b border-white/5 pb-6">
                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">
                                 {isEn
                                     ? "WhatsApp Contact for Order"
@@ -211,6 +229,7 @@ export default function Create({ company = {} }) {
                                     setData("whatsapp_contact", e.target.value)
                                 }
                                 className="bg-[#0f172a] border border-white/10 rounded-xl text-xs font-bold p-3.5 text-white focus:border-amber-500 focus:outline-none w-full"
+                                required
                             />
                             {errors.whatsapp_contact && (
                                 <span className="text-xs text-red-400 font-bold">
@@ -219,25 +238,56 @@ export default function Create({ company = {} }) {
                             )}
                         </div>
 
-                        {/* 8. Spesifikasi Detail Mesin */}
-                        <div className="flex flex-col space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                                {isEn
-                                    ? "Detailed Machine Technical Specs"
-                                    : "Spesifikasi Teknis Detail & Kapabilitas Mesin"}
-                            </label>
-                            <textarea
-                                value={data.spesifikasi_mesin}
-                                onChange={(e) =>
-                                    setData("spesifikasi_mesin", e.target.value)
-                                }
-                                placeholder="e.g., Diameter 30-34 inci, gauge 24-28, sangat mumpuni memproduksi kain poplin konstruksi padat..."
-                                rows={4}
-                                className="bg-[#0f172a] border border-white/10 rounded-xl text-xs font-bold p-3.5 text-white focus:border-amber-500 focus:outline-none w-full resize-none font-sans leading-relaxed"
-                            />
+                        {/* 🌐 8. SEPASANG INPUT SPESIFIKASI DETEIL TEKNIS (BILINGUAL LAYOUT) */}
+                        <div className="space-y-6 pt-2">
+                            {/* Spesifikasi Mesin - Bahasa Indonesia */}
+                            <div className="flex flex-col space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-amber-500">
+                                    Spesifikasi Teknis Detail & Kapabilitas
+                                    Mesin (ID)
+                                </label>
+                                <textarea
+                                    value={data.spesifikasi_mesin}
+                                    onChange={(e) =>
+                                        setData(
+                                            "spesifikasi_mesin",
+                                            e.target.value,
+                                        )
+                                    }
+                                    placeholder="e.g., Diameter 30-34 inci, gauge 24-28, sangat mumpuni memproduksi kain poplin konstruksi padat..."
+                                    rows={3}
+                                    className="bg-[#0f172a] border border-white/10 rounded-xl text-xs font-medium p-4 text-white focus:border-amber-500 focus:outline-none w-full resize-none font-sans leading-relaxed shadow-inner"
+                                    required
+                                />
+                                {errors.spesifikasi_mesin && (
+                                    <span className="text-xs text-red-400 font-bold">
+                                        ⚠️ {errors.spesifikasi_mesin}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Spesifikasi Mesin - English Extension */}
+                            <div className="flex flex-col space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-indigo-400">
+                                    Detailed Machine Technical Specs &
+                                    Capabilities (EN)
+                                </label>
+                                <textarea
+                                    value={data.spesifikasi_mesin_en || ""}
+                                    onChange={(e) =>
+                                        setData(
+                                            "spesifikasi_mesin_en",
+                                            e.target.value,
+                                        )
+                                    }
+                                    placeholder="e.g., Diameter 30-34 inches, gauge 24-28, highly capable of producing high-density poplin construction fabrics..."
+                                    rows={3}
+                                    className="bg-[#0f172a] border border-white/10 rounded-xl text-xs font-medium p-4 text-white focus:border-indigo-500 focus:outline-none w-full resize-none font-sans leading-relaxed shadow-inner"
+                                />
+                            </div>
                         </div>
 
-                        {/* --- EXECUTE BUTTON --- */}
+                        {/* --- EXECUTE BUTTON (SUBMIT MATANG) --- */}
                         <div className="pt-4 border-t border-white/5 flex justify-end">
                             <button
                                 type="submit"
