@@ -1,6 +1,14 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { useState } from "react";
-import { ShieldCheck, LogOut, Menu, X, Globe, Library, LayoutDashboard } from "lucide-react";
+import {
+    ShieldCheck,
+    LogOut,
+    Menu,
+    X,
+    Globe,
+    Library,
+    LayoutDashboard,
+} from "lucide-react";
 
 export default function Navbar() {
     const { props } = usePage();
@@ -42,15 +50,26 @@ export default function Navbar() {
         <nav className="bg-[#0b1329]/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50 shadow-2xl">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex justify-between h-20 items-center">
-                    
                     {/* LOGO SINKRON: DIGESTEX GLOBAL HUB */}
-                    <Link href="/" className="flex items-center gap-3 shrink-0 group">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform duration-300">
-                            <ShieldCheck className="w-5 h-5 text-[#030712] stroke-[2.5]" />
+                    {/* 🛡️ LOGO RESMI MANDIRI: PT DIGESTEX GLOBAL INTELLIGENCE */}
+                    <Link
+                        href="/"
+                        className="flex items-center gap-3 shrink-0 group"
+                    >
+                        <div className="hover:scale-105 transition-transform duration-300">
+                            <img
+                                src="/images/logoWeb.png"
+                                className="h-10 w-auto rounded-xl shadow-lg shadow-amber-500/5"
+                                alt="Digestex Global Logo"
+                            />
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-black tracking-tighter text-sm uppercase text-white leading-none">DIGESTEX</span>
-                            <span className="text-[8px] text-amber-500 font-mono tracking-widest uppercase font-bold mt-1">GLOBAL HUB</span>
+                            {/* <span className="font-black tracking-tighter text-sm uppercase text-white leading-none">
+                                DIGESTEX
+                            </span>
+                            <span className="text-[8px] text-amber-500 font-mono tracking-widest uppercase font-bold mt-1">
+                                GLOBAL HUB
+                            </span> */}
                         </div>
                     </Link>
 
@@ -62,7 +81,10 @@ export default function Navbar() {
                         </Link>
 
                         {/* 📊 SUNTIKAN TOMBOL UTAMA BARU: DASHBOARD AKSES DI NAV BAR DEPAN */}
-                        <Link href={route("dashboard")} className={navLinkStyle}>
+                        <Link
+                            href={route("dashboard")}
+                            className={navLinkStyle}
+                        >
                             <LayoutDashboard className="w-3.5 h-3.5 text-amber-500/80" />
                             {isEn ? "Dashboard" : "Dashboard"}
                             <span className={underlineStyle}></span>
@@ -84,27 +106,42 @@ export default function Navbar() {
                             className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white hover:text-emerald-400 transition-all group relative py-2 bg-white/5 border border-white/5 px-3 py-1.5 rounded-xl duration-300"
                         >
                             <span>🧮</span>
-                            <span>{isEn ? "Industrial Toolbox" : "Alat Industri"}</span>
+                            <span>
+                                {isEn ? "Industrial Toolbox" : "Alat Industri"}
+                            </span>
                             <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[6px] text-[#030712] px-1.5 py-0.5 rounded-md font-black tracking-tighter">
                                 PREMIUM
                             </span>
                             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-emerald-500 transition-all duration-300 group-hover:w-full"></span>
                         </Link>
 
-                        <Link href={route("companies.index")} className={navLinkStyle}>
-                            <Library className="w-3.5 h-3.5 text-amber-500/60" /> Big Data
+                        <Link
+                            href={route("companies.index")}
+                            className={navLinkStyle}
+                        >
+                            <Library className="w-3.5 h-3.5 text-amber-500/60" />{" "}
+                            Big Data
                             <span className={underlineStyle}></span>
                         </Link>
 
                         {/* AUTHENTICATION ROUTING NODE SECTION */}
                         {auth.user ? (
                             <div className="flex items-center gap-6 ml-2 border-l border-white/10 pl-6">
-                                <Link href={route("dashboard")} className="text-right group">
+                                <Link
+                                    href={route("dashboard")}
+                                    className="text-right group"
+                                >
                                     <p className="text-[8px] font-black uppercase text-gray-500 tracking-widest leading-none mb-1 group-hover:text-amber-400 transition-colors">
-                                        {isEn ? "Welcome Back," : "Selamat Datang,"}
+                                        {isEn
+                                            ? "Welcome Back,"
+                                            : "Selamat Datang,"}
                                     </p>
                                     <p className="text-[10px] font-black italic text-white uppercase leading-none tracking-wide">
-                                        "{auth.user.name ? auth.user.name.split(" ")[0] : "User"}"
+                                        "
+                                        {auth.user.name
+                                            ? auth.user.name.split(" ")[0]
+                                            : "User"}
+                                        "
                                     </p>
                                 </Link>
                                 <button
@@ -147,7 +184,11 @@ export default function Navbar() {
                             onClick={() => setIsOpen(!isOpen)}
                             className="text-amber-500 bg-white/5 border border-white/5 rounded-xl p-2.5 z-50 relative transition-transform"
                         >
-                            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                            {isOpen ? (
+                                <X className="w-5 h-5" />
+                            ) : (
+                                <Menu className="w-5 h-5" />
+                            )}
                         </button>
                     </div>
                 </div>
@@ -162,20 +203,21 @@ export default function Navbar() {
                 }`}
             >
                 <div className="px-8 pt-28 pb-10 flex flex-col gap-6 h-full overflow-y-auto">
-                    
                     {/* TAYANGAN PROFIL USER DI SELULER */}
                     {auth.user && (
                         <div className="pb-6 border-b border-white/5 flex justify-between items-center">
                             <div>
                                 <p className="text-[8px] font-black text-amber-500 uppercase tracking-[0.2em] mb-1">
-                                    {isEn ? "Authenticated Executive" : "Terautentikasi Sebagai"}
+                                    {isEn
+                                        ? "Authenticated Executive"
+                                        : "Terautentikasi Sebagai"}
                                 </p>
                                 <p className="text-white font-black text-base truncate uppercase italic tracking-tight">
                                     {auth.user.name}
                                 </p>
                             </div>
-                            <Link 
-                                href={route("dashboard")} 
+                            <Link
+                                href={route("dashboard")}
                                 onClick={() => setIsOpen(false)}
                                 className="bg-white/5 border border-white/5 text-amber-400 font-mono text-[9px] font-bold px-3 py-2 rounded-xl uppercase tracking-wider shadow-inner"
                             >
@@ -200,7 +242,8 @@ export default function Navbar() {
                             onClick={() => setIsOpen(false)}
                             className="text-xs font-black uppercase text-amber-400 tracking-widest hover:text-amber-400 transition-colors flex items-center gap-2"
                         >
-                            <LayoutDashboard className="w-4 h-4" /> {isEn ? "Data Dashboard" : "Dashboard Data"}
+                            <LayoutDashboard className="w-4 h-4" />{" "}
+                            {isEn ? "Data Dashboard" : "Dashboard Data"}
                         </Link>
 
                         <Link
@@ -228,7 +271,9 @@ export default function Navbar() {
                             <div className="flex items-center gap-3">
                                 <span className="text-xl">🧮</span>
                                 <span className="text-emerald-400 font-black uppercase text-[10px] tracking-widest">
-                                    {isEn ? "Industrial Toolbox" : "Alat Industri"}
+                                    {isEn
+                                        ? "Industrial Toolbox"
+                                        : "Alat Industri"}
                                 </span>
                             </div>
                             <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[#030712] text-[7px] font-black px-2 py-1 rounded shadow-md">

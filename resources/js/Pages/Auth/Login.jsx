@@ -40,6 +40,22 @@ export default function Login({ status, canResetPassword }) {
                 </p>
             </div>
 
+            {/* 🛡️ NOTIFIKASI GERBANG AKSES MANDIRI BERBASIS NOMOR ANGGOTA ASOSIASI */}
+            <div className="mb-6 bg-gradient-to-r from-amber-500/10 to-yellow-600/5 border border-amber-500/20 p-4 rounded-2xl shadow-xl backdrop-blur-sm space-y-1">
+                <p className="text-[9px] font-black uppercase text-amber-400 tracking-widest flex items-center justify-center gap-1.5">
+                    <i className="fas fa-id-card"></i>
+                    {isEn
+                        ? "Association Member Access Routing"
+                        : "Gerbang Validasi Anggota Asosiasi"}
+                </p>
+                {/* Mengubah warna dari text-gray-300 menjadi text-white tebal */}
+                <p className="text-white text-[11px] text-center leading-relaxed font-sans font-bold">
+                    {isEn
+                        ? "Active members can directly log in using your official Association Membership ID (e.g., 1241/0006.P) as your login identity."
+                        : "Anggota aktif dapat langsung masuk menggunakan Nomor Anggota Resmi Asosiasi Anda (Contoh: 1241/0006.P) pada kolom identitas."}
+                </p>
+            </div>
+
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-500 italic">
                     {status}
@@ -127,7 +143,7 @@ export default function Login({ status, canResetPassword }) {
                             className="w-auto h-6"
                         />
                     </div>
-                    <span className="text-gray-700 font-bold text-[10px] uppercase tracking-[0.15em]">
+                    <span className="text-white font-black text-[10px] uppercase tracking-[0.15em] group-hover:text-yellow-400 transition-colors duration-300">
                         {isEn
                             ? "Continue with Google"
                             : "Lanjutkan dengan Google"}
@@ -161,13 +177,14 @@ export default function Login({ status, canResetPassword }) {
             </form>
 
             {/* SEKSI DAFTAR / PRICING */}
-            <div className="mt-8 text-center border-t border-white/10 pt-6">
-                <p className="text-gray-800 text-[11px] font-black uppercase tracking-widest mb-4">
+            <div className="mt-5 text-center border-t border-white/10 pt-4">
+                {/* Mengubah warna dari text-gray-800 menjadi text-gray-300 yang tajam memancar */}
+                <p className="text-gray-300 text-[10px] font-black uppercase tracking-widest mb-1.5">
                     {isEn ? "Don't have an account?" : "Belum punya akun?"}
                 </p>
                 <Link
-                    href={route("pricing.index")} // Mengarah ke halaman baru
-                    className="text-yellow-500 hover:text-white font-black uppercase italic text-xs tracking-tighter transition-all underline decoration-yellow-500/30"
+                    href={route("pricing.index")}
+                    className="text-yellow-500 hover:text-white font-black uppercase italic text-xs tracking-tighter transition-all underline decoration-yellow-500/30 block hover:scale-105 duration-300"
                 >
                     {isEn
                         ? "Register & See Pricing →"

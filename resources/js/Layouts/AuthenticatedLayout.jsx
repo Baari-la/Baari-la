@@ -50,17 +50,18 @@ export default function AuthenticatedLayout({ header, children }) {
                                     href="/"
                                     className="flex items-center gap-3 group"
                                 >
-                                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform duration-300">
-                                        <ShieldCheck className="w-5 h-5 text-[#030712] stroke-[2.5]" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-black tracking-tighter text-sm uppercase text-white leading-none">
+                                    <img
+                                        src="/images/logoWeb.png"
+                                        className="h-10 w-auto rounded-xl shadow-lg shadow-amber-500/5"
+                                        alt="Digestex Global Logo"
+                                    />
+                                    {/* <span className="font-black tracking-tighter text-sm uppercase text-white leading-none">
                                             API JAKARTA
                                         </span>
                                         <span className="text-[7px] text-amber-500 font-mono tracking-widest uppercase font-bold mt-1">
                                             GLOBAL TRADE NODE
-                                        </span>
-                                    </div>
+                                        </span> */}
+                                    {/* </div> */}
                                 </Link>
                             </div>
 
@@ -149,12 +150,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                         </button>
                                     </Dropdown.Trigger>
                                     <Dropdown.Content className="bg-[#0b1329] border border-white/10 rounded-2xl shadow-2xl p-1 mt-2">
-
-<Dropdown.Link
+                                        <Dropdown.Link
                                             href={route("profile.edit")}
                                             className="text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-white rounded-xl px-4 py-2.5 flex items-center gap-2"
                                         >
-                                            <Settings className="w-3.5 h-3.5 text-gray-500" /> Account Settings
+                                            <Settings className="w-3.5 h-3.5 text-gray-500" />{" "}
+                                            Account Settings
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route("logout")}
@@ -162,7 +163,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             as="button"
                                             className="text-xs font-bold text-red-400 hover:bg-red-500/10 rounded-xl px-4 py-2.5 flex items-center gap-2 w-full text-left"
                                         >
-                                            <LogOut className="w-3.5 h-3.5" /> Log Out
+                                            <LogOut className="w-3.5 h-3.5" />{" "}
+                                            Log Out
                                         </Dropdown.Link>
                                     </Dropdown.Content>
                                 </Dropdown>
@@ -224,7 +226,8 @@ export default function AuthenticatedLayout({ header, children }) {
                         active={route().current("logistics.tracking")}
                         className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-amber-400 flex items-center gap-2"
                     >
-                        <Globe className="w-3.5 h-3.5" /> {isEn ? "Port Tracking" : "Pelacakan Kontainer"}
+                        <Globe className="w-3.5 h-3.5" />{" "}
+                        {isEn ? "Port Tracking" : "Pelacakan Kontainer"}
                     </ResponsiveNavLink>
 
                     <ResponsiveNavLink
@@ -260,21 +263,21 @@ export default function AuthenticatedLayout({ header, children }) {
             </nav>
 
             {/* --- AREA HEADER DINAMIS SUB-HALAMAN (SINKRONISASI TEMA DARK PREMIUM) --- */}
-           {header && (
-    <header className="bg-gradient-to-r from-[#0b1329] via-[#0f172a]/40 to-transparent border-b border-white/5 shadow-2xl relative overflow-hidden">
-        {/* Ornamen Pendaran Cahaya Neon Emas di Sudut Belakang */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -ml-20 -mt-20"></div>
-        
-        <div className="mx-auto max-w-7xl px-6 py-6 sm:px-8 lg:px-10 relative z-10">
-            {/* Garis Vertikal Emas Kokoh Sebagai Penopang Fokus Visual */}
-            <div className="border-l-4 border-amber-500 pl-4">
-                <h1 className="text-lg lg:text-xl font-black uppercase tracking-wider font-sans text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-gray-400 drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">
-                    {header}
-                </h1>
-            </div>
-        </div>
-    </header>
-)}
+            {header && (
+                <header className="bg-gradient-to-r from-[#0b1329] via-[#0f172a]/40 to-transparent border-b border-white/5 shadow-2xl relative overflow-hidden">
+                    {/* Ornamen Pendaran Cahaya Neon Emas di Sudut Belakang */}
+                    <div className="absolute top-0 left-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -ml-20 -mt-20"></div>
+
+                    <div className="mx-auto max-w-7xl px-6 py-6 sm:px-8 lg:px-10 relative z-10">
+                        {/* Garis Vertikal Emas Kokoh Sebagai Penopang Fokus Visual */}
+                        <div className="border-l-4 border-amber-500 pl-4">
+                            <h1 className="text-lg lg:text-xl font-black uppercase tracking-wider font-sans text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-gray-400 drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">
+                                {header}
+                            </h1>
+                        </div>
+                    </div>
+                </header>
+            )}
 
             {/* --- AREA MAIN STREAM VIEWPORT UTAMA (ANIMASI SMOOTH LOADING) --- */}
             <main className="relative z-10 animate-fade-in-up">{children}</main>
@@ -283,10 +286,15 @@ export default function AuthenticatedLayout({ header, children }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="border-t border-white/5 pt-8 pb-12 mt-12 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-500 font-medium font-mono">
                     <p>
-                        &copy; 2026 <span className="text-amber-500/80 font-bold">PT. Digestex Global Intelligence</span>. All Rights Reserved.
+                        &copy; 2026{" "}
+                        <span className="text-amber-500/80 font-bold">
+                            PT. Digestex Global Intelligence
+                        </span>
+                        . All Rights Reserved.
                     </p>
                     <p className="uppercase tracking-widest text-[9px] bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
-                        <i className="fas fa-shield-alt text-emerald-500/40 mr-1.5"></i> Officially Endorsed Technology Provider for API Jakarta
+                        <i className="fas fa-shield-alt text-emerald-500/40 mr-1.5"></i>{" "}
+                        Officially Endorsed Technology Provider for API Jakarta
                     </p>
                 </div>
             </div>
