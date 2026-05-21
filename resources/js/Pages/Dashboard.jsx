@@ -59,18 +59,25 @@ export default function Dashboard({
     const isEn = locale === "en" || auth?.user?.locale === "en";
 
     // 🕵️ MATRIKS EKSTRAKSI OTOMATIS BARIS TERAKHIR TABEL MARKET_HISTORIES (ID 46)
-    const latestHistoryRecord = marketHistory && marketHistory.length > 0 
-        ? marketHistory[marketHistory.length - 1] 
-        : null;
+    const latestHistoryRecord =
+        marketHistory && marketHistory.length > 0
+            ? marketHistory[marketHistory.length - 1]
+            : null;
 
     // Menentukan nilai live rate murni: Jika usd_idr bawaan kosong, ambil dari record database terbaru
-    const liveExchangeRate = usd_idr && parseFloat(usd_idr) > 0 
-        ? parseFloat(usd_idr) 
-        : (latestHistoryRecord && latestHistoryRecord.usd_idr ? parseFloat(latestHistoryRecord.usd_idr) : 17600);
+    const liveExchangeRate =
+        usd_idr && parseFloat(usd_idr) > 0
+            ? parseFloat(usd_idr)
+            : latestHistoryRecord && latestHistoryRecord.usd_idr
+              ? parseFloat(latestHistoryRecord.usd_idr)
+              : 17600;
 
-    const liveCottonPrice = cottonPrice && parseFloat(cottonPrice) > 0 
-        ? cottonPrice 
-        : (latestHistoryRecord && latestHistoryRecord.cotton_price ? latestHistoryRecord.cotton_price : "81.51");
+    const liveCottonPrice =
+        cottonPrice && parseFloat(cottonPrice) > 0
+            ? cottonPrice
+            : latestHistoryRecord && latestHistoryRecord.cotton_price
+              ? latestHistoryRecord.cotton_price
+              : "81.51";
 
     // FUNGSI EKSPOR CAPTURE GAMBAR HTML2CANVAS
     const exportAsImage = async (elementId, fileName) => {
@@ -88,7 +95,7 @@ export default function Dashboard({
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-bold leading-tight text-gray-800">
+                <h2 className="text-xl font-black uppercase tracking-wider font-sans text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400 drop-shadow-[0_2px_10px_rgba(96,165,250,0.3)]">
                     Industrial Intelligence Dashboard
                 </h2>
             }
@@ -97,7 +104,6 @@ export default function Dashboard({
 
             <div className="py-12 bg-gray-50">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    
                     {/* --- SECTION: UPDATE DATA PERUSAHAAN --- */}
                     <div className="mb-10 bg-gradient-to-r from-[#0f172a] to-[#1e293b] p-8 rounded-[40px] border border-white/10 shadow-2xl flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="flex items-center gap-6">
@@ -147,7 +153,8 @@ export default function Dashboard({
                                 WELCOME BACK, {auth.user.name.toUpperCase()}!
                             </h2>
                             <p className="text-blue-100 opacity-80 font-medium">
-                                Intelligence system is active. Your encrypted data stream is ready.
+                                Intelligence system is active. Your encrypted
+                                data stream is ready.
                             </p>
                         </div>
                         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
@@ -230,23 +237,31 @@ export default function Dashboard({
                         href={route("intelligence.center")}
                         className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 mb-8"
                     >
-                        <span className="mr-2">🚀</span> Buka Deep Intelligence Center
+                        <span className="mr-2">🚀</span> Buka Deep Intelligence
+                        Center
                     </Link>
 
                     {/* --- BILINGUAL WARNING INDUSTRIAL INSIGHT --- */}
                     <div className="bg-amber-50 border-l-4 border-amber-400 p-4 my-6 rounded-r-xl">
                         <div className="flex items-center">
-                            <AlertCircle className="text-amber-600 mr-3" size={24} />
+                            <AlertCircle
+                                className="text-amber-600 mr-3"
+                                size={24}
+                            />
                             <div>
                                 <h4 className="text-sm font-bold text-amber-800 uppercase tracking-wider">
                                     Industrial Insight /{" "}
-                                    <span className="italic">Wawasan Industri</span>
+                                    <span className="italic">
+                                        Wawasan Industri
+                                    </span>
                                 </h4>
                                 <p className="text-sm text-amber-700">
-                                    Export value to USA remains dominant, but keep an eye on China's premium growth.
+                                    Export value to USA remains dominant, but
+                                    keep an eye on China's premium growth.
                                 </p>
                                 <p className="text-xs text-amber-600 italic mt-1">
-                                    Nilai ekspor ke AS tetap dominan, namun perhatikan pertumbuhan premium di Cina.
+                                    Nilai ekspor ke AS tetap dominan, namun
+                                    perhatikan pertumbuhan premium di Cina.
                                 </p>
                             </div>
                         </div>
@@ -254,32 +269,42 @@ export default function Dashboard({
 
                     {/* --- AREA YANG AKAN DI-CAPTURE (id="capture-area") --- */}
                     <div id="capture-area" className="p-4 rounded-3xl">
-                          
-    {/* 🕵️ SUNTIKAN LOGIKA PEMBERSIH DATA: KONVERSI TEKS DB MENJADI ANGKA MURNI RECHARTS */}
-    {(() => {
-        const cleanedMarketHistory = marketHistory && marketHistory.length > 0
-            ? marketHistory.map(item => ({
-                ...item,
-                // Memaksa nilai teks DB dari Python menjadi angka matematika murni
-                cotton_price: item.cotton_price ? parseFloat(item.cotton_price) : 0,
-                usd_idr: item.usd_idr ? parseFloat(item.usd_idr) : 0,
-                // Format penamaan tanggal agar grafik sumbu X terlihat rapi
-                date: item.date ? item.date.split('-').slice(1).reverse().join('/') : '' 
-            }))
-            : [];
+                        {/* 🕵️ SUNTIKAN LOGIKA PEMBERSIH DATA: KONVERSI TEKS DB MENJADI ANGKA MURNI RECHARTS */}
+                        {(() => {
+                            const cleanedMarketHistory =
+                                marketHistory && marketHistory.length > 0
+                                    ? marketHistory.map((item) => ({
+                                          ...item,
+                                          // Memaksa nilai teks DB dari Python menjadi angka matematika murni
+                                          cotton_price: item.cotton_price
+                                              ? parseFloat(item.cotton_price)
+                                              : 0,
+                                          usd_idr: item.usd_idr
+                                              ? parseFloat(item.usd_idr)
+                                              : 0,
+                                          // Format penamaan tanggal agar grafik sumbu X terlihat rapi
+                                          date: item.date
+                                              ? item.date
+                                                    .split("-")
+                                                    .slice(1)
+                                                    .reverse()
+                                                    .join("/")
+                                              : "",
+                                      }))
+                                    : [];
 
-        return (
-            <div className="bg-white rounded-[40px] shadow-sm overflow-hidden border border-gray-100 mb-8">
-                {/* PILOT DATA SEKARANG DIALIRKAN VIA cleanedMarketHistory */}
-                <CottonCurrencyTrendChart
-                    data={cleanedMarketHistory} 
-                    usd_idr={usd_idr}
-                    cottonPrice={cottonPrice}
-                    isEn={isEn}
-                />
-            </div>
-        );
-    })()}
+                            return (
+                                <div className="bg-white rounded-[40px] shadow-sm overflow-hidden border border-gray-100 mb-8">
+                                    {/* PILOT DATA SEKARANG DIALIRKAN VIA cleanedMarketHistory */}
+                                    <CottonCurrencyTrendChart
+                                        data={cleanedMarketHistory}
+                                        usd_idr={usd_idr}
+                                        cottonPrice={cottonPrice}
+                                        isEn={isEn}
+                                    />
+                                </div>
+                            );
+                        })()}
                         {/* GRAFIK TUJUAN EKSPOR MACO WIDE SCREEN */}
                         <div className="mx-auto max-w-none px-4 sm:px-6 lg:px-10">
                             <TopMarketChart
@@ -325,10 +350,10 @@ export default function Dashboard({
                             }
                             className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-bold shadow-xl transition-all flex items-center gap-2 cursor-pointer"
                         >
-                            <i className="fab fa-whatsapp text-lg"></i> CAPTURE & SHARE TO WHATSAPP
+                            <i className="fab fa-whatsapp text-lg"></i> CAPTURE
+                            & SHARE TO WHATSAPP
                         </button>
                     </div>
-
                 </div>
             </div>
         </AuthenticatedLayout>
