@@ -50,7 +50,7 @@ export default function Navbar() {
         <nav className="bg-[#0b1329]/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50 shadow-2xl">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex justify-between h-20 items-center">
-                    {/* LOGO SINKRON: DIGESTEX GLOBAL HUB */}
+                    
                     {/* 🛡️ LOGO RESMI MANDIRI: PT DIGESTEX GLOBAL INTELLIGENCE */}
                     <Link
                         href="/"
@@ -59,17 +59,17 @@ export default function Navbar() {
                         <div className="hover:scale-105 transition-transform duration-300">
                             <img
                                 src="/images/logoWeb.png"
-                                className="h-10 w-auto rounded-xl shadow-lg shadow-amber-500/5"
+                                className="h-10 w-auto rounded-xl shadow-lg shadow-amber-500/5 border border-white/5"
                                 alt="Digestex Global Logo"
                             />
                         </div>
                         <div className="flex flex-col">
-                            {/* <span className="font-black tracking-tighter text-sm uppercase text-white leading-none">
+                            <span className="font-black tracking-tighter text-sm uppercase text-white leading-none">
                                 DIGESTEX
                             </span>
                             <span className="text-[8px] text-amber-500 font-mono tracking-widest uppercase font-bold mt-1">
                                 GLOBAL HUB
-                            </span> */}
+                            </span>
                         </div>
                     </Link>
 
@@ -182,56 +182,51 @@ export default function Navbar() {
                     <div className="md:hidden flex items-center gap-4">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="text-amber-500 bg-white/5 border border-white/5 rounded-xl p-2.5 z-50 relative transition-transform"
+                            className="text-amber-500 bg-white/5 border border-white/5 rounded-xl p-2.5 z-50 relative transition-transform active:scale-95"
                         >
-                            {isOpen ? (
-                                <X className="w-5 h-5" />
-                            ) : (
-                                <Menu className="w-5 h-5" />
-                            )}
+                            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* MOBILE MENU OVERLAY GLASSMORPHISM SMOOTH SLIDE (HP VIEW) */}
+            {/* 🛡️ REPARASI MUTLAK: OVERLAY DIUBAH MENJADI MURNI DI BAWAH KEPALA NAVBAR (ANTI-TUMPANG TINDIH KHUSUS HOME) */}
             <div
-                className={`md:hidden bg-[#0b1329]/98 backdrop-blur-2xl fixed inset-0 z-40 transition-all duration-500 ease-in-out ${
+                className={`md:hidden bg-[#0b1329]/98 backdrop-blur-2xl border-t border-white/5 fixed top-20 left-0 right-0 bottom-0 z-50 transition-all duration-500 ease-in-out ${
                     isOpen
-                        ? "translate-y-0 opacity-100"
+                        ? "translate-y-0 opacity-100 pointer-events-auto"
                         : "-translate-y-full opacity-0 pointer-events-none"
                 }`}
             >
-                <div className="px-8 pt-28 pb-10 flex flex-col gap-6 h-full overflow-y-auto">
+                {/* Jarak padding atas disesuaikan menjadi pt-6 agar teks menu mekar besar sempurna */}
+                <div className="px-8 pt-6 pb-12 flex flex-col gap-6 h-full overflow-y-auto">
                     {/* TAYANGAN PROFIL USER DI SELULER */}
                     {auth.user && (
-                        <div className="pb-6 border-b border-white/5 flex justify-between items-center">
+                        <div className="pb-4 border-b border-white/5 flex justify-between items-center bg-black/20 p-4 rounded-xl">
                             <div>
                                 <p className="text-[8px] font-black text-amber-500 uppercase tracking-[0.2em] mb-1">
-                                    {isEn
-                                        ? "Authenticated Executive"
-                                        : "Terautentikasi Sebagai"}
+                                    {isEn ? "Authenticated Executive" : "Terautentikasi Sebagai"}
                                 </p>
-                                <p className="text-white font-black text-base truncate uppercase italic tracking-tight">
+                                <p className="text-white font-black text-sm uppercase italic tracking-tight">
                                     {auth.user.name}
                                 </p>
                             </div>
                             <Link
                                 href={route("dashboard")}
                                 onClick={() => setIsOpen(false)}
-                                className="bg-white/5 border border-white/5 text-amber-400 font-mono text-[9px] font-bold px-3 py-2 rounded-xl uppercase tracking-wider shadow-inner"
+                                className="bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] font-mono text-[9px] font-black px-3 py-2 rounded-lg uppercase tracking-wider shadow-md"
                             >
                                 Console &rarr;
                             </Link>
                         </div>
                     )}
 
-                    {/* LINK NAVIGASI RESPONSIVE SELULER KONTRAS TINGGI */}
-                    <div className="flex flex-col gap-6 mt-2">
+                    {/* LINK NAVIGASI RESPONSIVE SELULER BESAR & KONTRAS TINGGI */}
+                    <div className="flex flex-col gap-5 mt-2 text-sm">
                         <Link
                             href={route("home")}
                             onClick={() => setIsOpen(false)}
-                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors"
+                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors py-2 border-b border-white/5 block"
                         >
                             {isEn ? "Home Portal" : "Beranda Portal"}
                         </Link>
@@ -240,7 +235,7 @@ export default function Navbar() {
                         <Link
                             href={route("dashboard")}
                             onClick={() => setIsOpen(false)}
-                            className="text-xs font-black uppercase text-amber-400 tracking-widest hover:text-amber-400 transition-colors flex items-center gap-2"
+                            className="text-xs font-black uppercase text-amber-400 tracking-widest hover:text-amber-400 transition-colors flex items-center gap-2 py-2 border-b border-white/5 block"
                         >
                             <LayoutDashboard className="w-4 h-4" />{" "}
                             {isEn ? "Data Dashboard" : "Dashboard Data"}
@@ -249,7 +244,7 @@ export default function Navbar() {
                         <Link
                             href={route("join.us")}
                             onClick={() => setIsOpen(false)}
-                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors"
+                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors py-2 border-b border-white/5 block"
                         >
                             {isEn ? "Join Us" : "Gabung Kami"}
                         </Link>
@@ -257,7 +252,7 @@ export default function Navbar() {
                         <Link
                             href={route("about")}
                             onClick={() => setIsOpen(false)}
-                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors"
+                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors py-2 border-b border-white/5 block"
                         >
                             {isEn ? "About Intelligence" : "Tentang Intelijen"}
                         </Link>
@@ -266,14 +261,12 @@ export default function Navbar() {
                         <Link
                             href={route("tools.calculator")}
                             onClick={() => setIsOpen(false)}
-                            className="flex justify-between items-center bg-emerald-500/5 border border-emerald-500/20 p-5 rounded-2xl shadow-xl mt-2 duration-300"
+                            className="flex justify-between items-center bg-emerald-500/5 border border-emerald-500/20 p-4 rounded-xl shadow-xl mt-1 duration-300"
                         >
                             <div className="flex items-center gap-3">
                                 <span className="text-xl">🧮</span>
                                 <span className="text-emerald-400 font-black uppercase text-[10px] tracking-widest">
-                                    {isEn
-                                        ? "Industrial Toolbox"
-                                        : "Alat Industri"}
+                                    {isEn ? "Industrial Toolbox" : "Alat Industri"}
                                 </span>
                             </div>
                             <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[#030712] text-[7px] font-black px-2 py-1 rounded shadow-md">
@@ -284,24 +277,24 @@ export default function Navbar() {
                         <Link
                             href={route("companies.index")}
                             onClick={() => setIsOpen(false)}
-                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors"
+                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors py-2 block"
                         >
                             Big Data Matrix
                         </Link>
                     </div>
 
-                    <div className="mt-auto space-y-6">
+                    <div className="mt-auto space-y-5">
                         {/* MOBILE LANGUAGE SWITCHER BUTTONS */}
                         <div className="flex bg-white/5 rounded-2xl p-1 border border-white/5">
                             <button
                                 onClick={() => toggleLanguage("id")}
-                                className={`flex-1 py-3.5 rounded-xl text-[10px] font-black uppercase transition-all ${!isEn ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md" : "text-gray-500"}`}
+                                className={`flex-1 py-3.5 rounded-xl text-[10px] font-black uppercase transition-all duration-300 ${!isEn ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md" : "text-gray-500"}`}
                             >
                                 ID
                             </button>
                             <button
                                 onClick={() => toggleLanguage("en")}
-                                className={`flex-1 py-3.5 rounded-xl text-[10px] font-black uppercase transition-all ${isEn ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md" : "text-gray-500"}`}
+                                className={`flex-1 py-3.5 rounded-xl text-[10px] font-black uppercase transition-all duration-300 ${isEn ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md" : "text-gray-500"}`}
                             >
                                 EN
                             </button>
@@ -312,7 +305,7 @@ export default function Navbar() {
                             <Link
                                 href={route("login")}
                                 onClick={() => setIsOpen(false)}
-                                className="block bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] text-center py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl tracking-wider"
+                                className="block bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] text-center py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl tracking-wider font-bold"
                             >
                                 {isEn ? "Log In Console" : "Masuk Konsol"}
                             </Link>
