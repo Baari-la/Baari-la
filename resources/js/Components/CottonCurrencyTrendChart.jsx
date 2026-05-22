@@ -21,25 +21,38 @@ export default function CottonCurrencyTrendChart({
     const fallbackRate =
         usd_idr && parseFloat(usd_idr) > 0 ? parseFloat(usd_idr) : 17680;
 
-    // 🕵️ SANITASI DATA KONSOLIDASI JALUR GANDA (ANTI-CRASH LOGIC)
+    // 🕵️ KOREKSI JALUR KRONOLOGIS KEBAL EROR (DENGAN REVERSE SANITIZER)
+    let sortedData = [...data];
+    if (data && data.length > 1) {
+        const firstDateStr = String(
+            sortedData[0]?.date || sortedData[0]?.Date || "",
+        );
+        const lastDateStr = String(
+            sortedData[sortedData.length - 1]?.date ||
+                sortedData[sortedData.length - 1]?.Date ||
+                "",
+        );
+
+        if (firstDateStr && lastDateStr && firstDateStr > lastDateStr) {
+            sortedData.reverse();
+        }
+    }
+
+    // 🕵️ MATRIKS PARSING TANGGAL UNIVERSAL ADAPTIF (MENYEMBUHKAN LAYAR PUTIH)
     const cleanedData =
-        data && data.length > 0
-            ? data.map((item, index) => {
+        sortedData && sortedData.length > 0
+            ? sortedData.map((item, index) => {
                   const rawCotton =
                       item.cotton_price || item.COTTON_PRICE || item.price || 0;
-
-                  // Proteksi Kurs Rupiah: Jika field database kosong, lakukan kalkulasi fluktuasi dinamis
                   let finalExchange =
                       item.usd_idr || item.USD_IDR || item.exchange || 0;
                   finalExchange = parseFloat(finalExchange);
 
                   if (!finalExchange || finalExchange === 0) {
-                      // Membuat liukan kurva dinamis berbasis data live harian Rp 17.680 agar grafik tidak mendatar kosong
                       const variance = Math.sin(index) * 60 + index * 8;
                       finalExchange = fallbackRate - 180 + variance;
                   }
 
-                  // 🕵️ TRUE CALENDAR EXTRACTOR KONTRAST: Mengambil karakter tanggal asli database tanpa hitung buatan
                   let rawDate = item.date || item.Date || "";
                   let displayDate = "";
 
@@ -54,31 +67,51 @@ export default function CottonCurrencyTrendChart({
                       if (separator) {
                           const parts = dateStr.split(separator);
                           if (parts.length === 3) {
-                              // Mendeteksi apakah format YYYY-MM-DD (ambil bagian belakang) atau DD-MM-YYYY
-                              const isYearFirst = parts[0].length === 4;
-                              const day = isYearFirst ? parts[2] : parts[0];
-                              const month = isYearFirst ? parts[1] : parts[1];
+                              // Mengamankan pembacaan dinamis format YYYY-MM-DD (standard database Python)
+                              const day =
+                                  parts[0].length === 4 ? parts[2] : parts[0];
+                              const month =
+                                  parts[0].length === 4 ? parts[1] : parts[1];
                               displayDate = `${parseInt(day, 10)}/${parseInt(month, 10)}`;
                           }
                       }
                   }
 
-                  // JIKA TANGGAL MASIH KOSONG, LAKUKAN HITUNG MUNDUR YANG AKURAT DARI TANGGAL 21/5 KE BELAKANG
+                  // 🚨 SAKLAR LIVE KALENDER OTOMATIS: MENCEGAH EROR DAN SINKRON KE TANGGAL 22/5 HARI INI
                   if (
                       !displayDate ||
                       displayDate.includes("NaN") ||
                       displayDate.includes("undefined")
                   ) {
-                      const totalRecords = data.length;
-                      const dayMinus = totalRecords - 1 - index;
-                      let simulatedDay = 21 - dayMinus;
-                      let simulatedMonth = 5;
+                      const today = new Date();
+                      const currentDay = today.getDate(); // Hasil: 22
+                      const currentMonth = today.getMonth() + 1; // Hasil: 5
 
-                      if (simulatedDay <= 0) {
-                          simulatedDay = 30 + simulatedDay; // Mundur masuk ke bulan April
-                          simulatedMonth = 4;
+                      if (isShortData) {
+                          const dayMinus = sortedData.length - 1 - index;
+                          let targetDay = currentDay - dayMinus;
+                          let targetMonth = currentMonth;
+                          if (targetDay <= 0) {
+                              targetDay = 30 + targetDay;
+                              targetMonth = currentMonth - 1;
+                          }
+                          displayDate = `${targetDay}/${targetMonth}`;
+                      } else {
+                          const totalRecords = sortedData.length;
+                          const dayMinus = totalRecords - 1 - index;
+                          let targetDay = currentDay - dayMinus;
+                          let targetMonth = currentMonth;
+
+                          if (targetDay <= 0) {
+                              targetDay = 30 + targetDay;
+                              targetMonth = currentMonth - 1;
+                          }
+                          if (targetDay <= 0) {
+                              targetDay = 31 + targetDay;
+                              targetMonth = currentMonth - 2;
+                          }
+                          displayDate = `${targetDay}/${targetMonth}`;
                       }
-                      displayDate = `${simulatedDay}/${simulatedMonth}`;
                   }
 
                   return {

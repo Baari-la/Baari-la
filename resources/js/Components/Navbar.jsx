@@ -50,7 +50,6 @@ export default function Navbar() {
         <nav className="bg-[#0b1329]/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50 shadow-2xl">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex justify-between h-20 items-center">
-                    
                     {/* 🛡️ LOGO RESMI MANDIRI: PT DIGESTEX GLOBAL INTELLIGENCE */}
                     <Link
                         href="/"
@@ -184,7 +183,11 @@ export default function Navbar() {
                             onClick={() => setIsOpen(!isOpen)}
                             className="text-amber-500 bg-white/5 border border-white/5 rounded-xl p-2.5 z-50 relative transition-transform active:scale-95"
                         >
-                            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                            {isOpen ? (
+                                <X className="w-5 h-5" />
+                            ) : (
+                                <Menu className="w-5 h-5" />
+                            )}
                         </button>
                     </div>
                 </div>
@@ -192,20 +195,22 @@ export default function Navbar() {
 
             {/* 🛡️ REPARASI MUTLAK: OVERLAY DIUBAH MENJADI MURNI DI BAWAH KEPALA NAVBAR (ANTI-TUMPANG TINDIH KHUSUS HOME) */}
             <div
-                className={`md:hidden bg-[#0b1329]/98 backdrop-blur-2xl border-t border-white/5 fixed top-20 left-0 right-0 bottom-0 z-50 transition-all duration-500 ease-in-out ${
+                className={`md:hidden bg-[#0b1329] backdrop-blur-2xl border-t border-white/5 fixed top-20 left-0 right-0 h-screen z-40 transition-all duration-500 ease-in-out ${
                     isOpen
                         ? "translate-y-0 opacity-100 pointer-events-auto"
                         : "-translate-y-full opacity-0 pointer-events-none"
                 }`}
             >
                 {/* Jarak padding atas disesuaikan menjadi pt-6 agar teks menu mekar besar sempurna */}
-                <div className="px-8 pt-6 pb-12 flex flex-col gap-6 h-full overflow-y-auto">
+                <div className="px-8 pt-4 pb-32 flex flex-col gap-5 h-full overflow-y-auto">
                     {/* TAYANGAN PROFIL USER DI SELULER */}
                     {auth.user && (
                         <div className="pb-4 border-b border-white/5 flex justify-between items-center bg-black/20 p-4 rounded-xl">
                             <div>
                                 <p className="text-[8px] font-black text-amber-500 uppercase tracking-[0.2em] mb-1">
-                                    {isEn ? "Authenticated Executive" : "Terautentikasi Sebagai"}
+                                    {isEn
+                                        ? "Authenticated Executive"
+                                        : "Terautentikasi Sebagai"}
                                 </p>
                                 <p className="text-white font-black text-sm uppercase italic tracking-tight">
                                     {auth.user.name}
@@ -266,7 +271,9 @@ export default function Navbar() {
                             <div className="flex items-center gap-3">
                                 <span className="text-xl">🧮</span>
                                 <span className="text-emerald-400 font-black uppercase text-[10px] tracking-widest">
-                                    {isEn ? "Industrial Toolbox" : "Alat Industri"}
+                                    {isEn
+                                        ? "Industrial Toolbox"
+                                        : "Alat Industri"}
                                 </span>
                             </div>
                             <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[#030712] text-[7px] font-black px-2 py-1 rounded shadow-md">
