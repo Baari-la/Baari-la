@@ -50,6 +50,7 @@ export default function Navbar() {
         <nav className="bg-[#0b1329]/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50 shadow-2xl">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex justify-between h-20 items-center">
+                    
                     {/* 🛡️ LOGO RESMI MANDIRI: PT DIGESTEX GLOBAL INTELLIGENCE */}
                     <Link
                         href="/"
@@ -183,34 +184,28 @@ export default function Navbar() {
                             onClick={() => setIsOpen(!isOpen)}
                             className="text-amber-500 bg-white/5 border border-white/5 rounded-xl p-2.5 z-50 relative transition-transform active:scale-95"
                         >
-                            {isOpen ? (
-                                <X className="w-5 h-5" />
-                            ) : (
-                                <Menu className="w-5 h-5" />
-                            )}
+                            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* 🛡️ REPARASI MUTLAK: OVERLAY DIUBAH MENJADI MURNI DI BAWAH KEPALA NAVBAR (ANTI-TUMPANG TINDIH KHUSUS HOME) */}
+            {/* 🛡️ REPARASI MUTLAK TINGGI OTOMATIS: MENGGANTI H-SCREEN MENJADI H-AUTO DAN MENERAPKAN BORDER CORNER RADIUS LUXURY */}
             <div
-                className={`md:hidden bg-[#0b1329] backdrop-blur-2xl border-t border-white/5 fixed top-20 left-0 right-0 h-screen z-40 transition-all duration-500 ease-in-out ${
+                className={`md:hidden bg-[#0b1329] border-b border-white/5 fixed top-20 left-0 right-0 h-auto z-50 transition-all duration-500 ease-in-out shadow-[0_25px_60px_rgba(0,0,0,0.8)] rounded-b-[35px] ${
                     isOpen
                         ? "translate-y-0 opacity-100 pointer-events-auto"
                         : "-translate-y-full opacity-0 pointer-events-none"
                 }`}
             >
-                {/* Jarak padding atas disesuaikan menjadi pt-6 agar teks menu mekar besar sempurna */}
-                <div className="px-8 pt-4 pb-32 flex flex-col gap-5 h-full overflow-y-auto">
+                {/* Padding dirapatkan secara vertikal (pb-8) agar membungkus padat tanpa sisa bolong bawah */}
+                <div className="px-8 pt-4 pb-8 flex flex-col gap-5 max-h-[calc(100vh-6rem)] overflow-y-auto">
                     {/* TAYANGAN PROFIL USER DI SELULER */}
                     {auth.user && (
                         <div className="pb-4 border-b border-white/5 flex justify-between items-center bg-black/20 p-4 rounded-xl">
                             <div>
                                 <p className="text-[8px] font-black text-amber-500 uppercase tracking-[0.2em] mb-1">
-                                    {isEn
-                                        ? "Authenticated Executive"
-                                        : "Terautentikasi Sebagai"}
+                                    {isEn ? "Authenticated Executive" : "Terautentikasi Sebagai"}
                                 </p>
                                 <p className="text-white font-black text-sm uppercase italic tracking-tight">
                                     {auth.user.name}
@@ -227,7 +222,7 @@ export default function Navbar() {
                     )}
 
                     {/* LINK NAVIGASI RESPONSIVE SELULER BESAR & KONTRAS TINGGI */}
-                    <div className="flex flex-col gap-5 mt-2 text-sm">
+                    <div className="flex flex-col gap-4 text-sm">
                         <Link
                             href={route("home")}
                             onClick={() => setIsOpen(false)}
@@ -236,7 +231,6 @@ export default function Navbar() {
                             {isEn ? "Home Portal" : "Beranda Portal"}
                         </Link>
 
-                        {/* 📊 SUNTIKAN TOMBOL RESPONSIVE NEW BAR DI HANDPHONE */}
                         <Link
                             href={route("dashboard")}
                             onClick={() => setIsOpen(false)}
@@ -271,9 +265,7 @@ export default function Navbar() {
                             <div className="flex items-center gap-3">
                                 <span className="text-xl">🧮</span>
                                 <span className="text-emerald-400 font-black uppercase text-[10px] tracking-widest">
-                                    {isEn
-                                        ? "Industrial Toolbox"
-                                        : "Alat Industri"}
+                                    {isEn ? "Industrial Toolbox" : "Alat Industri"}
                                 </span>
                             </div>
                             <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[#030712] text-[7px] font-black px-2 py-1 rounded shadow-md">
@@ -290,29 +282,29 @@ export default function Navbar() {
                         </Link>
                     </div>
 
-                    <div className="mt-auto space-y-5">
+                    <div className="mt-2 space-y-3.5 pt-4 border-t border-white/5">
                         {/* MOBILE LANGUAGE SWITCHER BUTTONS */}
                         <div className="flex bg-white/5 rounded-2xl p-1 border border-white/5">
                             <button
                                 onClick={() => toggleLanguage("id")}
-                                className={`flex-1 py-3.5 rounded-xl text-[10px] font-black uppercase transition-all duration-300 ${!isEn ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md" : "text-gray-500"}`}
+                                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all duration-300 ${!isEn ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md" : "text-gray-500"}`}
                             >
                                 ID
                             </button>
                             <button
                                 onClick={() => toggleLanguage("en")}
-                                className={`flex-1 py-3.5 rounded-xl text-[10px] font-black uppercase transition-all duration-300 ${isEn ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md" : "text-gray-500"}`}
+                                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all duration-300 ${isEn ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md" : "text-gray-500"}`}
                             >
                                 EN
                             </button>
                         </div>
 
-                        {/* MOBILE LOGIN/LOGOUT ACTION FLOW */}
+                        {/* MOBILE LOGIN/LOGOUT ACTION FLOW - DENGAN CLIP TINGGI PAS */}
                         {!auth.user ? (
                             <Link
                                 href={route("login")}
                                 onClick={() => setIsOpen(false)}
-                                className="block bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] text-center py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl tracking-wider font-bold"
+                                className="block bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] text-center py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl tracking-wider font-bold"
                             >
                                 {isEn ? "Log In Console" : "Masuk Konsol"}
                             </Link>

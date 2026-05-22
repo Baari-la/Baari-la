@@ -40,7 +40,7 @@ export default function InaugurationPopup({ isEn }) {
                         <div className="relative z-10">
                             <div className="flex justify-center gap-4 mb-8">
                                 <img
-                                    src="/images/logo-api.png"
+                                    src="/images/logoWeb.png"
                                     className="h-12 object-contain"
                                     alt="API"
                                 />
