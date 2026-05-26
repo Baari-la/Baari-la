@@ -16,9 +16,9 @@ export default function PartnerLogos() {
 
                     {/* Partner Lokal: API Jakarta */}
                     <img
-                        src="/images/partners/api-logo.png"
+                        src="/images/partners/apiI-logo.png"
                         className="h-10 md:h-12 w-auto hover:scale-110 transition-transform"
-                        alt="API Jakarta"
+                        alt="Partner"
                     />
 
                     {/* Partner China: Pattern Tech */}

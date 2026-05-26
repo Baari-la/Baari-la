@@ -2,8 +2,8 @@ export default function PartnerSponsorship({ isEn }) {
     // Kita batasi hanya 1 Platinum (Utama) dan 2 Slot Cadangan (Gold)
     const featuredPartners = [
         {
-            name: "API JAKARTA",
-            logo: "/images/logo_api_digestex2.png",
+            name: "PARTNER",
+            logo: "/images/",
             isMain: true,
         },
         { name: "AVAILABLE SLOT", tier: "Gold Partner", isMain: false },
@@ -32,7 +32,7 @@ export default function PartnerSponsorship({ isEn }) {
                                 <img
                                     src={p.logo}
                                     className="h-12 object-contain"
-                                    alt="API"
+                                    alt="PARTNER"
                                 />
                             </div>
                             <p className="text-center mt-4 text-[9px] font-black text-yellow-500 uppercase tracking-widest">

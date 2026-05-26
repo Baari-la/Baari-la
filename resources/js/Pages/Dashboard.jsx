@@ -6,6 +6,11 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
 import html2canvas from "html2canvas";
 import React from "react";
+import AiForecastChart from "@/Components/AiForecastChart";
+import PredictiveCalculator from "@/Components/PredictiveCalculator";
+import PortTrackerWidget from "@/Components/PortTrackerWidget";
+import IkmTextileTools from "@/Components/IkmTextileTools";
+import DomesticEwsWidget from "@/Components/DomesticEwsWidget";
 
 import {
     XAxis,
@@ -47,6 +52,8 @@ const labels = {
 
 export default function Dashboard({
     marketHistory = [], // Memberikan proteksi array kosong bawaan agar aman dari crash
+    containerLogs = [],
+    ewsLiveAlerts = [],
     topDestinations = {},
     cottonTrend,
     usd_idr,
@@ -269,20 +276,18 @@ export default function Dashboard({
 
                     {/* --- AREA YANG AKAN DI-CAPTURE (id="capture-area") --- */}
                     <div id="capture-area" className="p-4 rounded-3xl">
-                        {/* 🕵️ SUNTIKAN LOGIKA PEMBERSIH DATA: KONVERSI TEKS DB MENJADI ANGKA MURNI RECHARTS */}
+                        {/* 🕵️ SUNTIKAN LOGIKA PEMBERSIH DATA RECHARTS */}
                         {(() => {
                             const cleanedMarketHistory =
                                 marketHistory && marketHistory.length > 0
                                     ? marketHistory.map((item) => ({
                                           ...item,
-                                          // Memaksa nilai teks DB dari Python menjadi angka matematika murni
                                           cotton_price: item.cotton_price
                                               ? parseFloat(item.cotton_price)
                                               : 0,
                                           usd_idr: item.usd_idr
                                               ? parseFloat(item.usd_idr)
                                               : 0,
-                                          // Format penamaan tanggal agar grafik sumbu X terlihat rapi
                                           date: item.date
                                               ? item.date
                                                     .split("-")
@@ -294,8 +299,8 @@ export default function Dashboard({
                                     : [];
 
                             return (
+                                /* Kotak ini khusus membungkus grafik latar belakang putih agar tetap bersih */
                                 <div className="bg-white rounded-[40px] shadow-sm overflow-hidden border border-gray-100 mb-8">
-                                    {/* PILOT DATA SEKARANG DIALIRKAN VIA cleanedMarketHistory */}
                                     <CottonCurrencyTrendChart
                                         data={cleanedMarketHistory}
                                         usd_idr={usd_idr}
@@ -305,6 +310,35 @@ export default function Dashboard({
                                 </div>
                             );
                         })()}
+
+                        {/* 🧮 POSISI TERBAIK & MANDIRI: KOTAK KALKULATOR PREDIKSI HPP PREMIUM (DI LUAR KOTAK PUTIH GRAFIK) */}
+                        <div className="mb-8">
+                            <PredictiveCalculator
+                                usd_idr={usd_idr}
+                                cottonPrice={cottonPrice}
+                                isEn={isEn}
+                            />
+                        </div>
+
+                        {/* 🧠 3. SEKTOR AI FORECAST: GRAFIK PROYEKSI 30 HARI KE DEPAN (PURPLE UNGU) */}
+                        <div className="mb-8">
+                            <AiForecastChart
+                                data={marketHistory} // Mengalirkan array data bursa untuk dianalisis model AI
+                                isEn={isEn}
+                            />
+                        </div>
+
+                        {/* 🚢 STRUKTUR BARU: WIDGET RADAR LOGISTIK PELABUHAN SELURUH INDONESIA */}
+                        <div className="mb-8">
+                            <PortTrackerWidget containerLogs={containerLogs} />
+                        </div>
+                        {/* 🚨 SEKTOR INTELLIGENCE DATA RIIL: DOMESTIC MARKET EARLY WARNING SYSTEM (EWS) */}
+                        <div className="mb-8">
+                            <DomesticEwsWidget alertsData={ewsLiveAlerts} />
+                        </div>
+                        <div className="mb-8">
+                            <IkmTextileTools />
+                        </div>
                         {/* GRAFIK TUJUAN EKSPOR MACO WIDE SCREEN */}
                         <div className="mx-auto max-w-none px-4 sm:px-6 lg:px-10">
                             <TopMarketChart

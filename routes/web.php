@@ -15,6 +15,7 @@ use App\Models\Member;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\PortTrackerController;
 use Inertia\Inertia;
 
 /*
@@ -28,6 +29,15 @@ Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/login', fn() => Inertia::render('Auth/Login'))->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+/// 🚢 PERLUASAN PIPA DATA: Menambahkan endpoint penarik status EWS Domestik untuk React Frontend
+Route::prefix('api/v2')->group(function () {
+    Route::post('/port-tracker/stream-input', [PortTrackerController::class, 'storeFeedData'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    
+    // Endpoint Baru penarik data agregat EWS riil
+    Route::get('/ews/domestic-status', [PortTrackerController::class, 'getLiveEwsStatus']);
+});
+
 // LEVEL 1: PUBLIK
 Route::get('/regulation', fn() => inertia('Regulation/Index'))->name('regulation.index');
 Route::get('/matchmaking', fn() => inertia('Matchmaking/Index'))->name('matchmaking.index');

@@ -27,8 +27,7 @@ export default function Events({ eventList }) {
                         </div>
                         <div className="p-8">
                             <h4 className="text-lg font-black italic mb-4 leading-tight">
-                                API JAKARTA – DIGESTEX WITH CENTRICSOFTWARE
-                                SUMMIT
+                                DIGESTEX WITH CENTRICSOFTWARE SUMMIT
                             </h4>
                             <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
                                 Jakarta, 2026 • Strategic Digitalization

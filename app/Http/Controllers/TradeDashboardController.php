@@ -116,6 +116,24 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
             'exchange' => (float) $item->usd_idr,
         ]);
         
+  // 🚢 KOREKSI KUERI: Menarik seluruh data log kontainer pelabuhan terbaru dari database tanpa batasan filter waktu lampau
+        $portLogs = \Illuminate\Support\Facades\DB::table('port_container_logs')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+         $portLogs = \Illuminate\Support\Facades\DB::connection('mysql')
+            ->table('port_container_logs')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+        // 🧠 MEMANGGIL FUNGSI REKAPITULASI DATA EWS INTERNAL
+        $ewsController = new \App\Http\Controllers\Api\PortTrackerController();
+        $ewsData = $ewsController->getLiveEwsStatus()->getData();
+
+            
+        
         // Kirim data ke React (Dashboard.jsx)
         return Inertia::render('Dashboard', [
             // Data Analitik Perdagangan
@@ -136,7 +154,9 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
             'cottonPrice' => $latestMarket->cotton_price ?? 71.31,
             'cottonTrend' => round($cottonChange, 2) . '%',
             'usd_idr' => $latestMarket->usd_idr ?? 16000,
-            // 'cottonPrice' => $latest->cotton_price ?? 0,
+             'containerLogs' => $portLogs, // 🌟 DATA TERBARU DIALIRKAN KE DASHBOARD.JSX
+            'ewsLiveAlerts' => $ewsData, 
+             // 'cottonPrice' => $latest->cotton_price ?? 0,
         // 'usd_idr' => $latest->usd_idr ?? 0,
             // Data Pendukung
             //  'annualTrend' => $this->getAnnualTrendData(), 
