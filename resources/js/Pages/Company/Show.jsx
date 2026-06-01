@@ -4,6 +4,12 @@ import { Head, Link, router } from "@inertiajs/react";
 
 export default function Show({ auth, company }) {
     const isEn = auth.locale === "en";
+    const featuredImage =
+        company.images?.find((img) => img.is_featured) || company.images?.[0];
+    // console.log(company.certifications);
+    // console.log(company.products);
+    // console.log("LEAD TIMES:", company.leadTimes);
+    console.log(company);
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -21,56 +27,674 @@ export default function Show({ auth, company }) {
                         ← {isEn ? "Back to Big Data" : "Kembali ke Big Data"}
                     </Link>
 
-                    {/* HEADER PROFILE */}
-                    {/* HEADER PROFILE */}
-                    <div className="bg-white/5 border border-white/10 rounded-[50px] p-10 mb-8 relative overflow-hidden">
-                        {/* 1. BARIS PALING ATAS: STATUS & PRESTIGE */}
-                        <div className="flex justify-between items-start mb-8">
-                            <div className="flex items-center gap-3">
-                                {company.membership_type === "gold_member" && (
-                                    <div className="flex items-center gap-2 bg-yellow-500 text-[#0a192f] text-[9px] font-black px-5 py-2 rounded-full uppercase tracking-tighter shadow-[0_0_20px_rgba(234,179,8,0.3)]">
-                                        <i className="fas fa-crown"></i>
-                                        Gold Member
-                                    </div>
-                                )}
-                                <span className="bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[8px] font-black px-4 py-2 rounded-full uppercase tracking-[0.3em] backdrop-blur-md shadow-[0_0_15px_rgba(59,130,246,0.1)]">
-                                    {company.sektor}
-                                </span>
-                            </div>
+                    {/* HERO HEADER */}
+                    <div className="relative rounded-[50px] overflow-hidden border border-white/10 mb-10">
+                        {/* BACKGROUND IMAGE */}
+                        <div className="absolute inset-0">
+                            <img
+                                src={
+                                    featuredImage?.image_url
+                                        ? featuredImage.image_url
+                                        : featuredImage?.image_path
+                                          ? `/storage/${featuredImage.image_path}`
+                                          : "/images/factory-placeholder.jpg"
+                                }
+                                className="w-full h-full object-cover"
+                            />
 
-                            {/* TOMBOL UPDATE PINDAH KE POJOK KANAN (TIDAK MENEMPEL) */}
-                            {auth.user &&
-                                (auth.user.role === "admin" ||
-                                    auth.user.company_id === company.id) && (
-                                    <Link
-                                        href={route(
-                                            "companies.edit",
-                                            company.id,
-                                        )}
-                                        className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/10 flex items-center gap-2"
-                                    >
-                                        <i className="fas fa-sync-alt"></i>
-                                        {isEn
-                                            ? "Update Intelligence"
-                                            : "Mutakhirkan Data"}
-                                    </Link>
-                                )}
+                            {/* OVERLAY */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-[#0a192f]/70 to-black/30"></div>
                         </div>
 
-                        {/* 2. BARIS TENGAH: NAMA PERUSAHAAN */}
-                        <div className="relative z-10 mt-4">
-                            <h1 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter leading-none mb-4 text-white">
-                                {company.nama_perusahaan}
-                            </h1>
-                            <div className="flex items-center gap-3 text-gray-400">
-                                <i className="fas fa-map-marker-alt text-yellow-500 text-xs"></i>
-                                <p className="text-xs font-medium italic tracking-wide">
-                                    {company.alamat_lengkap}
+                        {/* CONTENT */}
+                        <div className="relative z-10 p-10 md:p-16 min-h-[500px] flex flex-col justify-between">
+                            {/* TOP BAR */}
+                            <div className="flex flex-wrap justify-between items-start gap-4">
+                                <div className="flex flex-wrap items-center gap-3">
+                                    {company.membership_type ===
+                                        "gold_member" && (
+                                        <div className="bg-yellow-500 text-[#0a192f] px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-2xl flex items-center gap-2">
+                                            <i className="fas fa-crown"></i>
+                                            Gold Member
+                                        </div>
+                                    )}
+
+                                    <div className="bg-blue-500/20 border border-blue-400/30 backdrop-blur-md px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.3em] text-blue-300 font-black">
+                                        {company.sektor || "Manufacturing"}
+                                    </div>
+
+                                    {company.status_verifikasi ===
+                                        "verified" && (
+                                        <div className="bg-emerald-500/20 border border-emerald-400/30 px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.3em] text-emerald-300 font-black">
+                                            VERIFIED SUPPLIER
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* UPDATE BUTTON */}
+                                {auth.user &&
+                                    (auth.user.role === "admin" ||
+                                        auth.user.company_id ===
+                                            company.id) && (
+                                        <Link
+                                            href={route(
+                                                "companies.edit",
+                                                company.id,
+                                            )}
+                                            className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2"
+                                        >
+                                            <i className="fas fa-pen"></i>
+
+                                            {isEn
+                                                ? "Update Profile"
+                                                : "Update Profil"}
+                                        </Link>
+                                    )}
+                            </div>
+
+                            {/* COMPANY IDENTITY */}
+                            <div className="max-w-4xl">
+                                <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none mb-6 text-white drop-shadow-2xl">
+                                    {company.nama_perusahaan}
+                                </h1>
+
+                                <div className="flex flex-wrap items-center gap-6 text-sm text-gray-300">
+                                    <div className="flex items-center gap-2">
+                                        <i className="fas fa-location-dot text-yellow-500"></i>
+                                        <span>{company.city}</span>
+                                    </div>
+
+                                    {company.tahun_berdiri && (
+                                        <div className="flex items-center gap-2">
+                                            <i className="fas fa-industry text-blue-400"></i>
+                                            <span>
+                                                Est. {company.tahun_berdiri}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {company.tenaga_kerja && (
+                                        <div className="flex items-center gap-2">
+                                            <i className="fas fa-users text-emerald-400"></i>
+                                            <span>{company.tenaga_kerja}</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* SHORT DESCRIPTION */}
+                                <p className="mt-8 text-lg text-gray-300 max-w-3xl leading-relaxed">
+                                    {company.produk ||
+                                        "Industrial manufacturing company profile."}
                                 </p>
                             </div>
                         </div>
                     </div>
-                    {/* Tambahan galeri */}
+
+                    {/* CERTIFICATION CARDS */}
+                    {company.certifications?.length > 0 && (
+                        <div className="mt-12 bg-white/5 border border-white/10 rounded-[40px] p-10 overflow-hidden relative">
+                            {/* BACKGROUND GLOW */}
+                            <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/10 blur-3xl rounded-full"></div>
+
+                            <div className="relative z-10">
+                                <div className="flex items-center justify-between mb-10">
+                                    <div>
+                                        <h2 className="text-emerald-400 text-xs font-black uppercase tracking-[0.4em] mb-3">
+                                            Global Certifications
+                                        </h2>
+
+                                        <p className="text-gray-500 text-sm italic">
+                                            Compliance • Sustainability •
+                                            International Standards
+                                        </p>
+                                    </div>
+
+                                    <div className="hidden md:flex items-center gap-2 text-[10px] uppercase tracking-widest text-gray-500 font-black">
+                                        <i className="fas fa-shield-check text-emerald-400"></i>
+                                        Verified Compliance
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {company.certifications.map((cert) => {
+                                        const certName =
+                                            cert.certification_name?.toUpperCase() ||
+                                            "";
+
+                                        let badgeColor =
+                                            "from-slate-700/40 to-slate-900/40";
+
+                                        let icon = "fas fa-award";
+
+                                        /*
+                    |--------------------------------------------------------------------------
+                    | SPECIAL BRANDING
+                    |--------------------------------------------------------------------------
+                    */
+
+                                        if (certName.includes("OEKO")) {
+                                            badgeColor =
+                                                "from-green-500/20 to-emerald-900/20";
+
+                                            icon = "fas fa-leaf";
+                                        }
+
+                                        if (certName.includes("GRS")) {
+                                            badgeColor =
+                                                "from-cyan-500/20 to-blue-900/20";
+
+                                            icon = "fas fa-recycle";
+                                        }
+
+                                        if (certName.includes("ISO")) {
+                                            badgeColor =
+                                                "from-yellow-500/20 to-orange-900/20";
+
+                                            icon = "fas fa-globe";
+                                        }
+
+                                        if (certName.includes("HIGG")) {
+                                            badgeColor =
+                                                "from-purple-500/20 to-fuchsia-900/20";
+
+                                            icon = "fas fa-chart-line";
+                                        }
+
+                                        if (certName.includes("BSCI")) {
+                                            badgeColor =
+                                                "from-pink-500/20 to-rose-900/20";
+
+                                            icon = "fas fa-users";
+                                        }
+
+                                        return (
+                                            <div
+                                                key={cert.id}
+                                                className={`relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br ${badgeColor} p-7 hover:scale-[1.02] transition-all duration-500 shadow-2xl`}
+                                            >
+                                                {/* GLOW */}
+                                                <div className="absolute inset-0 bg-white/[0.02]"></div>
+
+                                                <div className="relative z-10">
+                                                    {/* TOP */}
+                                                    <div className="flex items-start justify-between mb-8">
+                                                        <div className="h-14 w-14 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center shadow-xl">
+                                                            <i
+                                                                className={`${icon} text-xl text-white`}
+                                                            ></i>
+                                                        </div>
+
+                                                        <span className="text-[8px] uppercase tracking-[0.3em] text-emerald-400 font-black">
+                                                            Certified
+                                                        </span>
+                                                    </div>
+
+                                                    {/* TITLE */}
+                                                    <h3 className="text-2xl font-black uppercase italic text-white leading-none mb-3">
+                                                        {
+                                                            cert.certification_name
+                                                        }
+                                                    </h3>
+
+                                                    {/* ISSUER */}
+                                                    <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-6">
+                                                        Issued by{" "}
+                                                        <span className="text-white">
+                                                            {cert.issuer || "-"}
+                                                        </span>
+                                                    </p>
+
+                                                    {/* CERT NUMBER */}
+                                                    <div className="mb-5">
+                                                        <p className="text-[8px] uppercase tracking-[0.3em] text-gray-500 font-black mb-2">
+                                                            Certificate Number
+                                                        </p>
+
+                                                        <div className="bg-black/20 border border-white/5 rounded-2xl px-4 py-3 text-xs text-white font-mono tracking-wide break-all">
+                                                            {cert.certificate_number ||
+                                                                "-"}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* VALIDITY */}
+                                                    <div className="flex items-center justify-between pt-5 border-t border-white/10">
+                                                        <div>
+                                                            <p className="text-[8px] uppercase tracking-[0.3em] text-gray-500 font-black mb-1">
+                                                                Valid Until
+                                                            </p>
+
+                                                            <p className="text-sm font-bold text-white">
+                                                                {cert.valid_until ||
+                                                                    "-"}
+                                                            </p>
+                                                        </div>
+
+                                                        <div className="h-10 w-10 rounded-xl bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
+                                                            <i className="fas fa-check text-emerald-400 text-sm"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* COMPANY GALLERY */}
+                    {company.images?.length > 0 && (
+                        <div className="mb-12">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
+                                    Factory Gallery
+                                </h2>
+
+                                <span className="text-[10px] uppercase tracking-widest text-gray-500">
+                                    {company.images.length} Images
+                                </span>
+                            </div>
+
+                            <div className="columns-1 md:columns-3 gap-5 space-y-5">
+                                {company.images.map((image) => (
+                                    <div
+                                        key={image.id}
+                                        className="break-inside-avoid overflow-hidden rounded-[30px] border border-white/10 bg-white/5"
+                                    >
+                                        <img
+                                            src={
+                                                image.image_url
+                                                    ? image.image_url
+                                                    : `/storage/${image.image_path}`
+                                            }
+                                            className="w-full object-cover hover:scale-105 transition-all duration-700"
+                                        />
+
+                                        <div className="p-5">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <span className="text-[9px] uppercase tracking-[0.3em] text-blue-400 font-black">
+                                                    {image.image_type}
+                                                </span>
+                                            </div>
+
+                                            <p className="text-sm text-gray-300">
+                                                {image.caption}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* PRODUCT SHOWCASE */}
+                    {company.products?.length > 0 && (
+                        <div className="bg-white/5 border border-white/10 p-10 rounded-[40px]">
+                            <h3 className="text-white text-xs font-black uppercase tracking-[0.4em] mb-6">
+                                Featured Products
+                            </h3>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {company.products.map((product) => (
+                                    <div
+                                        key={product.id}
+                                        className="border border-white/10 rounded-3xl p-5 bg-white/5 hover:bg-white/10 transition-all"
+                                    >
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div>
+                                                <h4 className="text-lg font-black uppercase italic text-white">
+                                                    {product.product_name}
+                                                </h4>
+
+                                                {product.category && (
+                                                    <p className="text-[9px] text-blue-400 uppercase font-black tracking-widest mt-1">
+                                                        {product.category}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            {product.is_primary === 1 && (
+                                                <span className="bg-yellow-500 text-[#0a192f] text-[8px] px-3 py-1 rounded-full font-black uppercase">
+                                                    Primary
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {product.description && (
+                                            <p className="text-sm text-gray-400 leading-relaxed">
+                                                {product.description}
+                                            </p>
+                                        )}
+
+                                        {product.hs_code && (
+                                            <div className="mt-4">
+                                                <span className="text-[9px] text-gray-500 uppercase tracking-widest">
+                                                    HS Code:
+                                                </span>
+
+                                                <span className="ml-2 text-yellow-500 font-black">
+                                                    {product.hs_code}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* CERTIFICATIONS */}
+                    {company.certifications?.length > 0 && (
+                        <div className="bg-white/5 border border-white/10 rounded-[40px] p-10 mt-8">
+                            <h2 className="text-emerald-400 text-xs font-black uppercase tracking-[0.4em] mb-8">
+                                Certifications
+                            </h2>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {company.certifications.map((cert) => (
+                                    <div
+                                        key={cert.id}
+                                        className="bg-white/5 border border-white/10 rounded-3xl p-5"
+                                    >
+                                        <p className="text-lg font-black uppercase italic text-white">
+                                            {cert.certification_name}
+                                        </p>
+
+                                        {cert.issuer && (
+                                            <p className="text-sm text-gray-400 mt-2">
+                                                {cert.issuer}
+                                            </p>
+                                        )}
+
+                                        {cert.certificate_number && (
+                                            <p className="text-[10px] text-yellow-500 uppercase tracking-widest mt-4">
+                                                #{cert.certificate_number}
+                                            </p>
+                                        )}
+
+                                        {cert.valid_until && (
+                                            <p className="text-[10px] text-blue-400 uppercase tracking-widest mt-2">
+                                                Valid Until: {cert.valid_until}
+                                            </p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Contoh capacity */}
+                    {company.capacities?.length > 0 && (
+                        <div className="bg-white/5 border border-white/10 rounded-[40px] p-10">
+                            <h2 className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em] mb-8">
+                                Production Capacity
+                            </h2>
+
+                            <div className="space-y-4">
+                                {company.capacities.map((capacity) => (
+                                    <div
+                                        key={capacity.id}
+                                        className="border border-white/10 rounded-2xl p-6 bg-white/5"
+                                    >
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 className="text-lg font-black text-white uppercase italic">
+                                                    {capacity.item_name}
+                                                </h3>
+
+                                                <p className="text-gray-400 text-xs uppercase tracking-widest mt-1">
+                                                    {capacity.capacity_type}
+                                                </p>
+                                            </div>
+
+                                            <div className="text-right">
+                                                <p className="text-2xl font-black text-emerald-400">
+                                                    {Number(
+                                                        capacity.capacity_value,
+                                                    ).toLocaleString()}
+                                                </p>
+
+                                                <p className="text-[10px] text-gray-500 uppercase">
+                                                    {capacity.capacity_unit}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4 flex gap-4 text-[10px] uppercase font-bold">
+                                            <span className="text-blue-400">
+                                                {capacity.capacity_category}
+                                            </span>
+
+                                            {capacity.machine_count && (
+                                                <span className="text-yellow-500">
+                                                    {capacity.machine_count}{" "}
+                                                    Machines
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MACHINERY */}
+                    {company.machines?.length > 0 && (
+                        <div className="bg-white/5 border border-white/10 rounded-[40px] p-10">
+                            <h2 className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em] mb-8">
+                                Machinery Fleet
+                            </h2>
+
+                            <div className="space-y-6">
+                                {company.machines.map((machine) => (
+                                    <div
+                                        key={machine.id}
+                                        className="border border-white/10 rounded-3xl p-6"
+                                    >
+                                        <div className="flex flex-wrap gap-3 mb-4">
+                                            <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs font-bold uppercase">
+                                                {machine.machine_category}
+                                            </span>
+
+                                            <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-bold uppercase">
+                                                {machine.machine_type}
+                                            </span>
+                                        </div>
+
+                                        <h3 className="text-xl font-black mb-2">
+                                            {machine.machine_brand}{" "}
+                                            {machine.machine_model}
+                                        </h3>
+
+                                        <div className="grid md:grid-cols-3 gap-4 text-sm">
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Quantity
+                                                </div>
+                                                <div className="font-bold">
+                                                    {machine.quantity}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Capacity
+                                                </div>
+                                                <div className="font-bold">
+                                                    {
+                                                        machine.production_capacity
+                                                    }{" "}
+                                                    {machine.capacity_unit}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Origin
+                                                </div>
+                                                <div className="font-bold">
+                                                    {machine.country_origin ||
+                                                        "-"}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Installed
+                                                </div>
+                                                <div className="font-bold">
+                                                    {machine.year_installed ||
+                                                        "-"}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Condition
+                                                </div>
+                                                <div className="font-bold">
+                                                    {machine.machine_condition ||
+                                                        "-"}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Automation
+                                                </div>
+                                                <div className="font-bold">
+                                                    {machine.automation_level ||
+                                                        "-"}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {machine.notes && (
+                                            <div className="mt-4 text-sm text-gray-400">
+                                                {machine.notes}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {/* MOQ */}
+                    {company.moqs?.length > 0 && (
+                        <div className="bg-white/5 border border-white/10 rounded-[40px] p-10">
+                            <h2 className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em] mb-8">
+                                Minimum Order Quantity (MOQ)
+                            </h2>
+
+                            <div className="space-y-6">
+                                {company.moqs.map((moq) => (
+                                    <div
+                                        key={moq.id}
+                                        className="border border-white/10 rounded-3xl p-6"
+                                    >
+                                        <h3 className="text-xl font-black mb-4">
+                                            {moq.product_name ||
+                                                "General Product"}
+                                        </h3>
+
+                                        <div className="grid md:grid-cols-3 gap-4 text-sm">
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Minimum Quantity
+                                                </div>
+
+                                                <div className="font-bold">
+                                                    {Number(
+                                                        moq.minimum_quantity ||
+                                                            0,
+                                                    ).toLocaleString()}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Unit
+                                                </div>
+
+                                                <div className="font-bold">
+                                                    {moq.unit || "-"}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Status
+                                                </div>
+
+                                                <div className="font-bold text-emerald-400">
+                                                    Available
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {moq.notes && (
+                                            <div className="mt-4 text-sm text-gray-400">
+                                                {moq.notes}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {/* LEAD TIMES */}
+
+                    {company.leadTimes?.length > 0 && (
+                        <div className="bg-white/5 border border-white/10 rounded-[40px] p-10">
+                            <h2 className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em] mb-8">
+                                Production Lead Times
+                            </h2>
+
+                            <div className="space-y-6">
+                                {company.leadTimes.map((leadTime) => (
+                                    <div
+                                        key={leadTime.id}
+                                        className="border border-white/10 rounded-3xl p-6"
+                                    >
+                                        <div className="flex flex-wrap gap-3 mb-4">
+                                            <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-bold uppercase">
+                                                {leadTime.lead_time_type ||
+                                                    "Standard"}
+                                            </span>
+                                        </div>
+
+                                        <div className="grid md:grid-cols-2 gap-4 text-sm">
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Lead Time
+                                                </div>
+
+                                                <div className="font-bold text-xl">
+                                                    {leadTime.days || 0} Days
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="text-gray-500 uppercase text-[10px]">
+                                                    Status
+                                                </div>
+
+                                                <div className="font-bold text-emerald-400">
+                                                    Active
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {leadTime.notes && (
+                                            <div className="mt-4 text-sm text-gray-400">
+                                                {leadTime.notes}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                     {/* Stock Barang */}
                     {/* FLASH STOCK BADGE - Penanda dari Lantai Bursa */}
                     {company.stock_qty > 0 && (
@@ -157,8 +781,18 @@ export default function Show({ auth, company }) {
                             <div className="bg-white/5 border border-white/10 rounded-[50px] overflow-hidden">
                                 <img
                                     src={
-                                        company.photo_url ||
-                                        "/images/factory-placeholder.jpg"
+                                        company.images?.find(
+                                            (img) => img.is_featured,
+                                        )?.image_path
+                                            ? `/storage/${
+                                                  company.images.find(
+                                                      (img) => img.is_featured,
+                                                  ).image_path
+                                              }`
+                                            : company.images?.[0]?.image_path
+                                              ? `/storage/${company.images[0].image_path}`
+                                              : company.photo_url ||
+                                                "/images/factory-placeholder.jpg"
                                     }
                                     className="w-full h-[400px] object-cover opacity-80 hover:opacity-100 transition-all duration-700"
                                     alt="Factory Profile"
@@ -242,26 +876,44 @@ export default function Show({ auth, company }) {
                                     </div>
                                 </div>
 
-                                {/* PRODUCT SHOWCASE PREVIEW */}
-                                <div className="bg-white/5 border border-white/10 p-10 rounded-[40px]">
-                                    <h3 className="text-white text-xs font-black uppercase tracking-[0.4em] mb-6">
-                                        Top Featured Products
-                                    </h3>
-                                    <div className="grid grid-cols-3 gap-4">
-                                        {/* Contoh looping gambar produk */}
-                                        {[1, 2, 3].map((i) => (
-                                            <div
-                                                key={i}
-                                                className="aspect-square bg-white/10 rounded-2xl overflow-hidden border border-white/10 hover:border-yellow-500 transition-all"
-                                            >
-                                                <img
-                                                    src={`/images/product-${i}.jpg`}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                        ))}
+                                {/* REAL COMPANY GALLERY */}
+                                {company.images?.length > 0 && (
+                                    <div className="bg-white/5 border border-white/10 p-10 rounded-[40px]">
+                                        <h3 className="text-white text-xs font-black uppercase tracking-[0.4em] mb-6">
+                                            Company Gallery
+                                        </h3>
+
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                            {company.images.map((image) => (
+                                                <div
+                                                    key={image.id}
+                                                    className="aspect-square bg-white/10 rounded-2xl overflow-hidden border border-white/10 hover:border-pink-500 transition-all"
+                                                >
+                                                    <img
+                                                        src={
+                                                            image.image_path
+                                                                ? `/storage/${image.image_path}`
+                                                                : image.image_url
+                                                        }
+                                                        alt={
+                                                            image.caption ||
+                                                            "Company Image"
+                                                        }
+                                                        className="w-full h-full object-cover"
+                                                    />
+
+                                                    {image.caption && (
+                                                        <div className="p-3 bg-[#0a192f] border-t border-white/5">
+                                                            <p className="text-[10px] text-gray-300 uppercase tracking-wider font-bold truncate">
+                                                                {image.caption}
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -285,7 +937,7 @@ export default function Show({ auth, company }) {
 
                             {/* LOGIKA PREMIUM LOCK PADA DETAIL */}
                             <div className="bg-white/5 border border-white/10 rounded-[40px] p-10 relative overflow-hidden">
-                                {!auth.user.is_premium && (
+                                {false && (
                                     <div className="absolute inset-0 bg-[#0a192f]/60 backdrop-blur-md z-20 flex flex-col items-center justify-center text-center p-10">
                                         <i className="fas fa-lock text-yellow-500 text-3xl mb-4"></i>
                                         <h3 className="text-xl font-black uppercase italic mb-2">

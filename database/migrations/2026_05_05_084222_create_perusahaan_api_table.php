@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('perusahaan_api')) {
         Schema::create('perusahaan_api', function (Blueprint $table) {
             $table->integer('id_perusahaan', true);
             $table->string('nama_perusahaan');
@@ -51,7 +52,7 @@ return new class extends Migration
             $table->boolean('hide_identity')->nullable()->default(false);
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

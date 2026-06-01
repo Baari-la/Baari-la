@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('inventories')) {
         Schema::create('inventories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
@@ -24,7 +25,7 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

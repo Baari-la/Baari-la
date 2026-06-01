@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('member_inventory')) {
         Schema::table('member_inventory', function (Blueprint $table) {
             $table->foreign(['user_id'], 'fk_member_user')->references(['id'])->on('users')->onUpdate('restrict')->onDelete('cascade');
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

@@ -9,8 +9,8 @@
         "@ckeditor/ckeditor5-build-classic": "^34.0.0",
         "@ckeditor/ckeditor5-react": "^9.3.0",
         "@headlessui/react": "^2.1.2",
-        "canvas-confetti": "^1.9.3",
         "@inertiajs/react": "^1.2.0",
+        "canvas-confetti": "^1.9.3",
         "framer-motion": "^11.5.4",
         "html2canvas": "^1.4.1",
         "html2pdf.js": "^0.10.2",
@@ -20,6 +20,7 @@
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "recharts": "^2.12.7",
+        "sweetalert2": "^11.26.25",
         "xlsx": "^0.18.5"
     },
     "devDependencies": {

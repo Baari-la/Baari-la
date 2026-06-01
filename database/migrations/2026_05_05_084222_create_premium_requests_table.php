@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('premium_requests')) {
         Schema::create('premium_requests', function (Blueprint $table) {
             $table->integer('id', true);
             $table->unsignedBigInteger('user_id')->nullable()->index('user_id');
@@ -19,7 +20,7 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

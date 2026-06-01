@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('mst_negara')) {
         Schema::create('mst_negara', function (Blueprint $table) {
             $table->integer('id_negara', true);
             $table->string('nama_negara', 100)->nullable()->unique('nama_negara');
@@ -18,7 +19,7 @@ return new class extends Migration
             $table->string('kode_negara_iso', 5)->nullable();
         });
     }
-
+}
     /**
      * Reverse the migrations.
      */

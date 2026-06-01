@@ -48,5 +48,64 @@ public function getIsExpiringAttribute()
            && $this->last_verified_at->diffInMonths(now()) < 12;
 }
 
+/*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS
+    |--------------------------------------------------------------------------
+    */
 
+    // Products
+    public function products()
+    {
+        return $this->hasMany(CompanyProduct::class);
+    }
+
+    // Export / Import Markets
+    public function markets()
+    {
+        return $this->hasMany(CompanyMarket::class);
+    }
+
+    // Certifications
+    public function certifications()
+    {
+        return $this->hasMany(CompanyCertification::class);
+    }
+
+    // Contacts
+    public function contacts()
+    {
+        return $this->hasMany(CompanyContact::class);
+    }
+
+    // Links
+    public function links()
+    {
+        return $this->hasMany(CompanyLink::class);
+    }
+
+    // Images
+    public function images()
+    {
+        return $this->hasMany(CompanyImage::class);
+    }
+    public function capacities()
+{
+    return $this->hasMany(CompanyCapacity::class);
+}
+
+public function machines()
+{
+    return $this->hasMany(CompanyMachine::class);
+}
+
+public function moqs()
+{
+    return $this->hasMany(CompanyMoq::class);
+}
+
+public function leadTimes()
+{
+    return $this->hasMany(CompanyLeadTime::class);
+}
 }

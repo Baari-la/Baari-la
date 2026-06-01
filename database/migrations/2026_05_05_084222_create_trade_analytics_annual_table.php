@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('trade_analytics_annual')) {
         Schema::create('trade_analytics_annual', function (Blueprint $table) {
             $table->integer('id_trade', true);
             $table->enum('tipe_arus', ['ekspor', 'impor']);
@@ -69,7 +70,7 @@ return new class extends Migration
             $table->double('vol_2026_02')->nullable()->default(0);
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

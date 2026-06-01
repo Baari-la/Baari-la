@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('regulations')) {
         Schema::create('regulations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->timestamps();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('failed_jobs')) {
         Schema::create('failed_jobs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('uuid')->unique();
@@ -21,7 +22,7 @@ return new class extends Migration
             $table->timestamp('failed_at')->useCurrent();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+       if (!Schema::hasTable('bkp_stg_ekspor_hs_val_fix')) { 
         Schema::create('bkp_stg_ekspor_hs_val_fix', function (Blueprint $table) {
             $table->integer('id')->default(0);
             $table->string('produk')->nullable();
@@ -51,7 +52,7 @@ return new class extends Migration
             $table->double('vol_2026_02')->nullable()->default(0);
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

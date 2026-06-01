@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('partnerships')) {
         Schema::create('partnerships', function (Blueprint $table) {
         $table->id();
         $table->string('name');             // e.g., "Centric Software", "PT. Loom Parts Indonesia"
@@ -24,7 +25,7 @@ return new class extends Migration
         $table->timestamps();
     });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

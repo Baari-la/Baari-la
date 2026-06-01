@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PortTrackerController;
 use Inertia\Inertia;
+use App\Models\Company;
 
 /*
 
@@ -24,11 +25,91 @@ use Inertia\Inertia;
 | LEVEL 1: PUBLIK (Tanpa Login)
 |--------------------------------------------------------------------------
 */
+// Hanya test
+
+
+
+Route::get('/test-company', function () {
+
+   $company = Company::with([
+         'products',
+         'markets',
+         'certifications',
+         'contacts',
+         'links',
+         'images',
+          'capacities'
+     ])->find(1);
+
+     return response()->json($company);
+
+ });
+
+// Batas test
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/login', fn() => Inertia::render('Auth/Login'))->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+// Tabel Direktory
+Route::post(
+    '/companies/{company}/machines',
+    [CompanyController::class, 'updateMachines']
+)->name('companies.machines.update');
+Route::post(
+    '/companies/{company}/moqs',
+    [CompanyController::class, 'updateMoqs']
+)->name('companies.moqs.update');
+Route::post(
+    '/companies/{company}/products',
+    [CompanyController::class, 'updateProducts']
+)->name('companies.products.update');
+
+Route::post(
+    '/companies/{company}/markets',
+    [CompanyController::class, 'updateMarkets']
+)->name('companies.markets.update');
+
+Route::post(
+    '/companies/{company}/certifications',
+    [CompanyController::class, 'updateCertifications']
+)->name('companies.certifications.update');
+
+Route::post(
+    '/companies/{company}/capacities',
+    [CompanyController::class, 'updateCapacities']
+)->name('companies.capacities.update');
+
+Route::post(
+    '/companies/{company}/contacts',
+    [CompanyController::class, 'updateContacts']
+)->name('companies.contacts.update');
+
+Route::post(
+    '/companies/{company}/links',
+    [CompanyController::class, 'updateLinks']
+)->name('companies.links.update');
+
+Route::post(
+    '/companies/{company}/images',
+    [CompanyController::class, 'updateImages']
+)->name('companies.images.update');
+
+Route::post(
+    '/companies/{company}/lead-times',
+    [CompanyController::class, 'updateLeadTimes']
+)->name('companies.leadtimes.update');
+
+// Hapus
+Route::delete(
+    '/companies/{company}/machines/{machine}',
+    [CompanyController::class, 'destroyMachine']
+)->name('companies.machines.destroy');
+
+
 
 /// 🚢 PERLUASAN PIPA DATA: Menambahkan endpoint penarik status EWS Domestik untuk React Frontend
 Route::prefix('api/v2')->group(function () {

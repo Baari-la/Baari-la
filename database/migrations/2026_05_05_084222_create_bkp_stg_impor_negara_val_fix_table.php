@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('bkp_stg_impor_negara_val_fix')) {
         Schema::create('bkp_stg_impor_negara_val_fix', function (Blueprint $table) {
             $table->string('produk')->nullable();
             $table->string('hs', 20)->nullable();
@@ -50,7 +51,7 @@ return new class extends Migration
             $table->string('dimensi', 50)->nullable();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

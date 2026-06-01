@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('temp_volume_penampung')) {
         Schema::create('temp_volume_penampung', function (Blueprint $table) {
             $table->integer('id', true);
             $table->string('produk')->nullable();
@@ -50,6 +51,7 @@ return new class extends Migration
             $table->double('vol_2026_01')->nullable()->default(0);
             $table->double('vol_2026_02')->nullable()->default(0);
         });
+    }
     }
 
     /**

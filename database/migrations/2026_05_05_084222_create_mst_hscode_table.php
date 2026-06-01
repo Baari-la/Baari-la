@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('mst_hscode')) {
         Schema::create('mst_hscode', function (Blueprint $table) {
             $table->integer('id_hs', true);
             $table->string('produk', 100)->nullable();
@@ -21,7 +22,7 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

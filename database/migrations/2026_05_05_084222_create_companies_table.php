@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('companies')) {
         Schema::create('companies', function (Blueprint $table) {
             $table->integer('id', true);
             $table->string('nomor_anggota', 50)->nullable();
@@ -46,7 +47,7 @@ return new class extends Migration
             $table->decimal('price', 15)->nullable()->default(0);
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

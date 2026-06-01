@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('premium_requests')) {
         Schema::table('premium_requests', function (Blueprint $table) {
             $table->foreign(['user_id'], 'premium_requests_ibfk_1')->references(['id'])->on('users')->onUpdate('restrict')->onDelete('cascade');
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

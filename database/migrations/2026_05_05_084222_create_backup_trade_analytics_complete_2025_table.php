@@ -10,7 +10,7 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
+    {if (!Schema::hasTable('backup_trade_analytics_complete_2025')) {
         Schema::create('backup_trade_analytics_complete_2025', function (Blueprint $table) {
             $table->integer('id_trade')->default(0);
             $table->enum('tipe_arus', ['ekspor', 'impor']);
@@ -69,7 +69,7 @@ return new class extends Migration
             $table->double('vol_2026_02')->nullable()->default(0);
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

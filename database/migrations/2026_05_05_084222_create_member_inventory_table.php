@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('member_inventory')) {
         Schema::create('member_inventory', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id')->index('fk_member_user');
@@ -26,7 +27,7 @@ return new class extends Migration
             $table->timestamp('updated_at')->useCurrentOnUpdate()->useCurrent();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

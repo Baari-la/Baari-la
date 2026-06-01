@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('users')) {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('google_id')->nullable();
@@ -27,7 +28,7 @@ return new class extends Migration
             $table->string('member_number')->nullable()->unique();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

@@ -14,6 +14,9 @@ protected $fillable = [
     'admin_note'
 ];
 
+ protected $casts = [
+        'proposed_data' => 'array',
+    ];
     //// Relasi agar Admin tahu perusahaan mana yang diedit
 public function company() {
     return $this->belongsTo(Company::class);

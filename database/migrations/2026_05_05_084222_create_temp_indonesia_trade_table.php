@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+      if (!Schema::hasTable('temp_indonesia_trade')) {  
         Schema::create('temp_indonesia_trade', function (Blueprint $table) {
             $table->string('produk')->nullable();
             $table->string('hs', 20)->nullable();
@@ -50,7 +51,7 @@ return new class extends Migration
             $table->string('dimensi', 50)->nullable();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

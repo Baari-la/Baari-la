@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('market_histories')) {
         Schema::create('market_histories', function (Blueprint $table) {
     $table->id();
     $table->string('symbol'); // Misal: CT=F (Cotton Futures)
@@ -20,7 +21,7 @@ return new class extends Migration
 });
 
     }
-
+    }
     /**
      * Reverse the migrations.
      */

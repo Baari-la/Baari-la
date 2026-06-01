@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('trade_analytics_monthly')) {
         Schema::create('trade_analytics_monthly', function (Blueprint $table) {
             $table->string('tipe_arus', 10)->nullable();
             $table->string('dimensi', 10)->nullable();
@@ -48,7 +49,7 @@ return new class extends Migration
             $table->double('vol_2026_02')->nullable();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */

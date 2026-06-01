@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('market_histories')) {
         Schema::create('market_histories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->date('date')->unique();
@@ -19,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-
+    }
     /**
      * Reverse the migrations.
      */
