@@ -215,7 +215,7 @@ public static function syncImages(
         array $markets
     ): void {
 
-        $company->markets()->delete();
+        
 
         foreach ($markets as $market) {
 
@@ -246,16 +246,8 @@ public static function syncCertifications(
     array $certifications
 ): void {
 
-//    dd($certifications);
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE OLD DATA
-    |--------------------------------------------------------------------------
-    */
 
-    $company->certifications()->delete();
-
-    /*
+       /*
     |--------------------------------------------------------------------------
     | INSERT NEW DATA
     |--------------------------------------------------------------------------
@@ -411,7 +403,7 @@ public static function syncContacts(
     array $contacts
 ): void {
 
-    $company->contacts()->delete();
+   
 
     foreach ($contacts as $contact) {
 
@@ -451,7 +443,7 @@ public static function syncContacts(
         array $links
     ): void {
 
-        $company->links()->delete();
+        
 
         foreach ($links as $link) {
 
@@ -482,7 +474,7 @@ public static function syncContacts(
         array $capacities
     ): void {
 
-        $company->capacities()->delete();
+       
 
         foreach ($capacities as $capacity) {
 
@@ -533,7 +525,7 @@ public static function syncLeadTimes(
     |--------------------------------------------------------------------------
     */
 
-    $company->leadTimes()->delete();
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -652,22 +644,9 @@ public static function syncMoqs(
 
         $processedIds[] = $newMoq->id;
     }
+  
 
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE REMOVED MOQ ONLY
-    |--------------------------------------------------------------------------
-    */
-
-    CompanyMoq::where(
-        'company_id',
-        $company->id
-    )
-    ->whereNotIn(
-        'id',
-        $processedIds
-    )
-    ->delete();
+    
 }
 
 public static function syncMachines(

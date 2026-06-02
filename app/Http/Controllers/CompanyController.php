@@ -373,6 +373,28 @@ public function updateMoqs(
     );
 }
 
+public function destroyMoq(
+    Company $company,
+    CompanyMoq $moq
+)
+{
+    if ($moq->company_id != $company->id) {
+
+        abort(
+            403,
+            'MOQ does not belong to this company.'
+        );
+
+    }
+
+    $moq->delete();
+
+    return back()->with(
+        'success',
+        'MOQ deleted successfully.'
+    );
+}
+
 public function updateLeadTimes(
     Request $request,
     Company $company
@@ -417,6 +439,30 @@ public function updateLeadTimes(
 
     return back();
 }
+public function destroyLeadTime(
+    Company $company,
+    CompanyLeadTime $leadTime
+)
+{
+    if (
+        $leadTime->company_id !=
+        $company->id
+    ) {
+
+        abort(
+            403,
+            'Lead Time does not belong to this company.'
+        );
+
+    }
+
+    $leadTime->delete();
+
+    return back()->with(
+        'success',
+        'Lead Time deleted successfully.'
+    );
+}
 
 public function updateCapacities(
     Request $request,
@@ -449,6 +495,30 @@ public function updateCapacities(
 
     return back();
 }
+public function destroyCapacity(
+    Company $company,
+    CompanyCapacity $capacity
+)
+{
+    if (
+        $capacity->company_id !=
+        $company->id
+    ) {
+
+        abort(
+            403,
+            'Capacity does not belong to this company.'
+        );
+
+    }
+
+    $capacity->delete();
+
+    return back()->with(
+        'success',
+        'Capacity deleted successfully.'
+    );
+}
 
 public function updateProducts(
     Request $request,
@@ -478,7 +548,45 @@ public function updateProducts(
 
     return back();
 }
+public function destroyProduct(
+    Company $company,
+    CompanyProduct $product
+)
+{
+    /*
+    |--------------------------------------------------------------------------
+    | Security Check
+    |--------------------------------------------------------------------------
+    */
 
+    if ($product->company_id != $company->id) {
+
+        abort(
+            403,
+            'Product does not belong to this company.'
+        );
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Delete
+    |--------------------------------------------------------------------------
+    */
+
+    $product->delete();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Response
+    |--------------------------------------------------------------------------
+    */
+
+    return back()->with(
+        'success',
+        'Product deleted successfully.'
+    );
+}
 public function updateMarkets(
     Request $request,
     Company $company
@@ -510,6 +618,27 @@ public function updateMarkets(
     return back();
 }
 
+public function destroyMarket(
+    Company $company,
+    CompanyMarket $market
+)
+{
+    if ($market->company_id != $company->id) {
+
+        abort(
+            403,
+            'Market does not belong to this company.'
+        );
+
+    }
+
+    $market->delete();
+
+    return back()->with(
+        'success',
+        'Market deleted successfully.'
+    );
+}
 
 public function updateCertifications(
     Request $request,
@@ -542,6 +671,46 @@ public function updateCertifications(
 
     return back();
 }
+public function destroyCertification(
+    Company $company,
+    CompanyCertification $certification
+)
+{
+    if (
+        $certification->company_id !=
+        $company->id
+    ) {
+
+        abort(
+            403,
+            'Certification does not belong to this company.'
+        );
+
+    }
+
+    if ($certification->certificate_file) {
+
+        Storage::disk('public')->delete(
+            $certification->certificate_file
+        );
+
+    }
+
+    if ($certification->logo_url) {
+
+        Storage::disk('public')->delete(
+            $certification->logo_url
+        );
+
+    }
+
+    $certification->delete();
+
+    return back()->with(
+        'success',
+        'Certification deleted successfully.'
+    );
+}
 
 public function updateContacts(
     Request $request,
@@ -572,6 +741,27 @@ public function updateContacts(
     return back();
 }
 
+public function destroyContact(
+    Company $company,
+    CompanyContact $contact
+)
+{
+    if ($contact->company_id != $company->id) {
+
+        abort(
+            403,
+            'Contact does not belong to this company.'
+        );
+
+    }
+
+    $contact->delete();
+
+    return back()->with(
+        'success',
+        'Contact deleted successfully.'
+    );
+}
 public function updateLinks(
     Request $request,
     Company $company
@@ -600,7 +790,27 @@ public function updateLinks(
 
     return back();
 }
+public function destroyLink(
+    Company $company,
+    CompanyLink $link
+)
+{
+    if ($link->company_id != $company->id) {
 
+        abort(
+            403,
+            'Link does not belong to this company.'
+        );
+
+    }
+
+    $link->delete();
+
+    return back()->with(
+        'success',
+        'Link deleted successfully.'
+    );
+}
 public function updateImages(
     Request $request,
     Company $company
@@ -647,7 +857,35 @@ public function updateImages(
 
     return back();
 }
+public function destroyImage(
+    Company $company,
+    CompanyImage $image
+)
+{
+    if ($image->company_id != $company->id) {
 
+        abort(
+            403,
+            'Image does not belong to this company.'
+        );
+
+    }
+
+    if ($image->image_url) {
+
+        Storage::disk('public')->delete(
+            $image->image_url
+        );
+
+    }
+
+    $image->delete();
+
+    return back()->with(
+        'success',
+        'Image deleted successfully.'
+    );
+}
 public function create()
 {
     return Inertia::render('Company/Create'); // Menuju file React baru

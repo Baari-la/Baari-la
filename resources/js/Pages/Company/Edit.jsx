@@ -465,15 +465,76 @@ export default function Edit({ auth, company }) {
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                const updated =
-                                                    data.products.filter(
-                                                        (_, i) => i !== index,
-                                                    );
-                                                setData("products", updated);
+                                                Swal.fire({
+                                                    title: "Delete Product?",
+                                                    text: "This product record will be permanently removed.",
+                                                    icon: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonColor:
+                                                        "#ef4444",
+                                                    cancelButtonColor:
+                                                        "#64748b",
+                                                    confirmButtonText:
+                                                        "Yes, Delete",
+                                                    cancelButtonText: "Cancel",
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        if (!product.id) {
+                                                            const updated = (
+                                                                data.products ||
+                                                                []
+                                                            ).filter(
+                                                                (_, i) =>
+                                                                    i !== index,
+                                                            );
+
+                                                            setData(
+                                                                "products",
+                                                                updated,
+                                                            );
+
+                                                            return;
+                                                        }
+
+                                                        router.delete(
+                                                            route(
+                                                                "companies.products.destroy",
+                                                                [
+                                                                    company.id,
+                                                                    product.id,
+                                                                ],
+                                                            ),
+                                                            {
+                                                                preserveScroll: true,
+
+                                                                onSuccess:
+                                                                    () => {
+                                                                        const updated =
+                                                                            (
+                                                                                data.products ||
+                                                                                []
+                                                                            ).filter(
+                                                                                (
+                                                                                    _,
+                                                                                    i,
+                                                                                ) =>
+                                                                                    i !==
+                                                                                    index,
+                                                                            );
+
+                                                                        setData(
+                                                                            "products",
+                                                                            updated,
+                                                                        );
+                                                                    },
+                                                            },
+                                                        );
+                                                    }
+                                                });
                                             }}
-                                            className="bg-red-500 px-4 rounded-xl text-white text-xl"
+                                            className="bg-red-500 hover:bg-red-400 text-white px-5 py-3 rounded-2xl text-xs font-black uppercase"
                                         >
-                                            ×
+                                            Remove Product
                                         </button>
                                     </div>
                                 ))}
@@ -1406,7 +1467,7 @@ export default function Edit({ auth, company }) {
                                                     onClick={() => {
                                                         Swal.fire({
                                                             title: "Delete MOQ?",
-                                                            text: "This MOQ record will be removed.",
+                                                            text: "This MOQ record will be permanently removed.",
                                                             icon: "warning",
                                                             showCancelButton: true,
                                                             confirmButtonColor:
@@ -1415,39 +1476,114 @@ export default function Edit({ auth, company }) {
                                                                 "#64748b",
                                                             confirmButtonText:
                                                                 "Yes, Delete",
+                                                            cancelButtonText:
+                                                                "Cancel",
                                                         }).then((result) => {
                                                             if (
                                                                 result.isConfirmed
                                                             ) {
-                                                                const updated =
-                                                                    (
-                                                                        data.moqs ||
-                                                                        []
-                                                                    ).filter(
+                                                                /*
+                |--------------------------------------------------------------------------
+                | NEW UNSAVED MOQ
+                |--------------------------------------------------------------------------
+                */
+
+                                                                if (!moq.id) {
+                                                                    const updated =
                                                                         (
-                                                                            _,
-                                                                            i,
-                                                                        ) =>
-                                                                            i !==
-                                                                            index,
+                                                                            data.moqs ||
+                                                                            []
+                                                                        ).filter(
+                                                                            (
+                                                                                _,
+                                                                                i,
+                                                                            ) =>
+                                                                                i !==
+                                                                                index,
+                                                                        );
+
+                                                                    setData(
+                                                                        "moqs",
+                                                                        updated,
                                                                     );
 
-                                                                setData(
-                                                                    "moqs",
-                                                                    updated,
-                                                                );
+                                                                    Swal.fire({
+                                                                        icon: "success",
+                                                                        title: "Removed",
+                                                                        text: "MOQ removed from form.",
+                                                                        timer: 1500,
+                                                                        showConfirmButton: false,
+                                                                    });
 
-                                                                Swal.fire({
-                                                                    icon: "success",
-                                                                    title: "Removed",
-                                                                    text: "MOQ removed from form.",
-                                                                    timer: 1500,
-                                                                    showConfirmButton: false,
-                                                                });
+                                                                    return;
+                                                                }
+
+                                                                /*
+                |--------------------------------------------------------------------------
+                | DELETE FROM DATABASE
+                |--------------------------------------------------------------------------
+                */
+
+                                                                router.delete(
+                                                                    route(
+                                                                        "companies.moqs.destroy",
+                                                                        [
+                                                                            company.id,
+                                                                            moq.id,
+                                                                        ],
+                                                                    ),
+                                                                    {
+                                                                        preserveScroll: true,
+
+                                                                        onSuccess:
+                                                                            () => {
+                                                                                const updated =
+                                                                                    (
+                                                                                        data.moqs ||
+                                                                                        []
+                                                                                    ).filter(
+                                                                                        (
+                                                                                            _,
+                                                                                            i,
+                                                                                        ) =>
+                                                                                            i !==
+                                                                                            index,
+                                                                                    );
+
+                                                                                setData(
+                                                                                    "moqs",
+                                                                                    updated,
+                                                                                );
+
+                                                                                Swal.fire(
+                                                                                    {
+                                                                                        icon: "success",
+                                                                                        title: "Deleted",
+                                                                                        text: "MOQ deleted successfully.",
+                                                                                        confirmButtonColor:
+                                                                                            "#22c55e",
+                                                                                    },
+                                                                                );
+                                                                            },
+
+                                                                        onError:
+                                                                            () => {
+                                                                                Swal.fire(
+                                                                                    {
+                                                                                        icon: "error",
+                                                                                        title: "Delete Failed",
+                                                                                        text: "Unable to delete MOQ.",
+                                                                                        confirmButtonColor:
+                                                                                            "#ef4444",
+                                                                                    },
+                                                                                );
+                                                                            },
+                                                                    },
+                                                                );
                                                             }
                                                         });
                                                     }}
-                                                    className="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded-xl text-xs font-black uppercase"
+                                                    className="bg-red-500 hover:bg-red-400 text-white px-5 py-3 rounded-2xl text-xs font-black uppercase"
                                                 >
                                                     Remove MOQ
                                                 </button>
@@ -1742,16 +1878,123 @@ export default function Edit({ auth, company }) {
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    const updated = (
-                                                        data.lead_times || []
-                                                    ).filter(
-                                                        (_, i) => i !== index,
-                                                    );
+                                                    Swal.fire({
+                                                        title: "Delete Lead Time?",
+                                                        text: "This lead time record will be permanently removed.",
+                                                        icon: "warning",
+                                                        showCancelButton: true,
+                                                        confirmButtonColor:
+                                                            "#ef4444",
+                                                        cancelButtonColor:
+                                                            "#64748b",
+                                                        confirmButtonText:
+                                                            "Yes, Delete",
+                                                        cancelButtonText:
+                                                            "Cancel",
+                                                    }).then((result) => {
+                                                        if (
+                                                            result.isConfirmed
+                                                        ) {
+                                                            /*
+                |--------------------------------------------------------------------------
+                | NEW UNSAVED LEAD TIME
+                |--------------------------------------------------------------------------
+                */
 
-                                                    setData(
-                                                        "lead_times",
-                                                        updated,
-                                                    );
+                                                            if (!leadTime.id) {
+                                                                const updated =
+                                                                    (
+                                                                        data.leadTimes ||
+                                                                        []
+                                                                    ).filter(
+                                                                        (
+                                                                            _,
+                                                                            i,
+                                                                        ) =>
+                                                                            i !==
+                                                                            index,
+                                                                    );
+
+                                                                setData(
+                                                                    "leadTimes",
+                                                                    updated,
+                                                                );
+
+                                                                Swal.fire({
+                                                                    icon: "success",
+                                                                    title: "Removed",
+                                                                    text: "Lead Time removed from form.",
+                                                                    timer: 1500,
+                                                                    showConfirmButton: false,
+                                                                });
+
+                                                                return;
+                                                            }
+
+                                                            /*
+                |--------------------------------------------------------------------------
+                | DELETE FROM DATABASE
+                |--------------------------------------------------------------------------
+                */
+
+                                                            router.delete(
+                                                                route(
+                                                                    "companies.lead-times.destroy",
+                                                                    [
+                                                                        company.id,
+                                                                        leadTime.id,
+                                                                    ],
+                                                                ),
+                                                                {
+                                                                    preserveScroll: true,
+
+                                                                    onSuccess:
+                                                                        () => {
+                                                                            const updated =
+                                                                                (
+                                                                                    data.leadTimes ||
+                                                                                    []
+                                                                                ).filter(
+                                                                                    (
+                                                                                        _,
+                                                                                        i,
+                                                                                    ) =>
+                                                                                        i !==
+                                                                                        index,
+                                                                                );
+
+                                                                            setData(
+                                                                                "leadTimes",
+                                                                                updated,
+                                                                            );
+
+                                                                            Swal.fire(
+                                                                                {
+                                                                                    icon: "success",
+                                                                                    title: "Deleted",
+                                                                                    text: "Lead Time deleted successfully.",
+                                                                                    confirmButtonColor:
+                                                                                        "#22c55e",
+                                                                                },
+                                                                            );
+                                                                        },
+
+                                                                    onError:
+                                                                        () => {
+                                                                            Swal.fire(
+                                                                                {
+                                                                                    icon: "error",
+                                                                                    title: "Delete Failed",
+                                                                                    text: "Unable to delete Lead Time.",
+                                                                                    confirmButtonColor:
+                                                                                        "#ef4444",
+                                                                                },
+                                                                            );
+                                                                        },
+                                                                },
+                                                            );
+                                                        }
+                                                    });
                                                 }}
                                                 className="bg-red-500 hover:bg-red-400 text-white px-5 py-3 rounded-2xl text-xs font-black uppercase"
                                             >
@@ -1932,7 +2175,7 @@ export default function Edit({ auth, company }) {
                                                 onClick={() => {
                                                     Swal.fire({
                                                         title: "Delete Contact?",
-                                                        text: "This contact record will be removed.",
+                                                        text: "This contact record will be permanently removed.",
                                                         icon: "warning",
                                                         showCancelButton: true,
                                                         confirmButtonColor:
@@ -1941,30 +2184,98 @@ export default function Edit({ auth, company }) {
                                                             "#64748b",
                                                         confirmButtonText:
                                                             "Yes, Delete",
+                                                        cancelButtonText:
+                                                            "Cancel",
                                                     }).then((result) => {
                                                         if (
                                                             result.isConfirmed
                                                         ) {
-                                                            const updated = (
-                                                                data.contacts ||
-                                                                []
-                                                            ).filter(
-                                                                (_, i) =>
-                                                                    i !== index,
-                                                            );
+                                                            if (!contact.id) {
+                                                                const updated =
+                                                                    (
+                                                                        data.contacts ||
+                                                                        []
+                                                                    ).filter(
+                                                                        (
+                                                                            _,
+                                                                            i,
+                                                                        ) =>
+                                                                            i !==
+                                                                            index,
+                                                                    );
 
-                                                            setData(
-                                                                "contacts",
-                                                                updated,
-                                                            );
+                                                                setData(
+                                                                    "contacts",
+                                                                    updated,
+                                                                );
 
-                                                            Swal.fire({
-                                                                icon: "success",
-                                                                title: "Removed",
-                                                                text: "Contact removed from the form.",
-                                                                timer: 1500,
-                                                                showConfirmButton: false,
-                                                            });
+                                                                Swal.fire({
+                                                                    icon: "success",
+                                                                    title: "Removed",
+                                                                    text: "Contact removed from form.",
+                                                                    timer: 1500,
+                                                                    showConfirmButton: false,
+                                                                });
+
+                                                                return;
+                                                            }
+
+                                                            router.delete(
+                                                                route(
+                                                                    "companies.contacts.destroy",
+                                                                    [
+                                                                        company.id,
+                                                                        contact.id,
+                                                                    ],
+                                                                ),
+                                                                {
+                                                                    preserveScroll: true,
+
+                                                                    onSuccess:
+                                                                        () => {
+                                                                            const updated =
+                                                                                (
+                                                                                    data.contacts ||
+                                                                                    []
+                                                                                ).filter(
+                                                                                    (
+                                                                                        _,
+                                                                                        i,
+                                                                                    ) =>
+                                                                                        i !==
+                                                                                        index,
+                                                                                );
+
+                                                                            setData(
+                                                                                "contacts",
+                                                                                updated,
+                                                                            );
+
+                                                                            Swal.fire(
+                                                                                {
+                                                                                    icon: "success",
+                                                                                    title: "Deleted",
+                                                                                    text: "Contact deleted successfully.",
+                                                                                    confirmButtonColor:
+                                                                                        "#22c55e",
+                                                                                },
+                                                                            );
+                                                                        },
+
+                                                                    onError:
+                                                                        () => {
+                                                                            Swal.fire(
+                                                                                {
+                                                                                    icon: "error",
+                                                                                    title: "Delete Failed",
+                                                                                    text: "Unable to delete contact.",
+                                                                                    confirmButtonColor:
+                                                                                        "#ef4444",
+                                                                                },
+                                                                            );
+                                                                        },
+                                                                },
+                                                            );
                                                         }
                                                     });
                                                 }}
@@ -2187,7 +2498,7 @@ export default function Edit({ auth, company }) {
                                                 onClick={() => {
                                                     Swal.fire({
                                                         title: "Delete Image?",
-                                                        text: "This image record will be removed.",
+                                                        text: "This image will be permanently removed.",
                                                         icon: "warning",
                                                         showCancelButton: true,
                                                         confirmButtonColor:
@@ -2196,30 +2507,98 @@ export default function Edit({ auth, company }) {
                                                             "#64748b",
                                                         confirmButtonText:
                                                             "Yes, Delete",
+                                                        cancelButtonText:
+                                                            "Cancel",
                                                     }).then((result) => {
                                                         if (
                                                             result.isConfirmed
                                                         ) {
-                                                            const updated = (
-                                                                data.images ||
-                                                                []
-                                                            ).filter(
-                                                                (_, i) =>
-                                                                    i !== index,
-                                                            );
+                                                            if (!image.id) {
+                                                                const updated =
+                                                                    (
+                                                                        data.images ||
+                                                                        []
+                                                                    ).filter(
+                                                                        (
+                                                                            _,
+                                                                            i,
+                                                                        ) =>
+                                                                            i !==
+                                                                            index,
+                                                                    );
 
-                                                            setData(
-                                                                "images",
-                                                                updated,
-                                                            );
+                                                                setData(
+                                                                    "images",
+                                                                    updated,
+                                                                );
 
-                                                            Swal.fire({
-                                                                icon: "success",
-                                                                title: "Removed",
-                                                                text: "Image removed from the form.",
-                                                                timer: 1500,
-                                                                showConfirmButton: false,
-                                                            });
+                                                                Swal.fire({
+                                                                    icon: "success",
+                                                                    title: "Removed",
+                                                                    text: "Image removed from form.",
+                                                                    timer: 1500,
+                                                                    showConfirmButton: false,
+                                                                });
+
+                                                                return;
+                                                            }
+
+                                                            router.delete(
+                                                                route(
+                                                                    "companies.images.destroy",
+                                                                    [
+                                                                        company.id,
+                                                                        image.id,
+                                                                    ],
+                                                                ),
+                                                                {
+                                                                    preserveScroll: true,
+
+                                                                    onSuccess:
+                                                                        () => {
+                                                                            const updated =
+                                                                                (
+                                                                                    data.images ||
+                                                                                    []
+                                                                                ).filter(
+                                                                                    (
+                                                                                        _,
+                                                                                        i,
+                                                                                    ) =>
+                                                                                        i !==
+                                                                                        index,
+                                                                                );
+
+                                                                            setData(
+                                                                                "images",
+                                                                                updated,
+                                                                            );
+
+                                                                            Swal.fire(
+                                                                                {
+                                                                                    icon: "success",
+                                                                                    title: "Deleted",
+                                                                                    text: "Image deleted successfully.",
+                                                                                    confirmButtonColor:
+                                                                                        "#22c55e",
+                                                                                },
+                                                                            );
+                                                                        },
+
+                                                                    onError:
+                                                                        () => {
+                                                                            Swal.fire(
+                                                                                {
+                                                                                    icon: "error",
+                                                                                    title: "Delete Failed",
+                                                                                    text: "Unable to delete image.",
+                                                                                    confirmButtonColor:
+                                                                                        "#ef4444",
+                                                                                },
+                                                                            );
+                                                                        },
+                                                                },
+                                                            );
                                                         }
                                                     });
                                                 }}
@@ -2321,16 +2700,76 @@ export default function Edit({ auth, company }) {
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    const updated =
-                                                        data.markets.filter(
-                                                            (_, i) =>
-                                                                i !== index,
-                                                        );
-                                                    setData("markets", updated);
+                                                    Swal.fire({
+                                                        title: "Delete Market?",
+                                                        text: "This market record will be permanently removed.",
+                                                        icon: "warning",
+                                                        showCancelButton: true,
+                                                        confirmButtonColor:
+                                                            "#ef4444",
+                                                        cancelButtonColor:
+                                                            "#64748b",
+                                                        confirmButtonText:
+                                                            "Yes, Delete",
+                                                    }).then((result) => {
+                                                        if (
+                                                            result.isConfirmed
+                                                        ) {
+                                                            if (!market.id) {
+                                                                setData(
+                                                                    "markets",
+                                                                    (
+                                                                        data.markets ||
+                                                                        []
+                                                                    ).filter(
+                                                                        (
+                                                                            _,
+                                                                            i,
+                                                                        ) =>
+                                                                            i !==
+                                                                            index,
+                                                                    ),
+                                                                );
+
+                                                                return;
+                                                            }
+
+                                                            router.delete(
+                                                                route(
+                                                                    "companies.markets.destroy",
+                                                                    [
+                                                                        company.id,
+                                                                        market.id,
+                                                                    ],
+                                                                ),
+                                                                {
+                                                                    preserveScroll: true,
+
+                                                                    onSuccess:
+                                                                        () => {
+                                                                            setData(
+                                                                                "markets",
+                                                                                (
+                                                                                    data.markets ||
+                                                                                    []
+                                                                                ).filter(
+                                                                                    (
+                                                                                        _,
+                                                                                        i,
+                                                                                    ) =>
+                                                                                        i !==
+                                                                                        index,
+                                                                                ),
+                                                                            );
+                                                                        },
+                                                                },
+                                                            );
+                                                        }
+                                                    });
                                                 }}
-                                                className="bg-red-500 px-4 rounded-xl text-white text-xl"
+                                                className="bg-red-500 hover:bg-red-400 text-white px-5 py-3 rounded-2xl text-xs font-black uppercase"
                                             >
-                                                ×
+                                                Remove Market
                                             </button>
                                         </div>
                                     </div>
@@ -2870,7 +3309,7 @@ export default function Edit({ auth, company }) {
                                                 onClick={() => {
                                                     Swal.fire({
                                                         title: "Delete Certification?",
-                                                        text: "This certification record will be removed.",
+                                                        text: "This certification will be permanently removed.",
                                                         icon: "warning",
                                                         showCancelButton: true,
                                                         confirmButtonColor:
@@ -2883,26 +3322,57 @@ export default function Edit({ auth, company }) {
                                                         if (
                                                             result.isConfirmed
                                                         ) {
-                                                            const updated = (
-                                                                data.certifications ||
-                                                                []
-                                                            ).filter(
-                                                                (_, i) =>
-                                                                    i !== index,
-                                                            );
+                                                            if (
+                                                                !certification.id
+                                                            ) {
+                                                                setData(
+                                                                    "certifications",
+                                                                    (
+                                                                        data.certifications ||
+                                                                        []
+                                                                    ).filter(
+                                                                        (
+                                                                            _,
+                                                                            i,
+                                                                        ) =>
+                                                                            i !==
+                                                                            index,
+                                                                    ),
+                                                                );
 
-                                                            setData(
-                                                                "certifications",
-                                                                updated,
-                                                            );
+                                                                return;
+                                                            }
 
-                                                            Swal.fire({
-                                                                icon: "success",
-                                                                title: "Removed",
-                                                                text: "Certification removed from the form.",
-                                                                timer: 1500,
-                                                                showConfirmButton: false,
-                                                            });
+                                                            router.delete(
+                                                                route(
+                                                                    "companies.certifications.destroy",
+                                                                    [
+                                                                        company.id,
+                                                                        certification.id,
+                                                                    ],
+                                                                ),
+                                                                {
+                                                                    preserveScroll: true,
+
+                                                                    onSuccess:
+                                                                        () => {
+                                                                            setData(
+                                                                                "certifications",
+                                                                                (
+                                                                                    data.certifications ||
+                                                                                    []
+                                                                                ).filter(
+                                                                                    (
+                                                                                        _,
+                                                                                        i,
+                                                                                    ) =>
+                                                                                        i !==
+                                                                                        index,
+                                                                                ),
+                                                                            );
+                                                                        },
+                                                                },
+                                                            );
                                                         }
                                                     });
                                                 }}
@@ -3045,7 +3515,7 @@ export default function Edit({ auth, company }) {
                                             onClick={() => {
                                                 Swal.fire({
                                                     title: "Delete Link?",
-                                                    text: "This link record will be removed.",
+                                                    text: "This link record will be permanently removed.",
                                                     icon: "warning",
                                                     showCancelButton: true,
                                                     confirmButtonColor:
@@ -3054,27 +3524,86 @@ export default function Edit({ auth, company }) {
                                                         "#64748b",
                                                     confirmButtonText:
                                                         "Yes, Delete",
+                                                    cancelButtonText: "Cancel",
                                                 }).then((result) => {
                                                     if (result.isConfirmed) {
-                                                        const updated = (
-                                                            data.links || []
-                                                        ).filter(
-                                                            (_, i) =>
-                                                                i !== index,
-                                                        );
+                                                        if (!link.id) {
+                                                            const updated = (
+                                                                data.links || []
+                                                            ).filter(
+                                                                (_, i) =>
+                                                                    i !== index,
+                                                            );
 
-                                                        setData(
-                                                            "links",
-                                                            updated,
-                                                        );
+                                                            setData(
+                                                                "links",
+                                                                updated,
+                                                            );
 
-                                                        Swal.fire({
-                                                            icon: "success",
-                                                            title: "Removed",
-                                                            text: "Link removed from the form.",
-                                                            timer: 1500,
-                                                            showConfirmButton: false,
-                                                        });
+                                                            Swal.fire({
+                                                                icon: "success",
+                                                                title: "Removed",
+                                                                text: "Link removed from form.",
+                                                                timer: 1500,
+                                                                showConfirmButton: false,
+                                                            });
+
+                                                            return;
+                                                        }
+
+                                                        router.delete(
+                                                            route(
+                                                                "companies.links.destroy",
+                                                                [
+                                                                    company.id,
+                                                                    link.id,
+                                                                ],
+                                                            ),
+                                                            {
+                                                                preserveScroll: true,
+
+                                                                onSuccess:
+                                                                    () => {
+                                                                        const updated =
+                                                                            (
+                                                                                data.links ||
+                                                                                []
+                                                                            ).filter(
+                                                                                (
+                                                                                    _,
+                                                                                    i,
+                                                                                ) =>
+                                                                                    i !==
+                                                                                    index,
+                                                                            );
+
+                                                                        setData(
+                                                                            "links",
+                                                                            updated,
+                                                                        );
+
+                                                                        Swal.fire(
+                                                                            {
+                                                                                icon: "success",
+                                                                                title: "Deleted",
+                                                                                text: "Link deleted successfully.",
+                                                                                confirmButtonColor:
+                                                                                    "#22c55e",
+                                                                            },
+                                                                        );
+                                                                    },
+
+                                                                onError: () => {
+                                                                    Swal.fire({
+                                                                        icon: "error",
+                                                                        title: "Delete Failed",
+                                                                        text: "Unable to delete link.",
+                                                                        confirmButtonColor:
+                                                                            "#ef4444",
+                                                                    });
+                                                                },
+                                                            },
+                                                        );
                                                     }
                                                 });
                                             }}

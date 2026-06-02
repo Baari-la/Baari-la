@@ -108,4 +108,10 @@ public function leadTimes()
 {
     return $this->hasMany(CompanyLeadTime::class);
 }
+public function quotations()
+{
+    return $this->hasMany(
+        Quotation::class
+    );
+}
 }

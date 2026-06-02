@@ -13,6 +13,7 @@ import {
     Layers,
     Settings,
     LogOut,
+    FileText,
 } from "lucide-react";
 
 export default function AuthenticatedLayout({ header, children }) {
@@ -90,7 +91,20 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Intelligence Center
                                 </NavLink>
-
+                                <NavLink
+                                    href={route("rfqs.index")}
+                                    active={route().current("rfqs.*")}
+                                    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all duration-300 hover:text-cyan-400 flex items-center gap-1.5"
+                                >
+                                    <FileText className="w-3.5 h-3.5 text-cyan-400/80" />
+                                    RFQ Marketplace
+                                </NavLink>
+                                <NavLink
+                                    href={route("quotations.index")}
+                                    active={route().current("quotations.index")}
+                                >
+                                    My Quotations
+                                </NavLink>
                                 {/* FITUR AMUNISI BARU: DIGITAL CONTAINER TRACKING JICT & NPCT1 */}
                                 <NavLink
                                     href={route("logistics.tracking")}
@@ -219,6 +233,14 @@ export default function AuthenticatedLayout({ header, children }) {
                     >
                         Intelligence Center
                     </ResponsiveNavLink>
+                    <ResponsiveNavLink
+                        href={route("rfqs.index")}
+                        active={route().current("rfqs.*")}
+                        className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-cyan-400 flex items-center gap-2"
+                    >
+                        <FileText className="w-3.5 h-3.5" />
+                        RFQ Marketplace
+                    </ResponsiveNavLink>
 
                     {/* SINKRONISASI MOBILE MENU: LIVE CONTAINER TRACKING GATEWAY */}
                     <ResponsiveNavLink
@@ -292,10 +314,10 @@ export default function AuthenticatedLayout({ header, children }) {
                         </span>
                         . All Rights Reserved.
                     </p>
-                    <p className="uppercase tracking-widest text-[9px] bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
+                    {/* <p className="uppercase tracking-widest text-[9px] bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
                         <i className="fas fa-shield-alt text-emerald-500/40 mr-1.5"></i>{" "}
                         Officially Endorsed Technology Provider for API Jakarta
-                    </p>
+                    </p> */}
                 </div>
             </div>
         </div>

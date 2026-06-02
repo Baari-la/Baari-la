@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PortTrackerController;
 use Inertia\Inertia;
 use App\Models\Company;
+use App\Http\Controllers\RfqController;
+use App\Http\Controllers\QuotationController;
 
 /*
 
@@ -108,6 +110,54 @@ Route::delete(
     '/companies/{company}/machines/{machine}',
     [CompanyController::class, 'destroyMachine']
 )->name('companies.machines.destroy');
+
+Route::delete(
+    '/companies/{company}/products/{product}',
+    [CompanyController::class, 'destroyProduct']
+)->name('companies.products.destroy');
+// Market
+Route::delete(
+    '/companies/{company}/markets/{market}',
+    [CompanyController::class, 'destroyMarket']
+)->name('companies.markets.destroy');
+// Certification
+Route::delete(
+    '/companies/{company}/certifications/{certification}',
+    [CompanyController::class, 'destroyCertification']
+)->name('companies.certifications.destroy');
+// Contact
+Route::delete(
+    '/companies/{company}/contacts/{contact}',
+    [CompanyController::class, 'destroyContact']
+)->name('companies.contacts.destroy');
+// Link
+Route::delete(
+    '/companies/{company}/links/{link}',
+    [CompanyController::class, 'destroyLink']
+)->name('companies.links.destroy');
+
+// Images
+Route::delete(
+    '/companies/{company}/images/{image}',
+    [CompanyController::class, 'destroyImage']
+)->name('companies.images.destroy');
+
+// Capacities
+Route::delete(
+    '/companies/{company}/capacities/{capacity}',
+    [CompanyController::class, 'destroyCapacity']
+)->name('companies.capacities.destroy');
+
+// MOQ
+Route::delete(
+    '/companies/{company}/moqs/{moq}',
+    [CompanyController::class, 'destroyMoq']
+)->name('companies.moqs.destroy');
+// LeadTimes
+Route::delete(
+    '/companies/{company}/lead-times/{leadTime}',
+    [CompanyController::class, 'destroyLeadTime']
+)->name('companies.lead-times.destroy');
 
 
 
@@ -243,6 +293,75 @@ Route::get('/admin/logistics', function () {
             'locale' => app()->getLocale()
         ]);
     })->name('logistics.tracking');
+
+// QUOTATION TABEL DIREKTORY
+Route::get(
+        '/rfqs',
+        [RfqController::class, 'index']
+    )->name('rfqs.index');
+
+    Route::get(
+        '/rfqs/create',
+        [RfqController::class, 'create']
+    )->name('rfqs.create');
+
+    Route::post(
+        '/rfqs',
+        [RfqController::class, 'store']
+    )->name('rfqs.store');
+
+    Route::get(
+        '/rfqs/{rfq}',
+        [RfqController::class, 'show']
+    )->name('rfqs.show');
+
+    Route::delete(
+        '/rfqs/{rfq}',
+        [RfqController::class, 'destroy']
+    )->name('rfqs.destroy');
+Route::post(
+    '/rfqs/{rfq}/quotations',
+    [QuotationController::class, 'store']
+)->name('quotations.store');
+
+Route::get(
+    '/quotations/{quotation}',
+    [QuotationController::class, 'show']
+)->name('quotations.show');
+
+Route::delete(
+    '/quotations/{quotation}',
+    [QuotationController::class, 'destroy']
+)->name('quotations.destroy');
+
+Route::post(
+    '/quotations/{quotation}/accept',
+    [QuotationController::class, 'accept']
+)->name('quotations.accept');
+
+Route::post(
+    '/quotations/{quotation}/reject',
+    [QuotationController::class, 'reject']
+)->name('quotations.reject');
+
+Route::post(
+    '/quotations/{quotation}/award',
+    [QuotationController::class, 'award']
+)->name('quotations.award');
+
+Route::post(
+    '/rfqs/{rfq}/close',
+    [RfqController::class, 'close']
+)->name('rfqs.close');
+Route::get(
+    '/my-quotations',
+    [QuotationController::class, 'myQuotations']
+)->name('quotations.my');
+
+Route::get(
+    '/my-quotations',
+    [QuotationController::class, 'index']
+)->name('quotations.index');
 
     });
 
