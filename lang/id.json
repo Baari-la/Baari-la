@@ -153,5 +153,17 @@
     "Map_Stats_3": "Analitik Real-time",
 
     "Partners_Title": "Jaringan Teknologi Strategis",
-    "Partners_Subtitle": "Berkolaborasi dengan pemimpin global untuk mendigitalisasi rantai nilai tekstil Indonesia."
+    "Partners_Subtitle": "Berkolaborasi dengan pemimpin global untuk mendigitalisasi rantai nilai tekstil Indonesia.",
+
+
+     "Purchase Order Detail": "Detail Pesanan Pembelian",
+    "Supplier": "Pemasok",
+    "Status": "Status",
+    "Unit Price": "Harga Satuan",
+    "Quantity": "Jumlah",
+    "Total Amount": "Total Harga",
+    "Delivery Date": "Tanggal Pengiriman",
+    "Start Production": "Mulai Produksi",
+    "production_started": "Produksi berhasil dimulai!",
+    "production_completed_error": "Pesanan sudah selesai diproduksi."
 }

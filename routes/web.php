@@ -20,6 +20,7 @@ use Inertia\Inertia;
 use App\Models\Company;
 use App\Http\Controllers\RfqController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\PurchaseOrderController;
 
 /*
 
@@ -362,8 +363,38 @@ Route::get(
     '/my-quotations',
     [QuotationController::class, 'index']
 )->name('quotations.index');
+Route::get(
+        '/purchase-orders',
+        [PurchaseOrderController::class, 'index']
+    )->name('purchase-orders.index');
 
-    });
+    Route::get(
+        '/purchase-orders/{purchaseOrder}',
+        [PurchaseOrderController::class, 'show']
+    )->name('purchase-orders.show');
+    Route::post(
+    '/purchase-orders/{purchaseOrder}/confirm',
+    [PurchaseOrderController::class, 'confirm']
+)->name('purchase-orders.confirm');
+
+Route::post(
+    '/purchase-orders/{purchaseOrder}/production',
+    [PurchaseOrderController::class, 'production']
+)->name('purchase-orders.production');
+Route::post('/purchase-orders/{purchaseOrder}/start-production', [PurchaseOrderController::class, 'startProduction'])
+        ->name('purchase-orders.start-production');
+
+Route::post(
+    '/purchase-orders/{purchaseOrder}/shipped',
+    [PurchaseOrderController::class, 'shipped']
+)->name('purchase-orders.shipped');
+
+Route::post(
+    '/purchase-orders/{purchaseOrder}/completed',
+    [PurchaseOrderController::class, 'completed']
+)->name('purchase-orders.completed');
+
+ });
 
 /*
 

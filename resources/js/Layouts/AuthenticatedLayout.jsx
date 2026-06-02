@@ -99,6 +99,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <FileText className="w-3.5 h-3.5 text-cyan-400/80" />
                                     RFQ Marketplace
                                 </NavLink>
+                    <NavLink
+    href={route("purchase-orders.index")}
+    active={route().current("purchase-orders.*")}
+    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:text-amber-400"
+>
+    Purchase Orders
+</NavLink>
                                 <NavLink
                                     href={route("quotations.index")}
                                     active={route().current("quotations.index")}
@@ -233,6 +240,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     >
                         Intelligence Center
                     </ResponsiveNavLink>
+                    
                     <ResponsiveNavLink
                         href={route("rfqs.index")}
                         active={route().current("rfqs.*")}
@@ -241,6 +249,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         <FileText className="w-3.5 h-3.5" />
                         RFQ Marketplace
                     </ResponsiveNavLink>
+                    
 
                     {/* SINKRONISASI MOBILE MENU: LIVE CONTAINER TRACKING GATEWAY */}
                     <ResponsiveNavLink

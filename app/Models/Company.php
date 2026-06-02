@@ -114,4 +114,11 @@ public function quotations()
         Quotation::class
     );
 }
+public function purchaseOrders()
+{
+    return $this->hasMany(
+        PurchaseOrder::class,
+        'supplier_company_id'
+    );
+}
 }

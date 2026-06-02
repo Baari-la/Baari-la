@@ -45,4 +45,10 @@ class Quotation extends Model
         'company_id'
     );
 }
+public function purchaseOrder()
+{
+    return $this->hasOne(
+        PurchaseOrder::class
+    );
+}
 }

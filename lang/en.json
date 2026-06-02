@@ -151,5 +151,16 @@
     "Map_Stats_3": "Real-time Analytics",
 
     "Partners_Title": "Strategic Technology Network",
-    "Partners_Subtitle": "Collaborating with global leaders to digitize the Indonesian textile value chain."
+    "Partners_Subtitle": "Collaborating with global leaders to digitize the Indonesian textile value chain.",
+
+    "Purchase Order Detail": "Purchase Order Detail",
+    "Supplier": "Supplier",
+    "Status": "Status",
+    "Unit Price": "Unit Price",
+    "Quantity": "Quantity",
+    "Total Amount": "Total Amount",
+    "Delivery Date": "Delivery Date",
+    "Start Production": "Start Production",
+    "production_started": "Production started successfully!",
+    "production_completed_error": "The order has already finished production."
 }

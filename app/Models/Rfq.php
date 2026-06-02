@@ -61,5 +61,12 @@ public function awardedQuotation()
         'awarded_quotation_id'
     );
 }
+public function purchaseOrder()
+{
+    return $this->hasOne(
+        PurchaseOrder::class
+    );
+}
+
 
 }

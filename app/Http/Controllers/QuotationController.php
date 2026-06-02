@@ -6,6 +6,7 @@ use App\Models\Quotation;
 use App\Models\Rfq;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\PurchaseOrder;
 
 class QuotationController extends Controller
 {
@@ -180,6 +181,12 @@ public function reject(Quotation $quotation)
    
 public function award(Quotation $quotation)
 {
+    /*
+    |--------------------------------------------------------------------------
+    | ONLY ACCEPTED QUOTATION
+    |--------------------------------------------------------------------------
+    */
+
     if ($quotation->status !== 'accepted') {
         return back()->withErrors([
             'quotation' =>
@@ -189,21 +196,100 @@ public function award(Quotation $quotation)
 
     $rfq = $quotation->rfq;
 
+    /*
+    |--------------------------------------------------------------------------
+    | RFQ ALREADY AWARDED ?
+    |--------------------------------------------------------------------------
+    */
+
+    if ($rfq->awarded_quotation_id) {
+        return back()->withErrors([
+            'quotation' =>
+                'This RFQ already has an awarded supplier.',
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE QUOTATION
+    |--------------------------------------------------------------------------
+    */
+
     $quotation->update([
         'status' => 'awarded',
     ]);
 
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE RFQ
+    |--------------------------------------------------------------------------
+    */
+
     $rfq->update([
-        'status' => 'awarded',
+        'status' => 'quoted',
         'awarded_quotation_id' => $quotation->id,
     ]);
 
+    /*
+    |--------------------------------------------------------------------------
+    | PREVENT DUPLICATE PO
+    |--------------------------------------------------------------------------
+    */
+
+    $exists = PurchaseOrder::where(
+        'quotation_id',
+        $quotation->id
+    )->exists();
+
+    if (!$exists) {
+
+        $poNumber =
+            'PO-' .
+            now()->format('YmdHis');
+
+        PurchaseOrder::create([
+
+            'rfq_id' =>
+                $rfq->id,
+
+            'quotation_id' =>
+                $quotation->id,
+
+            'buyer_id' =>
+                $rfq->user_id,
+
+            'supplier_company_id' =>
+                $quotation->company_id,
+
+            'po_number' =>
+                $poNumber,
+
+            'unit_price' =>
+                $quotation->unit_price,
+
+            'quantity' =>
+                $rfq->required_quantity,
+
+            'total_amount' =>
+                $quotation->unit_price *
+                $rfq->required_quantity,
+
+            'currency' =>
+                'USD',
+
+            'delivery_date' =>
+                $rfq->required_delivery_date,
+
+            'status' =>
+                'pending',
+        ]);
+    }
+
     return back()->with(
         'success',
-        'Supplier awarded successfully.'
+        'Supplier awarded and PO created successfully.'
     );
 }
-
 public function close(Rfq $rfq)
 {
     /*
