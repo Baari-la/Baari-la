@@ -51,4 +51,12 @@ class PurchaseOrder extends Model
             'supplier_company_id'
         );
     }
+
+    public function documents()
+    {
+        return $this->hasMany(
+            PurchaseOrderDocument::class,
+            'purchase_order_id'
+        );
+    }
 }

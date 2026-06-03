@@ -10,10 +10,11 @@ use Inertia\Response;
 
 class RfqController extends Controller
 {
-    public function index(): Response
+   public function index(): Response
 {
     $rfqs = Rfq::with([
             'user',
+            'company',
             'files',
             'quotations',
         ])
@@ -35,9 +36,14 @@ class RfqController extends Controller
 
                 'unit' => $rfq->unit,
 
-                'destination_country' => $rfq->destination_country,
+                'destination_country' =>
+                    $rfq->destination_country,
 
-                'status' => $rfq->status,
+                'status' =>
+                    $rfq->status,
+
+                'quotation_deadline' =>
+                    $rfq->quotation_deadline,
 
                 'quotation_count' =>
                     $rfq->quotations->count(),
@@ -50,8 +56,13 @@ class RfqController extends Controller
                         ->format('d M Y'),
 
                 'user' => [
-                    'id' => $rfq->user?->id,
+                    'id'   => $rfq->user?->id,
                     'name' => $rfq->user?->name,
+                ],
+
+                'company' => [
+                    'id'   => $rfq->company?->id,
+                    'name' => $rfq->company?->nama_perusahaan,
                 ],
             ];
         });
@@ -71,7 +82,7 @@ class RfqController extends Controller
     );
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
 {
     $validated = $request->validate([
 
@@ -96,6 +107,15 @@ class RfqController extends Controller
         'destination_country' =>
             'nullable|string|max:255',
 
+        'incoterm' =>
+            'nullable|string|max:20',
+
+        'currency' =>
+            'required|string|max:10',
+
+        'quotation_deadline' =>
+            'nullable|date',
+
         'attachments.*' => [
             'nullable',
             'file',
@@ -104,8 +124,33 @@ class RfqController extends Controller
         ],
     ]);
 
+    /*
+    |--------------------------------------------------------------------------
+    | User Validation
+    |--------------------------------------------------------------------------
+    */
+
+    $user = auth()->user();
+
+    if (!$user->company_id) {
+
+        return back()->withErrors([
+            'company' =>
+                'Your account is not linked to a company.',
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RFQ Data
+    |--------------------------------------------------------------------------
+    */
+
     $validated['user_id'] =
-        auth()->id();
+        $user->id;
+
+    $validated['company_id'] =
+        $user->company_id;
 
     $validated['rfq_number'] =
         'RFQ-' . now()->format('YmdHis');
@@ -113,6 +158,12 @@ class RfqController extends Controller
     $rfq = Rfq::create(
         $validated
     );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attachments
+    |--------------------------------------------------------------------------
+    */
 
     if ($request->hasFile('attachments')) {
 
@@ -140,22 +191,158 @@ class RfqController extends Controller
     );
 }
 
-    public function show(Rfq $rfq)
-    {
-      $rfq->load([
-    'user',
-    'files',
-    'quotations' => fn ($q) => $q->latest(),
-    'quotations.company',
-]);
+   public function show(Rfq $rfq)
+{
+     
+    $rfq->load([
+        'user',
+        'company',
+        'files',
+        'quotations' => fn ($query) => $query->latest(),
+        'quotations.company',
+    ]);
+
+    //  dd($rfq->toArray());
 
     return Inertia::render(
         'RFQ/Show',
         [
-            'rfq' => $rfq,
+            'rfq' => [
+
+                'id' => $rfq->id,
+
+                'user_id' => $rfq->user_id,
+
+                'company_id' => $rfq->company_id,
+
+                'rfq_number' => $rfq->rfq_number,
+
+                'product_name' => $rfq->product_name,
+
+                'hs_code' => $rfq->hs_code,
+
+                'description' => $rfq->description,
+
+                'required_quantity' => $rfq->required_quantity,
+
+                'unit' => $rfq->unit,
+
+                'required_delivery_date' =>
+                    $rfq->required_delivery_date,
+
+                'destination_country' =>
+                    $rfq->destination_country,
+
+                'incoterm' =>
+                    $rfq->incoterm,
+
+                'currency' =>
+                    $rfq->currency,
+
+                'quotation_deadline' =>
+                    $rfq->quotation_deadline,
+
+                'status' =>
+                    $rfq->status,
+
+                'awarded_quotation_id' =>
+                    $rfq->awarded_quotation_id,
+
+                /*
+                |----------------------------------------------------------
+                | BUYER COMPANY
+                |----------------------------------------------------------
+                */
+
+                'company' => [
+                    'id' =>
+                        $rfq->company?->id,
+
+                    'nama_perusahaan' =>
+                        $rfq->company?->nama_perusahaan,
+                ],
+
+                /*
+                |----------------------------------------------------------
+                | CREATOR
+                |----------------------------------------------------------
+                */
+
+                'user' => [
+                    'id' =>
+                        $rfq->user?->id,
+
+                    'name' =>
+                        $rfq->user?->name,
+                ],
+
+                /*
+                |----------------------------------------------------------
+                | FILES
+                |----------------------------------------------------------
+                */
+
+                'files' => $rfq->files->map(
+                    fn ($file) => [
+
+                        'id' => $file->id,
+
+                        'file_name' =>
+                            $file->file_name,
+
+                        'file_path' =>
+                            $file->file_path,
+                    ]
+                ),
+
+                /*
+                |----------------------------------------------------------
+                | QUOTATIONS
+                |----------------------------------------------------------
+                */
+
+                'quotations' => $rfq->quotations->map(
+                    fn ($quotation) => [
+
+                        'id' =>
+                            $quotation->id,
+
+                        'company_id' =>
+                            $quotation->company_id,
+
+                        'unit_price' =>
+                            $quotation->unit_price,
+
+                        'minimum_order_quantity' =>
+                            $quotation->minimum_order_quantity,
+
+                        'lead_time_days' =>
+                            $quotation->lead_time_days,
+
+                        'remarks' =>
+                            $quotation->remarks,
+
+                        'status' =>
+                            $quotation->status,
+
+                        'created_at' =>
+                            optional(
+                                $quotation->created_at
+                            )->format('d M Y'),
+
+                        'company' => [
+                            'id' =>
+                                $quotation->company?->id,
+
+                            'nama_perusahaan' =>
+                                $quotation->company?->nama_perusahaan,
+                        ],
+                    ]
+                ),
+            ],
         ]
     );
-    }
+}
 
     public function destroy(Rfq $rfq)
     {

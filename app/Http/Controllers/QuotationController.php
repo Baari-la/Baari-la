@@ -31,69 +31,102 @@ public function index()
 /**
      * Simpan quotation supplier
      */
-    public function store(Request $request, Rfq $rfq)
-    {
-        $validated = $request->validate([
-            'unit_price' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
+    public function store(
+    Request $request,
+    Rfq $rfq
+)
+{
+    $validated = $request->validate([
 
-            'minimum_order_quantity' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
+        'unit_price' => [
+            'required',
+            'numeric',
+            'min:0',
+        ],
 
-            'lead_time_days' => [
-                'nullable',
-                'integer',
-                'min:0',
-            ],
+        'minimum_order_quantity' => [
+            'nullable',
+            'numeric',
+            'min:0',
+        ],
 
-            'remarks' => [
-                'nullable',
-                'string',
-            ],
+        'lead_time_days' => [
+            'nullable',
+            'integer',
+            'min:0',
+        ],
+
+        'remarks' => [
+            'nullable',
+            'string',
+        ],
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | COMPANY ID
+    |--------------------------------------------------------------------------
+    */
+
+    $companyId = auth()->user()->company_id;
+
+    if (!$companyId) {
+
+        return back()->withErrors([
+            'company' =>
+                'Your account is not linked to a company.',
         ]);
-        
-        /*
-        |--------------------------------------------------------------------------
-        | COMPANY ID
-        |--------------------------------------------------------------------------
-        |
-        | Untuk sementara ambil dari user login.
-        | Nanti bisa disesuaikan jika satu user
-        | memiliki lebih dari satu perusahaan.
-        |
-        */
+    }
 
-        $companyId = auth()->user()->company_id;
+    /*
+    |--------------------------------------------------------------------------
+    | BUYER CANNOT QUOTE OWN RFQ
+    |--------------------------------------------------------------------------
+    */
 
-if (!$companyId) {
-    return back()->withErrors([
-        'company' => 'Your account is not linked to a company.',
-    ]);
-}
+    if ($rfq->company_id == $companyId) {
 
-/*
-|--------------------------------------------------------------------------
-| RFQ MUST BE OPEN
-|--------------------------------------------------------------------------
-*/
+        return back()->withErrors([
+            'quotation' =>
+                'You cannot submit a quotation to your own RFQ.',
+        ]);
+    }
 
-if ($rfq->status !== 'open') {
-    return back()->withErrors([
-        'rfq' => 'This RFQ is no longer accepting quotations.',
-    ]);
-}
+    /*
+    |--------------------------------------------------------------------------
+    | RFQ MUST BE OPEN
+    |--------------------------------------------------------------------------
+    */
 
-/*
-|--------------------------------------------------------------------------
-| PREVENT DUPLICATE QUOTATION
-|--------------------------------------------------------------------------
-*/
+    if ($rfq->status !== 'open') {
+
+        return back()->withErrors([
+            'rfq' =>
+                'This RFQ is no longer accepting quotations.',
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | QUOTATION DEADLINE
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        $rfq->quotation_deadline &&
+        now()->gt(
+            \Carbon\Carbon::parse(
+                $rfq->quotation_deadline
+            )->endOfDay()
+        )
+    ) {
+
+        return back()->withErrors([
+            'quotation' =>
+                'Quotation deadline has passed.',
+        ]);
+    }
+
 
 $exists = Quotation::where('rfq_id', $rfq->id)
     ->where('company_id', $companyId)
@@ -157,6 +190,12 @@ return redirect()
     }
 public function accept(Quotation $quotation)
 {
+    if (
+        $quotation->rfq->company_id != auth()->user()->company_id
+    ) {
+        abort(403);
+    }
+
     $quotation->update([
         'status' => 'accepted',
     ]);
@@ -169,6 +208,12 @@ public function accept(Quotation $quotation)
 
 public function reject(Quotation $quotation)
 {
+    if (
+        $quotation->rfq->company_id != auth()->user()->company_id
+    ) {
+        abort(403);
+    }
+
     $quotation->update([
         'status' => 'rejected',
     ]);
@@ -194,7 +239,13 @@ public function award(Quotation $quotation)
         ]);
     }
 
-    $rfq = $quotation->rfq;
+   $rfq = $quotation->rfq;
+
+if (
+    $rfq->company_id != auth()->user()->company_id
+) {
+    abort(403);
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -226,9 +277,10 @@ public function award(Quotation $quotation)
     */
 
     $rfq->update([
-        'status' => 'quoted',
-        'awarded_quotation_id' => $quotation->id,
-    ]);
+    'status' => 'awarded',
+    'awarded_quotation_id' => $quotation->id,
+    'awarded_at' => now(),
+]);
 
     /*
     |--------------------------------------------------------------------------
@@ -274,8 +326,7 @@ public function award(Quotation $quotation)
                 $quotation->unit_price *
                 $rfq->required_quantity,
 
-            'currency' =>
-                'USD',
+            'currency' => $rfq->currency ?? 'USD',
 
             'delivery_date' =>
                 $rfq->required_delivery_date,
@@ -298,9 +349,11 @@ public function close(Rfq $rfq)
     |--------------------------------------------------------------------------
     */
 
-    if ($rfq->user_id !== auth()->id()) {
-        abort(403);
-    }
+    if (
+    $rfq->company_id != auth()->user()->company_id
+) {
+    abort(403);
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -345,13 +398,19 @@ public function myQuotations()
     /**
      * Hapus quotation
      */
-    public function destroy(Quotation $quotation)
-    {
-        $quotation->delete();
-
-        return back()->with(
-            'success',
-            'Quotation deleted successfully.'
-        );
+   public function destroy(Quotation $quotation)
+{
+    if (
+        $quotation->company_id != auth()->user()->company_id
+    ) {
+        abort(403);
     }
+
+    $quotation->delete();
+
+    return back()->with(
+        'success',
+        'Quotation deleted successfully.'
+    );
+}
 }

@@ -21,6 +21,7 @@ use App\Models\Company;
 use App\Http\Controllers\RfqController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\PurchaseOrderDocumentController;
 
 /*
 
@@ -393,6 +394,12 @@ Route::post(
     '/purchase-orders/{purchaseOrder}/completed',
     [PurchaseOrderController::class, 'completed']
 )->name('purchase-orders.completed');
+Route::post(
+    '/purchase-orders/{purchaseOrder}/documents',
+    [PurchaseOrderDocumentController::class, 'store']
+)->name(
+    'purchase-orders.documents.store'
+);
 
  });
 

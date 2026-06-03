@@ -48,6 +48,9 @@ export default function Index({ auth, rfqs }) {
                                 <th className="text-left p-4 font-bold">
                                     Status
                                 </th>
+                                <th className="px-4 py-3">Buyer</th>
+
+                                <th className="px-4 py-3">Deadline</th>
                                 <th className="text-left p-4 font-bold">
                                     Action
                                 </th>
@@ -58,7 +61,7 @@ export default function Index({ auth, rfqs }) {
                             {rfqs.data.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan="7"
+                                        colSpan="9"
                                         className="p-8 text-center text-gray-500"
                                     >
                                         No RFQ found.
@@ -87,7 +90,7 @@ export default function Index({ auth, rfqs }) {
                                         </td>
 
                                         <td className="p-4 text-gray-800 font-medium">
-                                            {rfq.quotations?.length || 0}
+                                            {rfq.quotation_count || 0}
                                         </td>
 
                                         <td className="p-4">
@@ -100,6 +103,25 @@ export default function Index({ auth, rfqs }) {
                                             >
                                                 {rfq.status}
                                             </span>
+                                        </td>
+
+                                        <td className="p-4 text-gray-800">
+                                            {rfq.company?.name || "-"}
+                                        </td>
+
+                                        <td className="p-4 text-gray-800">
+                                            {rfq.quotation_deadline
+                                                ? new Date(
+                                                      rfq.quotation_deadline,
+                                                  ).toLocaleDateString(
+                                                      "en-GB",
+                                                      {
+                                                          day: "2-digit",
+                                                          month: "short",
+                                                          year: "numeric",
+                                                      },
+                                                  )
+                                                : "-"}
                                         </td>
 
                                         <td className="p-4">

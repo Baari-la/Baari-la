@@ -62,11 +62,13 @@ class PurchaseOrderController extends Controller
     ) {
 
         $purchaseOrder->load([
-            'rfq',
-            'quotation',
-            'buyer',
-            'supplier',
-        ]);
+    'rfq',
+    'quotation',
+    'buyer',
+    'supplier',
+    'documents',
+    'documents.uploader',
+]);
 
         return Inertia::render(
             'PurchaseOrders/Show',
@@ -89,6 +91,7 @@ public function confirm(
 
     $purchaseOrder->update([
         'status' => 'confirmed',
+        'confirmed_at' => now(),
     ]);
 
     return back()->with(
@@ -96,6 +99,7 @@ public function confirm(
         'Order confirmed successfully.'
     );
 }
+
 public function production(
     PurchaseOrder $purchaseOrder
 )
@@ -111,6 +115,7 @@ public function production(
 
     $purchaseOrder->update([
         'status' => 'production',
+        'production_started_at' => now(),
     ]);
 
     return back()->with(
@@ -134,6 +139,7 @@ public function shipped(
 
     $purchaseOrder->update([
         'status' => 'shipped',
+        'shipped_at' => now(),
     ]);
 
     return back()->with(
@@ -157,6 +163,7 @@ public function completed(
 
     $purchaseOrder->update([
         'status' => 'completed',
+        'completed_at' => now(),
     ]);
 
     return back()->with(

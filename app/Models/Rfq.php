@@ -15,6 +15,11 @@ class Rfq extends Model
         'file_name',
         'product_name',
         'hs_code',
+        'company_id',
+        'incoterm',
+        'currency',
+        'quotation_deadline',
+        'awarded_at',
 
         'description',
 
@@ -68,5 +73,20 @@ public function purchaseOrder()
     );
 }
 
+public function buyerCompany()
+{
+    return $this->belongsTo(
+        \App\Models\Company::class,
+        'buyer_company_id'
+    );
+}
+public function company()
+{
+    return $this->belongsTo(
+        Company::class,
+        'company_id',
+        'id'
+    );
+}
 
 }

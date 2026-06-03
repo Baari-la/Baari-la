@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link, useForm, usePage, router } from "@inertiajs/react";
+import { Head, Link, useForm, router } from "@inertiajs/react";
 
 export default function Show({ auth, rfq }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -8,6 +8,23 @@ export default function Show({ auth, rfq }) {
         lead_time_days: "",
         remarks: "",
     });
+
+    const companyId = auth.user?.company_id;
+
+    const isBuyer = companyId === rfq.company_id;
+
+    const deadlinePassed =
+        rfq.quotation_deadline &&
+        new Date() > new Date(`${rfq.quotation_deadline}T23:59:59`);
+
+    const canSubmitQuotation =
+        rfq.status === "open" && !isBuyer && !deadlinePassed;
+
+    const formatNumber = (value) =>
+        Number(value || 0).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
 
     const submitQuotation = (e) => {
         e.preventDefault();
@@ -34,7 +51,50 @@ export default function Show({ auth, rfq }) {
                         Back
                     </Link>
                 </div>
+                {/* Tambahan */}
+                <div>
+                    <strong className="text-gray-700 block mb-1">
+                        Buyer Company
+                    </strong>
 
+                    <div className="text-gray-900">
+                        {rfq.company?.nama_perusahaan ?? rfq.user?.name ?? "-"}
+                    </div>
+                </div>
+
+                <div>
+                    <strong className="text-gray-700 block mb-1">
+                        Incoterm
+                    </strong>
+
+                    <div className="text-gray-900">{rfq.incoterm || "-"}</div>
+                </div>
+
+                <div>
+                    <strong className="text-gray-700 block mb-1">
+                        Currency
+                    </strong>
+
+                    <div className="text-gray-900">{rfq.currency || "-"}</div>
+                </div>
+
+                <div>
+                    <strong className="text-gray-700 block mb-1">
+                        Quotation Deadline
+                    </strong>
+
+                    <div className="text-gray-900">
+                        {rfq.quotation_deadline
+                            ? new Date(
+                                  rfq.quotation_deadline,
+                              ).toLocaleDateString("en-GB", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                              })
+                            : "-"}
+                    </div>
+                </div>
                 {/* RFQ Detail */}
                 <div className="bg-white rounded-2xl shadow p-6 mb-6">
                     <div className="grid md:grid-cols-2 gap-6">
@@ -120,7 +180,7 @@ export default function Show({ auth, rfq }) {
                         </div>
                     </div>
                 </div>
-                {auth?.user?.id === rfq.user_id &&
+                {auth?.user?.company_id === rfq.company_id &&
                     rfq.status === "awarded" &&
                     rfq.awarded_quotation_id && (
                         <div className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6">
@@ -184,7 +244,8 @@ export default function Show({ auth, rfq }) {
 
                 {/* Submit Quotation */}
 
-                {["open", "quoted"].includes(rfq.status) ? (
+                {["open", "quoted"].includes(rfq.status) &&
+                auth.user.company_id !== rfq.company_id ? (
                     <div className="bg-white rounded-2xl shadow p-6 mt-8">
                         <h2 className="text-xl font-bold text-gray-900 mb-6">
                             Submit Quotation
@@ -365,7 +426,8 @@ export default function Show({ auth, rfq }) {
                         Quotations
                     </h2>
 
-                    {rfq.quotations?.length > 0 ? (
+                    {Array.isArray(rfq.quotations) &&
+                    rfq.quotations.length > 0 ? (
                         <div className="space-y-4">
                             {rfq.quotations.map((quotation) => (
                                 <div
@@ -383,7 +445,8 @@ export default function Show({ auth, rfq }) {
                                         <strong className="text-gray-700">
                                             Unit Price:
                                         </strong>{" "}
-                                        {quotation.unit_price}
+                                        {rfq.currency || "USD"}{" "}
+                                        {formatNumber(quotation.unit_price)}
                                     </div>
 
                                     <div className="mb-1">
@@ -409,19 +472,25 @@ export default function Show({ auth, rfq }) {
                                     </div>
 
                                     {/* SUBMITTED */}
-                                    {auth.user.id === rfq.user_id &&
+                                    {auth.user.company_id === rfq.company_id &&
                                         quotation.status === "submitted" && (
                                             <div className="flex gap-2 mt-4">
                                                 <button
                                                     type="button"
-                                                    onClick={() =>
-                                                        router.post(
-                                                            route(
-                                                                "quotations.accept",
-                                                                quotation.id,
-                                                            ),
-                                                        )
-                                                    }
+                                                    onClick={() => {
+                                                        if (
+                                                            confirm(
+                                                                "Accept this quotation?",
+                                                            )
+                                                        ) {
+                                                            router.post(
+                                                                route(
+                                                                    "quotations.accept",
+                                                                    quotation.id,
+                                                                ),
+                                                            );
+                                                        }
+                                                    }}
                                                     className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg"
                                                 >
                                                     Accept
@@ -429,14 +498,20 @@ export default function Show({ auth, rfq }) {
 
                                                 <button
                                                     type="button"
-                                                    onClick={() =>
-                                                        router.post(
-                                                            route(
-                                                                "quotations.reject",
-                                                                quotation.id,
-                                                            ),
-                                                        )
-                                                    }
+                                                    onClick={() => {
+                                                        if (
+                                                            confirm(
+                                                                "Reject this quotation?",
+                                                            )
+                                                        ) {
+                                                            router.post(
+                                                                route(
+                                                                    "quotations.reject",
+                                                                    quotation.id,
+                                                                ),
+                                                            );
+                                                        }
+                                                    }}
                                                     className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg"
                                                 >
                                                     Reject
@@ -445,7 +520,7 @@ export default function Show({ auth, rfq }) {
                                         )}
 
                                     {/* ACCEPTED */}
-                                    {auth.user.id === rfq.user_id &&
+                                    {auth.user.company_id === rfq.company_id &&
                                         quotation.status === "accepted" && (
                                             <div className="flex gap-2 mt-4">
                                                 <button

@@ -10,6 +10,9 @@ export default function Create({ auth }) {
         unit: "PCS",
         required_delivery_date: "",
         destination_country: "",
+        incoterm: "",
+        currency: "USD",
+        quotation_deadline: "",
         attachments: [],
     });
 
@@ -120,6 +123,61 @@ export default function Create({ auth }) {
 
                             <option value="YARD">YARD</option>
                         </select>
+                    </div>
+                    {/* Tambahan Field */}
+                    <div>
+                        <label className="block mb-1 font-medium">
+                            Currency
+                        </label>
+
+                        <select
+                            value={data.currency}
+                            onChange={(e) =>
+                                setData("currency", e.target.value)
+                            }
+                            className="w-full border rounded-lg"
+                        >
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="IDR">IDR</option>
+                            <option value="JPY">JPY</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">
+                            Incoterm
+                        </label>
+
+                        <select
+                            value={data.incoterm}
+                            onChange={(e) =>
+                                setData("incoterm", e.target.value)
+                            }
+                            className="w-full border rounded-lg"
+                        >
+                            <option value="">Select Incoterm</option>
+
+                            <option value="EXW">EXW</option>
+                            <option value="FOB">FOB</option>
+                            <option value="CFR">CFR</option>
+                            <option value="CIF">CIF</option>
+                            <option value="DAP">DAP</option>
+                            <option value="DDP">DDP</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">
+                            Quotation Deadline
+                        </label>
+
+                        <input
+                            type="date"
+                            value={data.quotation_deadline}
+                            onChange={(e) =>
+                                setData("quotation_deadline", e.target.value)
+                            }
+                            className="w-full border rounded-lg"
+                        />
                     </div>
 
                     {/* Delivery Date */}
