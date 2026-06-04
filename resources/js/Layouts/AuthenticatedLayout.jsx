@@ -99,13 +99,15 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <FileText className="w-3.5 h-3.5 text-cyan-400/80" />
                                     RFQ Marketplace
                                 </NavLink>
-                    <NavLink
-    href={route("purchase-orders.index")}
-    active={route().current("purchase-orders.*")}
-    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:text-amber-400"
->
-    Purchase Orders
-</NavLink>
+                                <NavLink
+                                    href={route("purchase-orders.index")}
+                                    active={route().current(
+                                        "purchase-orders.*",
+                                    )}
+                                    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:text-amber-400"
+                                >
+                                    Purchase Orders
+                                </NavLink>
                                 <NavLink
                                     href={route("quotations.index")}
                                     active={route().current("quotations.index")}
@@ -137,6 +139,46 @@ export default function AuthenticatedLayout({ header, children }) {
                                         Premium
                                     </span>
                                 </NavLink>
+                                {/* ✨ SUNTIKAN INTEGRASI BARU: DROPDOWN COLLECTIVE SOURCING DESKTOP */}
+                                <div className="relative flex items-center px-2">
+                                    <Dropdown>
+                                        <Dropdown.Trigger>
+                                            <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:text-amber-400 focus:outline-none transition duration-150 cursor-pointer">
+                                                <Layers className="w-3.5 h-3.5 text-amber-500/80" />
+                                                <span>Collective Sourcing</span>
+                                                <span className="text-[8px] text-gray-400">
+                                                    ▼
+                                                </span>
+                                            </button>
+                                        </Dropdown.Trigger>
+                                        <Dropdown.Content className="bg-[#0b1329] border border-white/10 rounded-2xl shadow-2xl p-1 mt-2 min-w-[200px]">
+                                            <Dropdown.Link
+                                                href={route(
+                                                    "collective-sourcing.index",
+                                                )}
+                                                className="text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-white rounded-xl px-4 py-2.5 block w-full text-left"
+                                            >
+                                                Open Demand Groups
+                                            </Dropdown.Link>
+                                            <Dropdown.Link
+                                                href={route(
+                                                    "collective-sourcing.create",
+                                                )}
+                                                className="text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-white rounded-xl px-4 py-2.5 block w-full text-left"
+                                            >
+                                                Create Requirement
+                                            </Dropdown.Link>
+                                            <Dropdown.Link
+                                                href={route(
+                                                    "collective-sourcing.my-requests",
+                                                )}
+                                                className="text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-white rounded-xl px-4 py-2.5 block w-full text-left"
+                                            >
+                                                My Requests
+                                            </Dropdown.Link>
+                                        </Dropdown.Content>
+                                    </Dropdown>
+                                </div>
                             </div>
                         </div>
 
@@ -240,7 +282,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     >
                         Intelligence Center
                     </ResponsiveNavLink>
-                    
+
                     <ResponsiveNavLink
                         href={route("rfqs.index")}
                         active={route().current("rfqs.*")}
@@ -249,7 +291,6 @@ export default function AuthenticatedLayout({ header, children }) {
                         <FileText className="w-3.5 h-3.5" />
                         RFQ Marketplace
                     </ResponsiveNavLink>
-                    
 
                     {/* SINKRONISASI MOBILE MENU: LIVE CONTAINER TRACKING GATEWAY */}
                     <ResponsiveNavLink
@@ -271,6 +312,39 @@ export default function AuthenticatedLayout({ header, children }) {
                             Premium
                         </span>
                     </ResponsiveNavLink>
+                    {/* ✨ SUBMENU COLLECTIVE SOURCING VERSI MOBILE */}
+                    <div className="pt-2 border-t border-white/5 space-y-1">
+                        <div className="px-4 py-1 text-[9px] font-black text-amber-500/80 uppercase tracking-widest flex items-center gap-1.5">
+                            <Layers className="w-3 h-3" /> Collective Sourcing
+                        </div>
+                        <ResponsiveNavLink
+                            href={route("collective-sourcing.index")}
+                            active={route().current(
+                                "collective-sourcing.index",
+                            )}
+                            className="rounded-xl text-[10px] font-bold uppercase tracking-widest block py-2.5 px-6 text-gray-300 hover:text-white"
+                        >
+                            - Open Demand Groups
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("collective-sourcing.create")}
+                            active={route().current(
+                                "collective-sourcing.create",
+                            )}
+                            className="rounded-xl text-[10px] font-bold uppercase tracking-widest block py-2.5 px-6 text-gray-300 hover:text-white"
+                        >
+                            - Create Requirement
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("collective-sourcing.my-requests")}
+                            active={route().current(
+                                "collective-sourcing.my-requests",
+                            )}
+                            className="rounded-xl text-[10px] font-bold uppercase tracking-widest block py-2.5 px-6 text-gray-300 hover:text-white"
+                        >
+                            - My Requests
+                        </ResponsiveNavLink>
+                    </div>
 
                     {/* 🌐 SUNTIKAN REAKTIF: LANGUAGE SWITCHER KHUSUS MOBILE VIEWPORT DI INDOOR DASBOR */}
                     <div className="pt-2 border-t border-white/5">
@@ -323,10 +397,6 @@ export default function AuthenticatedLayout({ header, children }) {
                         </span>
                         . All Rights Reserved.
                     </p>
-                    {/* <p className="uppercase tracking-widest text-[9px] bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
-                        <i className="fas fa-shield-alt text-emerald-500/40 mr-1.5"></i>{" "}
-                        Officially Endorsed Technology Provider for API Jakarta
-                    </p> */}
                 </div>
             </div>
         </div>

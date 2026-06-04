@@ -22,6 +22,7 @@ use App\Http\Controllers\RfqController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseOrderDocumentController;
+use App\Http\Controllers\CollectiveSourcingController;
 
 /*
 
@@ -400,6 +401,31 @@ Route::post(
 )->name(
     'purchase-orders.documents.store'
 );
+// IKM Sourcing
+ Route::get(
+            '/collective-sourcing',
+            [CollectiveSourcingController::class, 'index']
+        )->name('collective-sourcing.index');
+
+        Route::get(
+            '/collective-sourcing/create',
+            [CollectiveSourcingController::class, 'create']
+        )->name('collective-sourcing.create');
+
+        Route::post(
+            '/collective-sourcing',
+            [CollectiveSourcingController::class, 'store']
+        )->name('collective-sourcing.store');
+
+        Route::get(
+            '/my-requests',
+            [CollectiveSourcingController::class, 'myRequests']
+        )->name('collective-sourcing.my-requests');
+
+        Route::get(
+    '/my-groups',
+    [CollectiveSourcingController::class, 'myGroups']
+)->name('collective-sourcing.my-groups');
 
  });
 
