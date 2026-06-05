@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-
+use App\Services\GenerateRFQService;
 use App\Models\CollectiveSourcingGroup;
 use App\Models\CollectiveSourcingRequest;
 
@@ -358,6 +358,8 @@ class CollectiveSourcingController extends Controller
      */
     public function myRequests(): Response
     {
+
+    
         $companyId = auth()->user()->company_id;
 
         $requests = CollectiveSourcingRequest::with([
@@ -379,6 +381,8 @@ class CollectiveSourcingController extends Controller
         );
     }
 
+
+   
     /**
      * My Groups
      */
@@ -407,4 +411,59 @@ class CollectiveSourcingController extends Controller
             ]
         );
     }
+public function show(
+    CollectiveSourcingGroup $group
+) {
+    $group->load([
+        'members.company',
+    ]);
+
+    return Inertia::render(
+        'CollectiveSourcing/Groups/Show',
+        [
+            'group' => $group,
+        ]
+    );
+}
+
+public function generateRfq(
+    CollectiveSourcingGroup $group
+) {
+
+   if (
+    $group->current_quantity <
+    $group->moq_quantity
+) {
+    return back()->with(
+        'error',
+        'MOQ target not reached.'
+    );
+}
+
+    $rfq = GenerateRFQService::run(
+        $group
+    );
+
+    return redirect()->route(
+        'rfqs.show',
+        $rfq
+    );
+}
+
+    public function showGroup(CollectiveSourcingGroup $group
+) 
+
+{
+    $group->load([
+        'requests.company',
+    ]);
+
+   
+    return Inertia::render(
+        'CollectiveSourcing/Show',
+        [
+            'group' => $group,
+        ]
+    );
+}
 }

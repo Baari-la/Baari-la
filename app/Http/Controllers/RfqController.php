@@ -359,4 +359,33 @@ class RfqController extends Controller
         'RFQ deleted successfully.'
     );
     }
+    public function close(Rfq $rfq)
+{
+    if (
+        auth()->user()->company_id !==
+        $rfq->company_id
+    ) {
+        abort(403);
+    }
+
+    if ($rfq->status !== 'awarded') {
+
+        return back()->with(
+            'error',
+            'RFQ must be awarded before closing.'
+        );
+    }
+
+    $rfq->update([
+        'status' => 'closed',
+    ]);
+
+    return redirect()->route(
+        'rfqs.show',
+        $rfq->id
+    )->with(
+        'success',
+        'RFQ closed successfully.'
+    );
+}
 }

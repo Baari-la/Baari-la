@@ -173,7 +173,7 @@ export default function Index({ auth, groups }) {
                                             <td className="p-4">
                                                 <Link
                                                     href={route(
-                                                        "collective-sourcing.show",
+                                                        "collective-sourcing.show-group",
                                                         group.id,
                                                     )}
                                                     className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"

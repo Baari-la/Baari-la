@@ -427,6 +427,17 @@ Route::post(
     [CollectiveSourcingController::class, 'myGroups']
 )->name('collective-sourcing.my-groups');
 
+Route::post(
+    '/collective-sourcing/groups/{group}/generate-rfq',
+    [CollectiveSourcingController::class, 'generateRfq']
+)->name(
+    'collective-sourcing.groups.generate-rfq'
+);
+Route::get(
+    '/collective-sourcing/groups/{group}',
+    [CollectiveSourcingController::class, 'showGroup']
+)->name('collective-sourcing.show-group');
+
  });
 
 /*

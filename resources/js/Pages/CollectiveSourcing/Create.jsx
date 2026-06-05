@@ -223,7 +223,16 @@ export default function Create({ auth }) {
                                 <label className="block mb-2 text-xs font-black uppercase tracking-widest text-amber-500/80">
                                     Destination Country
                                 </label>
-
+                                <input
+                                    type="text"
+                                    value={data.destination_country}
+                                    onChange={(e) =>
+                                        setData(
+                                            "destination_country",
+                                            e.target.value,
+                                        )
+                                    }
+                                />
                                 <input
                                     type="text"
                                     value={data.destination_city}

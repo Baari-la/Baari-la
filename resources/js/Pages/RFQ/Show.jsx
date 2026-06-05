@@ -188,9 +188,14 @@ export default function Show({ auth, rfq }) {
                                 Supplier Awarded
                             </h3>
 
-                            <p className="text-green-700 mb-4">
-                                Supplier has been selected. You can now close
-                                this RFQ.
+                            <p className="text-green-700">
+                                Selected Supplier:
+                                <strong className="ml-1">
+                                    {
+                                        rfq.awardedQuotation?.company
+                                            ?.nama_perusahaan
+                                    }
+                                </strong>
                             </p>
 
                             <button
@@ -244,8 +249,7 @@ export default function Show({ auth, rfq }) {
 
                 {/* Submit Quotation */}
 
-                {["open", "quoted"].includes(rfq.status) &&
-                auth.user.company_id !== rfq.company_id ? (
+                {canSubmitQuotation ? (
                     <div className="bg-white rounded-2xl shadow p-6 mt-8">
                         <h2 className="text-xl font-bold text-gray-900 mb-6">
                             Submit Quotation
@@ -402,21 +406,53 @@ export default function Show({ auth, rfq }) {
                         </form>
                     </div>
                 ) : (
-                    <div className="bg-yellow-50 border border-yellow-300 rounded-2xl p-6 mt-8">
-                        <h2 className="text-lg font-bold text-yellow-800 mb-2">
-                            Quotation Closed
-                        </h2>
+                    <div className="mt-8">
+                        {isBuyer && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+                                <h2 className="text-lg font-bold text-blue-800 mb-2">
+                                    Buyer Actions
+                                </h2>
 
-                        <p className="text-yellow-700">
-                            This RFQ is no longer accepting quotations.
-                        </p>
+                                <p className="text-blue-700">
+                                    You are the buyer for this RFQ.
+                                </p>
+                            </div>
+                        )}
 
-                        <div className="mt-3 text-sm text-yellow-800">
-                            Current Status:
-                            <span className="font-semibold ml-2 uppercase">
-                                {rfq.status}
-                            </span>
-                        </div>
+                        {!isBuyer &&
+                            deadlinePassed &&
+                            rfq.status === "open" && (
+                                <div className="bg-yellow-50 border border-yellow-300 rounded-2xl p-6">
+                                    <h2 className="text-lg font-bold text-yellow-800 mb-2">
+                                        Quotation Deadline Passed
+                                    </h2>
+
+                                    <p className="text-yellow-700">
+                                        This RFQ is no longer accepting
+                                        quotations because the quotation
+                                        deadline has passed.
+                                    </p>
+                                </div>
+                            )}
+
+                        {["closed", "completed"].includes(rfq.status) && (
+                            <div className="bg-gray-50 border border-gray-300 rounded-2xl p-6">
+                                <h2 className="text-lg font-bold text-gray-800 mb-2">
+                                    RFQ Closed
+                                </h2>
+
+                                <p className="text-gray-700">
+                                    This RFQ is no longer accepting quotations.
+                                </p>
+
+                                <div className="mt-3 text-sm text-gray-800">
+                                    Current Status:
+                                    <span className="font-semibold ml-2 uppercase">
+                                        {rfq.status}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -432,47 +468,89 @@ export default function Show({ auth, rfq }) {
                             {rfq.quotations.map((quotation) => (
                                 <div
                                     key={quotation.id}
-                                    className="border border-gray-200 rounded-xl p-4 text-gray-900"
+                                    className={`border rounded-xl p-4 text-gray-900 ${
+                                        quotation.status === "awarded"
+                                            ? "border-green-300 bg-green-50"
+                                            : "border-gray-200"
+                                    }`}
                                 >
-                                    <div className="mb-1">
-                                        <strong className="text-gray-700">
-                                            Company:
-                                        </strong>{" "}
-                                        {quotation.company?.nama_perusahaan}
+                                    <div className="grid md:grid-cols-2 gap-3">
+                                        <div>
+                                            <strong className="text-gray-700">
+                                                Company:
+                                            </strong>{" "}
+                                            {quotation.company?.nama_perusahaan}
+                                        </div>
+
+                                        <div>
+                                            <strong className="text-gray-700">
+                                                Unit Price:
+                                            </strong>{" "}
+                                            {rfq.currency || "USD"}{" "}
+                                            {formatNumber(quotation.unit_price)}
+                                        </div>
+
+                                        <div>
+                                            <strong className="text-gray-700">
+                                                MOQ:
+                                            </strong>{" "}
+                                            {quotation.minimum_order_quantity ||
+                                                "-"}
+                                        </div>
+
+                                        <div>
+                                            <strong className="text-gray-700">
+                                                Lead Time:
+                                            </strong>{" "}
+                                            {quotation.lead_time_days || "-"}{" "}
+                                            days
+                                        </div>
                                     </div>
 
-                                    <div className="mb-1">
-                                        <strong className="text-gray-700">
-                                            Unit Price:
-                                        </strong>{" "}
-                                        {rfq.currency || "USD"}{" "}
-                                        {formatNumber(quotation.unit_price)}
+                                    {quotation.remarks && (
+                                        <div className="mt-3">
+                                            <strong className="text-gray-700">
+                                                Remarks:
+                                            </strong>
+
+                                            <div className="text-gray-600 mt-1">
+                                                {quotation.remarks}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* STATUS BADGE */}
+
+                                    <div className="mt-4">
+                                        {quotation.status === "submitted" && (
+                                            <span className="inline-flex px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">
+                                                Submitted
+                                            </span>
+                                        )}
+
+                                        {quotation.status === "accepted" && (
+                                            <span className="inline-flex px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold">
+                                                Accepted
+                                            </span>
+                                        )}
+
+                                        {quotation.status === "rejected" && (
+                                            <span className="inline-flex px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-semibold">
+                                                Rejected
+                                            </span>
+                                        )}
+
+                                        {quotation.status === "awarded" && (
+                                            <span className="inline-flex px-3 py-1 rounded-full bg-green-600 text-white text-sm font-semibold">
+                                                ✓ Selected Supplier
+                                            </span>
+                                        )}
                                     </div>
 
-                                    <div className="mb-1">
-                                        <strong className="text-gray-700">
-                                            MOQ:
-                                        </strong>{" "}
-                                        {quotation.minimum_order_quantity ||
-                                            "-"}
-                                    </div>
+                                    {/* BUYER ACTIONS */}
 
-                                    <div className="mb-1">
-                                        <strong className="text-gray-700">
-                                            Lead Time:
-                                        </strong>{" "}
-                                        {quotation.lead_time_days || "-"} days
-                                    </div>
-
-                                    <div>
-                                        <strong className="text-gray-700">
-                                            Status:
-                                        </strong>{" "}
-                                        {quotation.status}
-                                    </div>
-
-                                    {/* SUBMITTED */}
                                     {auth.user.company_id === rfq.company_id &&
+                                        rfq.status === "open" &&
                                         quotation.status === "submitted" && (
                                             <div className="flex gap-2 mt-4">
                                                 <button
@@ -519,44 +597,32 @@ export default function Show({ auth, rfq }) {
                                             </div>
                                         )}
 
-                                    {/* ACCEPTED */}
                                     {auth.user.company_id === rfq.company_id &&
+                                        rfq.status === "open" &&
                                         quotation.status === "accepted" && (
-                                            <div className="flex gap-2 mt-4">
+                                            <div className="mt-4">
                                                 <button
                                                     type="button"
-                                                    onClick={() =>
-                                                        router.post(
-                                                            route(
-                                                                "quotations.award",
-                                                                quotation.id,
-                                                            ),
-                                                        )
-                                                    }
+                                                    onClick={() => {
+                                                        if (
+                                                            confirm(
+                                                                "Award this supplier?",
+                                                            )
+                                                        ) {
+                                                            router.post(
+                                                                route(
+                                                                    "quotations.award",
+                                                                    quotation.id,
+                                                                ),
+                                                            );
+                                                        }
+                                                    }}
                                                     className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg"
                                                 >
                                                     Award Supplier
                                                 </button>
                                             </div>
                                         )}
-
-                                    {/* AWARDED */}
-                                    {quotation.status === "awarded" && (
-                                        <div className="mt-4">
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold">
-                                                ✓ Awarded Supplier
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {/* REJECTED */}
-                                    {quotation.status === "rejected" && (
-                                        <div className="mt-4">
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-semibold">
-                                                ✕ Rejected
-                                            </span>
-                                        </div>
-                                    )}
                                 </div>
                             ))}
                         </div>
