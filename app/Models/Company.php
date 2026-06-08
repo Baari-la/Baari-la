@@ -2,6 +2,7 @@
 namespace App\Models; 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use App\Models\SupplierReview;
 
 class Company extends Model
 {
@@ -118,6 +119,13 @@ public function purchaseOrders()
 {
     return $this->hasMany(
         PurchaseOrder::class,
+        'supplier_company_id'
+    );
+}
+public function supplierReviews()
+{
+    return $this->hasMany(
+        SupplierReview::class,
         'supplier_company_id'
     );
 }

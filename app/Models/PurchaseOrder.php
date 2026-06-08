@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\PurchaseOrderDispute;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\PurchaseOrderPayment;
+use App\Models\SupplierReview;
 
 class PurchaseOrder extends Model
 {
@@ -18,6 +20,23 @@ class PurchaseOrder extends Model
         'currency',
         'delivery_date',
         'status',
+        'confirmed_at',
+    'production_started_at',
+    'shipped_at',
+    'completed_at',
+    'goods_received_at',
+    'goods_received_by',
+
+    ];
+
+    protected $casts = [
+        'delivery_date' => 'date',
+
+        'confirmed_at' => 'datetime',
+        'production_started_at' => 'datetime',
+        'shipped_at' => 'datetime',
+        'completed_at' => 'datetime',
+        'goods_received_at' => 'datetime',
     ];
 
     /*
@@ -28,12 +47,16 @@ class PurchaseOrder extends Model
 
     public function rfq()
     {
-        return $this->belongsTo(Rfq::class);
+        return $this->belongsTo(
+            Rfq::class
+        );
     }
 
     public function quotation()
     {
-        return $this->belongsTo(Quotation::class);
+        return $this->belongsTo(
+            Quotation::class
+        );
     }
 
     public function buyer()
@@ -59,4 +82,32 @@ class PurchaseOrder extends Model
             'purchase_order_id'
         );
     }
+public function payments()
+{
+    return $this->hasMany(
+        PurchaseOrderPayment::class,
+        'purchase_order_id'
+    );
+}
+public function shipment()
+{
+    return $this->hasOne(
+        PurchaseOrderShipment::class,
+        'purchase_order_id'
+    );
+}
+ public function disputes()
+{
+    return $this->hasMany(
+        PurchaseOrderDispute::class,
+        'purchase_order_id'
+    );
+}   
+
+public function review()
+{
+    return $this->hasOne(
+        SupplierReview::class
+    );
+}
 }

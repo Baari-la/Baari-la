@@ -5,17 +5,41 @@ namespace App\Http\Controllers;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDocument;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class PurchaseOrderDocumentController extends Controller
 {
     public function store(
         Request $request,
         PurchaseOrder $purchaseOrder
-    ) {
+    ): RedirectResponse {
 
-        $request->validate([
+        /*
+        |--------------------------------------------------------------------------
+        | ONLY SUPPLIER CAN UPLOAD
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            auth()->user()->company_id !==
+            $purchaseOrder->supplier_company_id
+        ) {
+            return back()->withErrors([
+                'document' =>
+                    'Only supplier can upload shipment documents.',
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION
+        |--------------------------------------------------------------------------
+        */
+
+        $validated = $request->validate([
             'document_type' => [
                 'required',
+                'in:invoice,packing_list,bill_of_lading,air_waybill,certificate_of_origin,insurance_certificate,inspection_certificate,other',
             ],
 
             'file' => [
@@ -37,31 +61,37 @@ class PurchaseOrderDocumentController extends Controller
             ],
         ]);
 
-        $path = $request
+        /*
+        |--------------------------------------------------------------------------
+        | STORE FILE
+        |--------------------------------------------------------------------------
+        */
+
+        $filePath = $request
             ->file('file')
             ->store(
                 'purchase-order-documents',
                 'public'
             );
 
+        /*
+        |--------------------------------------------------------------------------
+        | CREATE DOCUMENT
+        |--------------------------------------------------------------------------
+        */
+
         PurchaseOrderDocument::create([
-            'purchase_order_id' =>
-                $purchaseOrder->id,
+            'purchase_order_id' => $purchaseOrder->id,
 
-            'uploaded_by' =>
-                auth()->id(),
+            'uploaded_by' => auth()->id(),
 
-            'document_type' =>
-                $request->document_type,
+            'document_type' => $validated['document_type'],
 
-            'document_number' =>
-                $request->document_number,
+            'document_number' => $validated['document_number'] ?? null,
 
-            'file_path' =>
-                $path,
+            'file_path' => $filePath,
 
-            'remarks' =>
-                $request->remarks,
+            'remarks' => $validated['remarks'] ?? null,
         ]);
 
         return back()->with(

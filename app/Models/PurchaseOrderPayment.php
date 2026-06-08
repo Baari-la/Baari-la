@@ -4,15 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PurchaseOrderDocument extends Model
+class PurchaseOrderPayment extends Model
 {
     protected $fillable = [
         'purchase_order_id',
-        'uploaded_by',
-        'document_type',
-        'document_number',
-        'file_path',
+        'paid_by',
+        'payment_reference',
+        'amount',
+        'currency',
+        'payment_method',
+        'payment_date',
+        'payment_proof',
         'remarks',
+    ];
+
+    protected $casts = [
+        'payment_date' => 'date',
     ];
 
     public function purchaseOrder()
@@ -22,12 +29,11 @@ class PurchaseOrderDocument extends Model
         );
     }
 
-    public function uploader()
+    public function payer()
     {
         return $this->belongsTo(
             User::class,
-            'uploaded_by'
+            'paid_by'
         );
     }
-    
 }

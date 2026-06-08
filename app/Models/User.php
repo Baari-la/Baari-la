@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\SupplierReview;
 
 class User extends Authenticatable
 {
@@ -53,6 +54,20 @@ public function purchaseOrders()
 {
     return $this->hasMany(
         PurchaseOrder::class,
+        'buyer_id'
+    );
+}
+public function purchaseOrderDisputes()
+{
+    return $this->hasMany(
+        PurchaseOrderDispute::class,
+        'created_by'
+    );
+}
+public function supplierReviews()
+{
+    return $this->hasMany(
+        SupplierReview::class,
         'buyer_id'
     );
 }

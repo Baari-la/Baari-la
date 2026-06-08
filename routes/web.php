@@ -23,6 +23,10 @@ use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseOrderDocumentController;
 use App\Http\Controllers\CollectiveSourcingController;
+use App\Http\Controllers\PurchaseOrderPaymentController;
+use App\Http\Controllers\PurchaseOrderShipmentController;
+use App\Http\Controllers\PurchaseOrderShipmentTrackController;
+use App\Http\Controllers\PurchaseOrderDisputeController;
 
 /*
 
@@ -381,7 +385,7 @@ Route::get(
 
 Route::post(
     '/purchase-orders/{purchaseOrder}/production',
-    [PurchaseOrderController::class, 'production']
+    [PurchaseOrderController::class, 'startProduction']
 )->name('purchase-orders.production');
 Route::post('/purchase-orders/{purchaseOrder}/start-production', [PurchaseOrderController::class, 'startProduction'])
         ->name('purchase-orders.start-production');
@@ -438,7 +442,65 @@ Route::get(
     [CollectiveSourcingController::class, 'showGroup']
 )->name('collective-sourcing.show-group');
 
- });
+Route::post(
+    '/quotations/{quotation}/generate-po',
+    [QuotationController::class, 'generatePurchaseOrder']
+)->name('quotations.generate-po');
+
+ 
+Route::post(
+   '/purchase-orders/{purchaseOrder}/documents',
+   [PurchaseOrderDocumentController::class, 'store']
+)->name('purchase-orders.documents.store');
+
+Route::post(
+   '/purchase-orders/{purchaseOrder}/payments',
+   [PurchaseOrderPaymentController::class, 'store']
+)->name(
+   'purchase-orders.payments.store'
+);
+Route::post(
+   '/purchase-orders/{purchaseOrder}/shipment',
+   [PurchaseOrderShipmentController::class, 'store']
+)->name(
+   'purchase-orders.shipment.store'
+);
+Route::post(
+   '/purchase-orders/{purchaseOrder}/shipment-tracks',
+   [PurchaseOrderShipmentTrackController::class, 'store']
+)->name('purchase-orders.shipment-tracks.store');
+Route::post(
+   '/purchase-orders/{purchaseOrder}/confirm-received',
+   [PurchaseOrderController::class, 'confirmReceived']
+)->name('purchase-orders.confirm-received');
+
+Route::post(
+    '/purchase-orders/{purchaseOrder}/disputes',
+    [PurchaseOrderDisputeController::class, 'store']
+)->name('purchase-orders.disputes.store');
+Route::post(
+    '/purchase-order-disputes/{dispute}/respond',
+    [PurchaseOrderDisputeController::class, 'respond']
+)->name(
+    'purchase-order-disputes.respond'
+);
+Route::post(
+    '/purchase-order-disputes/{dispute}/resolve',
+    [PurchaseOrderDisputeController::class, 'resolve']
+)->name('purchase-order-disputes.resolve');
+Route::post(
+    '/purchase-order-disputes/{dispute}/close',
+    [PurchaseOrderDisputeController::class, 'close']
+)->name(
+    'purchase-order-disputes.close'
+);
+Route::post(
+    '/purchase-orders/{purchaseOrder}/review',
+    [SupplierReviewController::class, 'store']
+)->name('purchase-orders.review.store');
+
+});
+
 
 /*
 

@@ -19,6 +19,7 @@ public function index()
         ->latest()
         ->get();
 
+        
     return Inertia::render(
         'Quotation/Index',
         [
@@ -413,4 +414,57 @@ public function myQuotations()
         'Quotation deleted successfully.'
     );
 }
+
+public function generatePurchaseOrder(
+    Quotation $quotation
+) {
+
+    $rfq = $quotation->rfq;
+
+    if ($quotation->status !== 'awarded') {
+        abort(403);
+    }
+
+    $existingPo = PurchaseOrder::where(
+        'quotation_id',
+        $quotation->id
+    )->first();
+
+    if ($existingPo) {
+        return redirect()->route(
+            'purchase-orders.show',
+            $existingPo
+        );
+    }
+
+    $po = PurchaseOrder::create([
+        'rfq_id' => $rfq->id,
+        'quotation_id' => $quotation->id,
+        'buyer_id' => $rfq->user_id,
+        'supplier_company_id' => $quotation->company_id,
+
+        'po_number' => 'PO-' . now()->format('YmdHis'),
+
+        'unit_price' => $quotation->unit_price,
+
+        'quantity' => $rfq->required_quantity,
+
+        'total_amount' =>
+            $quotation->unit_price *
+            $rfq->required_quantity,
+
+        'currency' => $rfq->currency,
+
+        'delivery_date' =>
+            $rfq->required_delivery_date,
+
+        'status' => 'draft',
+    ]);
+
+    return redirect()->route(
+        'purchase-orders.show',
+        $po
+    );
+}
+
 }

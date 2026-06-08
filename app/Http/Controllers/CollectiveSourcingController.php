@@ -403,13 +403,21 @@ class CollectiveSourcingController extends Controller
             ->withCount('requests')
             ->latest()
             ->paginate(20);
+  
+return Inertia::render(
+    'CollectiveSourcing/MyGroups',
+    [
+        'groups' => $groups,
+        'test' => 'hello',
+    ]
+);
 
-        return Inertia::render(
-            'CollectiveSourcing/MyGroups',
-            [
-                'groups' => $groups,
-            ]
-        );
+        //         return Inertia::render(
+        //     'CollectiveSourcing/MyGroups',
+        //     [
+        //         'groups' => $groups,
+        //     ]
+        // );
     }
 public function show(
     CollectiveSourcingGroup $group
