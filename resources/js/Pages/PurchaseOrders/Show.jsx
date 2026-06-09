@@ -373,6 +373,33 @@ export default function Show({
         purchaseOrder.disputes?.some(
             (dispute) => dispute.status !== "closed",
         ) ?? false;
+    const [showReviewForm, setShowReviewForm] = useState(false);
+
+    const {
+        data: reviewData,
+        setData: setReviewData,
+        post: postReview,
+        processing: reviewProcessing,
+        errors: reviewErrors,
+        reset: resetReview,
+    } = useForm({
+        quality_rating: 5,
+        delivery_rating: 5,
+        communication_rating: 5,
+        comment: "",
+    });
+
+    const submitReview = (e) => {
+        e.preventDefault();
+
+        postReview(route("purchase-orders.review.store", purchaseOrder.id), {
+            onSuccess: () => {
+                resetReview();
+
+                setShowReviewForm(false);
+            },
+        });
+    };
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title={purchaseOrder.po_number} />
@@ -2121,6 +2148,163 @@ export default function Show({
                         </div>
                     )}
                 </div>
+                {/* Rating */}
+                {isBuyer && purchaseOrder.status === "completed" && (
+                    <div className="bg-white rounded-2xl shadow p-6 mb-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-lg font-bold">
+                                Supplier Review
+                            </h2>
+
+                            {!purchaseOrder.review && (
+                                <button
+                                    onClick={() =>
+                                        setShowReviewForm(!showReviewForm)
+                                    }
+                                    className="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg"
+                                >
+                                    Rate Supplier
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Existing Review */}
+
+                        {purchaseOrder.review && (
+                            <div className="space-y-3">
+                                <div>
+                                    Quality: ⭐{" "}
+                                    {purchaseOrder.review.quality_rating}/5
+                                </div>
+
+                                <div>
+                                    Delivery: ⭐{" "}
+                                    {purchaseOrder.review.delivery_rating}/5
+                                </div>
+
+                                <div>
+                                    Communication: ⭐{" "}
+                                    {purchaseOrder.review.communication_rating}
+                                    /5
+                                </div>
+
+                                <div className="font-bold text-lg text-green-600">
+                                    Overall:{" "}
+                                    {purchaseOrder.review.overall_rating}/5
+                                </div>
+
+                                {purchaseOrder.review.comment && (
+                                    <div className="bg-gray-50 rounded-lg p-3">
+                                        {purchaseOrder.review.comment}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Review Form */}
+
+                        {!purchaseOrder.review && showReviewForm && (
+                            <form onSubmit={submitReview} className="space-y-4">
+                                <div>
+                                    <label>Quality</label>
+
+                                    <select
+                                        value={reviewData.quality_rating}
+                                        onChange={(e) =>
+                                            setReviewData(
+                                                "quality_rating",
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="w-full border rounded-lg p-3"
+                                    >
+                                        {[1, 2, 3, 4, 5].map((n) => (
+                                            <option key={n} value={n}>
+                                                {n} Star
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label>Delivery</label>
+
+                                    <select
+                                        value={reviewData.delivery_rating}
+                                        onChange={(e) =>
+                                            setReviewData(
+                                                "delivery_rating",
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="w-full border rounded-lg p-3"
+                                    >
+                                        {[1, 2, 3, 4, 5].map((n) => (
+                                            <option key={n} value={n}>
+                                                {n} Star
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label>Communication</label>
+
+                                    <select
+                                        value={reviewData.communication_rating}
+                                        onChange={(e) =>
+                                            setReviewData(
+                                                "communication_rating",
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="w-full border rounded-lg p-3"
+                                    >
+                                        {[1, 2, 3, 4, 5].map((n) => (
+                                            <option key={n} value={n}>
+                                                {n} Star
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label>Comment</label>
+
+                                    <textarea
+                                        rows="4"
+                                        value={reviewData.comment}
+                                        onChange={(e) =>
+                                            setReviewData(
+                                                "comment",
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="w-full border rounded-lg p-3"
+                                    />
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <button
+                                        type="submit"
+                                        disabled={reviewProcessing}
+                                        className="bg-green-600 hover:bg-green-500 text-white px-5 py-3 rounded-xl"
+                                    >
+                                        Submit Review
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowReviewForm(false)}
+                                        className="bg-gray-200 px-5 py-3 rounded-xl"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                )}
                 {/* ORDER TIMELINE */}
 
                 <div className="bg-white rounded-2xl shadow p-6 mb-6">

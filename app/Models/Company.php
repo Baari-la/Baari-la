@@ -129,4 +129,13 @@ public function supplierReviews()
         'supplier_company_id'
     );
 }
+
+public function reviews()
+{
+    return $this->hasMany(
+        SupplierReview::class,
+        'supplier_company_id'
+    );
+}
+
 }

@@ -14,14 +14,23 @@ class SupplierReview extends Model
         'quality_rating',
         'delivery_rating',
         'communication_rating',
-
+'overall_rating',
         'comment',
     ];
 
 public function purchaseOrder()
 {
     return $this->belongsTo(
-        PurchaseOrder::class
+        PurchaseOrder::class,
+        'purchase_order_id'
+    );
+}
+
+public function reviewer()
+{
+    return $this->belongsTo(
+        User::class,
+        'reviewed_by'
     );
 }
 

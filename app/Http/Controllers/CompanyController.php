@@ -918,10 +918,44 @@ public function store(Request $request)
         ->with('success', 'Data Industri Berhasil Ditambahkan.');
 }
 
-
-
 public function show(Company $company)
 {
+$companyType = 'manufacturer';
+
+if (
+    str_contains(
+        strtoupper($company->sektor),
+        'SUPPORTING'
+    )
+) {
+    $companyType = 'supporting_industry';
+}
+
+$companyTypeLabels = [
+
+    'manufacturer' =>
+        '🏭 Manufacturer',
+
+    'trader' =>
+        '📦 Trading Company',
+
+    'supporting_industry' =>
+        '⚙️ Supporting Industry',
+
+    'service_provider' =>
+        '🤝 Service Provider',
+
+    'association' =>
+        '🏛 Industry Association',
+
+    'education' =>
+        '🎓 Education Institution',
+
+    'government' =>
+        '🏢 Government Agency',
+];
+
+
     $company->load([
         'products',
         'markets',
@@ -932,12 +966,410 @@ public function show(Company $company)
         'capacities',
         'machines',
         'moqs',
-        'leadTimes'
-    
+        'leadTimes',
+
+        'reviews',
+        'reviews.buyer',
+        'reviews.purchaseOrder',
     ]);
 
-     return Inertia::render('Company/Show', [
+    $reviewCount = $company->reviews->count();
+
+    $averageQuality = round(
+        $company->reviews->avg('quality_rating') ?? 0,
+        2
+    );
+
+    $averageDelivery = round(
+        $company->reviews->avg('delivery_rating') ?? 0,
+        2
+    );
+
+    $averageCommunication = round(
+        $company->reviews->avg('communication_rating') ?? 0,
+        2
+    );
+
+    $overallRating = $reviewCount > 0
+        ? round(
+            (
+                $averageQuality +
+                $averageDelivery +
+                $averageCommunication
+            ) / 3,
+            2
+        )
+        : 0;
+/*
+|--------------------------------------------------------------------------
+| COMPANY AGE
+|--------------------------------------------------------------------------
+*/
+
+$companyAge = null;
+
+if (
+    !empty($company->tahun_berdiri)
+) {
+    $companyAge =
+        now()->year -
+        (int) $company->tahun_berdiri;
+}
+
+/*
+|--------------------------------------------------------------------------
+| COMPANY CREDENTIALS
+|--------------------------------------------------------------------------
+*/
+
+$credentials = [];
+
+/*
+|--------------------------------------------------------------------------
+| VERIFIED SUPPLIER
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $company->status_verifikasi === 'verified'
+) {
+    $credentials[] = [
+        'icon' => '✅',
+        'label' => 'Verified Supplier',
+    ];
+}
+
+if ($company->markets->count() > 0) {
+    $credentials[] = [
+        'icon' => '🌏',
+        'label' => 'Multi-Market Supplier',
+    ];
+}
+/*
+|--------------------------------------------------------------------------
+| API MEMBER
+|--------------------------------------------------------------------------
+*/
+
+if ($company->is_api_member) {
+
+    $credentials[] = [
+        'icon' => '🤝',
+        'label' => 'API Member',
+    ];
+}
+
+/*
+|--------------------------------------------------------------------------
+| INDUSTRY EXPERIENCE
+|--------------------------------------------------------------------------
+*/
+
+if ($companyAge >= 1) {
+
+    $credentials[] = [
+        'icon' => '🏛',
+        'label' =>
+            $companyAge .
+            ' Years Industry Experience',
+    ];
+}
+
+/*
+|--------------------------------------------------------------------------
+| INDUSTRY ROLE
+|--------------------------------------------------------------------------
+*/
+
+if ($company->sektor) {
+
+    $credentials[] = [
+        'icon' => '🏭',
+        'label' => $company->sektor,
+    ];
+}
+
+/*
+|--------------------------------------------------------------------------
+| PRODUCTION READY
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $company->machines->count() > 0 &&
+    $company->capacities->count() > 0
+) {
+    $credentials[] = [
+        'icon' => '⚙️',
+        'label' => 'Production Ready',
+    ];
+}
+
+/*
+|--------------------------------------------------------------------------
+| CERTIFIED
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $company->certifications->count() > 0
+) {
+    $credentials[] = [
+        'icon' => '🏅',
+        'label' => 'Certified Manufacturer',
+    ];
+}
+
+/*
+|--------------------------------------------------------------------------
+| PREMIUM MEMBER
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $company->membership_type !== 'public'
+) {
+    $credentials[] = [
+        'icon' => '⭐',
+        'label' => 'Premium Member',
+    ];
+}
+   
+/*
+|--------------------------------------------------------------------------
+| TRUST SCORE
+|--------------------------------------------------------------------------
+*/
+
+$rawTrustScore = 0;
+
+/*
+|--------------------------------------------------------------------------
+| VERIFIED
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $company->status_verifikasi === 'verified'
+) {
+    $rawTrustScore += 25;
+}
+
+/*
+|--------------------------------------------------------------------------
+| API MEMBER
+|--------------------------------------------------------------------------
+*/
+
+if ($company->is_api_member) {
+
+    $rawTrustScore += 10;
+}
+
+/*
+|--------------------------------------------------------------------------
+| COMPANY EXPERIENCE
+|--------------------------------------------------------------------------
+*/
+
+if ($companyAge >= 20) {
+
+    $rawTrustScore += 10;
+
+} elseif ($companyAge >= 10) {
+
+    $rawTrustScore += 5;
+}
+
+/*
+|--------------------------------------------------------------------------
+| PROFILE COMPLETENESS
+|--------------------------------------------------------------------------
+*/
+
+$profileFields = [
+
+    $company->nama_perusahaan,
+    $company->alamat_lengkap,
+    $company->telepon,
+    $company->email_web,
+    $company->photo_url,
+    $company->catalog_url,
+    $company->tahun_berdiri,
+];
+
+$filledFields = collect(
+    $profileFields
+)->filter()->count();
+
+$rawTrustScore += round(
+    ($filledFields / 7) * 15
+);
+
+/*
+|--------------------------------------------------------------------------
+| CERTIFICATIONS
+|--------------------------------------------------------------------------
+*/
+
+$rawTrustScore += min(
+    20,
+    $company->certifications->count() * 15
+);
+
+/*
+|--------------------------------------------------------------------------
+| CAPACITY
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $company->capacities->count() > 0
+) {
+    $rawTrustScore += 10;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MACHINES
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $company->machines->count() > 0
+) {
+    $rawTrustScore += 10;
+}
+
+/*
+|--------------------------------------------------------------------------
+| PRODUCTS
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $company->products->count() > 0
+) {
+    $rawTrustScore += 5;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MARKETS
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $company->markets->count() > 0
+) {
+    $rawTrustScore += 5;
+}
+
+/*
+|--------------------------------------------------------------------------
+| BUYER REVIEWS
+|--------------------------------------------------------------------------
+*/
+
+$rawTrustScore += min(
+    5,
+    $reviewCount
+);
+
+/*
+|--------------------------------------------------------------------------
+| NORMALIZE TO 100
+|--------------------------------------------------------------------------
+*/
+
+$trustScore = min(
+    100,
+    $rawTrustScore
+);
+
+/*
+|--------------------------------------------------------------------------
+| PROFILE COMPLETENESS
+|--------------------------------------------------------------------------
+*/
+$profileItems = [
+
+    'company_logo' =>
+        !empty($company->photo_url),
+
+    'company_description' =>
+        !empty($company->alamat_lengkap),
+
+    'product_catalog' =>
+        $company->products->count() > 0,
+
+    'machinery' =>
+        $company->machines->count() > 0,
+
+    'production_capacity' =>
+        $company->capacities->count() > 0,
+
+    'certifications' =>
+        $company->certifications->count() > 0,
+
+    'contact_information' =>
+        $company->contacts->count() > 0,
+
+    'markets' =>
+        $company->markets->count() > 0,
+
+    'catalog_file' =>
+        !empty($company->catalog_url),
+
+    'company_images' =>
+        $company->images->count() > 0,
+];
+
+$totalProfileItems = count(
+    $profileItems
+);
+
+$completedProfileItems = collect(
+    $profileItems
+)->filter()->count();
+
+$profileCompleteness = round(
+    (
+        $completedProfileItems /
+        $totalProfileItems
+    ) * 100
+);
+
+
+    return Inertia::render('Company/Show', [
         'company' => $company,
+        'companyAge' => $companyAge,
+        'reviewSummary' => [
+            'review_count' => $reviewCount,
+            'quality' => $averageQuality,
+            'delivery' => $averageDelivery,
+            'communication' => $averageCommunication,
+            'overall' => $overallRating,
+        ],
+        'companyTypeLabel' => $companyTypeLabels[$companyType]?? 
+        'Company',
+        'credentials' => $credentials,
+            'trustScore' => [
+            'score' => $trustScore,
+            'raw_score' => $rawTrustScore,
+            'max' => 100,
+    ],
+        
+    'profileCompleteness' => [
+    'percentage' =>
+        $profileCompleteness,
+    'completed' =>
+        $completedProfileItems,
+    'total' =>
+        $totalProfileItems,
+    'items' =>
+        $profileItems,
+],
     ]);
 }
 

@@ -1,15 +1,64 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-// import { Head, Link, usePage } from "@inertiajs/react";
 import { Head, Link, router } from "@inertiajs/react";
 
-export default function Show({ auth, company }) {
+export default function Show({
+    company,
+    auth,
+    reviewSummary,
+    credentials,
+    trustScore,
+    companyAge,
+}) {
     const isEn = auth.locale === "en";
+
     const featuredImage =
         company.images?.find((img) => img.is_featured) || company.images?.[0];
-    // console.log(company.certifications);
-    // console.log(company.products);
-    // console.log("LEAD TIMES:", company.leadTimes);
-    console.log(company);
+    const trustLevel =
+        trustScore.score >= 90
+            ? {
+                  label: "Elite Supplier",
+                  color: "bg-emerald-100 text-emerald-800",
+              }
+            : trustScore.score >= 75
+              ? {
+                    label: "Trusted Supplier",
+                    color: "bg-blue-100 text-blue-800",
+                }
+              : trustScore.score >= 60
+                ? {
+                      label: "Verified Supplier",
+                      color: "bg-green-100 text-green-800",
+                  }
+                : trustScore.score >= 40
+                  ? {
+                        label: "Active Supplier",
+                        color: "bg-yellow-100 text-yellow-800",
+                    }
+                  : {
+                        label: "Basic Profile",
+                        color: "bg-gray-100 text-gray-700",
+                    };
+
+    const RatingBar = ({ label, value }) => (
+        <div>
+            <div className="flex justify-between mb-1">
+                <span className="text-sm text-gray-600">{label}</span>
+
+                <span className="font-medium">
+                    {Number(value || 0).toFixed(1)}
+                </span>
+            </div>
+
+            <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                    className="bg-yellow-500 h-2 rounded-full"
+                    style={{
+                        width: `${(Number(value || 0) / 5) * 100}%`,
+                    }}
+                />
+            </div>
+        </div>
+    );
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -121,6 +170,241 @@ export default function Show({ auth, company }) {
                                     )}
                                 </div>
 
+                                {/* Tambahan Rating */}
+                                {/* COMPANY CREDENTIALS */}
+
+                                <div className="bg-white rounded-2xl shadow p-6 mb-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h2 className="text-xl font-bold text-gray-900">
+                                                Company Credentials
+                                            </h2>
+
+                                            <div className="text-sm text-gray-500">
+                                                Trust & Business Verification
+                                            </div>
+                                        </div>
+
+                                        <span
+                                            className={`px-4 py-2 rounded-full text-sm font-semibold ${trustLevel.color}`}
+                                        >
+                                            {trustLevel.label}
+                                        </span>
+                                    </div>
+
+                                    <div className="grid md:grid-cols-2 gap-3">
+                                        {credentials.map(
+                                            (credential, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="flex items-center gap-3 border rounded-xl px-4 py-3"
+                                                >
+                                                    <span className="text-xl">
+                                                        {credential.icon}
+                                                    </span>
+
+                                                    <span className="font-medium text-gray-800">
+                                                        {credential.label}
+                                                    </span>
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
+
+                                    {/* TRUST SCORE */}
+
+                                    <div className="mt-6 border-t pt-6">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="font-semibold">
+                                                Trust Score
+                                            </span>
+
+                                            <span className="text-xl font-bold">
+                                                {trustScore.score}/100
+                                            </span>
+                                        </div>
+
+                                        <div className="w-full bg-gray-200 rounded-full h-3">
+                                            <div
+                                                className="bg-green-600 h-3 rounded-full transition-all"
+                                                style={{
+                                                    width: `${trustScore.score}%`,
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="text-sm text-gray-500 mt-2">
+                                            Business credibility based on
+                                            verification, certifications,
+                                            profile completeness, operational
+                                            capability and buyer reviews.
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* SUPPLIER RATING */}
+
+                                <div className="bg-white rounded-2xl shadow p-6 mb-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h2 className="text-xl font-bold text-gray-900">
+                                                Supplier Rating
+                                            </h2>
+                                        </div>
+
+                                        <div className="text-center">
+                                            <div className="text-5xl font-bold text-yellow-500">
+                                                ⭐{" "}
+                                                {reviewSummary.overall.toFixed(
+                                                    2,
+                                                )}
+                                                <span className="text-2xl text-gray-500">
+                                                    {" "}
+                                                    / 5.00
+                                                </span>
+                                            </div>
+
+                                            <div className="text-sm text-gray-500 mt-2">
+                                                Based on{" "}
+                                                {reviewSummary.review_count}{" "}
+                                                Verified Buyer Review
+                                                {reviewSummary.review_count > 1
+                                                    ? "s"
+                                                    : ""}
+                                                {reviewSummary.overall >= 4.5 &&
+                                                    reviewSummary.review_count >
+                                                        0 && (
+                                                        <div className="mt-2">
+                                                            <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">
+                                                                🏆 TOP RATED
+                                                                SUPPLIER
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-5 mt-6">
+                                        <RatingBar
+                                            label="Quality"
+                                            value={reviewSummary.quality}
+                                        />
+
+                                        <RatingBar
+                                            label="Delivery"
+                                            value={reviewSummary.delivery}
+                                        />
+
+                                        <RatingBar
+                                            label="Communication"
+                                            value={reviewSummary.communication}
+                                        />
+                                    </div>
+                                </div>
+                                {/* BUYER REVIEWS */}
+
+                                <div className="bg-white rounded-2xl shadow p-6 mb-6">
+                                    <h2 className="text-xl font-bold mb-4">
+                                        Buyer Reviews
+                                    </h2>
+
+                                    {company.reviews?.length > 0 ? (
+                                        <div className="space-y-5">
+                                            {company.reviews.map((review) => {
+                                                const overall =
+                                                    (review.quality_rating +
+                                                        review.delivery_rating +
+                                                        review.communication_rating) /
+                                                    3;
+
+                                                const stars = "⭐".repeat(
+                                                    Math.round(overall),
+                                                );
+
+                                                return (
+                                                    <div
+                                                        key={review.id}
+                                                        className="border rounded-xl p-5"
+                                                    >
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <div>
+                                                                <div className="font-semibold text-gray-900">
+                                                                    {review
+                                                                        .buyer
+                                                                        ?.name ||
+                                                                        "Verified Buyer"}
+                                                                </div>
+
+                                                                <div className="text-xs text-green-600 font-medium mt-1">
+                                                                    ✓ Verified
+                                                                    Transaction
+                                                                </div>
+
+                                                                {review
+                                                                    .purchase_order
+                                                                    ?.po_number && (
+                                                                    <div className="text-xs text-gray-500 mt-1">
+                                                                        {
+                                                                            review
+                                                                                .purchase_order
+                                                                                .po_number
+                                                                        }
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="text-sm text-gray-400">
+                                                                {new Date(
+                                                                    review.created_at,
+                                                                ).toLocaleDateString(
+                                                                    "en-GB",
+                                                                    {
+                                                                        day: "2-digit",
+                                                                        month: "short",
+                                                                        year: "numeric",
+                                                                    },
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="text-lg mb-2">
+                                                            {stars}
+                                                        </div>
+
+                                                        <div className="text-sm text-gray-600 mb-3">
+                                                            Quality:{" "}
+                                                            {
+                                                                review.quality_rating
+                                                            }
+                                                            {" • "}
+                                                            Delivery:{" "}
+                                                            {
+                                                                review.delivery_rating
+                                                            }
+                                                            {" • "}
+                                                            Communication:{" "}
+                                                            {
+                                                                review.communication_rating
+                                                            }
+                                                        </div>
+
+                                                        {review.comment && (
+                                                            <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-700">
+                                                                "
+                                                                {review.comment}
+                                                                "
+                                                            </blockquote>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-500">
+                                            No reviews available yet.
+                                        </div>
+                                    )}
+                                </div>
                                 {/* SHORT DESCRIPTION */}
                                 <p className="mt-8 text-lg text-gray-300 max-w-3xl leading-relaxed">
                                     {company.produk ||

@@ -107,7 +107,9 @@ public function shipment()
 public function review()
 {
     return $this->hasOne(
-        SupplierReview::class
+        SupplierReview::class,
+        'purchase_order_id'
     );
 }
+
 }
