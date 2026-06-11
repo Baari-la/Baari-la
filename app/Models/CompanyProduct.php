@@ -14,8 +14,11 @@ class CompanyProduct extends Model
     protected $fillable = [
         'company_id',
         'product_name',
+        'product_name_en',
         'hs_code',
-        'description'
+        'description',
+         'is_primary',
+         'category',
     ];
 
     public function company()

@@ -4,6 +4,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import IndustrialAnalyticsChart from "@/Components/IndustrialAnalyticsChart";
 import VerificationQueue from "@/Components/VerificationQueue";
 import StockOverview from "@/Components/StockOverview";
+import CompanyClaimsQueue from "@/Components/Admin/CompanyClaimsQueue";
 
 export default function Dashboard({
     auth,
@@ -15,9 +16,18 @@ export default function Dashboard({
     healthStats,
     pendingCount,
     pendingUpdates,
+    pendingClaims,
 }) {
     const [quickSearch, setQuickSearch] = useState("");
     const [selectedUpdate, setSelectedUpdate] = useState(null);
+    const handleReject = (id) => {
+        if (!confirm("Reject this update request?")) {
+            return;
+        }
+
+        router.post(route("admin.reject-update", id));
+    };
+
     const handleApprove = (id) => {
         if (
             !confirm(
@@ -112,11 +122,15 @@ export default function Dashboard({
 
                     <div>
                         <StockOverview stockOverview={stockOverview} />
+
                         <VerificationQueue
                             pendingUpdates={pendingUpdates}
                             setSelectedUpdate={setSelectedUpdate}
                         />
+
+                        <CompanyClaimsQueue pendingClaims={pendingClaims} />
                     </div>
+
                     {/* 3. MODAL AUDIT DATA */}
                     {selectedUpdate && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 bg-[#050c1b] rounded-[40px] border border-emerald-500/30 mb-10 relative shadow-2xl animate-in fade-in zoom-in duration-300">

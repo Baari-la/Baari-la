@@ -7,12 +7,34 @@ export default function Show({
     reviewSummary,
     credentials,
     trustScore,
+    profileCompleteness,
+    companyRoleLabel,
     companyAge,
 }) {
     const isEn = auth.locale === "en";
 
     const featuredImage =
         company.images?.find((img) => img.is_featured) || company.images?.[0];
+
+    const getProfileStatus = (percentage) => {
+        if (percentage >= 90) {
+            return "Industry Showcase";
+        }
+
+        if (percentage >= 75) {
+            return "High Visibility";
+        }
+
+        if (percentage >= 50) {
+            return "Good Visibility";
+        }
+
+        if (percentage >= 25) {
+            return "Growing Visibility";
+        }
+
+        return "Getting Started";
+    };
     const trustLevel =
         trustScore.score >= 90
             ? {
@@ -108,8 +130,8 @@ export default function Show({
                                         </div>
                                     )}
 
-                                    <div className="bg-blue-500/20 border border-blue-400/30 backdrop-blur-md px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.3em] text-blue-300 font-black">
-                                        {company.sektor || "Manufacturing"}
+                                    <div className="text-sm font-semibold">
+                                        {companyRoleLabel}
                                     </div>
 
                                     {company.status_verifikasi ===
@@ -146,7 +168,142 @@ export default function Show({
                                 <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none mb-6 text-white drop-shadow-2xl">
                                     {company.nama_perusahaan}
                                 </h1>
+                                {company.claimed_by_user_id && (
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 mt-2 rounded-full bg-green-100 text-green-700 text-xs font-bold">
+                                        ✓ Verified Company Owner
+                                    </div>
+                                )}
+                                {/* Company Credential */}
 
+                                {/* Tambahan */}
+                                <div className="grid lg:grid-cols-2 gap-6 mb-6">
+                                    <div className="bg-white rounded-2xl shadow p-6">
+                                        <h2 className="text-lg font-bold text-gray-900 mb-2">
+                                            Company Credentials
+                                        </h2>
+
+                                        <div className="text-sm text-gray-500 mb-5">
+                                            Trust & Business Verification
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            {credentials.map(
+                                                (credential, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center gap-3"
+                                                    >
+                                                        <span className="text-xl">
+                                                            {credential.icon}
+                                                        </span>
+
+                                                        <span className="text-gray-800">
+                                                            {credential.label}
+                                                        </span>
+                                                    </div>
+                                                ),
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded-2xl shadow p-6">
+                                        <h2 className="text-lg font-bold text-gray-900 mb-2">
+                                            Profile Visibility Score
+                                        </h2>
+
+                                        <div className="text-sm text-gray-500 mb-5">
+                                            Profile quality and visibility score
+                                        </div>
+
+                                        <div className="flex items-end gap-3 mb-4">
+                                            <div className="text-4xl font-bold text-blue-600">
+                                                {profileCompleteness.percentage}
+                                                %
+                                            </div>
+
+                                            <div className="text-sm text-gray-500 pb-1">
+                                                {getProfileStatus(
+                                                    profileCompleteness.percentage,
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
+                                            <div
+                                                className="bg-blue-600 h-3 rounded-full"
+                                                style={{
+                                                    width: `${profileCompleteness.percentage}%`,
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="text-sm text-gray-600">
+                                            {profileCompleteness.completed}
+                                            {" of "}
+                                            {profileCompleteness.total}
+                                            {" sections completed"}
+                                        </div>
+                                        {profileCompleteness.completed_items
+                                            ?.length > 0 && (
+                                            <div className="mt-5">
+                                                <div className="text-sm font-semibold text-green-700 mb-2">
+                                                    Completed
+                                                </div>
+
+                                                <div className="space-y-1">
+                                                    {profileCompleteness.completed_items.map(
+                                                        (item, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="text-sm text-green-600 flex items-start gap-2"
+                                                            >
+                                                                <span>✓</span>
+
+                                                                <span>
+                                                                    {item}
+                                                                </span>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                        {profileCompleteness.missing_items
+                                            ?.length > 0 && (
+                                            <div className="mt-6 border-t pt-4">
+                                                <div className="text-sm font-semibold text-gray-800 mb-3">
+                                                    Improve Profile Visibility
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    {profileCompleteness.missing_items.map(
+                                                        (item, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="text-sm text-gray-600 flex items-start gap-2"
+                                                            >
+                                                                <span className="text-orange-500">
+                                                                    ○
+                                                                </span>
+
+                                                                <span>
+                                                                    {item}
+                                                                </span>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </div>
+
+                                                <Link
+                                                    href={`/companies/${company.id}/edit`}
+                                                    className="mt-5 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                                                >
+                                                    Update Profile
+                                                </Link>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                {/* Batas tambahan */}
                                 <div className="flex flex-wrap items-center gap-6 text-sm text-gray-300">
                                     <div className="flex items-center gap-2">
                                         <i className="fas fa-location-dot text-yellow-500"></i>
@@ -173,74 +330,6 @@ export default function Show({
                                 {/* Tambahan Rating */}
                                 {/* COMPANY CREDENTIALS */}
 
-                                <div className="bg-white rounded-2xl shadow p-6 mb-6">
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div>
-                                            <h2 className="text-xl font-bold text-gray-900">
-                                                Company Credentials
-                                            </h2>
-
-                                            <div className="text-sm text-gray-500">
-                                                Trust & Business Verification
-                                            </div>
-                                        </div>
-
-                                        <span
-                                            className={`px-4 py-2 rounded-full text-sm font-semibold ${trustLevel.color}`}
-                                        >
-                                            {trustLevel.label}
-                                        </span>
-                                    </div>
-
-                                    <div className="grid md:grid-cols-2 gap-3">
-                                        {credentials.map(
-                                            (credential, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center gap-3 border rounded-xl px-4 py-3"
-                                                >
-                                                    <span className="text-xl">
-                                                        {credential.icon}
-                                                    </span>
-
-                                                    <span className="font-medium text-gray-800">
-                                                        {credential.label}
-                                                    </span>
-                                                </div>
-                                            ),
-                                        )}
-                                    </div>
-
-                                    {/* TRUST SCORE */}
-
-                                    <div className="mt-6 border-t pt-6">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <span className="font-semibold">
-                                                Trust Score
-                                            </span>
-
-                                            <span className="text-xl font-bold">
-                                                {trustScore.score}/100
-                                            </span>
-                                        </div>
-
-                                        <div className="w-full bg-gray-200 rounded-full h-3">
-                                            <div
-                                                className="bg-green-600 h-3 rounded-full transition-all"
-                                                style={{
-                                                    width: `${trustScore.score}%`,
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="text-sm text-gray-500 mt-2">
-                                            Business credibility based on
-                                            verification, certifications,
-                                            profile completeness, operational
-                                            capability and buyer reviews.
-                                        </div>
-                                    </div>
-                                </div>
                                 {/* SUPPLIER RATING */}
 
                                 <div className="bg-white rounded-2xl shadow p-6 mb-6">
@@ -252,54 +341,78 @@ export default function Show({
                                         </div>
 
                                         <div className="text-center">
-                                            <div className="text-5xl font-bold text-yellow-500">
-                                                ⭐{" "}
-                                                {reviewSummary.overall.toFixed(
-                                                    2,
-                                                )}
-                                                <span className="text-2xl text-gray-500">
-                                                    {" "}
-                                                    / 5.00
-                                                </span>
-                                            </div>
+                                            {reviewSummary.review_count > 0 ? (
+                                                <>
+                                                    <div className="text-5xl font-bold text-yellow-500">
+                                                        ⭐{" "}
+                                                        {reviewSummary.overall.toFixed(
+                                                            2,
+                                                        )}
+                                                        <span className="text-2xl text-gray-500">
+                                                            {" "}
+                                                            / 5.00
+                                                        </span>
+                                                    </div>
 
-                                            <div className="text-sm text-gray-500 mt-2">
-                                                Based on{" "}
-                                                {reviewSummary.review_count}{" "}
-                                                Verified Buyer Review
-                                                {reviewSummary.review_count > 1
-                                                    ? "s"
-                                                    : ""}
-                                                {reviewSummary.overall >= 4.5 &&
-                                                    reviewSummary.review_count >
-                                                        0 && (
-                                                        <div className="mt-2">
-                                                            <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">
-                                                                🏆 TOP RATED
-                                                                SUPPLIER
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                            </div>
+                                                    <div className="text-sm text-gray-500 mt-2">
+                                                        Based on{" "}
+                                                        {
+                                                            reviewSummary.review_count
+                                                        }{" "}
+                                                        Verified Buyer Review
+                                                        {reviewSummary.review_count >
+                                                        1
+                                                            ? "s"
+                                                            : ""}
+                                                    </div>
+
+                                                    {reviewSummary.overall >=
+                                                        4.5 &&
+                                                        reviewSummary.review_count >=
+                                                            5 && (
+                                                            <div className="mt-3">
+                                                                <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">
+                                                                    🏆 TOP RATED
+                                                                    SUPPLIER
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="text-2xl font-semibold text-gray-400">
+                                                        No Rating Yet
+                                                    </div>
+
+                                                    <div className="text-sm text-gray-500 mt-2">
+                                                        No verified buyer
+                                                        reviews available yet.
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
 
-                                    <div className="space-y-5 mt-6">
-                                        <RatingBar
-                                            label="Quality"
-                                            value={reviewSummary.quality}
-                                        />
+                                    {reviewSummary.review_count > 0 && (
+                                        <div className="space-y-5 mt-6">
+                                            <RatingBar
+                                                label="Quality"
+                                                value={reviewSummary.quality}
+                                            />
 
-                                        <RatingBar
-                                            label="Delivery"
-                                            value={reviewSummary.delivery}
-                                        />
+                                            <RatingBar
+                                                label="Delivery"
+                                                value={reviewSummary.delivery}
+                                            />
 
-                                        <RatingBar
-                                            label="Communication"
-                                            value={reviewSummary.communication}
-                                        />
-                                    </div>
+                                            <RatingBar
+                                                label="Communication"
+                                                value={
+                                                    reviewSummary.communication
+                                                }
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                                 {/* BUYER REVIEWS */}
 

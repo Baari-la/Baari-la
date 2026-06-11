@@ -72,4 +72,11 @@ public function supplierReviews()
     );
 }
 
+public function companyClaims()
+{
+    return $this->hasMany(
+        CompanyClaim::class
+    );
+}
+
 }

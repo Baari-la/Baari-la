@@ -19,6 +19,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\CompanyProfileVisibilityService;
 
 class CompanyController extends Controller
 {
@@ -922,6 +923,138 @@ public function show(Company $company)
 {
 $companyType = 'manufacturer';
 
+$profileItems = [
+
+    'company_logo' =>
+        !empty($company->photo_url),
+
+    'company_description' =>
+        !empty($company->produk),
+
+    'company_profile' =>
+        !empty($company->nama_perusahaan),
+
+    'contact_information' =>
+        $company->contacts->count() > 0,
+
+    'catalog_file' =>
+        !empty($company->catalog_url),
+
+    'company_images' =>
+        $company->images->count() > 0,
+
+    'website_email' =>
+        !empty($company->email_web),
+
+    'year_established' =>
+        !empty($company->tahun_berdiri),
+
+    'certifications' =>
+        $company->certifications->count() > 0,
+
+    'business_links' =>
+        $company->links->count() > 0,
+
+];
+
+$profileLabels = [
+
+    'company_logo' =>
+        'Upload Company Logo',
+
+    'company_description' =>
+        'Add Company Description',
+
+    'company_profile' =>
+        'Complete Company Profile',
+
+    'contact_information' =>
+        'Add Contact Information',
+
+    'catalog_file' =>
+        'Upload Product Catalog',
+
+    'company_images' =>
+        'Upload Company Images',
+
+    'website_email' =>
+        'Add Website / Email',
+
+    'year_established' =>
+        'Add Year Established',
+
+    'certifications' =>
+        'Add Certifications',
+
+    'business_links' =>
+        'Add Business Links',
+
+    'products' =>
+        'Add Products',
+
+    'machines' =>
+        'Add Machinery Information',
+
+    'capacities' =>
+        'Add Production Capacity',
+
+    'markets' =>
+        'Add Export Markets',
+];
+
+$companyRoleLabels = [
+
+    'fiber_producer' =>
+        '🧵 Fiber Producer',
+
+    'yarn_manufacturer' =>
+        '🧶 Yarn Manufacturer',
+
+    'fabric_manufacturer' =>
+        '🏭 Fabric Manufacturer',
+
+    'dyeing_finishing' =>
+        '🎨 Dyeing & Finishing',
+
+    'garment_manufacturer' =>
+        '👕 Garment Manufacturer',
+
+    'home_textile_manufacturer' =>
+        '🏠 Home Textile Manufacturer',
+
+    'testing_certification' =>
+        '🧪 Testing & Certification',
+
+    'machinery_supplier' =>
+        '⚙️ Machinery Supplier',
+
+    'chemical_supplier' =>
+        '🧴 Chemical Supplier',
+
+    'logistics_provider' =>
+        '🚚 Logistics Provider',
+
+    'software_provider' =>
+        '💻 Software Provider',
+
+    'financial_partner' =>
+        '🏦 Financial Partner',
+
+    'industry_association' =>
+        '🏛 Industry Association',
+
+    'education_institution' =>
+        '🎓 Education Institution',
+
+    'government_institution' =>
+        '🏢 Government Institution',
+];
+$companyRoleLabel =
+    $companyRoleLabels[
+        $company->company_role
+    ] ?? $company->sektor;
+
+    
 if (
     str_contains(
         strtoupper($company->sektor),
@@ -1081,11 +1214,10 @@ if ($companyAge >= 1) {
 |--------------------------------------------------------------------------
 */
 
-if ($company->sektor) {
+if ($companyRoleLabel) {
 
     $credentials[] = [
-        'icon' => '🏭',
-        'label' => $company->sektor,
+        'label' => $companyRoleLabel,
     ];
 }
 
@@ -1181,30 +1313,6 @@ if ($companyAge >= 20) {
     $rawTrustScore += 5;
 }
 
-/*
-|--------------------------------------------------------------------------
-| PROFILE COMPLETENESS
-|--------------------------------------------------------------------------
-*/
-
-$profileFields = [
-
-    $company->nama_perusahaan,
-    $company->alamat_lengkap,
-    $company->telepon,
-    $company->email_web,
-    $company->photo_url,
-    $company->catalog_url,
-    $company->tahun_berdiri,
-];
-
-$filledFields = collect(
-    $profileFields
-)->filter()->count();
-
-$rawTrustScore += round(
-    ($filledFields / 7) * 15
-);
 
 /*
 |--------------------------------------------------------------------------
@@ -1293,57 +1401,75 @@ $trustScore = min(
 |--------------------------------------------------------------------------
 */
 $profileItems = [
-
     'company_logo' =>
         !empty($company->photo_url),
-
     'company_description' =>
         !empty($company->alamat_lengkap),
-
-    'product_catalog' =>
-        $company->products->count() > 0,
-
-    'machinery' =>
-        $company->machines->count() > 0,
-
-    'production_capacity' =>
-        $company->capacities->count() > 0,
-
-    'certifications' =>
-        $company->certifications->count() > 0,
-
+    'company_profile' =>
+        !empty($company->nama_perusahaan),
     'contact_information' =>
         $company->contacts->count() > 0,
-
-    'markets' =>
-        $company->markets->count() > 0,
-
     'catalog_file' =>
         !empty($company->catalog_url),
-
     'company_images' =>
         $company->images->count() > 0,
+    'website_email' =>
+        !empty($company->email_web),
+    'year_established' =>
+        !empty($company->tahun_berdiri),
+    'certifications' =>
+        $company->certifications->count() > 0,
+    'business_links' =>
+        $company->links->count() > 0,
+    'products' =>
+        $company->products->count() > 0,
+    'machines' =>
+        $company->machines->count() > 0,
+    'capacities' =>
+        $company->capacities->count() > 0,
+    'markets' =>
+        $company->markets->count() > 0,
 ];
 
 $totalProfileItems = count(
-    $profileItems
+  $profileItems
 );
 
 $completedProfileItems = collect(
-    $profileItems
+$profileItems
 )->filter()->count();
 
-$profileCompleteness = round(
-    (
-        $completedProfileItems /
-        $totalProfileItems
-    ) * 100
-);
+$profileCompleteness =
+    CompanyProfileVisibilityService::calculate(
+       $company
+     );
+$missingItems = [];
 
+ foreach (
+    $profileItems as $key => $completed
+ ) {
+
+     if (!$completed) {
+
+         $missingItems[] =
+            $profileLabels[$key];
+     }
+ }
 
     return Inertia::render('Company/Show', [
         'company' => $company,
         'companyAge' => $companyAge,
+        'companyTypeLabel' => $companyTypeLabels[$companyType]?? 
+        'Company',
+        'companyRoleLabel' => $companyRoleLabel,
+        'credentials' => $credentials,
+    'trustScore' => [
+            'score' => $trustScore,
+            'raw_score' => $rawTrustScore,
+            'max' => 100,
+    ],
+    
+    'profileCompleteness' => $profileCompleteness,
         'reviewSummary' => [
             'review_count' => $reviewCount,
             'quality' => $averageQuality,
@@ -1351,25 +1477,6 @@ $profileCompleteness = round(
             'communication' => $averageCommunication,
             'overall' => $overallRating,
         ],
-        'companyTypeLabel' => $companyTypeLabels[$companyType]?? 
-        'Company',
-        'credentials' => $credentials,
-            'trustScore' => [
-            'score' => $trustScore,
-            'raw_score' => $rawTrustScore,
-            'max' => 100,
-    ],
-        
-    'profileCompleteness' => [
-    'percentage' =>
-        $profileCompleteness,
-    'completed' =>
-        $completedProfileItems,
-    'total' =>
-        $totalProfileItems,
-    'items' =>
-        $profileItems,
-],
     ]);
 }
 

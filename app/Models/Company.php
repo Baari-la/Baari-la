@@ -3,40 +3,165 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use App\Models\SupplierReview;
+use App\Models\User;
+use App\Models\CompanyUpdate;
 
 class Company extends Model
 {
-protected $appends = ['verification_status'];
+protected $appends = [
+    'verification_status',
+    'data_source_label',
+    'data_source_badge',
+    'is_claimed',
+];
+
 protected $fillable = [
     'nama_perusahaan', 'sektor', 'wilayah', 'alamat_lengkap', 'city', 
     'telepon', 'email_web', 'pimpinan', 'pimpinan_2', 'tenaga_kerja', 
     'pasar_ekspor', 'produk', 'category', 'membership_type', 
     'nomor_anggota', 'photo_url', 'photo_pimpinan', 'photo_pimpinan_2', 'catalog_url','last_verified_at', 'status_verifikasi', 'stock_ready_caption',
-    'stock_qty',
-    'stock_unit',
-    'price'
+    'stock_qty','company_role','data_source', 'claimed_by_user_id', 'last_updated_at',
+    'stock_unit', 'price'
 ];
  // GABUNGKAN SEMUA CASTS DI SINI (Hanya boleh ada satu blok ini)
     protected $casts = [
         'last_verified_at' => 'datetime',
+        'last_updated_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
+    
+public function claims()
+{
+    return $this->hasMany(
+        CompanyClaim::class
+    );
+}
+
+public function pendingClaims()
+{
+    return $this->hasMany(
+        CompanyClaim::class
+    )->where(
+        'status',
+        'pending'
+    );
+}
+
+public function approvedClaims()
+{
+    return $this->hasMany(
+        CompanyClaim::class
+    )->where(
+        'status',
+        'approved'
+    );
+}
+
+    
+public function getIsClaimedAttribute()
+{
+    return !is_null(
+        $this->claimed_by_user_id
+    );
+}
+
+public function getDataSourceLabelAttribute()
+{
+    return match (
+        $this->data_source
+    ) {
+
+        'company_updated' =>
+            'Company Managed',
+
+        'verified_by_admin' =>
+            'Verified Profile',
+
+        default =>
+            'Legacy Directory',
+    };
+}
+
+public function getDataSourceBadgeAttribute()
+{
+    return match (
+        $this->data_source
+    ) {
+
+        'company_updated' =>
+            '👤',
+
+        'verified_by_admin' =>
+            '✅',
+
+        default =>
+            '📚',
+    };
+}
+
+public function isClaimed(): bool
+{
+    return !is_null(
+        $this->claimed_by_user_id
+    );
+}
+
+public function isLegacyProfile(): bool
+{
+    return $this->data_source ===
+        'legacy_directory';
+}
+
+public function isCompanyManaged(): bool
+{
+    return $this->data_source ===
+        'company_updated';
+}
+
+public function isVerifiedProfile(): bool
+{
+    return $this->data_source ===
+        'verified_by_admin';
+}
+
+public function owner()
+{
+    return $this->belongsTo(
+        User::class,
+        'claimed_by_user_id'
+    );
+}
+
 public function getVerificationStatusAttribute()
 {
-    // 1. Jika belum pernah verifikasi sama sekali
-    if (is_null($this->last_verified_at)) {
-        return 'Legacy Data';
+    if (
+        $this->data_source ===
+        'verified_by_admin'
+    ) {
+
+        if (
+            $this->last_verified_at &&
+            $this->last_verified_at
+                ->diffInMonths(now()) > 12
+        ) {
+
+            return 'Needs Update';
+        }
+
+        return 'Verified';
     }
 
-    // 2. Jika verifikasi terakhir sudah lebih dari 12 bulan (1 tahun)
-    if ($this->last_verified_at->diffInMonths(now()) > 12) {
-        return 'Needs Update';
+    if (
+        $this->data_source ===
+        'company_updated'
+    ) {
+
+        return 'Company Managed';
     }
 
-    // 3. Jika data masih segar
-    return 'Verified';
+    return 'Legacy Data';
 }
 
 // app/Models/Company.php
@@ -84,6 +209,13 @@ public function getIsExpiringAttribute()
     {
         return $this->hasMany(CompanyLink::class);
     }
+    
+    public function updates()
+{
+    return $this->hasMany(
+        CompanyUpdate::class
+    );
+}
 
     // Images
     public function images()

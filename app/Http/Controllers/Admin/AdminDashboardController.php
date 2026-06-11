@@ -7,9 +7,9 @@ use Inertia\Inertia;
 use App\Models\Company;
 use App\Models\CompanyUpdate;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
 use App\Models\AuditLog;
+use App\Models\CompanyClaim;
+
 
 
 class AdminDashboardController extends Controller
@@ -94,14 +94,36 @@ class AdminDashboardController extends Controller
         'gold_members'    => Company::where('membership_type', 'gold_member')->count(),
         'premium_requests' => DB::table('premium_requests')->where('status', 'pending')->count(),
         // Tambahkan hitungan angka untuk badge notifikasi
-        'pending_updates_count' => \App\Models\CompanyUpdate::where('status', 'pending')->count(),
-    ],
+        'pending_updates_count' =>
+        CompanyUpdate::where(
+            'status',
+            'pending'
+        )->count(),
+
+    'pending_claims_count' =>
+        CompanyClaim::where(
+            'status',
+            'pending'
+        )->count(),
+        
+        ],
     
     // Data list untuk tabel audit admin
     'pendingUpdates'  => \App\Models\CompanyUpdate::with(['company', 'user'])
                         ->where('status', 'pending')
                         ->latest()
                         ->get(),
+    'pendingClaims' =>
+        CompanyClaim::with([
+            'company',
+            'user'
+        ])
+        ->where(
+            'status',
+            'pending'
+        )
+        ->latest()
+        ->get(),
 
     'recentCompanies' => Company::latest()->take(10)->get(),
     'stockOverview'   => $stockOverview,
@@ -116,40 +138,200 @@ class AdminDashboardController extends Controller
 // Menyetujui dan memindahkan data ke tabel utama
 public function approveUpdate($id)
 {
-     $update = \App\Models\CompanyUpdate::findOrFail($id);
-    $company = \App\Models\Company::findOrFail($update->company_id);
+    $update = CompanyUpdate::findOrFail($id);
 
-    // 1. Ambil data usulan dari JSON
-    $newData = json_decode($update->proposed_data, true);
+    DB::transaction(function () use ($update) {
 
-    // 2. TAMBAHKAN BARIS INI: Paksa status di tabel utama menjadi verified
-    $company->status_verifikasi = 'verified'; 
+        $company = Company::findOrFail(
+            $update->company_id
+        );
 
-    // 3. Timpa data lainnya
-    $company->update($newData);
+        $newData = $update->proposed_data;
 
-    // 4. Ubah status antrean agar hilang dari daftar "Pending"
-    $update->update(['status' => 'approved']);
+        $newData['status_verifikasi'] = 'verified';
+        $newData['last_verified_at'] = now();
+        $newData['last_updated_at'] = now();
+        $newData['data_source'] = 'verified_by_admin';
+        $company->update($newData);
 
-    
-    // 4. Catat ke Audit Log untuk akuntabilitas
-    \App\Models\AuditLog::create([
-        'user_id' => auth()->id(),
-        'company_id' => $company->id,
-        'action' => 'approved',
-        'details' => 'Admin menyetujui pemutakhiran data mandiri perusahaan.'
-    ]);
+        $update->update([
 
-    return back()->with('message', 'Audit Berhasil: Data perusahaan telah diperbarui secara live.');
+            'status' =>
+                'approved',
+
+            'approved_by' =>
+                auth()->id(),
+
+            'approved_at' =>
+                now(),
+        ]);
+
+        AuditLog::create([
+    'user_id' => auth()->id(),
+    'company_id' => $company->id,
+    'action' => 'approved',
+    'details' => 'Company update approved.'
+]);
+    });
+
+    return back()->with(
+        'message',
+        'Audit Berhasil: Data perusahaan telah diperbarui secara live.'
+    );
 }
 
+public function approveClaim(
+    CompanyClaim $claim
+)
+{
+    $company = $claim->company;
+
+    if (
+        $company->claimed_by_user_id
+    ) {
+
+        return back()->with(
+            'error',
+            'Company already claimed.'
+        );
+    }
+
+    DB::transaction(function () use (
+        $claim,
+        $company
+    ) {
+
+        $company->update([
+
+            'claimed_by_user_id' =>
+                $claim->user_id,
+
+            'data_source' =>
+                'company_updated',
+
+            'status_verifikasi' =>
+                'verified',
+
+            'last_updated_at' =>
+                now(),
+
+            'last_verified_at' =>
+                now(),
+        ]);
+
+        $claim->user->update([
+
+            'company_id' =>
+                $company->id,
+        ]);
+
+        $claim->update([
+
+            'status' =>
+                'approved',
+
+            'reviewed_at' =>
+                now(),
+        ]);
+
+        CompanyClaim::where(
+            'company_id',
+            $company->id
+        )
+        ->where(
+            'id',
+            '!=',
+            $claim->id
+        )
+        ->where(
+            'status',
+            'pending'
+        )
+        ->update([
+
+            'status' =>
+                'rejected',
+
+            'reviewed_at' =>
+                now(),
+        ]);
+
+        AuditLog::create([
+    'user_id' => auth()->id(),
+    'company_id' => $company->id,
+    'action' => 'approved',
+    'details' => 'Company claim approved.'
+]);
+    });
+
+    return back()->with(
+        'message',
+        'Company claim approved.'
+    );
+}
 
 // Menolak usulan perubahan
-public function rejectUpdate(\App\Models\CompanyUpdate $update)
+public function rejectUpdate(
+    CompanyUpdate $update
+)
 {
-    $update->update(['status' => 'rejected']);
-    return back()->with('message', 'Usulan perubahan data telah ditolak.');
+    DB::transaction(function () use (
+        $update
+    ) {
+
+        $update->update([
+
+            'status' =>
+                'rejected',
+
+            'approved_by' =>
+                auth()->id(),
+
+            'approved_at' =>
+                now(),
+        ]);
+
+        AuditLog::create([
+    'user_id' => auth()->id(),
+    'company_id' => $update->company_id,
+    'action' => 'rejected',
+    'details' => 'Company update rejected.'
+]);
+    });
+
+    return back()->with(
+        'message',
+        'Usulan perubahan data telah ditolak.'
+    );
 }
+public function rejectClaim(
+    CompanyClaim $claim
+)
+{
+    DB::transaction(function () use (
+        $claim
+    ) {
 
+        $claim->update([
 
+            'status' =>
+                'rejected',
+
+            'reviewed_at' =>
+                now(),
+        ]);
+
+        AuditLog::create([
+    'user_id' => auth()->id(),
+    'company_id' => $claim->company_id,
+    'action' => 'rejected',
+    'details' => 'Company claim rejected.'
+]);
+    });
+
+    return back()->with(
+        'message',
+        'Company claim rejected.'
+    );
+}
 }

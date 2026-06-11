@@ -11,16 +11,16 @@ class CompanyContact extends Model
 
     protected $table = 'company_contacts';
 
-    protected $fillable = [
-        
-'company_id',
-'contact_name',
-'position',
-'phone',
-'email',
-'created_at',
-'updated_at',
-    ];
+ protected $fillable = [
+    'company_id',
+    'contact_name',
+    'position',
+    'phone',
+    'whatsapp',
+    'email',
+    'photo_url',
+    'is_primary',
+];
 
     public function company()
     {

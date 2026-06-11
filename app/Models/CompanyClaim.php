@@ -4,27 +4,31 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CompanyUpdate extends Model
+class CompanyClaim extends Model
 {
     protected $fillable = [
 
         'company_id',
         'user_id',
 
-        'proposed_data',
+        'full_name',
+        'position',
+
+        'email',
+        'phone',
+
+        'notes',
 
         'status',
-        'admin_note',
 
-        'approved_by',
-        'approved_at',
+        'submitted_at',
+        'reviewed_at',
     ];
 
     protected $casts = [
 
-        'proposed_data' => 'array',
-
-        'approved_at' => 'datetime',
+        'submitted_at' => 'datetime',
+        'reviewed_at' => 'datetime',
 
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -47,14 +51,6 @@ class CompanyUpdate extends Model
     {
         return $this->belongsTo(
             User::class
-        );
-    }
-
-    public function approver()
-    {
-        return $this->belongsTo(
-            User::class,
-            'approved_by'
         );
     }
 

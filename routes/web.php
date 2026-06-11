@@ -28,6 +28,7 @@ use App\Http\Controllers\PurchaseOrderShipmentController;
 use App\Http\Controllers\PurchaseOrderShipmentTrackController;
 use App\Http\Controllers\PurchaseOrderDisputeController;
 use App\Http\Controllers\SupplierReviewController;
+use App\Http\Controllers\CompanyClaimController;
 
 /*
 
@@ -500,6 +501,14 @@ Route::post(
     [SupplierReviewController::class, 'store']
 )->name('purchase-orders.review.store');
 
+Route::post(
+            '/companies/{company}/claim',
+            [CompanyClaimController::class, 'store']
+        )
+        ->name(
+            'companies.claim'
+        );
+
 });
 
 
@@ -509,12 +518,52 @@ Route::post(
 | LEVEL 4: ADMIN ONLY
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/pending-updates', [AdminDashboardController::class, 'pendingUpdates'])->name('pending-updates');
-    Route::post('/approve-update/{id}', [AdminDashboardController::class, 'approveUpdate'])->name('approve-update');
-    Route::post('/reject-update/{id}', [AdminDashboardController::class, 'rejectUpdate'])->name('reject-update');
-    Route::resource('gallery', GalleryController::class);
-    Route::post('/companies/{company}/verify', [CompanyController::class, 'verify'])->name('companies.verify');
-    
+Route::middleware([
+    'auth',
+    'verified',
+    'admin'
+])
+->prefix('admin')
+->name('admin.')
+->group(function () {
+
+    Route::get(
+        '/dashboard',
+        [AdminDashboardController::class, 'index']
+    )->name('dashboard');
+
+    Route::get(
+        '/pending-updates',
+        [AdminDashboardController::class, 'pendingUpdates']
+    )->name('pending-updates');
+
+    Route::post(
+        '/approve-update/{id}',
+        [AdminDashboardController::class, 'approveUpdate']
+    )->name('approve-update');
+
+    Route::post(
+        '/reject-update/{id}',
+        [AdminDashboardController::class, 'rejectUpdate']
+    )->name('reject-update');
+
+    Route::post(
+        '/company-claims/{claim}/approve',
+        [AdminDashboardController::class, 'approveClaim']
+    )->name('company-claims.approve');
+
+    Route::post(
+        '/company-claims/{claim}/reject',
+        [AdminDashboardController::class, 'rejectClaim']
+    )->name('company-claims.reject');
+
+    Route::resource(
+        'gallery',
+        GalleryController::class
+    );
+
+    Route::post(
+        '/companies/{company}/verify',
+        [CompanyController::class, 'verify']
+    )->name('companies.verify');
 });

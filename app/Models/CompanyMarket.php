@@ -21,4 +21,12 @@ class CompanyMarket extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function markets()
+{
+    return $this->hasMany(
+        CompanyMarket::class,
+        'company_id'
+    );
+}
 }
