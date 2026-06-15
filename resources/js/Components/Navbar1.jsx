@@ -1,19 +1,36 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { useState } from "react";
+import {
+    ShieldCheck,
+    LogOut,
+    Menu,
+    X,
+    Globe,
+    Library,
+    LayoutDashboard,
+} from "lucide-react";
 
 export default function Navbar() {
     const { props } = usePage();
-    const { auth, errors } = props;
+    const { auth } = props;
     const isEn = props.locale === "en" || auth?.locale === "en";
     const [isOpen, setIsOpen] = useState(false);
 
     const handleLogout = (e) => {
         e.preventDefault();
-        router.post(route("logout"));
+        router.post(
+            route("logout"),
+            {},
+            {
+                onSuccess: () => {
+                    window.location.href = "/";
+                },
+            },
+        );
     };
 
     const toggleLanguage = (lang) => {
-        router.get(
+        router.post(
             route("language.switch", { locale: lang }),
             {},
             {
@@ -23,83 +40,154 @@ export default function Navbar() {
         );
     };
 
+    // Style helper premium dengan kontras ketajaman tinggi sejak awal muat halaman
+    const navLinkStyle =
+        "relative text-[10px] font-black uppercase tracking-widest text-gray-200 hover:text-amber-400 transition-all duration-300 group py-2 flex items-center gap-1";
+    const underlineStyle =
+        "absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-300 group-hover:w-full shadow-[0_0_10px_rgba(245,158,11,0.8)]";
+
     return (
-        <nav className="bg-[#0a192f] border-b border-white/10 sticky top-0 z-50">
+        <nav className="bg-[#0b1329]/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50 shadow-2xl">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex justify-between h-20 items-center">
-                    {/* LOGO */}
-                    <Link href="/" className="flex items-center gap-3">
-                        <img
-                            src="/images/logo_api_digestex2.png"
-                            className="h-10 w-auto"
-                            alt="Logo"
-                        />
-                        <span className="text-white font-black italic text-xl tracking-tighter uppercase">
-                            Digestex<span className="text-yellow-500">V2</span>
-                        </span>
+                    {/* 🛡️ LOGO RESMI MANDIRI: PT DIGESTEX GLOBAL INTELLIGENCE */}
+                    <Link
+                        href="/"
+                        className="flex items-center gap-3 shrink-0 group"
+                    >
+                        <div className="hover:scale-105 transition-transform duration-300">
+                            <img
+                                src="/images/logoWeb.png"
+                                className="h-10 w-auto rounded-xl shadow-lg shadow-amber-500/5 border border-white/5"
+                                alt="Digestex Global Logo"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="font-black tracking-tighter text-sm uppercase text-white leading-none">
+                                DIGESTEX
+                            </span>
+                            <span className="text-[8px] text-amber-500 font-mono tracking-widest uppercase font-bold mt-1">
+                                GLOBAL HUB
+                            </span>
+                        </div>
                     </Link>
 
-                    {/* DESKTOP MENU (Hidden on Mobile) */}
+                    {/* DESKTOP MENU (PC VIEWPORT HIGH CONTRAST) */}
                     <div className="hidden md:flex items-center gap-6">
-                        <Link
-                            href={route("home")}
-                            className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-yellow-500"
-                        >
+                        <Link href={route("home")} className={navLinkStyle}>
                             {isEn ? "Home" : "Beranda"}
+                            <span className={underlineStyle}></span>
                         </Link>
                         <Link
                             href={route("companies.index")}
-                            className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-yellow-500"
+                            className={navLinkStyle}
                         >
-                            Big Data
+                            {isEn ? "INDUSTRY DIRECTORY" : "DIREKTORI INDUSTRI"}
+                            <span className={underlineStyle}></span>
+                        </Link>
+                        <Link
+                            href={route("sourcing-hub")}
+                            className={navLinkStyle}
+                        >
+                            {isEn ? "SOURCING HUB" : "PUSAT PENGADAAN"}
+
+                            <span className="text-[7px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">
+                                {isEn ? "COMING SOON" : "SEGERA HADIR"}
+                            </span>
+
+                            <span className={underlineStyle}></span>
+                        </Link>
+                        {/* 📊 SUNTIKAN TOMBOL UTAMA BARU: DASHBOARD AKSES DI NAV BAR DEPAN */}
+                        {/* <Link
+                            href={route("dashboard")}
+                            className={navLinkStyle}
+                        >
+                            <LayoutDashboard className="w-3.5 h-3.5 text-amber-500/80" />
+                            {isEn ? "Dashboard" : "Dashboard"}
+                            <span className={underlineStyle}></span>
+                        </Link> */}
+
+                        <Link href={route("join.us")} className={navLinkStyle}>
+                            {isEn ? "Join Us" : "Gabung Kami"}
+                            <span className={underlineStyle}></span>
                         </Link>
 
+                        <Link href={route("about")} className={navLinkStyle}>
+                            {isEn ? "About Us" : "Tentang Kami"}
+                            <span className={underlineStyle}></span>
+                        </Link>
+
+                        {/* MENU ALAT INDUSTRI / TOOLBOX PREMIUM */}
+                        <Link
+                            href={route("tools.calculator")}
+                            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white hover:text-emerald-400 transition-all group relative py-2 bg-white/5 border border-white/5 px-3 py-1.5 rounded-xl duration-300"
+                        >
+                            <span>🧮</span>
+                            <span>
+                                {isEn ? "Industrial Toolbox" : "Alat Industri"}
+                            </span>
+                            <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[6px] text-[#030712] px-1.5 py-0.5 rounded-md font-black tracking-tighter">
+                                PREMIUM
+                            </span>
+                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-emerald-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+
+                        <Link
+                            href={route("companies.index")}
+                            className={navLinkStyle}
+                        >
+                            <Library className="w-3.5 h-3.5 text-amber-500/60" />{" "}
+                            Big Data
+                            <span className={underlineStyle}></span>
+                        </Link>
+
+                        {/* AUTHENTICATION ROUTING NODE SECTION */}
                         {auth.user ? (
-                            <div className="flex items-center gap-6">
-                                {/* SAPAAN PERSONAL (LOKALISASI) */}
-                                <div className="text-right hidden lg:block border-r border-white/10 pr-6">
-                                    <p className="text-[8px] font-black uppercase text-gray-500 tracking-widest leading-none mb-1">
+                            <div className="flex items-center gap-6 ml-2 border-l border-white/10 pl-6">
+                                <Link
+                                    href={route("dashboard")}
+                                    className="text-right group"
+                                >
+                                    <p className="text-[8px] font-black uppercase text-gray-500 tracking-widest leading-none mb-1 group-hover:text-amber-400 transition-colors">
                                         {isEn
                                             ? "Welcome Back,"
                                             : "Selamat Datang,"}
                                     </p>
-                                    <p className="text-[10px] font-black italic text-white uppercase leading-none">
-                                        "{auth.user.name}"
+                                    <p className="text-[10px] font-black italic text-white uppercase leading-none tracking-wide">
+                                        "
+                                        {auth.user.name
+                                            ? auth.user.name.split(" ")[0]
+                                            : "User"}
+                                        "
                                     </p>
-                                </div>
-
-                                {/* Lencana ID Anggota */}
-                                {/* <span className="text-[9px] font-black uppercase text-yellow-500 tracking-widest border border-yellow-500/20 px-3 py-1 rounded-full bg-yellow-500/5">
-                                    {auth.user.role === "admin"
-                                        ? "Admin Console"
-                                        : `ID: ${auth.user.member_number || "Member"}`}
-                                </span> */}
-
-                                {/* Tombol Logout */}
+                                </Link>
                                 <button
                                     onClick={handleLogout}
-                                    className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-red-500 transition-colors"
+                                    className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-400 transition-colors flex items-center gap-1 cursor-pointer"
                                 >
-                                    <i className="fas fa-sign-out-alt mr-2"></i>
-                                    {isEn ? "Logout" : "Keluar"}
+                                    <LogOut className="w-3.5 h-3.5" />
                                 </button>
                             </div>
                         ) : (
                             <Link
                                 href={route("login")}
-                                className="bg-yellow-500 text-[#0a192f] px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest"
+                                className="bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all duration-300"
                             >
                                 {isEn ? "Login" : "Masuk"}
                             </Link>
                         )}
 
-                        {/* DESKTOP LANG SWITCHER */}
-                        <div className="flex bg-white/5 rounded-full p-1 border border-white/10">
+                        {/* BILINGUAL LANGUAGE SELECTOR TOGGLES */}
+                        <div className="flex bg-white/5 rounded-full p-1 border border-white/5 ms-2">
                             {["id", "en"].map((lang) => (
                                 <button
                                     key={lang}
                                     onClick={() => toggleLanguage(lang)}
-                                    className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${(lang === "en" ? isEn : !isEn) ? "bg-yellow-500 text-[#0a192f]" : "text-gray-500"}`}
+                                    className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-300 cursor-pointer ${
+                                        (lang === "en" ? isEn : !isEn)
+                                            ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712]"
+                                            : "text-gray-400 hover:text-white"
+                                    }`}
                                 >
                                     {lang}
                                 </button>
@@ -107,87 +195,153 @@ export default function Navbar() {
                         </div>
                     </div>
 
-                    {/* HAMBURGER BUTTON (Mobile Only) */}
-                    <div className="md:hidden">
+                    {/* MOBILE HAMBURGER BUTTON VIEWPORT */}
+                    <div className="md:hidden flex items-center gap-4">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="text-yellow-500 text-2xl p-2"
+                            className="text-amber-500 bg-white/5 border border-white/5 rounded-xl p-2.5 z-50 relative transition-transform active:scale-95"
                         >
-                            <i
-                                className={`fas ${isOpen ? "fa-times" : "fa-bars"}`}
-                            ></i>
+                            {isOpen ? (
+                                <X className="w-5 h-5" />
+                            ) : (
+                                <Menu className="w-5 h-5" />
+                            )}
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* MOBILE MENU (Slide Down) */}
+            {/* 🛡️ REPARASI MUTLAK TINGGI OTOMATIS: MENGGANTI H-SCREEN MENJADI H-AUTO DAN MENERAPKAN BORDER CORNER RADIUS LUXURY */}
             <div
-                className={`md:hidden bg-[#0d1d36] border-t border-white/10 transition-all duration-300 overflow-hidden ${isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}
+                className={`md:hidden bg-[#0b1329] border-b border-white/5 fixed top-20 left-0 right-0 h-auto z-50 transition-all duration-500 ease-in-out shadow-[0_25px_60px_rgba(0,0,0,0.8)] rounded-b-[35px] ${
+                    isOpen
+                        ? "translate-y-0 opacity-100 pointer-events-auto"
+                        : "-translate-y-full opacity-0 pointer-events-none"
+                }`}
             >
-                <div className="px-6 py-6 flex flex-col gap-5">
-                    {/* INFO USER DI HP */}
+                {/* Padding dirapatkan secara vertikal (pb-8) agar membungkus padat tanpa sisa bolong bawah */}
+                <div className="px-8 pt-4 pb-8 flex flex-col gap-5 max-h-[calc(100vh-6rem)] overflow-y-auto">
+                    {/* TAYANGAN PROFIL USER DI SELULER */}
                     {auth.user && (
-                        <div className="pb-4 border-b border-white/5">
-                            <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-1">
-                                Authenticated As
-                            </p>
-                            <p className="text-white font-bold text-sm">
-                                {auth.user.member_number || auth.user.name}
-                            </p>
+                        <div className="pb-4 border-b border-white/5 flex justify-between items-center bg-black/20 p-4 rounded-xl">
+                            <div>
+                                <p className="text-[8px] font-black text-amber-500 uppercase tracking-[0.2em] mb-1">
+                                    {isEn
+                                        ? "Authenticated Executive"
+                                        : "Terautentikasi Sebagai"}
+                                </p>
+                                <p className="text-white font-black text-sm uppercase italic tracking-tight">
+                                    {auth.user.name}
+                                </p>
+                            </div>
+                            <Link
+                                href={route("dashboard")}
+                                onClick={() => setIsOpen(false)}
+                                className="bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] font-mono text-[9px] font-black px-3 py-2 rounded-lg uppercase tracking-wider shadow-md"
+                            >
+                                Console &rarr;
+                            </Link>
                         </div>
                     )}
 
-                    <Link
-                        href={route("home")}
-                        className="text-xs font-black uppercase text-gray-300 tracking-widest"
-                    >
-                        {isEn ? "Home" : "Beranda"}
-                    </Link>
+                    {/* LINK NAVIGASI RESPONSIVE SELULER BESAR & KONTRAS TINGGI */}
+                    <div className="flex flex-col gap-4 text-sm">
+                        <Link
+                            href={route("home")}
+                            onClick={() => setIsOpen(false)}
+                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors py-2 border-b border-white/5 block"
+                        >
+                            {isEn ? "Home Portal" : "Beranda Portal"}
+                        </Link>
 
-                    <Link
-                        href={route("companies.index")}
-                        className="text-xs font-black uppercase text-gray-300 tracking-widest"
-                    >
-                        Big Data
-                    </Link>
+                        <Link
+                            href={route("dashboard")}
+                            onClick={() => setIsOpen(false)}
+                            className="text-xs font-black uppercase text-amber-400 tracking-widest hover:text-amber-400 transition-colors flex items-center gap-2 py-2 border-b border-white/5 block"
+                        >
+                            <LayoutDashboard className="w-4 h-4" />{" "}
+                            {isEn ? "Data Dashboard" : "Dashboard Data"}
+                        </Link>
 
-                    {/* MOBILE LANG SWITCHER */}
-                    <div className="flex items-center gap-4 py-2">
-                        <span className="text-[10px] font-black uppercase text-gray-500">
-                            Language:
-                        </span>
-                        <div className="flex bg-white/5 rounded-lg p-1 border border-white/10">
+                        <Link
+                            href={route("join.us")}
+                            onClick={() => setIsOpen(false)}
+                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors py-2 border-b border-white/5 block"
+                        >
+                            {isEn ? "Join Us" : "Gabung Kami"}
+                        </Link>
+
+                        <Link
+                            href={route("about")}
+                            onClick={() => setIsOpen(false)}
+                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors py-2 border-b border-white/5 block"
+                        >
+                            {isEn ? "About Intelligence" : "Tentang Intelijen"}
+                        </Link>
+
+                        {/* MOBILE TOOLBOX GLASS KARTU PREMIUM */}
+                        <Link
+                            href={route("tools.calculator")}
+                            onClick={() => setIsOpen(false)}
+                            className="flex justify-between items-center bg-emerald-500/5 border border-emerald-500/20 p-4 rounded-xl shadow-xl mt-1 duration-300"
+                        >
+                            <div className="flex items-center gap-3">
+                                <span className="text-xl">🧮</span>
+                                <span className="text-emerald-400 font-black uppercase text-[10px] tracking-widest">
+                                    {isEn
+                                        ? "Industrial Toolbox"
+                                        : "Alat Industri"}
+                                </span>
+                            </div>
+                            <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[#030712] text-[7px] font-black px-2 py-1 rounded shadow-md">
+                                PREMIUM
+                            </span>
+                        </Link>
+
+                        <Link
+                            href={route("companies.index")}
+                            onClick={() => setIsOpen(false)}
+                            className="text-xs font-black uppercase text-white tracking-widest hover:text-amber-400 transition-colors py-2 block"
+                        >
+                            Big Data Matrix
+                        </Link>
+                    </div>
+
+                    <div className="mt-2 space-y-3.5 pt-4 border-t border-white/5">
+                        {/* MOBILE LANGUAGE SWITCHER BUTTONS */}
+                        <div className="flex bg-white/5 rounded-2xl p-1 border border-white/5">
                             <button
                                 onClick={() => toggleLanguage("id")}
-                                className={`px-4 py-1.5 rounded-md text-[10px] font-black ${!isEn ? "bg-yellow-500 text-[#0a192f]" : "text-white"}`}
+                                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all duration-300 ${!isEn ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md" : "text-gray-500"}`}
                             >
                                 ID
                             </button>
                             <button
                                 onClick={() => toggleLanguage("en")}
-                                className={`px-4 py-1.5 rounded-md text-[10px] font-black ${isEn ? "bg-yellow-500 text-[#0a192f]" : "text-white"}`}
+                                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all duration-300 ${isEn ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md" : "text-gray-500"}`}
                             >
                                 EN
                             </button>
                         </div>
-                    </div>
 
-                    {auth.user ? (
-                        <button
-                            onClick={handleLogout}
-                            className="w-full text-left text-xs font-black uppercase text-red-500 tracking-widest pt-4 border-t border-white/5"
-                        >
-                            {isEn ? "Logout" : "Keluar"}
-                        </button>
-                    ) : (
-                        <Link
-                            href={route("login")}
-                            className="bg-yellow-500 text-[#0a192f] text-center py-4 rounded-xl text-xs font-black uppercase"
-                        >
-                            {isEn ? "Login Console" : "Masuk Konsol"}
-                        </Link>
-                    )}
+                        {/* MOBILE LOGIN/LOGOUT ACTION FLOW - DENGAN CLIP TINGGI PAS */}
+                        {!auth.user ? (
+                            <Link
+                                href={route("login")}
+                                onClick={() => setIsOpen(false)}
+                                className="block bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] text-center py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl tracking-wider font-bold"
+                            >
+                                {isEn ? "Log In Console" : "Masuk Konsol"}
+                            </Link>
+                        ) : (
+                            <button
+                                onClick={handleLogout}
+                                className="w-full text-center py-4 text-[10px] font-black uppercase text-red-400 tracking-widest border border-red-500/10 rounded-2xl transition-all bg-red-500/5 cursor-pointer"
+                            >
+                                {isEn ? "Logout Account" : "Keluar Akun"}
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </nav>

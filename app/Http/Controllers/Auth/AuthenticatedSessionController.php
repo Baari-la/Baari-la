@@ -49,8 +49,9 @@ class AuthenticatedSessionController extends Controller
     }
 
     $request->session()->regenerate();
-
-    // Arahkan ke Intelligence Center sesuai keinginan Bapak
+return auth()->user()->role === 'admin'
+    ? redirect()->intended(route('admin.dashboard'))
+    : redirect()->intended('/dashboard');
     return redirect()->intended('/dashboard'); 
 }
 

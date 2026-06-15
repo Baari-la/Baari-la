@@ -13,6 +13,7 @@ use App\Models\CompanyCapacity;
 use App\Models\CompanyMachine;
 use App\Models\CompanyMoq;
 use App\Models\CompanyLeadTime;
+use App\Services\CompanyLocationService;
 
 class CompanyRelationalSyncService
 {
@@ -84,9 +85,27 @@ class CompanyRelationalSyncService
             $data['lead_times'] ?? []
         );
            }
+
+     if (array_key_exists('locations', $data)) {
+    CompanyLocationService::syncLocations(
+        $company,
+        $data['locations'] ?? []
+    );
+}
         
     }
 
+public static function syncLocations(
+    Company $company,
+    array $locations
+): void {
+
+    // dd($locations);
+
+    $company->locations()->update([
+        'is_primary' => false,
+    ]);
+}
     /*
     |--------------------------------------------------------------------------
     | PRODUCTS

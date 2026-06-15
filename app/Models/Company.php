@@ -179,6 +179,13 @@ public function getIsExpiringAttribute()
     | RELATIONSHIPS
     |--------------------------------------------------------------------------
     */
+public function locations()
+{
+    return $this->hasMany(
+        CompanyLocation::class,
+        'company_id'
+    );
+}
 
     // Products
     public function products()
@@ -270,4 +277,10 @@ public function reviews()
     );
 }
 
+public function industryPartner()
+{
+    return $this->hasOne(
+        IndustryPartner::class
+    );
+}
 }

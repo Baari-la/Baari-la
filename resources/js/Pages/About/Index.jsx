@@ -1,290 +1,341 @@
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Head, usePage } from "@inertiajs/react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import WebsiteLayout from "@/Layouts/WebsiteLayout";
+import { Link } from "@inertiajs/react";
 
-export default function Index() {
-    const { locale, auth, galleries = [], translations = {} } = usePage().props;
+export default function About() {
+    const timeline = [
+        {
+            year: "2002",
+            title: "Industry Association Engagement",
+            description:
+                "Beginning active involvement within Indonesia's textile industry ecosystem.",
+        },
 
-    const [selectedImg, setSelectedImg] = useState(null);
+        {
+            year: "2005 - 2010",
+            title: "Government & International Media",
+            description:
+                "Supporting industry development through government initiatives and contributions to international textile publications.",
+        },
 
-    const isEn = locale === "en";
-    const t = (key) => translations[key] || key;
+        {
+            year: "2011",
+            title: "DigTex Industry Magazine",
+            description:
+                "Launching industry publications dedicated to Indonesia's textile and apparel sector.",
+        },
 
-    useEffect(() => {
-        if (!selectedImg) {
-            document.body.style.overflow = "";
-            return;
-        }
+        {
+            year: "2011 - 2017",
+            title: "Industry Directory & Publications",
+            description:
+                "Publishing company directories, market information, and industry communications.",
+        },
 
-        document.body.style.overflow = "hidden";
+        {
+            year: "2020",
+            title: "Digital News Platform",
+            description:
+                "Expanding into digital media and online industry news.",
+        },
 
-        const handleEsc = (e) => {
-            if (e.key === "Escape") setSelectedImg(null);
-        };
+        {
+            year: "2026",
+            title: "Industry Ecosystem Platform",
+            description:
+                "Building a platform connecting industry stakeholders through information, intelligence, solutions, and collaboration.",
+        },
+    ];
 
-        window.addEventListener("keydown", handleEsc);
+    const pillars = [
+        "Manufacturers",
+        "Raw Materials",
+        "Technology Solutions",
+        "Industrial Machinery",
+        "Testing & Certification",
+        "Logistics & Supply Chain",
+        "Trade Finance",
+        "Research & Education",
+    ];
 
-        return () => {
-            document.body.style.overflow = "";
-            window.removeEventListener("keydown", handleEsc);
-        };
-    }, [selectedImg]);
+    const solutions = [
+        {
+            title: "Industry Directory",
+            desc: "Verified company profiles and business discovery.",
+        },
+        {
+            title: "Industry Solutions",
+            desc: "Technology, certification, logistics, finance, and industrial services.",
+        },
+        {
+            title: "Market Intelligence",
+            desc: "Import-export data, trade intelligence, and market trends.",
+        },
+        {
+            title: "News & Events",
+            desc: "Industry news, exhibitions, regulations, and developments.",
+        },
+        {
+            title: "Industry Exchange",
+            desc: "Connecting sourcing, opportunities, capacity, and collaboration.",
+        },
+        {
+            title: "Ecosystem Partners",
+            desc: "Organizations supporting industry growth and innovation.",
+        },
+    ];
 
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title={t("About_Title")} />
+        <WebsiteLayout>
+            {/* HERO */}
 
-            <div className="bg-[#0a192f] min-h-screen py-24 text-white font-sans">
+            {/* HERO */}
+
+            <section className="py-32">
+                <div className="max-w-6xl mx-auto px-6 text-center">
+                    <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
+                        ABOUT DIGTEX
+                    </span>
+
+                    <h1
+                        className="
+            text-5xl
+            md:text-7xl
+            font-black
+            text-white
+            mt-6
+            uppercase
+            leading-tight
+        "
+                    >
+                        Textile Industry
+                        <br />
+                        Ecosystem
+                    </h1>
+
+                    <p
+                        className="
+            mt-8
+            text-white
+            text-xl
+            md:text-2xl
+            font-bold
+            max-w-4xl
+            mx-auto
+        "
+                    >
+                        Connecting Industry, Solutions, Markets, and
+                        Opportunities.
+                    </p>
+
+                    <p
+                        className="
+            mt-6
+            text-gray-400
+            max-w-3xl
+            mx-auto
+            leading-relaxed
+        "
+                    >
+                        Built upon decades of industry experience, publications,
+                        market intelligence, and ecosystem development across
+                        the textile value chain.
+                    </p>
+                </div>
+            </section>
+            <section className="py-24 border-t border-white/5">
                 <div className="max-w-6xl mx-auto px-6">
-                    {/* HERO / COMPANY STORY */}
-                    <section className="max-w-4xl mb-24">
-                        <h4 className="text-yellow-500 text-[11px] font-black uppercase tracking-[0.5em] mb-4">
-                            {t("About_Title")}
-                        </h4>
-                        <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter leading-none uppercase mb-10">
-                            {isEn
-                                ? "The Legacy and the Future"
-                                : "Warisan dan Masa Depan"}
-                        </h1>
-                        <p className="text-gray-400 text-lg leading-relaxed font-medium">
-                            {isEn
-                                ? "DigestexGlobal is an independent industrial intelligence platform focused on accelerating digital transformation across the textile sector. We support the full industrial value chain—from fiber development to finished garment production—through data-driven insights, trade visibility, and seamless manufacturing connectivity. Built with a strong foundation in Indonesia’s textile ecosystem, DigestexGlobal serves as a global gateway for 8-digit trade intelligence, cross-border supply chain visibility, and industrial collaboration."
-                                : "DigestexGlobal adalah platform intelijen industri independen yang berfokus pada percepatan transformasi digital di sektor tekstil. Kami mendukung seluruh rantai nilai industri—mulai dari pengembangan serat hingga produksi garmen jadi—melalui insight berbasis data, visibilitas perdagangan, dan konektivitas manufaktur yang terintegrasi. Dibangun dari fondasi kuat dalam ekosistem tekstil Indonesia, DigestexGlobal berperan sebagai gerbang global untuk intelijen perdagangan 8-digit, visibilitas rantai pasok lintas batas, dan kolaborasi industri."}
-                        </p>
-                    </section>
+                    <div className="text-center mb-16">
+                        <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
+                            OUR JOURNEY
+                        </span>
 
-                    {/* GLOBAL NETWORK */}
-                    <section className="mb-32 relative overflow-hidden">
-                        <div className="mb-12">
-                            <h3 className="text-white text-3xl font-black italic uppercase tracking-tighter mb-4">
-                                {t("Map_Title")}
-                            </h3>
-                            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] max-w-2xl leading-relaxed">
-                                {isEn
-                                    ? "Visualizing the movement of Indonesia’s textile intelligence across key manufacturing, sourcing, and trade corridors worldwide."
-                                    : "Memvisualisasikan pergerakan intelijen tekstil Indonesia melalui koridor manufaktur, sourcing, dan perdagangan utama di berbagai wilayah dunia."}
-                            </p>
-                        </div>
+                        <h2 className="text-4xl md:text-5xl font-black text-white mt-4 uppercase">
+                            More Than Two Decades Of Industry Experience
+                        </h2>
+                    </div>
 
-                        <div className="relative aspect-video bg-[#050c1b] border border-white/5 rounded-[60px] overflow-hidden group shadow-2xl">
-                            <img
-                                src="/images/global-connectivity-map.jpg"
-                                alt="Global Connectivity"
-                                className="w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 transition-all duration-1000"
-                            />
-
-                            <div className="absolute top-[68%] left-[78%]">
-                                <span className="relative flex h-6 w-6">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75" />
-                                    <span className="relative inline-flex rounded-full h-6 w-6 bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.6)]" />
-                                </span>
-                            </div>
-
-                            <div className="absolute bottom-10 left-10 right-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {[
-                                    ["Map_Stats_1", "USA & EU FOCUS"],
-                                    ["Map_Stats_2", "124+ DESTINATIONS"],
-                                    ["Map_Stats_3", "8-DIGIT PRECISION"],
-                                ].map(([label, value]) => (
-                                    <div
-                                        key={label}
-                                        className="bg-[#050c1b]/80 backdrop-blur-md p-6 rounded-3xl border border-white/10"
-                                    >
-                                        <p className="text-yellow-500 text-[8px] font-black uppercase tracking-widest mb-1">
-                                            {t(label)}
-                                        </p>
-                                        <h5 className="text-white text-lg font-black uppercase tracking-tighter">
-                                            {value}
-                                        </h5>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* INDUSTRIAL VALUE CHAIN */}
-                    <section className="mb-32">
-                        <h3 className="text-white text-2xl font-black italic mb-10 uppercase tracking-tighter">
-                            {t("Ecosystem_Title")}
-                        </h3>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {[
-                                [
-                                    "fas fa-microchip",
-                                    "Ecosystem_Hulu_Title",
-                                    "Ecosystem_Hulu_Desc",
-                                ],
-                                [
-                                    "fas fa-shipping-fast",
-                                    "Ecosystem_Hilir_Title",
-                                    "Ecosystem_Hilir_Desc",
-                                ],
-                                [
-                                    "fas fa-globe",
-                                    "Ecosystem_Connect_Title",
-                                    "Ecosystem_Connect_Desc",
-                                ],
-                            ].map(([icon, title, desc]) => (
-                                <div
-                                    key={title}
-                                    className="p-10 bg-white/5 border border-white/10 rounded-[45px] hover:border-yellow-500/30 transition-all"
-                                >
-                                    <i
-                                        className={`${icon} text-yellow-500 text-2xl mb-6`}
-                                    />
-                                    <h4 className="text-white font-black mb-4 uppercase text-sm tracking-widest">
-                                        {t(title)}
-                                    </h4>
-                                    <p className="text-gray-500 text-[10px] leading-relaxed font-bold uppercase italic">
-                                        {t(desc)}
-                                    </p>
+                    <div className="space-y-8">
+                        {timeline.map((item) => (
+                            <div
+                                key={item.year}
+                                className="
+                        rounded-[32px]
+                        border border-white/10
+                        bg-white/5
+                        p-8
+                    "
+                            >
+                                <div className="text-yellow-500 font-black text-xl">
+                                    {item.year}
                                 </div>
-                            ))}
-                        </div>
-                    </section>
 
-                    {/* CORE PRINCIPLES */}
-                    <section className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-20 border-t border-white/10">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="space-y-4">
-                                <h4 className="text-white text-sm font-black uppercase italic underline decoration-yellow-500 decoration-2 underline-offset-8">
-                                    {t(`Charter_Point_${i}_Title`)}
-                                </h4>
-                                <p className="text-gray-500 text-[10px] leading-relaxed uppercase font-bold tracking-wider">
-                                    {t(`Charter_Point_${i}_Body`)}
+                                <h3 className="text-white text-2xl font-black mt-2">
+                                    {item.title}
+                                </h3>
+
+                                <p className="text-gray-400 mt-4">
+                                    {item.description}
                                 </p>
                             </div>
                         ))}
-                    </section>
-
-                    {/* DOCUMENTATION / GALLERY */}
-                    <section className="mt-32">
-                        <h3 className="text-white text-2xl font-black italic mb-10 uppercase tracking-tighter">
-                            {isEn
-                                ? "Industrial Documentation"
-                                : "Dokumentasi Aktivitas Industri"}
-                        </h3>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {galleries.map((item) => (
-                                <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() => setSelectedImg(item)}
-                                    className="group relative overflow-hidden rounded-[40px] bg-white/5 border border-white/10 aspect-square text-left cursor-pointer"
-                                >
-                                    <img
-                                        src={`/storage/${item.image_path}`}
-                                        alt={item.title_id}
-                                        className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-80" />
-                                    <div className="absolute bottom-8 left-8 right-8">
-                                        <span className="text-[8px] font-black text-yellow-500 uppercase tracking-widest">
-                                            {item.category}
-                                        </span>
-                                        <h4 className="text-white text-sm font-bold uppercase mt-1 leading-tight">
-                                            {isEn
-                                                ? item.title_en || item.title_id
-                                                : item.title_id}
-                                        </h4>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* PARTNERS */}
-                    <section className="mt-32 pt-20 border-t border-white/10 text-center">
-                        <div className="mb-16">
-                            <h3 className="text-white text-2xl font-black italic uppercase tracking-tighter mb-4">
-                                {t("Partners_Title")}
-                            </h3>
-                            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] max-w-xl mx-auto leading-relaxed">
-                                {t("Partners_Subtitle")}
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center opacity-50 grayscale group hover:opacity-100 transition-all duration-700">
-                            {["centric", "coats", "epson", "testex"].map(
-                                (logo) => (
-                                    <div
-                                        key={logo}
-                                        className="flex justify-center"
-                                    >
-                                        <img
-                                            src={`/images/partners/${logo}.png`}
-                                            alt={logo}
-                                            className="h-10 object-contain group-hover:grayscale-0"
-                                        />
-                                    </div>
-                                ),
-                            )}
-                        </div>
-
-                        <div className="mt-20">
-                            <a
-                                href="mailto:support@digestexmedia.com"
-                                className="inline-block bg-white/5 border border-white/10 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl"
-                            >
-                                {isEn
-                                    ? "Build a Strategic Partnership"
-                                    : "Bangun Kemitraan Strategis"}
-                            </a>
-                        </div>
-                    </section>
+                    </div>
                 </div>
-            </div>
+            </section>
+            {/* OUR JOURNEY */}
 
-            <AnimatePresence>
-                {selectedImg && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setSelectedImg(null)}
-                        className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0a192f]/95 backdrop-blur-xl p-4 md:p-10"
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 20 }}
-                            onClick={(e) => e.stopPropagation()}
-                            role="dialog"
-                            aria-modal="true"
-                            className="relative max-w-5xl w-full"
-                        >
-                            <img
-                                src={`/storage/${selectedImg.image_path}`}
-                                alt={selectedImg.title_id}
-                                className="w-full h-auto max-h-[85vh] object-contain rounded-3xl shadow-2xl border border-white/10"
-                            />
+            {/* BUILT FROM INDUSTRY EXPERIENCE */}
 
-                            <div className="mt-6 text-center">
-                                <h4 className="text-white text-xl font-black uppercase italic">
-                                    {isEn
-                                        ? selectedImg.title_en ||
-                                          selectedImg.title_id
-                                        : selectedImg.title_id}
-                                </h4>
-                                <p className="text-yellow-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">
-                                    {selectedImg.category}
+            <section className="py-24 border-t border-white/5">
+                <div className="max-w-5xl mx-auto px-6 text-center">
+                    <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
+                        BUILT FROM INDUSTRY EXPERIENCE
+                    </span>
+
+                    <h2 className="text-4xl md:text-5xl font-black text-white mt-4 uppercase">
+                        More Than A Platform
+                    </h2>
+
+                    <p className="mt-8 text-gray-400 text-lg leading-relaxed">
+                        DigTex was not created from a business plan.
+                    </p>
+
+                    <p className="mt-6 text-gray-400 text-lg leading-relaxed">
+                        It was built from decades of industry experience,
+                        relationships, publications, market intelligence, and
+                        ecosystem development within Indonesia's textile
+                        industry.
+                    </p>
+
+                    <p className="mt-6 text-gray-400 text-lg leading-relaxed">
+                        Today, DigTex is evolving into a platform connecting
+                        manufacturers, suppliers, technology providers,
+                        certification organizations, logistics companies,
+                        financial institutions, research centers, and industry
+                        associations.
+                    </p>
+                </div>
+            </section>
+
+            {/* ECOSYSTEM VISION */}
+
+            <section className="py-24 border-t border-white/5">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
+                            ECOSYSTEM VISION
+                        </span>
+
+                        <h2 className="text-4xl font-black text-white mt-4 uppercase">
+                            Connecting The Textile Value Chain
+                        </h2>
+                    </div>
+
+                    <div className="grid md:grid-cols-4 gap-6">
+                        {pillars.map((pillar) => (
+                            <div
+                                key={pillar}
+                                className="rounded-[24px] border border-white/10 bg-white/5 p-6 text-center"
+                            >
+                                <h3 className="text-white font-black">
+                                    {pillar}
+                                </h3>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            <section className="py-24 border-t border-white/5">
+                <div className="max-w-5xl mx-auto px-6 text-center">
+                    <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
+                        OUR MISSION
+                    </span>
+
+                    <h2 className="text-4xl md:text-5xl font-black text-white mt-4 uppercase">
+                        Connecting Industry, Solutions, Markets, and
+                        Opportunities
+                    </h2>
+
+                    <p className="mt-8 text-gray-400 text-lg leading-relaxed">
+                        DigTex exists to support collaboration, knowledge
+                        sharing, business development, and sustainable growth
+                        throughout the textile ecosystem.
+                    </p>
+                </div>
+            </section>
+            {/* DIGTEX TODAY */}
+
+            <section className="py-24 border-t border-white/5">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
+                            DIGTEX TODAY
+                        </span>
+
+                        <h2 className="text-4xl font-black text-white mt-4 uppercase">
+                            Supporting The Industry Through Digital Solutions
+                        </h2>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {solutions.map((item) => (
+                            <div
+                                key={item.title}
+                                className="rounded-[32px] border border-white/10 bg-white/5 p-8"
+                            >
+                                <h3 className="text-white text-xl font-black">
+                                    {item.title}
+                                </h3>
+
+                                <p className="text-gray-400 mt-4">
+                                    {item.desc}
                                 </p>
                             </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
-                            <button
-                                type="button"
-                                onClick={() => setSelectedImg(null)}
-                                className="absolute -top-12 right-0 text-white text-sm font-black uppercase tracking-widest hover:text-yellow-500"
-                            >
-                                Close [x]
-                            </button>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </AuthenticatedLayout>
+            {/* CTA */}
+
+            <section className="py-24 border-t border-white/5">
+                <div className="max-w-4xl mx-auto px-6 text-center">
+                    <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
+                        FOUNDING ECOSYSTEM PARTNER PROGRAM
+                    </span>
+
+                    <h2 className="text-4xl md:text-5xl font-black text-white mt-4 uppercase">
+                        Join The Ecosystem
+                    </h2>
+
+                    <p className="mt-6 text-gray-400">
+                        Help shape a connected textile ecosystem by supporting
+                        industry collaboration, innovation, market intelligence,
+                        and knowledge sharing.
+                    </p>
+
+                    <Link
+                        href={route("ecosystem-partner.index")}
+                        className="
+                inline-flex
+                items-center
+                justify-center
+                mt-10
+                px-8
+                py-4
+                rounded-full
+                bg-yellow-500
+                text-black
+                font-black
+                uppercase
+                text-xs
+                tracking-widest
+            "
+                    >
+                        Become A Founding Ecosystem Partner
+                    </Link>
+                </div>
+            </section>
+        </WebsiteLayout>
     );
 }

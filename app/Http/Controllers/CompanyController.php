@@ -1518,6 +1518,7 @@ public function edit(Company $company)
         'capacities',
         'machines',
         'moqs',
+        'locations',
         'leadTimes'
     ]);
 
@@ -1541,9 +1542,6 @@ public function update(Request $request, Company $company)
     | PROTECTION
     |--------------------------------------------------------------------------
     */
-// dd($request->all());
-
-
 
     $isOwner = $user->company_id == $company->id;
     $isAdmin = $user->role === 'admin';
@@ -1579,6 +1577,44 @@ public function update(Request $request, Company $company)
         'stock_unit' => 'nullable|string',
         'price' => 'nullable|numeric',
 
+        
+        // Location
+
+        'locations' => 'nullable|array',
+
+'locations.*.id' => 'nullable|integer',
+
+'locations.*.location_name' =>
+    'nullable|string|max:255',
+
+'locations.*.location_type' =>
+    'nullable|string|max:100',
+
+'locations.*.country_name' =>
+    'nullable|string|max:255',
+
+'locations.*.province_name' =>
+    'nullable|string|max:255',
+
+'locations.*.city_name' =>
+    'nullable|string|max:255',
+
+'locations.*.address' =>
+    'nullable|string',
+
+'locations.*.contact_person' =>
+    'nullable|string|max:255',
+
+'locations.*.phone' =>
+    'nullable|string|max:255',
+
+'locations.*.email' =>
+    'nullable|string|max:255',
+
+'locations.*.is_primary' =>
+    'nullable|boolean',
+        
+        
         /*
         |--------------------------------------------------------------------------
         | PRODUCTS
@@ -1882,6 +1918,9 @@ public function update(Request $request, Company $company)
 
             'moqs' =>
                 $validated['moqs'] ?? [],
+                
+                'locations' => 
+                $validated['locations'] ?? [],
 
             'lead_times' =>
                 $validated['lead_times'] ?? [],  

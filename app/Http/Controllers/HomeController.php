@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 use App\Models\MarketHistory;
 use App\Models\News;
 use App\Models\Company;
+use App\Models\CompanyProduct;
+use App\Models\CompanyMarket;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Models\IndustryPartner;
 
 class HomeController extends Controller
 {
@@ -96,8 +99,50 @@ $inventoryItems = \DB::table('inventories')->orderBy('created_at', 'desc')->get(
 // Ambil seluruh daftar kemitraan B2B multi-sektor dari database
 $partnershipItems = \DB::table('partnerships')->orderBy('match_percentage', 'desc')->get();
 
+$directoryStats = [
+
+    'companies' =>
+        Company::count(),
+
+    'products' =>
+        CompanyProduct::count(),
+
+    'markets' =>
+        CompanyMarket::count(),
+
+    'exportCompanies' =>
+        Company::has('markets')->count(),
+];
+
+// Iklan/partner
+$featuredPartner =
+    IndustryPartner::where(
+        'is_active',
+        true
+    )
+    ->where(
+        'partner_level',
+        'gold'
+    )
+    ->first();
+
+    $industrySolutions =
+    IndustryPartner::where(
+        'is_active',
+        true
+    )
+    ->take(6)
+    ->get();
+
         // 7. Render Seluruh Payload ke Halaman Depan
         return Inertia::render('Home', [
+            'directoryStats' => ['companies' => Company::count(),
+            'products' => CompanyProduct::count(),
+            'markets' => CompanyMarket::count(),
+            'exportCompanies' => Company::has('markets')->count(),
+],
+           'featuredPartner' => $featuredPartner,
+           'industrySolutions' => $industrySolutions,
             'marketHistory'     => $marketHistory,
             'topStocks'         => $topStocks,
             'latestNews'        => News::latest()->take(3)->get(),

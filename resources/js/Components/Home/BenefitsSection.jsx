@@ -13,30 +13,30 @@ export default function BenefitsSection({ isEn }) {
                 level: isEn ? "MARKET INTELLIGENCE" : "INTELIJEN PASAR",
 
                 title: isEn
-                    ? "Domestic & SME Ecosystem"
-                    : "Ekosistem Domestik & IKM",
+                    ? "Industry Visibility & Discovery"
+                    : "Visibilitas & Keterpencarian Industri",
 
                 features: isEn
                     ? [
-                          "Local Market Trends",
-                          "SME / IKM Visibility",
                           "Verified Industry Directory",
-                          "Trade & Regulatory Updates",
+                          "Product & Supplier Discovery",
+                          "SME / IKM Visibility",
+                          "Industry & Regulatory Updates",
                       ]
                     : [
-                          "Tren Pasar Lokal",
-                          "Visibilitas IKM",
-                          "Direktori Industri Terverifikasi",
-                          "Pembaruan Regulasi & Perdagangan",
+                          "Direktori Industri Terverifikasi ",
+                          "Pencarian Produk & Supplier",
+                          "Panggung Digital IKM",
+                          "Kabar Industri & Kebijakan",
                       ],
 
                 note: isEn
-                    ? "Supporting local industry, SMEs, mills, suppliers, traders, and ecosystem participants."
+                    ? "Built for manufacturers, IKM/SMEs, suppliers, traders, associations, and industry stakeholders seeking greater visibility across the textile ecosystem. Discover verified companies, products, capabilities, certifications, and market presence through a unified industry directory."
                     : "Mendukung industri lokal, IKM, pabrik, pemasok, trader, dan pelaku ekosistem.",
 
                 cta: isEn
-                    ? "Explore Market Intelligence"
-                    : "Jelajahi Intelijen Pasar",
+                    ? "Explore Industry Directory"
+                    : "Telusuri Direktori Industri",
 
                 color: "text-white",
                 bg: "bg-white/5",
@@ -46,32 +46,32 @@ export default function BenefitsSection({ isEn }) {
 
             {
                 level: isEn
-                    ? "OPERATIONAL INTELLIGENCE"
-                    : "INTELIJEN OPERASIONAL",
+                    ? "SUPPLY CHAIN INTELLIGENCE"
+                    : "INTELIJEN RANTAI PASOK",
 
-                title: isEn ? "Industrial Visibility" : "Visibilitas Industri",
+                title: isEn
+                    ? "Sourcing & Procurement Excellence"
+                    : "Keunggulan Sourcing & Pengadaan",
 
                 features: isEn
                     ? [
-                          "Supply Chain Monitoring",
-                          "Manufacturing Intelligence",
-                          "Sourcing & Procurement Insights",
-                          "Export / Import Movement Radar",
+                          "RFQ Marketplace",
+                          "MOQ Matching Network",
+                          "Collective Sourcing",
+                          "Supplier Performance Insights",
                       ]
                     : [
-                          "Pemantauan Rantai Pasok",
-                          "Intelijen Manufaktur",
-                          "Insight Sourcing & Procurement",
-                          "Radar Pergerakan Ekspor / Impor",
+                          "Pasar RFQ & Penawaran",
+                          "Pencocokan MOQ",
+                          "Pengadaan Bersama",
+                          "Analitik Kinerja Supplier",
                       ],
 
                 note: isEn
-                    ? "Designed for manufacturers, suppliers, sourcing teams, exporters, and operational stakeholders."
-                    : "Dirancang untuk produsen, pemasok, tim sourcing, eksportir, dan pemangku kepentingan operasional.",
+                    ? "The Unified Ecosystem for Global and Domestic Textile Sourcing.Built for manufacturers, IKM/SMEs, suppliers, traders, and associations. Streamline your entire supply chain—from RFQs, MOQ negotiation, domestic and cross-border shipment, to secure payments."
+                    : "Ekosistem Terintegrasi untuk Sourcing Tekstil Global dan Domestik.Dirancang untuk manufaktur, IKM, supplier, trader, dan asosiasi. Jalankan seluruh proses rantai pasok Anda secara efisien—mulai dari RFQ, negosiasi MOQ, pengiriman domestik & lintas negara, hingga pembayaran yang aman.",
 
-                cta: isEn
-                    ? "Access Operational Insights"
-                    : "Akses Insight Operasional",
+                cta: isEn ? "Access Sourcing Hub" : "Akses Pusat Sourcing",
 
                 color: "text-blue-400",
                 bg: "bg-blue-500/5",
@@ -83,33 +83,33 @@ export default function BenefitsSection({ isEn }) {
                 level: isEn ? "STRATEGIC INTELLIGENCE" : "INTELIJEN STRATEGIS",
 
                 title: isEn
-                    ? "Regional & Global Advantage"
+                    ? "Regional & Global Competitiveness"
                     : "Keunggulan Regional & Global",
 
                 features: isEn
                     ? [
                           "Regional Trade Radar",
-                          "Risk & Opportunity Monitoring",
-                          "Cross-Border Supply Chain Intelligence",
+                          "Import & Export Intelligence",
+                          "Supply Chain Risk Monitoring",
                           "Executive Strategic Briefings",
                       ]
                     : [
-                          "Radar Perdagangan Regional",
-                          "Pemantauan Risiko & Peluang",
-                          "Intelijen Rantai Pasok Lintas Negara",
-                          "Briefing Strategis Eksekutif",
+                          "Pantauan Pasar Regional",
+                          "Intelijen Ekspor & Impor",
+                          "Mitigasi Risiko Rantai Pasok ",
+                          "Laporan Strategis Eksekutif",
                       ],
 
                 note: isEn
-                    ? "Built for PMA, multinational brands, institutions, investors, and strategic ecosystem partners."
-                    : "Dibangun untuk PMA, brand multinasional, institusi, investor, dan mitra strategis ekosistem.",
+                    ? "Built for multinational brands, PMA, institutions, investors, and strategic decision makers navigating regional and global markets."
+                    : "Dirancang untuk merek multinasional, PMA, institusi, investor, dan pengambil keputusan strategis yang menavigasi pasar regional dan global.",
 
                 privilege: isEn
-                    ? "Verified ecosystem connectivity and selected strategic privileges through industry association networks."
-                    : "Konektivitas ekosistem terverifikasi dan privilese strategis tertentu melalui jaringan asosiasi industri.",
+                    ? "Premium intelligence services, executive insights, and ecosystem connectivity through trusted industry networks."
+                    : "Layanan intelijen premium, wawasan eksekutif, dan konektivitas ekosistem melalui jaringan industri yang terpercaya.",
 
                 cta: isEn
-                    ? "Unlock Strategic Intelligence"
+                    ? "Explore Strategic Intelligence"
                     : "Buka Intelijen Strategis",
 
                 color: "text-yellow-500",

@@ -1,5 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm, router, Link } from "@inertiajs/react";
+import CompanyLocationsSection from "@/Pages/Company/CompanyLocationsSection";
 import Swal from "sweetalert2";
 
 export default function Edit({ auth, company }) {
@@ -51,6 +52,8 @@ export default function Edit({ auth, company }) {
         machines: company.machines || [],
         moqs: company.moqs || [],
         lead_times: company.leadTimes || [],
+
+        locations: company.locations || [],
 
         contacts: company.contacts || [],
         links: company.links || [],
@@ -235,6 +238,33 @@ export default function Edit({ auth, company }) {
             },
         );
     };
+    const saveLocations = () => {
+        post(
+            route("companies.locations.update", company.id),
+            {
+                locations: data.locations,
+            },
+            {
+                preserveScroll: true,
+
+                onSuccess: () => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Locations Saved",
+                    });
+                },
+
+                onError: () => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Save Failed",
+                        text: "Unable to save location data.",
+                    });
+                },
+            },
+        );
+    };
+
     const saveLinks = () => {
         post(
             route("companies.links.update", company.id),
@@ -418,7 +448,12 @@ export default function Edit({ auth, company }) {
                                 />
                             </div>
                         </div>
-
+                        {/* Laokasi */}
+                        <CompanyLocationsSection
+                            data={data}
+                            setData={setData}
+                            saveLocations={saveLocations}
+                        />
                         {/* PRODUCTS RELATIONAL */}
                         <div className="pt-6 border-t border-white/5">
                             <div className="flex justify-between items-center mb-6">

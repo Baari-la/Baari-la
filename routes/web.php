@@ -29,6 +29,9 @@ use App\Http\Controllers\PurchaseOrderShipmentTrackController;
 use App\Http\Controllers\PurchaseOrderDisputeController;
 use App\Http\Controllers\SupplierReviewController;
 use App\Http\Controllers\CompanyClaimController;
+use App\Http\Controllers\IndustrySolutionController;
+use App\Http\Controllers\EcosystemPartnerController;
+use App\Http\Controllers\CompanyLocationController;
 
 /*
 
@@ -276,6 +279,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/my-company/edit', [CompanyController::class, 'edit'])->name('companies.edit_self');
     Route::get('/companies/{company}/edit', [CompanyController::class, 'edit'])->name('companies.edit');
     Route::post('/companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
+    Route::post('/companies/{company}/locations',[CompanyLocationController::class, 'update'])->name('companies.locations.update');
 
     // Intelligence & Radar
     Route::get('/intelligence-center', [AnalyticsController::class, 'deepAnalysis'])->name('intelligence.center');
@@ -509,8 +513,21 @@ Route::post(
             'companies.claim'
         );
 
-});
+        });
+Route::get('/industry-solutions',[IndustrySolutionController::class, 'index'])->name('industry-solutions.index');
+Route::get('/industry-solutions/{category}',[IndustrySolutionController::class, 'show']
+)->name('industry-solutions.show');
+Route::get('/ecosystem-partner',[EcosystemPartnerController::class, 'index']
+)->name('ecosystem-partner.index');
 
+// Menu
+Route::get('/sourcing-hub', function () {
+        return Inertia::render('SourcingHub/Index');
+    })->name('sourcing-hub');
+
+Route::get('/market-intelligence', function () {
+        return Inertia::render('MarketIntelligence/Index');
+    })->name(    'market-intelligence');
 
 /*
 
@@ -527,10 +544,8 @@ Route::middleware([
 ->name('admin.')
 ->group(function () {
 
-    Route::get(
-        '/dashboard',
-        [AdminDashboardController::class, 'index']
-    )->name('dashboard');
+    Route::get('dashboard', [AdminDashboardController::class, 'index'])
+    ->name('dashboard');
 
     Route::get(
         '/pending-updates',

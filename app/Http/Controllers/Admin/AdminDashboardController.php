@@ -148,30 +148,64 @@ public function approveUpdate($id)
 
         $newData = $update->proposed_data;
 
-        $newData['status_verifikasi'] = 'verified';
-        $newData['last_verified_at'] = now();
-        $newData['last_updated_at'] = now();
-        $newData['data_source'] = 'verified_by_admin';
-        $company->update($newData);
+        /*
+        |--------------------------------------------------------------------------
+        | JSON STRING → ARRAY
+        |--------------------------------------------------------------------------
+        */
+
+        if (is_string($newData)) {
+
+            $newData = json_decode(
+                $newData,
+                true
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | RELATIONAL DATA
+        |--------------------------------------------------------------------------
+        */
+
+        if (isset($newData['type'])) {
+
+            \App\Services\CompanyRelationalSyncService::sync(
+                $company,
+                $newData
+            );
+
+        } else {
+
+            /*
+            |--------------------------------------------------------------------------
+            | COMPANY TABLE UPDATE
+            |--------------------------------------------------------------------------
+            */
+
+            $newData['status_verifikasi'] = 'verified';
+            $newData['last_verified_at'] = now();
+            $newData['last_updated_at'] = now();
+            $newData['data_source'] = 'verified_by_admin';
+
+            $company->update($newData);
+        }
 
         $update->update([
 
-            'status' =>
-                'approved',
+            'status' => 'approved',
 
-            'approved_by' =>
-                auth()->id(),
+            'approved_by' => auth()->id(),
 
-            'approved_at' =>
-                now(),
+            'approved_at' => now(),
         ]);
 
         AuditLog::create([
-    'user_id' => auth()->id(),
-    'company_id' => $company->id,
-    'action' => 'approved',
-    'details' => 'Company update approved.'
-]);
+            'user_id' => auth()->id(),
+            'company_id' => $company->id,
+            'action' => 'approved',
+            'details' => 'Company update approved.',
+        ]);
     });
 
     return back()->with(

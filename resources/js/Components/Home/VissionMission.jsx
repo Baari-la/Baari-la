@@ -6,14 +6,14 @@ export default function VisionMission({ isEn }) {
         highlight: isEn ? "Mission" : "Misi",
 
         intro: isEn
-            ? "Building an independent intelligence ecosystem that strengthens market visibility, industrial competitiveness, and strategic decision-making across domestic, regional, and global textile value chains."
-            : "Membangun ekosistem intelijen independen yang memperkuat visibilitas pasar, daya saing industri, serta pengambilan keputusan strategis di seluruh rantai nilai tekstil domestik, regional, dan global.",
+            ? "Building an independent industry ecosystem that connects market visibility, sourcing intelligence, and strategic decision-making across domestic, regional, and global textile value chains."
+            : "Mewujudkan ekosistem industri yang mandiri dengan mengintegrasikan visibilitas pasar, kecerdasan sourcing, dan kebijakan strategis di sepanjang rantai nilai tekstil domestik, regional, maupun global.",
 
         visionTitle: isEn ? "Vision" : "Visi",
 
         vision: isEn
-            ? "To become a trusted independent corporate and market intelligence platform for the textile, garment, footwear, and supply chain ecosystem — connecting local industries, SMEs, manufacturers, institutions, investors, and global stakeholders through structured, actionable, and credible intelligence."
-            : "Menjadi platform intelijen korporasi dan pasar independen yang terpercaya bagi ekosistem tekstil, garmen, alas kaki, dan rantai pasok — menghubungkan industri lokal, IKM, manufaktur, institusi, investor, dan pemangku kepentingan global melalui intelijen yang terstruktur, kredibel, dan dapat ditindaklanjuti.",
+            ? "To become the trusted digital ecosystem for the textile, apparel, footwear, and supply chain industries—connecting companies, markets, sourcing opportunities, and strategic intelligence through a unified platform that drives visibility, collaboration, and sustainable growth."
+            : "Menyediakan intelijen industri yang terpercaya dan visibilitas terverifikasi bagi perusahaan, produk, kapabilitas, sertifikasi, serta peluang pasar di seluruh ekosistem tekstil.",
 
         missions: [
             {
@@ -22,8 +22,8 @@ export default function VisionMission({ isEn }) {
                     : "Memperkuat Visibilitas Pasar",
 
                 text: isEn
-                    ? "Provide structured intelligence for domestic markets, SMEs, industrial players, and trade stakeholders to improve transparency and faster decision-making."
-                    : "Menyediakan intelijen terstruktur bagi pasar domestik, IKM, pelaku industri, dan pemangku kepentingan perdagangan untuk meningkatkan transparansi serta pengambilan keputusan yang lebih cepat.",
+                    ? "Provide trusted industry intelligence and verified visibility for companies, products, capabilities, certifications, and market opportunities across the textile ecosystem."
+                    : "Menyediakan intelijen industri yang terpercaya dan visibilitas terverifikasi bagi perusahaan, produk, kapabilitas, sertifikasi, serta peluang pasar di seluruh ekosistem tekstil.",
 
                 icon: "fa-chart-line",
                 color: "text-blue-400",
@@ -36,7 +36,7 @@ export default function VisionMission({ isEn }) {
                     : "Mendorong Keunggulan Industri & Rantai Pasok",
 
                 text: isEn
-                    ? "Support manufacturers, suppliers, exporters, and PMA companies with intelligence that improves sourcing, operations, competitiveness, and risk management."
+                    ? "Enable sourcing, procurement, and supply chain collaboration through digital tools, verified networks, and actionable intelligence that improve competitiveness, efficiency, and resilience."
                     : "Mendukung produsen, pemasok, eksportir, dan perusahaan PMA dengan intelijen yang meningkatkan sourcing, operasional, daya saing, dan mitigasi risiko.",
 
                 icon: "fa-industry",
@@ -50,8 +50,8 @@ export default function VisionMission({ isEn }) {
                     : "Menghubungkan Ekosistem Regional & Global",
 
                 text: isEn
-                    ? "Bridge Indonesia’s industrial ecosystem with regional and international opportunities through strategic intelligence, verified connectivity, and cross-border market insight."
-                    : "Menjembatani ekosistem industri Indonesia dengan peluang regional dan internasional melalui intelijen strategis, konektivitas terverifikasi, serta wawasan pasar lintas negara.",
+                    ? "Connect Indonesia’s textile ecosystem with regional and global markets through strategic intelligence, trusted industry networks, trade opportunities, and cross-border collaboration."
+                    : "Menghubungkan ekosistem tekstil Indonesia dengan pasar regional dan global melalui intelijen strategis, jaringan industri terpercaya, peluang perdagangan, serta kolaborasi lintas negara.",
 
                 icon: "fa-globe-asia",
                 color: "text-yellow-500",

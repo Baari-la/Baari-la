@@ -18,8 +18,23 @@ export default function Dashboard({
     pendingUpdates,
     pendingClaims,
 }) {
+    const isEn = locale === "en";
     const [quickSearch, setQuickSearch] = useState("");
     const [selectedUpdate, setSelectedUpdate] = useState(null);
+    const handleQuickSearch = (e) => {
+        e.preventDefault();
+
+        if (!quickSearch.trim()) {
+            return;
+        }
+
+        router.visit(
+            route("directory.index", {
+                search: quickSearch,
+            }),
+        );
+    };
+
     const handleReject = (id) => {
         if (!confirm("Reject this update request?")) {
             return;
@@ -27,6 +42,16 @@ export default function Dashboard({
 
         router.post(route("admin.reject-update", id));
     };
+    const t = (text) => text;
+
+    // untuk location
+
+    // const proposedData = selectedUpdate?.proposed_data;
+
+    // const newData =
+    //     typeof proposedData === "string"
+    //         ? JSON.parse(proposedData)
+    //         : proposedData || {};
 
     const handleApprove = (id) => {
         if (
@@ -50,18 +75,6 @@ export default function Dashboard({
                 },
             },
         );
-    };
-
-    const { translations } = usePage().props;
-
-    const t = (key) =>
-        translations && translations[key] ? translations[key] : key;
-    const isEn = locale === "en" || auth?.user?.locale === "en";
-
-    const handleQuickSearch = (e) => {
-        e.preventDefault();
-        if (!quickSearch) return;
-        router.get(route("companies.index"), { search: quickSearch });
     };
 
     return (
@@ -191,9 +204,103 @@ export default function Dashboard({
 
                                 {/* Parsing JSON proposed_data */}
                                 {(() => {
-                                    const newData = JSON.parse(
-                                        selectedUpdate.proposed_data,
-                                    );
+                                    const newData =
+                                        typeof selectedUpdate.proposed_data ===
+                                        "string"
+                                            ? JSON.parse(
+                                                  selectedUpdate.proposed_data,
+                                              )
+                                            : selectedUpdate.proposed_data ||
+                                              {};
+                                    // untuk komponen
+                                    if (newData.type === "locations") {
+                                        return (
+                                            <div className="p-5 bg-emerald-500/5 rounded-2xl border border-emerald-500/20 space-y-4 shadow-inner">
+                                                <h3 className="text-emerald-400 font-bold">
+                                                    Proposed Locations
+                                                </h3>
+
+                                                {newData.locations?.map(
+                                                    (location, index) => (
+                                                        <div
+                                                            key={
+                                                                location.id ??
+                                                                index
+                                                            }
+                                                            className="border border-white/10 rounded-xl p-4"
+                                                        >
+                                                            <p>
+                                                                <strong>
+                                                                    Name:
+                                                                </strong>{" "}
+                                                                {
+                                                                    location.location_name
+                                                                }
+                                                            </p>
+
+                                                            <p>
+                                                                <strong>
+                                                                    Type:
+                                                                </strong>{" "}
+                                                                {
+                                                                    location.location_type
+                                                                }
+                                                            </p>
+
+                                                            <p>
+                                                                <strong>
+                                                                    City:
+                                                                </strong>{" "}
+                                                                {location.city_name ||
+                                                                    "-"}
+                                                            </p>
+
+                                                            <p>
+                                                                <strong>
+                                                                    Address:
+                                                                </strong>{" "}
+                                                                {location.address ||
+                                                                    "-"}
+                                                            </p>
+
+                                                            <p>
+                                                                <strong>
+                                                                    Primary:
+                                                                </strong>{" "}
+                                                                {location.is_primary
+                                                                    ? "Yes"
+                                                                    : "No"}
+                                                            </p>
+                                                        </div>
+                                                    ),
+                                                )}
+
+                                                <div className="pt-6 flex gap-3">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleApprove(
+                                                                selectedUpdate.id,
+                                                            )
+                                                        }
+                                                        className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl"
+                                                    >
+                                                        Approve Change
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() =>
+                                                            handleReject(
+                                                                selectedUpdate.id,
+                                                            )
+                                                        }
+                                                        className="flex-1 bg-red-600/20 text-red-500 border border-red-600/30 py-3 rounded-xl"
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
                                     return (
                                         <div className="p-5 bg-emerald-500/5 rounded-2xl border border-emerald-500/20 space-y-4 shadow-inner">
                                             <div>
