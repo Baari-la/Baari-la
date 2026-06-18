@@ -171,6 +171,11 @@ Route::delete(
     [CompanyController::class, 'destroyLeadTime']
 )->name('companies.lead-times.destroy');
 
+Route::delete(
+    '/company-locations/{location}',
+    [CompanyController::class, 'destroyLocation']
+)->name('company-locations.destroy');
+
 
 
 /// 🚢 PERLUASAN PIPA DATA: Menambahkan endpoint penarik status EWS Domestik untuk React Frontend

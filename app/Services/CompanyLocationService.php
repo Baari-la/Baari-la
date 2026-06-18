@@ -76,8 +76,11 @@ class CompanyLocationService
         |--------------------------------------------------------------------------
         */
 
-        // $company->locations()
-        //     ->whereNotIn('id', $processedIds)
-        //     ->delete();
+        if (!empty($processedIds)) {
+
+    $company->locations()
+        ->whereNotIn('id', $processedIds)
+        ->delete();
+}
     }
 }

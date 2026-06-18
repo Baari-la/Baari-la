@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\CompanyProfileVisibilityService;
+use App\Services\CompanyMachineService;
 
 class CompanyController extends Controller
 {
@@ -233,7 +234,10 @@ public function index(Request $request)
 public function updateMachines(
     Request $request,
     Company $company
-) {
+) 
+  
+{
+    
 
     $validated = $request->validate([
 
@@ -262,6 +266,12 @@ public function updateMachines(
         'machines.*.capacity_unit' =>
             'nullable|string|max:100',
 
+        'machines.*.energy_consumption' =>
+            'nullable|numeric',
+
+        'machines.*.energy_unit' =>
+            'nullable|string|max:100',
+
         'machines.*.working_width' =>
             'nullable|string|max:100',
 
@@ -287,10 +297,11 @@ public function updateMachines(
             'nullable|string',
     ]);
 
-    CompanyRelationalSyncService::syncMachines(
-        $company,
-        $validated['machines'] ?? []
-    );
+        
+    CompanyMachineService::syncMachines(
+    $company,
+    $validated['machines'] ?? []
+);
 
     return back()->with(
         'success',
@@ -1535,6 +1546,8 @@ public function edit(Company $company)
 
 public function update(Request $request, Company $company)
 {
+
+
     $user = auth()->user();
 
     /*
@@ -1636,6 +1649,7 @@ public function update(Request $request, Company $company)
         */
 
         'markets' => 'nullable|array',
+        'markets.*.id' => 'nullable|integer',
         'markets.*.country_name' => 'nullable|string',
         'markets.*.market_type' => 'nullable|string',
 
@@ -1646,6 +1660,7 @@ public function update(Request $request, Company $company)
         */
 
             'certifications' => ['nullable', 'array'],
+            'certifications.*.id' => 'nullable|integer',
             'certifications.*.certification_name' =>
                 'nullable|string|max:255',
             'certifications.*.category' =>
@@ -1688,6 +1703,7 @@ public function update(Request $request, Company $company)
         |--------------------------------------------------------------------------
         */
         'images' => 'nullable|array',
+        'images.*.id' => 'nullable|integer',
         'images.*.image_type' => 'nullable|string',
         'images.*.image_url' => 'nullable|string',
         'images.*.caption' => 'nullable|string',
@@ -1701,6 +1717,7 @@ public function update(Request $request, Company $company)
         */
 
         'contacts' => 'nullable|array',
+        'contacts.*.id' => 'nullable|integer',
         'contacts.*.contact_name' => 'nullable|string',
         'contacts.*.position' => 'nullable|string',
         'contacts.*.phone' => 'nullable|string',
@@ -1713,6 +1730,7 @@ public function update(Request $request, Company $company)
         */
 
         'links' => 'nullable|array',
+        'links.*.id' => 'nullable|integer',
         'links.*.link_type' => 'nullable|string',
         'links.*.url' => 'nullable|string',
 
@@ -1723,6 +1741,8 @@ public function update(Request $request, Company $company)
         */
 
         'capacities' => 'nullable|array',
+        'capacities.*.id' =>
+    'nullable|integer',
         'capacities.*.capacity_type' => 'nullable|string',
         'capacities.*.item_name' => 'nullable|string',
         'capacities.*.capacity_value' => 'nullable|numeric',
@@ -1739,6 +1759,9 @@ public function update(Request $request, Company $company)
 */
 
 'machines' => 'nullable|array',
+
+'machines.*.id' =>
+    'nullable|integer',
 
 'machines.*.machine_category' =>
     'nullable|string|max:255',
@@ -1759,6 +1782,12 @@ public function update(Request $request, Company $company)
     'nullable|numeric',
 
 'machines.*.capacity_unit' =>
+    'nullable|string|max:100',
+
+'machines.*.energy_consumption' =>
+    'nullable|numeric',
+
+'machines.*.energy_unit' =>
     'nullable|string|max:100',
 
 'machines.*.working_width' =>
@@ -1792,7 +1821,7 @@ public function update(Request $request, Company $company)
 */
 
 'moqs' => 'nullable|array',
-
+'moqs.*.id' => 'nullable|integer',
 'moqs.*.product_name' => 'nullable|string|max:255',
 'moqs.*.minimum_quantity' => 'nullable|numeric',
 
@@ -1809,7 +1838,7 @@ public function update(Request $request, Company $company)
 */
 
 'lead_times' => 'nullable|array',
-
+'lead_times.*.id' => 'nullable|integer',
 'lead_times.*.lead_time_type' =>
     'nullable|string|max:255',
 
@@ -1823,7 +1852,6 @@ public function update(Request $request, Company $company)
     ]);
 
    
-
     /*
     |--------------------------------------------------------------------------
     | MAIN COMPANY DATA
@@ -1886,6 +1914,7 @@ public function update(Request $request, Company $company)
     |--------------------------------------------------------------------------
     */
 
+
     \App\Models\CompanyUpdate::create([
         'company_id' => $company->id,
 
@@ -1928,6 +1957,8 @@ public function update(Request $request, Company $company)
 
         'status' => 'pending',
     ]);
+
+// dd($validated['capacities']);
 
     return redirect()
         ->route('intelligence.center')

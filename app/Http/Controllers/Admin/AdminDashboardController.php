@@ -139,7 +139,9 @@ class AdminDashboardController extends Controller
 public function approveUpdate($id)
 {
     $update = CompanyUpdate::findOrFail($id);
-
+// dd([
+//     'raw_proposed_data' => $update->proposed_data,
+// ]);
     DB::transaction(function () use ($update) {
 
         $company = Company::findOrFail(
@@ -168,28 +170,50 @@ public function approveUpdate($id)
         |--------------------------------------------------------------------------
         */
 
-        if (isset($newData['type'])) {
+        /*
+|--------------------------------------------------------------------------
+| UPDATE COMPANY MASTER DATA
+|--------------------------------------------------------------------------
+*/
 
-            \App\Services\CompanyRelationalSyncService::sync(
-                $company,
-                $newData
-            );
+$companyFields = collect($newData)
+    ->except([
+        'products',
+        'images',
+        'markets',
+        'certifications',
+        'contacts',
+        'links',
+        'capacities',
+        'machines',
+        'moqs',
+        'locations',
+        'lead_times',
+    ])
+    ->toArray();
 
-        } else {
+$companyFields['status_verifikasi'] = 'verified';
+$companyFields['last_verified_at'] = now();
+$companyFields['last_updated_at'] = now();
+$companyFields['data_source'] = 'verified_by_admin';
 
-            /*
-            |--------------------------------------------------------------------------
-            | COMPANY TABLE UPDATE
-            |--------------------------------------------------------------------------
-            */
+$company->update($companyFields);
+// dd($newData['capacities'] ?? 'NO CAPACITIES');
+/*
+|--------------------------------------------------------------------------
+| RELATIONAL DATA
+|--------------------------------------------------------------------------
+*/
 
-            $newData['status_verifikasi'] = 'verified';
-            $newData['last_verified_at'] = now();
-            $newData['last_updated_at'] = now();
-            $newData['data_source'] = 'verified_by_admin';
+\App\Services\CompanyRelationalSyncService::sync(
+    $company,
+    $newData
+);
 
-            $company->update($newData);
-        }
+logger('RELATIONAL SYNC EXECUTED', [
+    'company_id' => $company->id,
+    'machines_count' => count($newData['machines'] ?? []),
+]);
 
         $update->update([
 

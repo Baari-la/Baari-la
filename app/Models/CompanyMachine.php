@@ -21,6 +21,9 @@ class CompanyMachine extends Model
     'production_capacity',
     'capacity_unit',
 
+    'energy_consumption',
+    'energy_unit',
+
     'working_width',
     'gauge_specification',
 
@@ -34,5 +37,17 @@ class CompanyMachine extends Model
     'is_active',
 
     'notes',
+];
+
+protected $casts = [
+
+    'quantity' => 'integer',
+
+    'production_capacity' => 'decimal:2',
+
+    'energy_consumption' => 'decimal:2',
+
+    'is_active' => 'boolean',
+
 ];
 }

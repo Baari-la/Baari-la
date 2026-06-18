@@ -21,6 +21,7 @@ import SourcingHubPreview from "@/Components/Home/SourcingHubPreview";
 import FeaturedPartnerBanner from "@/Components/Home/FeaturedPartnerBanner";
 import IndustrySolutionsSection from "@/Components/Home/IndustrySolutionsSection";
 import SponsoredInsightSection from "@/Components/Home/SponsoredInsightSection";
+import MarketTicker from "@/Components/MarketTicker";
 export default function Home(props) {
     // 1. Ambil data trade mentah
     const garmentTrade = props.garmentTrade || { export_pcs: 0, import_pcs: 0 };
@@ -97,55 +98,10 @@ export default function Home(props) {
                 />
 
                 {/* --- 1. TICKER - STICKY TOP --- */}
-                <div className="bg-[#0a192f] border-b border-white/5 py-2 overflow-hidden sticky top-0 z-[60] backdrop-blur-md">
-                    <div className="flex animate-marquee whitespace-nowrap">
-                        <div className="flex items-center">
-                            <span className="flex items-center gap-2 font-black text-yellow-500 text-[10px] uppercase mx-8">
-                                <span className="h-1.5 w-1.5 rounded-full bg-yellow-500 animate-ping"></span>
-                                {isEn
-                                    ? "LIVE MARKET INTELLIGENCE"
-                                    : "INTELIJEN PASAR LANGSUNG"}
-                            </span>
-                            <span className="font-bold text-white text-[10px] uppercase mx-8">
-                                NY/ICE COTTON:{" "}
-                                <span className="text-yellow-500">
-                                    ${currentCotton}
-                                </span>{" "}
-                                USD/LB
-                            </span>
-                            <span className="font-bold text-white text-[10px] uppercase mx-8 border-l border-white/10 pl-8">
-                                {isEn ? "EXCHANGE RATE" : "KURS USD/IDR"}:
-                                <span className="text-emerald-400 ml-2">
-                                    Rp{" "}
-                                    {parseFloat(currentExchange).toLocaleString(
-                                        "id-ID",
-                                    )}
-                                </span>
-                            </span>
-                        </div>
-                        {/* Duplikat untuk Loop */}
-                        <div className="flex items-center">
-                            <span className="flex items-center gap-2 font-black text-yellow-500 text-[10px] uppercase mx-8">
-                                <span className="h-1.5 w-1.5 rounded-full bg-yellow-500 animate-ping"></span>
-                                {isEn
-                                    ? "LIVE MARKET INTELLIGENCE"
-                                    : "INTELIJEN PASAR LANGSUNG"}
-                            </span>
-                            <span className="font-bold text-white text-[10px] uppercase mx-8">
-                                NY/ICE COTTON:{" "}
-                                <span className="text-yellow-500">
-                                    ${currentCotton}
-                                </span>{" "}
-                                USD/LB
-                            </span>
-                        </div>
-                    </div>
-                    <style
-                        dangerouslySetInnerHTML={{
-                            __html: `@keyframes marquee-home { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .animate-marquee { display: flex; animation: marquee-home 30s linear infinite; min-width: 200%; }`,
-                        }}
-                    />
-                </div>
+                <MarketTicker
+                    cotton={currentCotton}
+                    exchangeRate={currentExchange}
+                />
 
                 <main className="flex-1 overflow-hidden relative">
                     {/* <Navbar auth={auth} /> */}

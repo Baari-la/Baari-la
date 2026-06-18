@@ -1,21 +1,28 @@
-export default function CompanyLocationsSection({
-    data,
-    setData,
-    saveLocations,
-}) {
+export default function CompanyLocationsSection({ data, setData, company }) {
     const addLocation = () => {
         setData("locations", [
             ...data.locations,
             {
+                id: null,
+
                 location_name: "",
+
                 location_type: "factory",
+
                 country_name: "Indonesia",
+
                 province_name: "",
+
                 city_name: "",
+
                 address: "",
+
                 contact_person: "",
+
                 phone: "",
+
                 email: "",
+
                 is_primary: false,
             },
         ]);
@@ -44,9 +51,7 @@ export default function CompanyLocationsSection({
         setData("locations", updated);
     };
 
-    const removeLocation = (index) => {
-        const location = data.locations[index];
-
+    const removeLocation = (location, index) => {
         if (location.is_primary) {
             alert(
                 "Primary location cannot be deleted. Please assign another primary location first.",
@@ -109,7 +114,7 @@ export default function CompanyLocationsSection({
             <div className="space-y-6">
                 {data.locations.map((location, index) => (
                     <div
-                        key={index}
+                        key={location.id || index}
                         className="
                             rounded-[24px]
                             border border-white/10
@@ -133,7 +138,7 @@ export default function CompanyLocationsSection({
 
                             <button
                                 type="button"
-                                onClick={() => removeLocation(index)}
+                                onClick={() => removeLocation(location, index)}
                                 className="
                                     text-red-400
                                     text-xs
@@ -382,27 +387,6 @@ export default function CompanyLocationsSection({
                         </div>
                     </div>
                 ))}
-            </div>
-
-            {/* SAVE */}
-
-            <div className="mt-8">
-                <button
-                    type="button"
-                    onClick={saveLocations}
-                    className="
-                        px-8
-                        py-4
-                        rounded-full
-                        bg-yellow-500
-                        text-black
-                        font-black
-                        uppercase
-                        tracking-widest
-                    "
-                >
-                    Save Locations
-                </button>
             </div>
         </div>
     );
