@@ -12,167 +12,171 @@ use App\Models\IndustryPartner;
 
 class HomeController extends Controller
 {
-    public function index()
-    {
-        // 1. Ambil data bursa paling terbaru untuk Ticker (currentCotton & currentExchange)
-        $latestMarket = \App\Models\MarketHistory::orderBy('date', 'desc')->first();
+             public function index()
+{
+    // Cek auth sekali di awal untuk optimasi
+    $isLoggedIn = auth()->check();
 
-        // 2. Ambil data harga kapas dan nilai tukar 7 hari terakhir untuk grafik utama
-        $marketHistory = \App\Models\MarketHistory::orderBy('date', 'desc')
-            ->take(7)
-            ->get()
-            ->reverse()
-            ->values()
-            ->map(fn($item) => [
-                'month'    => date('d M', strtotime($item->date)),
-                'price'    => (float) str_replace(',', '', $item->cotton_price), 
-                'exchange' => (float) $item->usd_idr,
-            ]);
+    // 1. Ambil data bursa paling terbaru untuk Ticker (Menggunakan Nullsafe Operator)
+    $latestMarket = \App\Models\MarketHistory::orderBy('date', 'desc')->first();
 
-        // 3. Logika Analisis Garmen Nasional
-        $garmentTradeData = DB::table('trade_master_annual_hscode')
-            ->selectRaw("
-                SUM(CASE WHEN tipe_arus = 'ekspor' THEN 
-                    CASE 
-                        WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 * 5.5
-                        WHEN TRIM(hs_code) LIKE '6110%' THEN vol_2025 * 2.5
-                        WHEN TRIM(hs_code) LIKE '6203%' OR TRIM(hs_code) LIKE '6204%' THEN vol_2025 * 1.8
-                        WHEN TRIM(hs_code) LIKE '6111%' OR TRIM(hs_code) LIKE '6209%' THEN vol_2025 * 8.0
-                        ELSE vol_2025 * 4.0
-                    END ELSE 0 END) as export_pcs,
-                SUM(CASE WHEN tipe_arus = 'impor' THEN 
-                    CASE 
-                        WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 * 5.5
-                        ELSE vol_2025 * 4.0
-                    END ELSE 0 END) as import_pcs
-            ")
-            ->whereRaw("(TRIM(hs_code) LIKE '61%' OR TRIM(hs_code) LIKE '62%')")
-            ->first();
+    // 2. Ambil data harga kapas dan nilai tukar 7 hari terakhir untuk grafik utama
+    $marketHistory = \App\Models\MarketHistory::orderBy('date', 'desc')
+        ->take(7)
+        ->get()
+        ->reverse()
+        ->values()
+        ->map(fn($item) => [
+            'month'    => date('d M', strtotime($item->date)),
+            'price'    => (float) str_replace(',', '', $item->cotton_price), 
+            'exchange' => (float) $item->usd_idr,
+        ]);
 
-        // 4. Ambil 5 Komoditas Teratas
-        $topProducts = DB::table('trade_master_annual_hscode')
-            ->selectRaw("TRIM(hs_code) as hs_code, uraian_hs, vol_2025, val_2025")
+    // 📊 3. LOGIKA ANALISIS GARMEN NASIONAL
+    $garmentTradeData = DB::table('trade_master_annual_hscode')
+        ->selectRaw("
+            SUM(CASE WHEN tipe_arus = 'ekspor' THEN 
+                CASE 
+                    WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 / 0.18
+                    WHEN TRIM(hs_code) LIKE '6110%' THEN vol_2025 / 0.55
+                    WHEN TRIM(hs_code) LIKE '6203%' THEN vol_2025 / 0.35
+                    WHEN TRIM(hs_code) LIKE '6204%' THEN vol_2025 / 0.25
+                    WHEN TRIM(hs_code) LIKE '6111%' OR TRIM(hs_code) LIKE '6209%' THEN vol_2025 / 0.12
+                    ELSE vol_2025 / 0.25
+                END ELSE 0 END) as export_pcs,
+            SUM(CASE WHEN tipe_arus = 'impor' THEN 
+                CASE 
+                    WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 / 0.18
+                    WHEN TRIM(hs_code) LIKE '6110%' THEN vol_2025 / 0.55
+                    WHEN TRIM(hs_code) LIKE '6203%' THEN vol_2025 / 0.35
+                    WHEN TRIM(hs_code) LIKE '6204%' THEN vol_2025 / 0.25
+                    ELSE vol_2025 / 0.25
+                END ELSE 0 END) as import_pcs
+        ")
+        ->whereRaw("(TRIM(hs_code) LIKE '61%' OR TRIM(hs_code) LIKE '62%')")
+        ->first();
+
+    // 📊 4. PERBAIKAN MUTLAK TREN: MENGHITUNG PERTUMBUHAN RIIL BERDASARKAN SELISIH VOLUME DB
+        // Kita tarik data volume 2024 dan 2025 langsung dari tabel secara rill
+        $rawTopProducts = DB::table('trade_master_annual_hscode')
+            ->selectRaw("TRIM(hs_code) as hs_code, uraian_hs, vol_2024, vol_2025, val_2025")
             ->where('tipe_arus', 'ekspor')
             ->where(function($q) {
                 $q->whereRaw("TRIM(hs_code) LIKE '61%'")
                   ->orWhereRaw("TRIM(hs_code) LIKE '62%'");
             })
             ->orderBy('val_2025', 'desc')
-            ->take(5)
+            ->take(15)
             ->get();
 
-        // 5. Data Bursa Stok Komoditas Anggota
-        $topStocks = DB::table('companies')
-            ->where('stock_qty', '>', 0)
-            ->selectRaw('
-                id as company_id, 
-                stock_ready_caption as product_name, 
-                SUM(stock_qty) as total_qty, 
-                stock_unit as unit
-            ')
-            ->groupBy('company_id', 'product_name', 'unit')
-            ->orderBy('total_qty', 'desc')
-            ->take(10)
-            ->get();
+        $topProducts = $rawTopProducts->map(function($item) {
+            $cleanHs = trim((string)$item->hs_code);
+            $hsPrefix = substr($cleanHs, 0, 4);
 
-        // 6. LOGIKA AMAN: PENGUNCI DATA SERAT STRATEGIS
-        $fiberData = $this->getFiberIntelligence();
-        
-       // Jika pengunjung BELUM LOGIN, potong data setelah tahun 2022
-if (!auth()->check()) {
-    $fiberData = collect($fiberData)->map(function($item, $key) {
-        // $key 0=2019, 1=2020, 2=2021, 3=2022. Kita potong jika indeks di atas 3 (2023, 2024, 2025)
-        if ($key > 3) { 
-            $item['cotton_vol'] = 0; $item['cotton_val'] = 0;
-            $item['syn_vol'] = 0;    $item['syn_val'] = 0;
-        }
-        return $item;
-    })->all();
-        } /* PERBAIKAN 1: Menutup blok penyeleksian data publik */
+            // ⚖️ MATRIKS DIVISOR GRAMASI RESMI (KG KE PCS)
+            $divisor = 0.25; // Default fallback
+            
+            if ($hsPrefix === '6203' || $hsPrefix === '6205') {
+                $divisor = 0.35; // Kemeja/Celana Pria (350 gram)
+            } elseif ($hsPrefix === '6109') {
+                $divisor = 0.18; // Kaos Oblong Katun (180 gram)
+            } elseif ($hsPrefix === '6110') {
+                $divisor = 0.55; // Sweater/Hoodie Rajut (550 gram)
+            } elseif ($hsPrefix === '6204' || $hsPrefix === '6104' || $hsPrefix === '6106') {
+                $divisor = 0.25; // Pakaian/Blouse Wanita (250 gram)
+            } elseif ($hsPrefix === '6201' || $hsPrefix === '6202') {
+                $divisor = 0.65; // Jaket Tebal / Overcoat (650 gram)
+            }
 
-        // Untuk data regulasi / presentasi Ambil 3 dokumen regulasi/materi terbaru untuk ditampilkan di halaman depan
-$regulations = \DB::table('regulations')
-    ->orderBy('event_date', 'desc')
-    ->get();
-$inventoryItems = \DB::table('inventories')->orderBy('created_at', 'desc')->get();
+            // 🧮 KONVERSI VOLUME REALISTIS (PCS)
+            // Mengubah data Kg asli database tahun 2024 & 2025 menjadi Pcs
+            $pcsVolume2024 = intval(floatval($item->vol_2024) / $divisor);
+            $pcsVolume2025 = intval(floatval($item->vol_2025) / $divisor);
 
-// Ambil seluruh daftar kemitraan B2B multi-sektor dari database
-$partnershipItems = \DB::table('partnerships')->orderBy('match_percentage', 'desc')->get();
+            // 📈 RUMUS PERTUMBUHAN RIIL INDONESIA (Murni membandingkan volume)
+            // Pengamanan jika data vol_2024 adalah 0 untuk menghindari pembagian dengan angka nol (division by zero)
+            $realGrowth = 0;
+            if ($pcsVolume2024 > 0) {
+                $realGrowth = (($pcsVolume2025 - $pcsVolume2024) / $pcsVolume2024) * 100;
+            }
 
-$directoryStats = [
+            return [
+                'hs_code' => $cleanHs,
+                'hs_code_clean' => $cleanHs,
+                'uraian_hs' => $item->uraian_hs,
+                'vol_2024' => $pcsVolume2024, // 🌟 REAL PCS 2024
+                'vol_2025' => $pcsVolume2025, // 🌟 REAL PCS 2025
+                'val_2025' => $item->val_2025,
+                'growth' => round($realGrowth, 2), // 🌟 TREN JUJUR RIIL DARI DATABASE
+            ];
+        })->all();
 
-    'companies' =>
-        Company::count(),
+    // 5. Data Bursa Stok Komoditas (Sudah Diperbaiki SQL Group By-nya)
+    $topStocks = DB::table('companies')
+        ->where('stock_qty', '>', 0)
+        ->selectRaw('id as company_id, stock_ready_caption as product_name, SUM(stock_qty) as total_qty, stock_unit as unit')
+        ->groupBy('id', 'stock_ready_caption', 'stock_unit')
+        ->orderBy('total_qty', 'desc')
+        ->take(10)
+        ->get();
 
-    'products' =>
-        CompanyProduct::count(),
+    // 6. LOGIKA AMAN SERAT STRATEGIS
+    $fiberData = $this->getFiberIntelligence();
+    if (!$isLoggedIn) {
+        $fiberData = collect($fiberData)->map(function($item, $key) {
+            if ($key > 3) { 
+                $item['cotton_vol'] = 0; $item['cotton_val'] = 0;
+                $item['syn_vol'] = 0;    $item['syn_val'] = 0;
+            }
+            return $item;
+        })->toArray();
+    }
 
-    'markets' =>
-        CompanyMarket::count(),
+    $regulations = DB::table('regulations')->orderBy('event_date', 'desc')->get();
+    $inventoryItems = DB::table('inventories')->orderBy('created_at', 'desc')->get();
+    $partnershipItems = DB::table('partnerships')->orderBy('match_percentage', 'desc')->get();
 
-    'exportCompanies' =>
-        Company::has('markets')->count(),
-];
+    $featuredPartner = IndustryPartner::where('is_active', true)->where('partner_level', 'gold')->first();
+    $industrySolutions = IndustryPartner::where('is_active', true)->take(6)->get();
 
-// Iklan/partner
-$featuredPartner =
-    IndustryPartner::where(
-        'is_active',
-        true
-    )
-    ->where(
-        'partner_level',
-        'gold'
-    )
-    ->first();
-
-    $industrySolutions =
-    IndustryPartner::where(
-        'is_active',
-        true
-    )
-    ->take(6)
-    ->get();
-
-        // 7. Render Seluruh Payload ke Halaman Depan
-        return Inertia::render('Home', [
-            'directoryStats' => ['companies' => Company::count(),
+    // 📊 7. MERENDER PAYLOAD KE INERTIA WEB INTERFACE
+    return Inertia::render('Home', [
+        'directoryStats' => [
+            'companies' => Company::count(),
             'products' => CompanyProduct::count(),
             'markets' => CompanyMarket::count(),
             'exportCompanies' => Company::has('markets')->count(),
-],
-           'featuredPartner' => $featuredPartner,
-           'industrySolutions' => $industrySolutions,
-            'marketHistory'     => $marketHistory,
-            'topStocks'         => $topStocks,
-            'latestNews'        => News::latest()->take(3)->get(),
-            'topProducts'       => $topProducts,
-            'fiberIntelligence' => $fiberData, /* PERBAIKAN 2: Menggunakan array yang sudah diproteksi, bukan fungsi mentah */
-            'isLoggedIn'        => auth()->check(),
-            'currentCotton'     => $latestMarket->cotton_price ?? 71.31,
-            'currentExchange'   => $latestMarket->usd_idr ?? 16000,
-            'garmentTrade'      => $garmentTradeData,
-            'totalGarment'      => (float) ($garmentTradeData->export_pcs ?? 0), /* PERBAIKAN 3: Memperbaiki nama variabel bursa garmen */
-            'pendingCount'      => auth()->check() ? Company::where('status_verifikasi', 'pending')->count() : 0,
-            'regulations' => $regulations,
-            'partnershipItems' => $partnershipItems,
-             'inventoryItems' => $inventoryItems,
-    'isLoggedIn'  => auth()->check(),
-'auth' => [
-        'user' => auth()->user() ? [
-            'id'            => auth()->user()->id,
-            'name'          => auth()->user()->name,
-            'email'         => auth()->user()->email,
-            'role'          => auth()->user()->role, 
-            'company_id'    => auth()->user()->company_id ?? auth()->user()->company_id,
-            'member_status' => auth()->user()->member_status ?? 'Free',
-            'locale'        => auth()->user()->locale ?? 'id',
-        ] : null,
-    ],
+        ],
+        'featuredPartner' => $featuredPartner,
+        'industrySolutions' => $industrySolutions,
+        'marketHistory'     => $marketHistory,
+        'topStocks'         => $topStocks,
+        'latestNews'        => News::latest()->take(3)->get(),
+        'topProducts'       => $topProducts, 
+        'fiberIntelligence' => $fiberData,
+        'isLoggedIn'        => $isLoggedIn,
+        'currentCotton'     => $latestMarket?->cotton_price ?? 71.31,
+        'currentExchange'   => $latestMarket?->usd_idr ?? 16000,
+        'garmentTrade'      => $garmentTradeData,
+        'totalGarment'      => (float) ($garmentTradeData->export_pcs ?? 0),
+        'pendingCount'      => $isLoggedIn ? Company::where('status_verifikasi', 'pending')->count() : 0,
+        'regulations'       => $regulations,
+        'partnershipItems'  => $partnershipItems,
+        'inventoryItems'    => $inventoryItems,
+        'auth' => [
+            'user' => auth()->user() ? [
+                'id'            => auth()->user()->id,
+                'name'          => auth()->user()->name,
+                'email'         => auth()->user()->email,
+                'role'          => auth()->user()->role, 
+                'company_id'    => auth()->user()->company_id,
+                'member_status' => auth()->user()->member_status ?? 'Free',
+                'locale'        => auth()->user()->locale ?? 'id',
+            ] : null,
+        ],
+    ]);
+}
 
-    
-        ]);
-    }
 
     // --- ASISTEN PRIVATE: DATA SERAT MURNI ANTI BENANG GANDA ---
     private function getFiberIntelligence() 

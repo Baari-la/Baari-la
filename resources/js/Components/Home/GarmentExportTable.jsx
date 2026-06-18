@@ -53,8 +53,8 @@ export default function GarmentExportTable({
         const excelData = topProducts.map((item) => ({
             "HS Code 8-Digit": item.hs_code_clean,
             Description: item.uraian_hs,
-            "Volume 2024 (KG)": Number(item.vol_2024),
-            "Volume 2025 (KG)": Number(item.vol_2025),
+            "Volume 2024 (Pcs)": Number(item.vol_2024),
+            "Volume 2025 (Pcs)": Number(item.vol_2025),
             "Growth (%)": Number(item.growth || 0).toFixed(2) + "%",
         }));
 
@@ -195,7 +195,7 @@ export default function GarmentExportTable({
                                     Description
                                 </th>
                                 <th className="px-6 py-5 text-[11px] font-black uppercase text-yellow-500 tracking-widest border-b border-white/10 text-right">
-                                    Vol 2025 (KG)
+                                    Vol 2025 (Pcs)
                                 </th>
                                 {/* KOLOM BARU: VALUE USD */}
                                 <th className="px-6 py-5 text-[11px] font-black uppercase text-emerald-400 tracking-widest border-b border-white/10 text-right">
@@ -226,13 +226,10 @@ export default function GarmentExportTable({
                                                 ? "HIDDEN PREMIUM DATA"
                                                 : item.uraian_hs}
                                         </td>
-                                        <td className="px-6 py-4 text-right text-white font-black text-sm tabular-nums">
-                                            {isLocked
-                                                ? "***,***"
-                                                : Number(
-                                                      item.vol_2025,
-                                                  ).toLocaleString()}
-                                        </td>
+                                         <td className="py-3.5 px-2 font-bold text-white">
+        {Number(item.vol_2025).toLocaleString('id-ID')}{" "}
+        <span className="text-[8px] text-gray-500 font-normal uppercase">Pcs</span> {/* 🌟 PASTIKAN PCS */}
+    </td>
                                         <td
                                             className={`px-6 py-4 text-right font-black text-xs ${item.growth > 0 ? "text-emerald-400" : "text-red-400"}`}
                                         >

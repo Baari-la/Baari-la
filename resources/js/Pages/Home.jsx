@@ -247,7 +247,9 @@ export default function Home(props) {
                     />
                     <IndustrySolutionsSection isEn={isEn} />
 
-                    <SourcingHubPreview />
+                    <SourcingHubPreview
+                     isEn={isEn}
+                    />
                     <section className="pt-24">
                         <div className="max-w-7xl mx-auto px-6 text-center mb-16">
                             <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
