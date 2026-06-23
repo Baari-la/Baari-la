@@ -11,7 +11,6 @@ use App\Services\Home\HomeTradeService;
 use Inertia\Inertia;
 use Inertia\Response;
 class HomeController extends Controller
-{
     /**
      * Menampilkan dashboard utama Digestex Global dengan pemetaan Multi-Service.
      */
@@ -29,5 +28,5 @@ class HomeController extends Controller
             $partner->getData(),
             $intelligence->getData()
         ));
+
     }
-}
