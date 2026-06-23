@@ -3,31 +3,67 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\App;
 
 class News extends Model
 {
-    // Nama tabel secara default adalah 'news', jika berbeda silakan tambahkan:
-    // protected $table = 'news';
+    protected $fillable = [
+        'title_id',
+        'summary_id',
+        'content_id',
 
-     protected $fillable = ['title_id', 'content_id', 'title_en', 'content_en', 'slug', 'author_id', 'image'];
+        'title_en',
+        'summary_en',
+        'content_en',
 
+        'slug',
+        'category',
+        'image',
+        'author_id',
 
-    // TAMBAHKAN BARIS INI: Agar kolom 'title' & 'content' muncul di React
-    protected $appends = ['title', 'content']; 
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+    ];
 
-    // Fungsi "Sakti" otomatis pilih bahasa (Accessor)
-    // Di React nanti, Bapak cukup panggil 'title' dan 'content' saja
-   public function getTitleAttribute() {
-        return app()->getLocale() == 'en' ? $this->title_en : $this->title_id;
+    protected $appends = [
+        'title',
+        'summary',
+        'content',
+    ];
+
+    protected $casts = [
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
+];
+
+    public function getTitleAttribute()
+    {
+        return app()->getLocale() === 'en'
+            ? $this->title_en
+            : $this->title_id;
     }
 
-    public function getContentAttribute() {
-        return app()->getLocale() == 'en' ? $this->content_en : $this->content_id;
+    public function getSummaryAttribute()
+    {
+        return app()->getLocale() === 'en'
+            ? $this->summary_en
+            : $this->summary_id;
     }
-public function getRouteKeyName()
-{
-    return 'slug';
-}
-    
+
+    public function getContentAttribute()
+    {
+        return app()->getLocale() === 'en'
+            ? $this->content_en
+            : $this->content_id;
+    }
+
+    public function getCategoryAttribute($value)
+    {
+        return $value ?: 'Industry News';
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

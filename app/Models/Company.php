@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use App\Models\SupplierReview;
 use App\Models\User;
 use App\Models\CompanyUpdate;
+use App\Models\MstCountry;
 
 class Company extends Model
 {
@@ -16,7 +17,8 @@ protected $appends = [
 ];
 
 protected $fillable = [
-    'nama_perusahaan', 'sektor', 'wilayah', 'alamat_lengkap', 'city', 
+    'nama_perusahaan', 'sektor', 'wilayah', 'alamat_lengkap', 'country_code',
+'country_name', 'city', 
     'telepon', 'email_web', 'pimpinan', 'pimpinan_2', 'tenaga_kerja', 
     'pasar_ekspor', 'produk', 'category', 'membership_type', 
     'nomor_anggota', 'photo_url', 'photo_pimpinan', 'photo_pimpinan_2', 'catalog_url','last_verified_at', 'status_verifikasi', 'stock_ready_caption',
@@ -31,7 +33,15 @@ protected $fillable = [
         'updated_at' => 'datetime',
     ];
 
-    
+public function country()
+{
+    return $this->belongsTo(
+        MstCountry::class,
+        'country_code',
+        'country_code'
+    );
+}
+
 public function claims()
 {
     return $this->hasMany(

@@ -1,4 +1,9 @@
-export default function CompanyLocationsSection({ data, setData, company }) {
+export default function CompanyLocationsSection({
+    data,
+    setData,
+    company,
+    countries,
+}) {
     const addLocation = () => {
         setData("locations", [
             ...data.locations,
@@ -27,6 +32,40 @@ export default function CompanyLocationsSection({ data, setData, company }) {
             },
         ]);
     };
+    const locationTypes = [
+        {
+            value: "head_office",
+            label: "Head Office",
+        },
+        {
+            value: "factory",
+            label: "Factory",
+        },
+        {
+            value: "warehouse",
+            label: "Warehouse",
+        },
+        {
+            value: "sales_office",
+            label: "Sales Office",
+        },
+        {
+            value: "representative_office",
+            label: "Representative Office",
+        },
+        {
+            value: "laboratory",
+            label: "Laboratory",
+        },
+        {
+            value: "rd_center",
+            label: "R&D Center",
+        },
+        {
+            value: "distribution_center",
+            label: "Distribution Center",
+        },
+    ];
 
     const updateLocation = (index, field, value) => {
         const updated = [...data.locations];
@@ -204,7 +243,7 @@ export default function CompanyLocationsSection({ data, setData, company }) {
                                 </label>
 
                                 <select
-                                    value={location.location_type || "factory"}
+                                    value={location.location_type || ""}
                                     onChange={(e) =>
                                         updateLocation(
                                             index,
@@ -213,33 +252,65 @@ export default function CompanyLocationsSection({ data, setData, company }) {
                                         )
                                     }
                                     className="
-                                        w-full
-                                        rounded-xl
-                                        border border-white/10
-                                        bg-black/20
-                                        px-4
-                                        py-3
-                                        text-white
-                                    "
+        w-full
+        rounded-xl
+        border border-white/10
+        bg-black/20
+        px-4
+        py-3
+        text-white
+    "
                                 >
-                                    <option value="head_office">
-                                        Head Office
-                                    </option>
-
-                                    <option value="factory">Factory</option>
-
-                                    <option value="warehouse">Warehouse</option>
-
-                                    <option value="branch_office">
-                                        Branch Office
-                                    </option>
-
-                                    <option value="research_center">
-                                        Research Center
-                                    </option>
+                                    {locationTypes.map((type) => (
+                                        <option
+                                            key={type.value}
+                                            value={type.value}
+                                        >
+                                            {type.label}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-2">
+                                    Country
+                                </label>
 
+                                <select
+                                    value={location.country_name || ""}
+                                    onChange={(e) => {
+                                        const selected = countries.find(
+                                            (country) =>
+                                                country.country_name ===
+                                                e.target.value,
+                                        );
+
+                                        updateLocation(
+                                            index,
+                                            "country_name",
+                                            selected.country_name,
+                                        );
+                                    }}
+                                    className="
+            w-full
+            rounded-xl
+            border border-white/10
+            bg-black/20
+            px-4
+            py-3
+            text-white
+        "
+                                >
+                                    {countries.map((country) => (
+                                        <option
+                                            key={country.country_code}
+                                            value={country.country_name}
+                                        >
+                                            {country.country_name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                             {/* CITY */}
 
                             <div>

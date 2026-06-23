@@ -19,7 +19,7 @@ export default function DeepIntelligence({
     company,
 }) {
     const [showSuccess, setShowSuccess] = useState(false);
-    const isEn = auth.user.locale === "en";
+    const isEn = auth?.user?.locale === "en";
 
     useEffect(() => {
         if (flash?.message) {

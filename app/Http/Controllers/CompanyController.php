@@ -12,6 +12,8 @@ use App\Models\CompanyContact;
 use App\Models\CompanyLink;
 use App\Models\CompanyImage;
 use App\Models\CompanyMachine;
+use App\Models\MstCountry;
+
 use Illuminate\Support\Facades\Storage;
 use App\Services\CompanyRelationalSyncService;
 use Illuminate\Http\Request;
@@ -49,6 +51,7 @@ public function index(Request $request)
         'leadTimes'
     ]);
 
+    
     /*
     |--------------------------------------------------------------------------
     | Search
@@ -211,11 +214,14 @@ public function index(Request $request)
         ->paginate(3, ['*'], 'news_page')
         ->withQueryString();
 
-    /*
+    
+  
+        /*
     |--------------------------------------------------------------------------
     | Render
     |--------------------------------------------------------------------------
     */
+   
 
     return Inertia::render('Company/Index', [
 
@@ -1533,6 +1539,10 @@ public function edit(Company $company)
         'leadTimes'
     ]);
 
+$countries = MstCountry::orderBy(
+    'country_name'
+)->get();
+
     /*
     |--------------------------------------------------------------------------
     | Render
@@ -1540,7 +1550,8 @@ public function edit(Company $company)
     */
 
     return Inertia::render('Company/Edit', [
-        'company' => $company
+        'company' => $company,
+        'countries' => $countries,
     ]);
 }
 
@@ -1573,6 +1584,10 @@ public function update(Request $request, Company $company)
 
         // MAIN TABLE
         'nama_perusahaan' => 'required|string|max:255',
+        
+        'country_code' => 'required|string|max:2',
+        'country_name' => 'required|string|max:100',
+        
         'sektor' => 'nullable|string',
         'wilayah' => 'nullable|string',
         'city' => 'nullable|string',
@@ -1860,6 +1875,10 @@ public function update(Request $request, Company $company)
 
     $mainData = [
         'nama_perusahaan' => $validated['nama_perusahaan'] ?? null,
+
+         'country_code' => $validated['country_code'] ?? 'ID',
+        'country_name' => $validated['country_name'] ?? 'Indonesia',
+
         'sektor' => $validated['sektor'] ?? null,
         'wilayah' => $validated['wilayah'] ?? null,
         'city' => $validated['city'] ?? null,

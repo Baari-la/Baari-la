@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Company;
 use App\Models\MarketHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -132,11 +132,15 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
         $ewsController = new \App\Http\Controllers\Api\PortTrackerController();
         $ewsData = $ewsController->getLiveEwsStatus()->getData();
 
-            
+    // Jumlah perusahaan di Directory
+
+      $totalCompanies = Company::count();
         
         // Kirim data ke React (Dashboard.jsx)
         return Inertia::render('Dashboard', [
-            // Data Analitik Perdagangan
+        // Jumlah perusahaan di direktory
+         'totalCompanies' => $totalCompanies,   
+        // Data Analitik Perdagangan
             'annualTrend' => $annualTrend,
             // 'marketHistory' => $marketHistory,
             'monthlyCompare' => $monthlyCompare,

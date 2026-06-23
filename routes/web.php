@@ -32,6 +32,7 @@ use App\Http\Controllers\CompanyClaimController;
 use App\Http\Controllers\IndustrySolutionController;
 use App\Http\Controllers\EcosystemPartnerController;
 use App\Http\Controllers\CompanyLocationController;
+use App\Http\Controllers\PartnerInsightController;
 
 /*
 
@@ -525,6 +526,17 @@ Route::get('/industry-solutions/{category}',[IndustrySolutionController::class, 
 Route::get('/ecosystem-partner',[EcosystemPartnerController::class, 'index']
 )->name('ecosystem-partner.index');
 
+// Partners
+Route::get(
+    '/partner-insights',
+    [PartnerInsightController::class, 'index']
+)->name('partner-insights.index');
+
+Route::get(
+    '/partner-insights/{partner}',
+    [PartnerInsightController::class, 'show']
+)->name('partner-insights.show');
+
 // Menu
 Route::get('/sourcing-hub', function () {
         return Inertia::render('SourcingHub/Index');
@@ -533,6 +545,7 @@ Route::get('/sourcing-hub', function () {
 Route::get('/market-intelligence', function () {
         return Inertia::render('MarketIntelligence/Index');
     })->name(    'market-intelligence');
+
 
 /*
 
@@ -586,4 +599,34 @@ Route::middleware([
         '/companies/{company}/verify',
         [CompanyController::class, 'verify']
     )->name('companies.verify');
+
+// News
+Route::get('/news', [NewsController::class, 'index'])
+    ->name('news.index');
+Route::post(
+    '/news/translate',
+    [NewsController::class, 'translate']
+)->name('news.translate');
+Route::post(
+    '/admin/news/suggest-meta',
+    [NewsController::class, 'suggestMeta']
+)->name('admin.news.suggest-meta');
+
+Route::get('/news/create', [NewsController::class, 'create'])
+    ->name('news.create');
+
+Route::post('/news', [NewsController::class, 'store'])
+    ->name('news.store');
+
+Route::get('/news/{news:slug}/edit', [NewsController::class, 'edit'])
+    ->name('news.edit');
+
+Route::put('/news/{news:slug}', [NewsController::class, 'update'])
+    ->name('news.update');
+
+Route::delete('/news/{news:slug}', [NewsController::class, 'destroy'])
+    ->name('news.destroy');
+
+
+
 });

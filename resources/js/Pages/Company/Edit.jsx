@@ -13,7 +13,9 @@ import ContactsSection from "@/Components/Company/ContactsSection";
 import MarketsSection from "@/Components/Company/MarketsSection";
 import LeadTimesSection from "@/Components/Company/LeadTimesSection";
 
-export default function Edit({ auth, company }) {
+export default function Edit({ auth, countries, company }) {
+    console.log(countries);
+
     const isEn = auth.locale === "en";
     const { data, setData, post, processing, errors } = useForm({
         _method: "post",
@@ -24,6 +26,9 @@ export default function Edit({ auth, company }) {
         |--------------------------------------------------------------------------
         */
         nama_perusahaan: company.nama_perusahaan || "",
+        country_code: company.country_code || "ID",
+        country_name: company.country_name || "Indonesia",
+
         category: company.category || "", // Ditambahkan agar tidak undefined
         pimpinan: company.pimpinan || "",
         tenaga_kerja: company.tenaga_kerja || "",
@@ -270,13 +275,92 @@ export default function Edit({ auth, company }) {
                                 </div>
                             </div>
                         </div>
-                        {/* Batas Tombol */}
                         {/* BASIC DATA & CEO */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* HEADQUARTERS COUNTRY */}
+                            <div>
+                                <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest block mb-3">
+                                    Headquarters Country
+                                </label>
+
+                                <select
+                                    value={data.country_code}
+                                    onChange={(e) => {
+                                        const selected = countries.find(
+                                            (country) =>
+                                                country.country_code ===
+                                                e.target.value,
+                                        );
+
+                                        setData(
+                                            "country_code",
+                                            selected.country_code,
+                                        );
+
+                                        setData(
+                                            "country_name",
+                                            selected.country_name,
+                                        );
+                                    }}
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl text-white p-3"
+                                >
+                                    {countries.map((country) => (
+                                        <option
+                                            key={country.country_code}
+                                            value={country.country_code}
+                                        >
+                                            {country.country_name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            {/* HEADQUARTERS COUNTRY */}
+                            <div>
+                                <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest block mb-3">
+                                    Headquarters Country
+                                </label>
+
+                                <select
+                                    value={data.country_code}
+                                    onChange={(e) => {
+                                        const selected = countries.find(
+                                            (country) =>
+                                                country.country_code ===
+                                                e.target.value,
+                                        );
+
+                                        setData(
+                                            "country_code",
+                                            selected.country_code,
+                                        );
+
+                                        setData(
+                                            "country_name",
+                                            selected.country_name,
+                                        );
+                                    }}
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl text-white p-3"
+                                >
+                                    {countries.map((country) => (
+                                        <option
+                                            key={country.country_code}
+                                            value={country.country_code}
+                                        >
+                                            {country.country_name}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <div className="text-xs text-yellow-400">
+                                    {data.country_code} - {data.country_name}
+                                </div>
+                            </div>
+                            {/* CATEGORY */}
                             <div>
                                 <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest block mb-3">
                                     Category
                                 </label>
+
                                 <input
                                     type="text"
                                     value={data.category}
@@ -287,10 +371,12 @@ export default function Edit({ auth, company }) {
                                 />
                             </div>
 
+                            {/* CEO */}
                             <div>
                                 <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest block mb-3">
                                     CEO / Director
                                 </label>
+
                                 <input
                                     type="text"
                                     value={data.pimpinan}
@@ -307,7 +393,9 @@ export default function Edit({ auth, company }) {
                             data={data}
                             setData={setData}
                             company={company}
+                            countries={countries}
                         />
+
                         {/* PRODUCTS RELATIONAL */}
                         <ProductsSection
                             data={data}

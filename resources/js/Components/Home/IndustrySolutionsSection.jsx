@@ -10,6 +10,8 @@ export default function IndustrySolutionsSection({ partners = [], isEn }) {
             description: isEn
                 ? "Quality assurance, laboratory testing, certification, and compliance solutions."
                 : "Jaminan mutu, pengujian laboratorium, sertifikasi, dan kepatuhan industri.",
+
+            leader: null,
         },
 
         {
@@ -90,19 +92,19 @@ export default function IndustrySolutionsSection({ partners = [], isEn }) {
             <div className="max-w-7xl mx-auto px-6">
                 <div className="text-center mb-16">
                     <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
-                        INDUSTRY SOLUTIONS
+                        TEXTILE INDUSTRY SOLUTIONS
                     </span>
 
                     <h2 className="text-4xl md:text-6xl font-black text-white mt-4 uppercase">
                         {isEn
-                            ? "Supporting The Textile Ecosystem"
-                            : "Mendukung Ekosistem Industri Tekstil"}
+                            ? "Connecting industry challenges with technology, certification, machinery, materials, logistics and business solutions."
+                            : "Pemimpin Solusi Dalam Ekosistem Tekstil"}
                     </h2>
 
-                    <p className="max-w-3xl mx-auto mt-6 text-gray-400">
+                    <p className="max-w-4xl mx-auto mt-6 text-gray-400">
                         {isEn
-                            ? "Connecting technology, certification, machinery, logistics, finance, and innovation across the textile value chain."
-                            : "Menghubungkan teknologi, sertifikasi, mesin, logistik, pembiayaan, dan inovasi di seluruh rantai nilai tekstil."}
+                            ? "Connecting technology providers, certification bodies, raw material suppliers, machinery companies, logistics providers, and financial institutions with the textile industry."
+                            : "Menghubungkan penyedia teknologi, lembaga sertifikasi, pemasok bahan baku, perusahaan mesin, logistik, dan institusi keuangan dengan industri tekstil."}
                     </p>
                 </div>
 

@@ -12,10 +12,14 @@ export default function Create({ auth }) {
 
     const { data, setData, post, processing } = useForm({
         title_id: "",
+        summary_id: "",
         title_en: "",
+        summary_en: "",
         content_id: "",
         content_en: "",
         slug: "",
+        category: "Industry News",
+        partner_name: "",
         image: null,
     });
 
@@ -34,7 +38,9 @@ export default function Create({ auth }) {
             if (data.title_id && data.title_id.length > 5) {
                 setIsTranslating(true);
                 axios
-                    .post(route("news.translate"), { text: data.title_id })
+                    .post(route("admin.news.translate"), {
+                        text: data.title_id,
+                    })
                     .then((res) => {
                         // Gunakan fungsional update (prev) agar data lain (seperti image/content) tidak hilang
                         setData((prev) => ({
@@ -50,13 +56,35 @@ export default function Create({ auth }) {
         return () => clearTimeout(timer);
     }, [data.title_id]);
 
+    // AUTO-TRANSLATE SUMMARY
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (data.summary_id && data.summary_id.length > 20) {
+                axios
+                    .post(route("admin.news.translate"), {
+                        text: data.summary_id,
+                    })
+                    .then((res) => {
+                        setData((prev) => ({
+                            ...prev,
+                            summary_en: res.data.translated,
+                        }));
+                    })
+                    .catch((err) => console.error(err));
+            }
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, [data.summary_id]);
+
     // 2. AUTO-TRANSLATE ISI BERITA (Content)
     useEffect(() => {
         const timer = setTimeout(() => {
             if (data.content_id && data.content_id.length > 50) {
                 const plainText = data.content_id.replace(/<[^>]*>?/gm, "");
                 axios
-                    .post(route("news.translate"), { text: plainText })
+                    .post(route("admin.news.translate"), { text: plainText })
                     .then((res) => {
                         setData((prev) => ({
                             ...prev,
@@ -70,7 +98,7 @@ export default function Create({ auth }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route("news.store"));
+        post(route("admin.news.store"));
     };
 
     return (
@@ -130,7 +158,46 @@ export default function Create({ auth }) {
                                 />
                             </div>
                         </div>
+                        {/* CATEGORY */}
 
+                        <div className="mb-8">
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
+                                Intelligence Category
+                            </label>
+
+                            <select
+                                value={data.category}
+                                onChange={(e) =>
+                                    setData("category", e.target.value)
+                                }
+                                className="w-full p-4 rounded-xl border border-slate-300 bg-white text-slate-900"
+                            >
+                                <option value="Market Intelligence">
+                                    Market Intelligence
+                                </option>
+
+                                <option value="Trade & Policy">
+                                    Trade & Policy
+                                </option>
+
+                                <option value="Sustainability">
+                                    Sustainability
+                                </option>
+
+                                <option value="Technology & Innovation">
+                                    Technology & Innovation
+                                </option>
+                                <option value="Partner Insights">
+                                    Partner Insights
+                                </option>
+                                <option value="Industry News">
+                                    Industry News
+                                </option>
+                                <option value="Events & Exhibitions">
+                                    Events & Exhibitions
+                                </option>
+                            </select>
+                        </div>
                         {/* INPUT JUDUL */}
                         <div
                             className={lang === "id" ? "block mb-8" : "hidden"}
@@ -142,7 +209,7 @@ export default function Create({ auth }) {
                             <input
                                 type="text"
                                 value={data.title_id}
-                                className="w-full p-4 rounded-xl border-gray-100 bg-gray-50 font-bold"
+                                className="w-full p-4 rounded-xl border border-slate-300 bg-white text-slate-900"
                                 onChange={(e) =>
                                     setData("title_id", e.target.value)
                                 }
@@ -151,7 +218,24 @@ export default function Create({ auth }) {
                                 Slug: {data.slug}
                             </p>
                         </div>
+                        {/* Sunnary ID */}
+                        <div
+                            className={lang === "id" ? "block mb-8" : "hidden"}
+                        >
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
+                                Executive Summary (ID)
+                            </label>
 
+                            <textarea
+                                rows={4}
+                                value={data.summary_id}
+                                onChange={(e) =>
+                                    setData("summary_id", e.target.value)
+                                }
+                                className="w-full p-4 rounded-xl border border-slate-300 bg-white text-slate-900"
+                                placeholder="Ringkasan utama artikel dalam 2-3 kalimat..."
+                            />
+                        </div>
                         <div
                             className={lang === "en" ? "block mb-8" : "hidden"}
                         >
@@ -169,6 +253,24 @@ export default function Create({ auth }) {
                             />
                         </div>
 
+                        {/* Summary EN */}
+                        <div
+                            className={lang === "en" ? "block mb-8" : "hidden"}
+                        >
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
+                                Executive Summary (EN)
+                            </label>
+
+                            <textarea
+                                rows={4}
+                                value={data.summary_en}
+                                onChange={(e) =>
+                                    setData("summary_en", e.target.value)
+                                }
+                                className="w-full p-4 rounded-xl border border-slate-300 bg-gray-50 text-slate-900"
+                                placeholder="Short executive summary..."
+                            />
+                        </div>
                         {/* EDITOR KONTEN */}
                         <div
                             className={lang === "id" ? "block mb-8" : "hidden"}

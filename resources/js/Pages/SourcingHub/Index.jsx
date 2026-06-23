@@ -11,7 +11,7 @@ export default function Index(props) {
             <div className="min-h-screen bg-slate-950 text-white">
                 {/* Hero */}
 
-                <section className="max-w-7xl mx-auto px-6 py-20 text-center">
+                <section className="max-w-7xl mx-auto px-6 py-12 text-center">
                     <h1 className="text-5xl font-bold mb-6">
                         {isEn ? "Sourcing Hub" : "Pusat Pengadaan"}
                     </h1>

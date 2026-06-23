@@ -7,7 +7,7 @@
     },
     "dependencies": {
         "@ckeditor/ckeditor5-build-classic": "^34.0.0",
-        "@ckeditor/ckeditor5-react": "^9.3.0",
+        "@ckeditor/ckeditor5-react": "^5.1.0",
         "@headlessui/react": "^2.1.2",
         "@inertiajs/react": "^1.2.0",
         "canvas-confetti": "^1.9.3",

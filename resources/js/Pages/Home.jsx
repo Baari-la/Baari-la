@@ -22,6 +22,9 @@ import FeaturedPartnerBanner from "@/Components/Home/FeaturedPartnerBanner";
 import IndustrySolutionsSection from "@/Components/Home/IndustrySolutionsSection";
 import SponsoredInsightSection from "@/Components/Home/SponsoredInsightSection";
 import MarketTicker from "@/Components/MarketTicker";
+import LatestIntelligence from "@/Components/Home/LatestIntelligence";
+import IntelligenceOverview from "@/Components/Home/IntelligenceOverview";
+
 export default function Home(props) {
     // 1. Ambil data trade mentah
     const garmentTrade = props.garmentTrade || { export_pcs: 0, import_pcs: 0 };
@@ -40,6 +43,16 @@ export default function Home(props) {
         topProducts = [],
         topStocks = [],
         latestNews = [],
+
+        latestIntelligence,
+        marketIntelligence,
+        tradePolicy,
+        sustainability,
+        technology,
+        industryNews,
+        partnerInsights,
+        intelligenceStats,
+
         latestRegulations = [],
         isLoggedIn,
         locale,
@@ -112,15 +125,17 @@ export default function Home(props) {
                     <div className="px-6 pt-20 pb-16 text-center relative overflow-hidden">
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
                         <h1 className="text-6xl md:text-8xl font-black mb-6 leading-none uppercase tracking-tighter italic relative z-10">
-                            {isEn ? "Textile Industry " : "Ekosistem Industri "}
+                            {isEn
+                                ? "Global Textile Intelligence "
+                                : "Ekosistem Industri "}
                             <span className="text-yellow-500 leading-none block md:inline">
-                                {isEn ? "Ecosystem" : "Tekstil Terintegrasi"}
+                                {isEn ? "Ecosystem" : "Global Terintegrasi"}
                             </span>
                         </h1>
                         <div className="max-w-4xl mx-auto mb-12 relative z-10">
                             <p className=" text-white text-lg md:text-2xl font-bold leading-relaxed tracking-tight">
                                 {isEn
-                                    ? "Connecting Industry, Sourcing Hub, and Market Intelligence across the textile supply chain."
+                                    ? "connecting companies, sourcing intelligence, market analytics, trade insights, and business opportunities across the textile supply chain."
                                     : "Menghubungkan Industri, Solusi, Pasar, dan Peluang."}
                             </p>
                             <p
@@ -154,7 +169,7 @@ export default function Home(props) {
                                     className="block w-full px-6 py-5 bg-transparent border-none text-white text-lg outline-none focus:ring-0 placeholder:text-gray-600"
                                     placeholder={
                                         isEn
-                                            ? "Search 1,982+ industries & news..."
+                                            ? "Search the global textile intelligence ecosystem..."
                                             : "Cari 1.982+ industri & berita..."
                                     }
                                 />
@@ -238,8 +253,31 @@ export default function Home(props) {
                                 </div>
                             </div>
                         </div>
+
+                        <LatestIntelligence
+                            latestIntelligence={latestIntelligence}
+                            marketIntelligence={marketIntelligence}
+                            tradePolicy={tradePolicy}
+                            sustainability={sustainability}
+                            technology={technology}
+                            industryNews={industryNews}
+                            intelligenceStats={intelligenceStats}
+                        />
+                        <IntelligenceOverview isEn={isEn} />
                     </div>
-                    <FeaturedPartnerBanner isEn={isEn} />
+                    <div className="mt-20">
+                        <div className="max-w-7xl mx-auto">
+                            <CottonCurrencyTrendChart
+                                data={marketHistory}
+                                isEn={isEn}
+                            />
+                        </div>
+                        <FiberComparisonChart
+                            data={fiberIntelligence}
+                            isEn={isEn}
+                            isLoggedIn={props.isLoggedIn} // <--- Kirim status login di sini
+                        />
+                    </div>
 
                     <IndustryDirectorySnapshot
                         isEn={isEn}
@@ -248,105 +286,12 @@ export default function Home(props) {
                     <IndustrySolutionsSection isEn={isEn} />
 
                     <SourcingHubPreview />
-                    <section className="pt-24">
-                        <div className="max-w-7xl mx-auto px-6 text-center mb-16">
-                            <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
-                                MARKET INTELLIGENCE
-                            </span>
 
-                            <h2 className="text-4xl md:text-6xl font-black text-white mt-4 uppercase">
-                                {isEn
-                                    ? "Insights For Better Decisions"
-                                    : "Wawasan Untuk Keputusan Yang Lebih Baik"}
-                            </h2>
-
-                            <p className="max-w-3xl mx-auto mt-6 text-gray-400">
-                                {isEn
-                                    ? "Trade analytics, sourcing intelligence, market trends, and strategic insights supporting manufacturers, suppliers, buyers, and industry stakeholders."
-                                    : "Analitik perdagangan, intelijen sourcing, tren pasar, dan wawasan strategis untuk mendukung produsen, pemasok, pembeli, dan pemangku kepentingan industri."}
-                            </p>
-                            <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto px-6 mt-16">
-                                {/* Trade Intelligence */}
-
-                                <div className="rounded-[32px]border border-white/10 bg-white/5 backdrop-blur-xl p-8 hover:border-yellow-500/30 transition-all duration-500">
-                                    <i className="fas fa-chart-line text-yellow-500 text-4xl mb-6" />
-
-                                    <h3 className="text-2xl font-black text-white mb-4">
-                                        Trade Intelligence
-                                    </h3>
-
-                                    <ul className="space-y-3 text-gray-400 text-sm">
-                                        <li>Import & Export Analytics</li>
-
-                                        <li>Trade Flow Monitoring</li>
-
-                                        <li>Market Access Insights</li>
-                                    </ul>
-                                </div>
-
-                                {/* Supply Chain Insights */}
-
-                                <div
-                                    className=" rounded-[32px]  border border-white/10 bg-white/5 backdrop-blur-xl
-        p-8 hover:border-yellow-500/30 transition-all duration-500"
-                                >
-                                    <i className="fas fa-industry text-yellow-500 text-4xl mb-6" />
-
-                                    <h3 className="text-2xl font-black text-white mb-4">
-                                        Sourcing Intelligence
-                                    </h3>
-
-                                    <ul className="space-y-3 text-gray-400 text-sm">
-                                        <li>Raw Material Trends</li>
-
-                                        <li>MOQ Intelligence</li>
-
-                                        <li>Supplier Discovery</li>
-                                    </ul>
-                                </div>
-
-                                {/* Market Trends */}
-
-                                <div className="rounded-[32px]border border-white/10 bg-white/5 backdrop-blur-xl p-8 hover:border-yellow-500/30 transition-all duration-500">
-                                    <i className="fas fa-globe-asia text-yellow-500 text-4xl mb-6" />
-
-                                    <h3 className="text-2xl font-black text-white mb-4">
-                                        Strategic Intelligence
-                                    </h3>
-
-                                    <ul className="space-y-3 text-gray-400 text-sm">
-                                        <li>Price Monitoring</li>
-
-                                        <li>Industry Updates</li>
-
-                                        <li>Executive Briefings</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
                     {/* Batas Sourcing Hub dan Market Intelligecnce*/}
 
                     {/* <MarketIntelligenceSection isEn={isEn} /> */}
 
                     <SponsoredInsightSection isEn={isEn} />
-
-                    <div
-                        className="mt-20 block w-full"
-                        style={{ minHeight: "350px" }}
-                    >
-                        <div className="max-w-7xl mx-auto">
-                            <CottonCurrencyTrendChart
-                                data={marketHistory}
-                                isEn={isEn}
-                            />
-                        </div>
-                    </div>
-                    <FiberComparisonChart
-                        data={fiberIntelligence}
-                        isEn={isEn}
-                        isLoggedIn={props.isLoggedIn} // <--- Kirim status login di sini
-                    />
                     {/* --- SECTION: TOP PRODUCTS & PAYWALL --- */}
                     <div className="px-6 mb-24">
                         <div className="max-w-7xl mx-auto relative">
@@ -394,7 +339,7 @@ export default function Home(props) {
                         </div>
                     </div>
 
-                    <section className="py-24 border-t border-white/5">
+                    <section className="py-4 border-t border-white/5">
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="text-center mb-16">
                                 <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
@@ -470,18 +415,19 @@ export default function Home(props) {
                             <PartnerLogo /> */}
                         </div>
                     </section>
-                    <NewsSection latestNews={latestNews} isEn={isEn} />
+                    <FeaturedPartnerBanner isEn={isEn} />
+                    {/* <NewsSection latestNews={latestNews} isEn={isEn} /> */}
                     {/* <EventSpotlight /> */}
-                    <LocalSolutions
+                    {/* <LocalSolutions
                         materials={props.regulations || []}
                         inventoryItems={props.inventoryItems || []}
                         partnershipItems={props.partnershipItems || []}
                         isLoggedIn={props.isLoggedIn}
                         memberStatus={props.auth?.user?.member_status || "Free"}
                         isEn={isEn}
-                        /* PERBAIKAN UTAMA: Teruskan objek auth ke dalam komponen */
+                        
                         auth={props.auth}
-                    />
+                    /> */}
                 </main>
             </div>
         </WebsiteLayout>

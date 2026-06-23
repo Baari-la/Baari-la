@@ -28,35 +28,39 @@ class HandleInertiaRequests extends Middleware
      * @return array<string, mixed>
      */
     public function share(Request $request): array
-{
-    // Ambil locale dari session, default ke config app
-    $currentLocale = session('locale', config('app.locale'));
+    {
+        // Ambil locale dari session, default ke config app
+        $currentLocale = session('locale', config('app.locale'));
 
-    return [
-        ...parent::share($request),
-        
-        // 1. PINDAHKAN LOCALE KE SINI (Agar bisa diakses Guest & Member)
-        'locale' => $currentLocale, 
- // TAMBAHKAN BARIS INI: Membaca file en.json atau id.json
-        'translations' => file_exists(lang_path("$currentLocale.json")) 
-            ? json_decode(file_get_contents(lang_path("$currentLocale.json")), true) 
-            : [],
-            'flash' => [
-    'message' => $request->session()->get('message'),
-],
+        return array_merge(parent::share($request), [
+            // Status Login & Lokalisasi (Bisa diakses Guest maupun Member)
+            'isLoggedIn'   => auth()->check(),
+            'locale'       => $currentLocale, 
             
-        'auth' => [
-            'user' => $request->user() ? [
-                'id' => $request->user()->id,
-                'name' => $request->user()->name,
-                'role' => $request->user()->role,
-                // Baris locale di sini boleh tetap ada atau dihapus
-                'locale' => $currentLocale, 
-                'is_api_member' => !empty($request->user()->member_number), 
-                'member_number' => $request->user()->member_number,
-                'company_id' => $request->user()->company_id,
-            ] : null,
-        ],
-    ];
-}
+            // Membaca file json bahasa (en.json / id.json)
+            'translations' => file_exists(lang_path("$currentLocale.json")) 
+                ? json_decode(file_get_contents(lang_path("$currentLocale.json")), true) 
+                : [],
+                
+            // Flash Message untuk notifikasi sukses/gagal
+            'flash' => [
+                'message' => $request->session()->get('message'),
+            ],
+                
+            // Data Autentikasi User Tergabung Lengkap
+            'auth' => [
+                'user' => $request->user() ? [
+                    'id'            => $request->user()->id,
+                    'name'          => $request->user()->name,
+                    'email'         => $request->user()->email,
+                    'role'          => $request->user()->role,
+                    'company_id'    => $request->user()->company_id,
+                    'member_status' => $request->user()->member_status ?? 'Free',
+                    'locale'        => $request->user()->locale ?? $currentLocale, 
+                    'is_api_member' => !empty($request->user()->member_number), 
+                    'member_number' => $request->user()->member_number,
+                ] : null,
+            ],
+        ]);
+    }
 }

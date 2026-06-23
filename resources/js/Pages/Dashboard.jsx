@@ -11,6 +11,8 @@ import PredictiveCalculator from "@/Components/PredictiveCalculator";
 import PortTrackerWidget from "@/Components/PortTrackerWidget";
 import IkmTextileTools from "@/Components/IkmTextileTools";
 import DomesticEwsWidget from "@/Components/DomesticEwsWidget";
+import StatsCards from "@/Components/Dashboard/StatsCards";
+import WelcomeBanner from "@/Components/Dashboard/WelcomeBanner";
 
 import {
     XAxis,
@@ -59,6 +61,8 @@ export default function Dashboard({
     usd_idr,
     cottonPrice,
     exportValue,
+    totalCompanies,
+
     memberStatus,
 }) {
     // AMBIL SEMUA DATA DARI usePage
@@ -154,90 +158,23 @@ export default function Dashboard({
                     </div>
 
                     {/* --- WELCOME BANNER --- */}
-                    <div className="bg-gradient-to-r from-blue-700 to-indigo-900 rounded-3xl p-8 mb-8 text-white shadow-2xl relative overflow-hidden">
-                        <div className="relative z-10">
-                            <h2 className="text-3xl font-black italic tracking-tighter mb-2">
-                                WELCOME BACK, {auth.user.name.toUpperCase()}!
-                            </h2>
-                            <p className="text-blue-100 opacity-80 font-medium">
-                                Intelligence system is active. Your encrypted
-                                data stream is ready.
-                            </p>
-                        </div>
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
-                    </div>
+                    <WelcomeBanner
+                        user={auth.user}
+                        memberStatus={memberStatus}
+                    />
 
                     <div className="mb-8">
                         <StockTicker topStocks={[]} />
                     </div>
 
                     {/* --- STATS CARDS GRID --- */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        {/* 1. COTTON PRICE */}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-yellow-500 text-gray-900 group hover:shadow-md transition-all">
-                            <div className="flex justify-between items-start">
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Cotton Price
-                                </p>
-                                <span
-                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${parseFloat(cottonTrend) >= 0 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
-                                >
-                                    {cottonTrend}
-                                </span>
-                            </div>
-                            <h3 className="text-2xl font-black mt-1">
-                                {cottonPrice}{" "}
-                                <span className="text-sm font-normal text-gray-400">
-                                    USD/lb
-                                </span>
-                            </h3>
-                        </div>
-
-                        {/* 2. EXCHANGE RATE (DATA LIVE DARIPADA PYTHON) */}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 text-gray-900 group hover:shadow-md transition-all">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                Kurs USD / IDR
-                            </p>
-                            <h3 className="text-2xl font-black mt-1">
-                                Rp {parseFloat(usd_idr).toLocaleString("id-ID")}
-                            </h3>
-                            <p className="text-[9px] text-gray-400 font-bold italic mt-1 uppercase">
-                                Bursa Live Data
-                            </p>
-                        </div>
-
-                        {/* 3. NATIONAL EXPORT */}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-600 text-gray-900 group hover:shadow-md transition-all">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                National Export
-                            </p>
-                            <h3 className="text-2xl font-black mt-1">
-                                ${exportValue}{" "}
-                                <span className="text-sm font-normal text-gray-400">
-                                    B
-                                </span>
-                            </h3>
-                        </div>
-
-                        {/* 4. USER STATUS */}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-indigo-500 text-gray-900 group hover:shadow-md transition-all">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                Account Status
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                                <h3
-                                    className={`text-lg font-black uppercase italic ${memberStatus.includes("Premium") ? "text-indigo-600" : "text-gray-600"}`}
-                                >
-                                    {memberStatus}
-                                </h3>
-                                {memberStatus.includes("Premium") && (
-                                    <span className="animate-pulse text-yellow-500">
-                                        ⭐
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                    <StatsCards
+                        cottonPrice={liveCottonPrice}
+                        cottonTrend={cottonTrend}
+                        liveExchangeRate={liveExchangeRate}
+                        exportValue={exportValue}
+                        totalCompanies={totalCompanies}
+                    />
 
                     {/* --- LINK CEPAT DEEP INTELLIGENCE --- */}
                     <Link

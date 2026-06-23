@@ -4,6 +4,7 @@ import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link, usePage, router } from "@inertiajs/react";
 import { useState } from "react";
+import HoverDropdown from "@/Components/HoverDropdown";
 import {
     ShieldCheck,
     Menu,
@@ -16,7 +17,13 @@ import {
     FileText,
 } from "lucide-react";
 
-export default function AuthenticatedLayout({ header, children }) {
+export default function AuthenticatedLayout({
+    icon,
+    label,
+    header,
+    width = "w-72",
+    children,
+}) {
     const user = usePage().props.auth.user;
     const { locale } = usePage().props;
     const isEn = locale === "en";
@@ -34,6 +41,10 @@ export default function AuthenticatedLayout({ header, children }) {
             },
         );
     };
+    const dashboardNavStyle =
+        "px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-700 hover:text-amber-500 transition-all duration-300";
+    const mobileNavStyle =
+        "block px-4 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-amber-500 transition";
 
     return (
         <div className="min-h-screen bg-[#030712] text-gray-100 font-sans selection:bg-amber-500 selection:text-black">
@@ -41,175 +52,235 @@ export default function AuthenticatedLayout({ header, children }) {
             <div className="h-1 w-full bg-gradient-to-r from-amber-600 via-yellow-500 to-emerald-500 shadow-[0_2px_20px_rgba(245,158,11,0.5)]"></div>
 
             {/* --- HEADER NAVIGASI GLASSMORPHISM PREMIUM --- */}
-            <nav className="bg-[#0b1329]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl sticky top-0 z-50">
+            <nav className="bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-20 items-center">
+                    <div className="grid grid-cols-[auto_1fr_auto] h-24 items-center gap-10">
                         <div className="flex items-center gap-10">
                             {/* LOGO PENYELARASAN BRANDING: API JAKARTA GLOBAL TRADE NODE */}
                             <div className="shrink-0 flex items-center">
                                 <Link
                                     href="/"
-                                    className="flex items-center gap-3 group"
+                                    className="flex flex-col items-start shrink-0"
                                 >
                                     <img
                                         src="/images/logoWeb.png"
-                                        className="h-10 w-auto rounded-xl shadow-lg shadow-amber-500/5"
-                                        alt="Digestex Global Logo"
+                                        className="h-14 w-auto"
+                                        alt="Digestex Global"
                                     />
-                                    {/* <span className="font-black tracking-tighter text-sm uppercase text-white leading-none">
-                                            API JAKARTA
+
+                                    <p className="mt-1 text-[9px] tracking-[0.15em] leading-none">
+                                        <span className="text-[#0B2E59]">
+                                            Where Textile Meets
+                                        </span>{" "}
+                                        <span className="text-[#F97316] font-semibold">
+                                            Intelligence
                                         </span>
-                                        <span className="text-[7px] text-amber-500 font-mono tracking-widest uppercase font-bold mt-1">
-                                            GLOBAL TRADE NODE
-                                        </span> */}
-                                    {/* </div> */}
+                                    </p>
                                 </Link>
                             </div>
 
                             {/* MENU UTAMA DESKTOP (PC LAYOUT) - HIGH CONTRAST READABILITY & ADDITIONAL TERMINAL */}
-                            <div className="hidden space-x-1 sm:flex items-center">
-                                <NavLink
-                                    href={route("home")}
-                                    active={route().current("home")}
-                                    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all duration-300 hover:text-amber-400"
-                                >
-                                    Home
-                                </NavLink>
-                                <NavLink
-                                    href={route("dashboard")}
-                                    active={route().current("dashboard")}
-                                    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all duration-300 hover:text-amber-400"
-                                >
-                                    Dashboard
-                                </NavLink>
-                                <NavLink
-                                    href={route("intelligence.center")}
-                                    active={route().current(
-                                        "intelligence.center",
-                                    )}
-                                    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all duration-300 hover:text-amber-400"
-                                >
-                                    Intelligence Center
-                                </NavLink>
-                                <NavLink
-                                    href={route("rfqs.index")}
-                                    active={route().current("rfqs.*")}
-                                    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all duration-300 hover:text-cyan-400 flex items-center gap-1.5"
-                                >
-                                    <FileText className="w-3.5 h-3.5 text-cyan-400/80" />
-                                    RFQ Marketplace
-                                </NavLink>
-                                <NavLink
-                                    href={route("purchase-orders.index")}
-                                    active={route().current(
-                                        "purchase-orders.*",
-                                    )}
-                                    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:text-amber-400"
-                                >
-                                    Purchase Orders
-                                </NavLink>
-                                <NavLink
-                                    href={route("quotations.index")}
-                                    active={route().current("quotations.index")}
-                                >
-                                    My Quotations
-                                </NavLink>
-                                {/* FITUR AMUNISI BARU: DIGITAL CONTAINER TRACKING JICT & NPCT1 */}
-                                <NavLink
-                                    href={route("logistics.tracking")}
-                                    active={route().current(
-                                        "logistics.tracking",
-                                    )}
-                                    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all duration-300 hover:text-amber-400 flex items-center gap-1.5"
-                                >
-                                    <Globe className="w-3.5 h-3.5 text-amber-500/80" />
-                                    {isEn
-                                        ? "Port Tracking"
-                                        : "Pelacakan Kontainer"}
-                                </NavLink>
+                            <div className="hidden xl:flex items-center gap-1">
+                                <div className="relative flex items-center">
+                                    <HoverDropdown
+                                        icon={
+                                            <Globe className="w-4 h-4 text-blue-500" />
+                                        }
+                                        label="Intelligence"
+                                    >
+                                        <Link
+                                            href={route("intelligence.center")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Intelligence Center
+                                        </Link>
 
-                                <NavLink
-                                    href={route("tools.calculator")}
-                                    active={route().current("tools.calculator")}
-                                    className="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center gap-1.5 bg-white/5 border border-white/5 duration-300 hover:text-emerald-400"
-                                >
-                                    <span>🧮</span>
-                                    <span>Industrial Toolbox</span>
-                                    <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[7px] text-[#030712] px-1.5 py-0.5 rounded-md font-black uppercase tracking-tighter">
-                                        Premium
-                                    </span>
-                                </NavLink>
-                                {/* ✨ SUNTIKAN INTEGRASI BARU: DROPDOWN COLLECTIVE SOURCING DESKTOP */}
-                                <div className="relative flex items-center px-2">
-                                    <Dropdown>
-                                        <Dropdown.Trigger>
-                                            <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:text-amber-400 focus:outline-none transition duration-150 cursor-pointer">
-                                                <Layers className="w-3.5 h-3.5 text-amber-500/80" />
-                                                <span>Collective Sourcing</span>
-                                                <span className="text-[8px] text-gray-400">
-                                                    ▼
-                                                </span>
-                                            </button>
-                                        </Dropdown.Trigger>
-                                        <Dropdown.Content className="bg-[#0b1329] border border-white/10 rounded-2xl shadow-2xl p-1 mt-2 min-w-[200px]">
-                                            <Dropdown.Link
-                                                href={route(
-                                                    "collective-sourcing.index",
-                                                )}
-                                                className="text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-white rounded-xl px-4 py-2.5 block w-full text-left"
-                                            >
-                                                Open Demand Groups
-                                            </Dropdown.Link>
-                                            <Dropdown.Link
-                                                href={route(
-                                                    "collective-sourcing.create",
-                                                )}
-                                                className="text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-white rounded-xl px-4 py-2.5 block w-full text-left"
-                                            >
-                                                Create Requirement
-                                            </Dropdown.Link>
-                                            <Dropdown.Link
-                                                href={route(
-                                                    "collective-sourcing.my-requests",
-                                                )}
-                                                className="text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-white rounded-xl px-4 py-2.5 block w-full text-left"
-                                            >
-                                                My Requests
-                                            </Dropdown.Link>
-                                        </Dropdown.Content>
-                                    </Dropdown>
+                                        <Link
+                                            href={route("market-intelligence")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Market Intelligence
+                                        </Link>
+                                    </HoverDropdown>
+                                </div>
+                                <div className="relative flex items-center">
+                                    <HoverDropdown
+                                        icon={
+                                            <FileText className="w-4 h-4 text-cyan-500" />
+                                        }
+                                        label="Trade Hub"
+                                    >
+                                        <Link
+                                            href={route("rfqs.index")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            RFQ Marketplace
+                                        </Link>
+
+                                        <Link
+                                            href={route(
+                                                "purchase-orders.index",
+                                            )}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Purchase Orders
+                                        </Link>
+
+                                        <Link
+                                            href={route("quotations.index")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            {isEn
+                                                ? "My Quotations"
+                                                : "Penawaran Saya"}
+                                        </Link>
+                                    </HoverDropdown>
+                                </div>
+                                {/* FITUR AMUNISI BARU: DIGITAL CONTAINER TRACKING JICT & NPCT1 */}
+                                {/* TOOLS */}
+
+                                <div className="relative flex items-center">
+                                    <HoverDropdown
+                                        icon={
+                                            <Layers className="w-4 h-4 text-amber-500" />
+                                        }
+                                        label="Sourcing Hub"
+                                    >
+                                        <Link
+                                            href={route(
+                                                "collective-sourcing.index",
+                                            )}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Open Demand Groups
+                                        </Link>
+
+                                        <Link
+                                            href={route(
+                                                "collective-sourcing.create",
+                                            )}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Create Requirement
+                                        </Link>
+
+                                        <Link
+                                            href={route(
+                                                "collective-sourcing.my-requests",
+                                            )}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            My Requests
+                                        </Link>
+
+                                        <div className="border-t border-slate-100 my-2"></div>
+                                    </HoverDropdown>
+                                </div>
+                                <div className="relative flex items-center">
+                                    <HoverDropdown
+                                        icon={<span>🏭</span>}
+                                        label="Directory"
+                                    >
+                                        <Link
+                                            href={route("companies.index")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Industry Directory
+                                        </Link>
+
+                                        <Link
+                                            href={route("companies.index")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Browse Companies
+                                        </Link>
+                                    </HoverDropdown>
+                                </div>
+                                <div className="relative flex items-center">
+                                    <HoverDropdown
+                                        icon={<span>🧮</span>}
+                                        label="Tools"
+                                    >
+                                        <Link
+                                            href={route("logistics.tracking")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Port Tracking
+                                        </Link>
+
+                                        <Link
+                                            href={route("tools.calculator")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Industrial Toolbox
+                                        </Link>
+                                    </HoverDropdown>
                                 </div>
                             </div>
                         </div>
 
                         {/* DROPDOWN USER EXECUTIVE (PC VIEW DENGAN BAHASA) */}
-                        <div className="hidden sm:flex sm:items-center sm:ms-6 gap-3">
+                        <div className="hidden xl:flex items-center gap-1">
                             {/* 🌐 SUNTIKAN INTEGRASI BARU: TOMBOL PILIHAN BAHASA DI INDOOR DASBOR */}
-                            <div className="flex bg-white/5 rounded-xl p-1 border border-white/5">
-                                {["id", "en"].map((lang) => (
-                                    <button
-                                        key={lang}
-                                        onClick={() => toggleLanguage(lang)}
-                                        className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase transition-all duration-300 cursor-pointer ${
-                                            (lang === "en" ? isEn : !isEn)
-                                                ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md"
-                                                : "text-gray-400 hover:text-white"
-                                        }`}
+                            <div className="flex items-center gap-2 bg-slate-100 rounded-full p-1 border border-slate-200 shadow-sm">
+                                {[
+                                    {
+                                        code: "id",
+                                        label: "Indonesia",
+                                        flag: "/images/id.png",
+                                    },
+                                    {
+                                        code: "en",
+                                        label: "English",
+                                        flag: "/images/en.png",
+                                    },
+                                ].map((lang, index) => (
+                                    <div
+                                        key={lang.code}
+                                        className="flex items-center"
                                     >
-                                        {lang}
-                                    </button>
+                                        {index > 0 && (
+                                            <div className="w-px h-5 bg-slate-300 mx-1" />
+                                        )}
+
+                                        <button
+                                            onClick={() =>
+                                                toggleLanguage(lang.code)
+                                            }
+                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-semibold transition-all duration-300 ${
+                                                (
+                                                    lang.code === "en"
+                                                        ? isEn
+                                                        : !isEn
+                                                )
+                                                    ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 shadow-md"
+                                                    : "text-slate-600 hover:bg-slate-200"
+                                            }`}
+                                        >
+                                            <img
+                                                src={lang.flag}
+                                                alt={lang.label}
+                                                className="w-4 h-4 rounded-full object-cover"
+                                            />
+
+                                            <span>{lang.label}</span>
+                                        </button>
+                                    </div>
                                 ))}
                             </div>
-
-                            <div className="bg-black/30 border border-white/5 px-4 py-2 rounded-2xl flex items-center gap-4 shadow-inner">
+                            <div className="bg-slate-50 border border-slate-200 px-4 py-2 rounded-2xl flex items-center gap-4 shadow-sm">
                                 <Dropdown>
                                     <Dropdown.Trigger>
-                                        <button className="inline-flex items-center text-[11px] font-black uppercase tracking-widest text-white hover:text-amber-400 focus:outline-none transition cursor-pointer">
-                                            <i className="fas fa-user-shield text-amber-500/60 mr-2 text-xs"></i>
-                                            {user
-                                                ? user.name
-                                                : "Executive Guest"}
-                                            <i className="fas fa-chevron-down text-[8px] text-gray-500 ms-2"></i>
+                                        <button className="inline-flex items-center text-[11px] font-bold tracking-wide text-slate-700 hover:text-amber-500 focus:outline-none transition cursor-pointer">
+                                            <i className="fas fa-user-shield text-amber-500 mr-2 text-xs"></i>
+
+                                            <span className="max-w-[160px] truncate">
+                                                {user
+                                                    ? user.name
+                                                    : "Executive Guest"}
+                                            </span>
+
+                                            <i className="fas fa-chevron-down text-[8px] text-slate-500 ms-2"></i>
                                         </button>
                                     </Dropdown.Trigger>
                                     <Dropdown.Content className="bg-[#0b1329] border border-white/10 rounded-2xl shadow-2xl p-1 mt-2">
@@ -235,7 +306,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         {/* TOMBOL MENU MOBILE HAMBURGER (RESPONSIVE VIEWPORT) */}
-                        <div className="-me-2 flex items-center sm:hidden">
+                        <div className="-me-2 flex items-center xl:hidden">
                             <button
                                 onClick={() =>
                                     setShowingNavigationDropdown(
@@ -258,7 +329,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div
                     className={
                         (showingNavigationDropdown ? "block" : "hidden") +
-                        " sm:hidden bg-[#0b1329]/95 backdrop-blur-xl border-t border-white/5 px-4 py-4 space-y-3 animate-fade-in"
+                        " sm:hidden bg-white border-t border-slate-200 border-t border-white/5 px-4 py-4 space-y-3 animate-fade-in"
                     }
                 >
                     <ResponsiveNavLink

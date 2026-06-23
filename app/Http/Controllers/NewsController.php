@@ -62,8 +62,14 @@ public function index()
 public function show(\App\Models\News $news) // Gunakan Type-Hinting Model News
 {
     // Tidak perlu lagi findOrFail, Laravel sudah mencarikannya untuk Anda
+   $relatedNews = News::where('id','!=',$news->id)
+    ->latest()
+    ->take(4)
+    ->get();
+   
     return inertia('News/Show', [
-        'news' => $news
+        'news' => $news,
+        'relatedNews' => $relatedNews,
     ]);
 }
 
@@ -90,9 +96,17 @@ public function store(Request $request)
     // Validasi data yang masuk
     $request->validate([
         'title_id' => 'required|min:5',
+        'summary_id' => 'nullable|string|max:2000',
         'content_id' => 'required',
+
+        'title_en' => 'nullable|string',
+    'summary_en' => 'nullable|string|max:2000',
+    'content_en' => 'nullable|string',
+
         'slug' => 'required|unique:news,slug', // Tambahkan validasi slug
-         'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Maksimal 2MB
+        'category' => 'required|string|max:100',
+         'partner_name' => 'nullable|string|max:255',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Maksimal 2MB
     ]);
 $imagePath = null;
     if ($request->hasFile('image')) {
@@ -106,20 +120,30 @@ $imagePath = null;
     
     \App\Models\News::create([
         'title_id' => $request->title_id,
-        'title_en' => $request->title_en,
-        'content_id' => $request->content_id,
-        'content_en' => $request->content_en,
-        'slug' => $request->slug, // MASUKKAN INI
-        'author_id' => auth()->id(),
-         'image' => $imagePath, // Simpan path gambar
-         // KOLOM SEO BARU:
-        'meta_title' => $request->meta_title,
-        'meta_description' => $request->meta_description,
-        'meta_keywords' => $request->meta_keywords,
+    'summary_id' => $request->summary_id,
+    'content_id' => $request->content_id,
+
+    'title_en' => $request->title_en,
+    'summary_en' => $request->summary_en,
+    'content_en' => $request->content_en,
+
+    'slug' => $request->slug,
+
+    'author_id' => auth()->id(),
+
+    'category' => $request->category,
+    'partner_name' => $request->partner_name,
+
+    'image' => $imagePath,
+
+    'meta_title' => $request->meta_title,
+    'meta_description' => $request->meta_description,
+    'meta_keywords' => $request->meta_keywords,
     ]);
 
         // Lempar kembali ke Dashboard dengan pesan sukses
-        return redirect()->route('news.index')->with('message', 'Global Intelligence News Published Successfully!');
+        return redirect()->route('admin.news.index')
+    ->with('message', 'Global Intelligence News Published Successfully!');
     }
 public function edit(News $news)
 {
@@ -130,9 +154,12 @@ public function edit(News $news)
 
 public function update(Request $request, News $news)
 {
+    //   dd($request->all());
     $request->validate([
         'title_id' => 'required',
+        'summary_id' => 'nullable|string|max:2000',
         'title_en' => 'required',
+          'summary_en' => 'nullable|string|max:2000',
         'content_id' => 'required',
         'content_en' => 'required',
     ]);
@@ -148,7 +175,7 @@ public function update(Request $request, News $news)
     // PERBAIKAN: Gunakan $data, BUKAN $request->all()
     $news->update($data); 
 
-    return redirect()->route('news.index')->with('message', 'Intelligence News Updated!');
+    return redirect()->route('admin.news.index')->with('message', 'Intelligence News Updated!');
 }
 
 
