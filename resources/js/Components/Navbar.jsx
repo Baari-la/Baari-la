@@ -1,6 +1,7 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+// import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 
 export default function PublicNavbar() {
     const { props } = usePage();
@@ -8,6 +9,7 @@ export default function PublicNavbar() {
     const isEn = props.locale === "en";
 
     const [isOpen, setIsOpen] = useState(false);
+    const [isIntelOpen, setIsIntelOpen] = useState(false);
 
     const toggleLanguage = (lang) => {
         router.post(
@@ -28,6 +30,38 @@ export default function PublicNavbar() {
         "absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-300 group-hover:w-full";
     const mobileNavLinkStyle =
         "text-[13px] font-bold uppercase tracking-wider text-slate-700 hover:text-amber-500 transition-colors duration-300";
+    const dropdownItemStyle =
+        "block px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-slate-700 hover:bg-slate-50 hover:text-amber-500 transition-colors duration-200";
+
+    // List sub-menu Intelligence Center agar DRY (Don't Repeat Yourself)
+    const intelligenceLinks = [
+        {
+            routeName: "intelligence.news",
+            en: "News Intelligence",
+            id: "Intelijen Berita",
+        },
+        {
+            routeName: "intelligence.market",
+            en: "Market Intelligence",
+            id: "Intelijen Pasar",
+        },
+        {
+            routeName: "intelligence.trade",
+            en: "Trade Intelligence",
+            id: "Intelijen Perdagangan",
+        },
+        {
+            routeName: "intelligence.policy",
+            en: "Policy Intelligence",
+            id: "Intelijen Kebijakan",
+        },
+        {
+            routeName: "intelligence.country",
+            en: "Country Intelligence",
+            id: "Intelijen Negara",
+        },
+    ];
+
     return (
         <nav className="bg-white/95 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50 shadow-sm">
             <div className="max-w-7xl mx-auto px-6">
@@ -83,19 +117,24 @@ export default function PublicNavbar() {
                             <span className={underlineStyle} />
                         </Link>
 
-                        {/* Intelligence Center */}
-                        <Link
-                            href={route("market-intelligence")}
-                            className={navLinkStyle}
+                        {/* Dropdown Menu Panel */}
+                        <div
+                            className={`absolute left-0 mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl py-2 transition-all duration-200 origin-top-left ${
+                                isIntelOpen
+                                    ? "opacity-100 scale-100 pointer-events-auto"
+                                    : "opacity-0 scale-95 pointer-events-none"
+                            }`}
                         >
-                            {isEn ? "Intelligence Center" : "Pusat Intelijen"}
-
-                            <span className="ml-2 text-[7px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded uppercase font-bold">
-                                Live
-                            </span>
-
-                            <span className={underlineStyle} />
-                        </Link>
+                            {intelligenceLinks.map((item, index) => (
+                                <Link
+                                    key={index}
+                                    href={route(item.routeName, item.params)} // 💡 Ditambahkan item.params di sini
+                                    className={dropdownItemStyle}
+                                >
+                                    {isEn ? item.en : item.id}
+                                </Link>
+                            ))}
+                        </div>
 
                         {/* Partner Insights */}
                         <Link
@@ -232,7 +271,25 @@ export default function PublicNavbar() {
                         </Link>
 
                         <hr className="border-slate-200 my-2" />
-
+                        <Link
+                            href="/admin/import-kemendag"
+                            className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                        >
+                            <svg
+                                className="w-5 h-5 mr-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                                />
+                            </svg>
+                            Import Data Kemendag
+                        </Link>
                         {/* LANGUAGE SWITCHER */}
 
                         <div className="flex items-center gap-2">

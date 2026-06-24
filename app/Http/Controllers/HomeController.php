@@ -14,6 +14,7 @@ class HomeController extends Controller
     /**
      * Menampilkan dashboard utama Digestex Global dengan pemetaan Multi-Service.
      */
+    {
     public function index(
         HomeMarketService $market,
         HomeTradeService $trade,
@@ -29,4 +30,5 @@ class HomeController extends Controller
             $intelligence->getData()
         ));
 
+    }
     }

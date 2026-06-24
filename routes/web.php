@@ -34,6 +34,7 @@ use App\Http\Controllers\EcosystemPartnerController;
 use App\Http\Controllers\CompanyLocationController;
 use App\Http\Controllers\PartnerInsightController;
 
+
 /*
 
 |--------------------------------------------------------------------------
@@ -546,6 +547,14 @@ Route::get('/market-intelligence', function () {
         return Inertia::render('MarketIntelligence/Index');
     })->name(    'market-intelligence');
 
+    Route::prefix('intelligence')->name('intelligence.')->group(function () {
+    Route::get('/news', [IntelligenceController::class, 'news'])->name('news');
+    Route::get('/market', [IntelligenceController::class, 'market'])->name('market');
+    Route::get('/trade', [IntelligenceController::class, 'trade'])->name('trade');
+    Route::get('/policy', [IntelligenceController::class, 'policy'])->name('policy');
+    Route::get('/country', [IntelligenceController::class, 'country'])->name('country');
+});
+
 
 /*
 
@@ -627,6 +636,9 @@ Route::put('/news/{news:slug}', [NewsController::class, 'update'])
 Route::delete('/news/{news:slug}', [NewsController::class, 'destroy'])
     ->name('news.destroy');
 
+Route::get('/admin/import-kemendag', [AdminDashboardController::class, 'showImportForm'])->name('admin.import.show');
 
+    // 2. Route untuk memproses upload excel (Tipe POST)
+    Route::post('/admin/import-kemendag', [AdminDashboardController::class, 'importDataKemendag'])->name('admin.import.kemendag');
 
 });

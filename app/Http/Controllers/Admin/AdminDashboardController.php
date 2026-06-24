@@ -9,6 +9,8 @@ use App\Models\CompanyUpdate;
 use Illuminate\Support\Facades\DB;
 use App\Models\AuditLog;
 use App\Models\CompanyClaim;
+use App\Models\TradeAnalyticsVertical;
+use Maatwebsite\Excel\Facades\Excel; // Sesuaikan dengan library excel yang Anda gunakan (misal: Maatwebsite/Laravel-Excel)
 
 
 
@@ -391,5 +393,55 @@ public function rejectClaim(
         'message',
         'Company claim rejected.'
     );
+}
+
+public function importDataKemendag(Request $request)
+{
+    $file = $request->file('file_excel');
+    $tahunTarget = $request->input('tahun'); // Misal admin input: 2026 lewat form
+
+    // Membaca data excel menjadi array
+    $dataArray = Excel::toArray([], $file)[0];
+    $header = array_shift($dataArray); // Mengambil baris pertama sebagai susunan header
+
+    foreach ($dataArray as $row) {
+    // Abaikan jika baris kosong atau jumlah kolom tidak sinkron dengan header
+    if (count($header) !== count($row)) {
+        continue; 
+    }
+        $rowData = array_combine($header, $row);
+
+        // Loop untuk 12 Bulan (1 = Jan, 12 = Des)
+        for ($bulan = 1; $bulan <= 12; $bulan++) {
+            // Membuat nama kolom dinamis sesuai format header excel admin
+            // Contoh: val_2026_01, vol_2026_01
+            $padBulan = str_pad($bulan, 2, '0', STR_PAD_LEFT); 
+            $kolomNilai = "val_{$tahunTarget}_{$padBulan}";
+            $kolomVolume = "vol_{$tahunTarget}_{$padBulan}";
+
+            // Ambil nilainya dari excel
+            $nilaiUsd = $rowData[$kolomNilai] ?? 0;
+            $volumeKg = $rowData[$kolomVolume] ?? 0;
+
+            // Masukkan ke database vertikal hanya jika ada transaksi (> 0)
+            if ($nilaiUsd > 0 || $volumeKg > 0) {
+                TradeAnalyticsVertical::create([
+                    'tipe_arus'   => $rowData['tipe_arus'] ?? 'ekspor',
+                    'dimensi'     => 'country',
+                    'produk'      => $rowData['produk'],
+                    'hs'          => $rowData['hs'],
+                    'uraian_hs'   => $rowData['uraian_hs'],
+                    'kode_negara' => $rowData['kode_negara'],
+                    'nama_negara' => $rowData['nama_negara'],
+                    'tahun'       => $tahunTarget,
+                    'bulan'       => $bulan,
+                    'value_usd'   => $nilaiUsd,
+                    'weight_kg'   => $volumeKg,
+                ]);
+            }
+        }
+    }
+
+   return Inertia::render('Admin/ImportKemendag');
 }
 }
