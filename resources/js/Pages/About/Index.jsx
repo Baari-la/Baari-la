@@ -129,8 +129,7 @@ export default function About() {
                 leading-relaxed
             "
                     >
-                        Built From Industry Experience. Powered By Industry
-                        Needs.
+                        Built From Industry Experience. Designed For Global Textile Business.
                     </p>
 
                     <p

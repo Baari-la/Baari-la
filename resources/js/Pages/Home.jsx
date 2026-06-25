@@ -125,18 +125,22 @@ export default function Home(props) {
                     <div className="px-6 pt-20 pb-16 text-center relative overflow-hidden">
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
                         <h1 className="text-6xl md:text-8xl font-black mb-6 leading-none uppercase tracking-tighter italic relative z-10">
-                            {isEn
-                                ? "Global Textile Intelligence "
-                                : "Ekosistem Industri "}
-                            <span className="text-yellow-500 leading-none block md:inline">
-                                {isEn ? "Ecosystem" : "Global Terintegrasi"}
-                            </span>
+                           {isEn
+        ? "Global Textile Industry"
+        : "Ekosistem Industri Tekstil"}
+
+    <span className="text-yellow-500 leading-none block md:inline">
+        {isEn
+            ? " Ecosystem"
+            : " Global"}
+    </span>
                         </h1>
                         <div className="max-w-4xl mx-auto mb-12 relative z-10">
                             <p className=" text-white text-lg md:text-2xl font-bold leading-relaxed tracking-tight">
                                 {isEn
-                                    ? "connecting companies, sourcing intelligence, market analytics, trade insights, and business opportunities across the textile supply chain."
-                                    : "Menghubungkan Industri, Solusi, Pasar, dan Peluang."}
+                                    ? "Connecting manufacturers, suppliers, buyers, market intelligence, and business opportunities throughout the global textile value chain."
+                                    : "Menghubungkan produsen, pemasok, pembeli, market intelligence, dan peluang bisnis di seluruh rantai nilai industri tekstil global."
+}
                             </p>
                             <p
                                 className="
@@ -150,8 +154,8 @@ export default function Home(props) {
         "
                             >
                                 {isEn
-                                    ? "Built to support collaboration, innovation, and sustainable growth across the textile value chain."
-                                    : "Dibangun untuk mendukung kolaborasi, inovasi, dan pertumbuhan berkelanjutan di seluruh rantai nilai industri tekstil."}
+                                    ? "Built from industry experience. Designed for global textile business."
+                                    : "Dibangun dari pengalaman industri. Dirancang untuk bisnis tekstil global."}
                             </p>
                         </div>
                         <form
@@ -265,7 +269,7 @@ export default function Home(props) {
                         />
                         <IntelligenceOverview isEn={isEn} />
                     </div>
-                    <div className="mt-20">
+                    <div className="mt-10">
                         <div className="max-w-7xl mx-auto">
                             <CottonCurrencyTrendChart
                                 data={marketHistory}
@@ -285,7 +289,9 @@ export default function Home(props) {
                     />
                     <IndustrySolutionsSection isEn={isEn} />
 
-                    <SourcingHubPreview />
+                    <SourcingHubPreview
+                    isEn={isEn}
+                    />
 
                     {/* Batas Sourcing Hub dan Market Intelligecnce*/}
 
