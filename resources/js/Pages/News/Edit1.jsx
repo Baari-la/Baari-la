@@ -1,135 +1,84 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import axios from "axios";
 
-export default function Create({ auth }) {
+export default function Edit({ news }) {
     const [lang, setLang] = useState("id");
+
+    const [preview, setPreview] = useState(
+        news.image ? `/storage/${news.image}` : null,
+    );
+
     const [isTranslating, setIsTranslating] = useState(false);
-    const [preview, setPreview] = useState(null);
-
-    const { data, setData, post, processing } = useForm({
-        title_id: "",
-        summary_id: "",
-        title_en: "",
-        summary_en: "",
-        content_id: "",
-        content_en: "",
-        slug: "",
-        category: "Industry News",
-        partner_name: "",
-        image: null,
-    });
-
-    // Handle Image Change & Preview
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        setData("image", file);
+
         if (file) {
+            setData("image", file);
             setPreview(URL.createObjectURL(file));
         }
     };
+    // Mengambil data lama dari database ke dalam form
+    const { data, setData, put, processing } = useForm({
+        category: news.category || "Industry News",
+        title_id: news.title_id || "",
+        summary_id: news.summary_id || "",
+        content_id: news.content_id || "",
+        slug: news.slug || "",
+        title_en: news.title_en || "",
+        summary_en: news.summary_en || "",
+        content_en: news.content_en || "",
 
-    // 1. AUTO-TRANSLATE JUDUL & SLUG
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (data.title_id && data.title_id.length > 5) {
-                setIsTranslating(true);
-                axios
-                    .post(route("admin.news.translate"), {
-                        text: data.title_id,
-                    })
-                    .then((res) => {
-                        // Gunakan fungsional update (prev) agar data lain (seperti image/content) tidak hilang
-                        setData((prev) => ({
-                            ...prev,
-                            title_en: res.data.translated,
-                            slug: res.data.slug,
-                        }));
-                    })
-                    .catch((err) => console.error(err))
-                    .finally(() => setIsTranslating(false));
-            }
-        }, 1500);
-        return () => clearTimeout(timer);
-    }, [data.title_id]);
-
-    // AUTO-TRANSLATE SUMMARY
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (data.summary_id && data.summary_id.length > 20) {
-                axios
-                    .post(route("admin.news.translate"), {
-                        text: data.summary_id,
-                    })
-                    .then((res) => {
-                        setData((prev) => ({
-                            ...prev,
-                            summary_en: res.data.translated,
-                        }));
-                    })
-                    .catch((err) => console.error(err));
-            }
-        }, 2000);
-
-        return () => clearTimeout(timer);
-    }, [data.summary_id]);
-
-    // 2. AUTO-TRANSLATE ISI BERITA (Content)
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (data.content_id && data.content_id.length > 50) {
-                const plainText = data.content_id.replace(/<[^>]*>?/gm, "");
-                axios
-                    .post(route("admin.news.translate"), { text: plainText })
-                    .then((res) => {
-                        setData((prev) => ({
-                            ...prev,
-                            content_en: `<p>${res.data.translated}</p>`,
-                        }));
-                    });
-            }
-        }, 3000);
-        return () => clearTimeout(timer);
-    }, [data.content_id]);
+        partner_name: news.partner_name || "",
+        meta_title: news.meta_title || "",
+        meta_description: news.meta_description || "",
+        meta_keywords: news.meta_keywords || "",
+        image: null,
+    });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route("admin.news.store"));
+        console.log("UPDATE CLICKED");
+        put(route("admin.news.update", news.slug));
     };
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="font-black text-xl text-[#0a192f] uppercase tracking-tighter">
-                    Bilingual Intelligence
+                <h2 className="font-bold text-xl text-gray-800">
+                    Edit Intelligence News
                 </h2>
             }
         >
-            <Head title="Write News" />
-            <div className="py-12 bg-gray-50 min-h-screen">
+            <Head title="Edit News" />
+            <div className="py-12 bg-gray-50">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    {/* TAB SWITCHER */}
-                    <div className="flex gap-2 bg-gray-200 p-1 rounded-xl w-fit mb-6">
+                    <div className="flex gap-4 mb-6">
                         <button
                             type="button"
                             onClick={() => setLang("id")}
-                            className={`px-6 py-2 rounded-lg font-bold text-[10px] uppercase transition ${lang === "id" ? "bg-[#0a192f] text-yellow-500 shadow-md" : "text-gray-500"}`}
+                            className={
+                                lang === "id"
+                                    ? "font-bold text-yellow-500"
+                                    : "text-gray-400"
+                            }
                         >
                             INDONESIA
                         </button>
                         <button
                             type="button"
                             onClick={() => setLang("en")}
-                            className={`px-6 py-2 rounded-lg font-bold text-[10px] uppercase transition ${lang === "en" ? "bg-[#0a192f] text-yellow-500 shadow-md" : "text-gray-500"}`}
+                            className={
+                                lang === "en"
+                                    ? "font-bold text-yellow-500"
+                                    : "text-gray-400"
+                            }
                         >
                             ENGLISH
                         </button>
                     </div>
-
                     <form
                         onSubmit={submit}
                         className="bg-white p-10 rounded-[40px] shadow-sm border border-gray-100"
@@ -187,12 +136,11 @@ export default function Create({ auth }) {
                                 <option value="Technology & Innovation">
                                     Technology & Innovation
                                 </option>
-                                <option value="Partner Insights">
-                                    Partner Insights
-                                </option>
+
                                 <option value="Industry News">
                                     Industry News
                                 </option>
+
                                 <option value="Events & Exhibitions">
                                     Events & Exhibitions
                                 </option>
@@ -218,7 +166,7 @@ export default function Create({ auth }) {
                                 Slug: {data.slug}
                             </p>
                         </div>
-                        {/* Sunnary ID */}
+                        {/* Summary ID */}
                         <div
                             className={lang === "id" ? "block mb-8" : "hidden"}
                         >
@@ -233,7 +181,7 @@ export default function Create({ auth }) {
                                     setData("summary_id", e.target.value)
                                 }
                                 className="w-full p-4 rounded-xl border border-slate-300 bg-white text-slate-900"
-                                placeholder="Ringkasan utama artikel dalam 2-3 kalimat..."
+                                placeholder="Ringkasan utama artikel..."
                             />
                         </div>
                         <div
@@ -252,7 +200,6 @@ export default function Create({ auth }) {
                                 }
                             />
                         </div>
-
                         {/* Summary EN */}
                         <div
                             className={lang === "en" ? "block mb-8" : "hidden"}
@@ -268,7 +215,7 @@ export default function Create({ auth }) {
                                     setData("summary_en", e.target.value)
                                 }
                                 className="w-full p-4 rounded-xl border border-slate-300 bg-gray-50 text-slate-900"
-                                placeholder="Short executive summary..."
+                                placeholder="Short article summary..."
                             />
                         </div>
                         {/* EDITOR KONTEN */}

@@ -15,6 +15,7 @@ import {
     Settings,
     LogOut,
     FileText,
+    Newspaper, // Tambahkan icon koran untuk menu berita
 } from "lucide-react";
 
 export default function AuthenticatedLayout({
@@ -79,7 +80,7 @@ export default function AuthenticatedLayout({
                                 </Link>
                             </div>
 
-                            {/* MENU UTAMA DESKTOP (PC LAYOUT) - HIGH CONTRAST READABILITY & ADDITIONAL TERMINAL */}
+                            {/* MENU UTAMA DESKTOP (PC LAYOUT) */}
                             <div className="hidden xl:flex items-center gap-1">
                                 <div className="relative flex items-center">
                                     <HoverDropdown
@@ -136,8 +137,6 @@ export default function AuthenticatedLayout({
                                         </Link>
                                     </HoverDropdown>
                                 </div>
-                                {/* FITUR AMUNISI BARU: DIGITAL CONTAINER TRACKING JICT & NPCT1 */}
-                                {/* TOOLS */}
 
                                 <div className="relative flex items-center">
                                     <HoverDropdown
@@ -219,9 +218,8 @@ export default function AuthenticatedLayout({
                             </div>
                         </div>
 
-                        {/* DROPDOWN USER EXECUTIVE (PC VIEW DENGAN BAHASA) */}
+                        {/* DROPDOWN USER EXECUTIVE (PC VIEW) */}
                         <div className="hidden xl:flex items-center gap-1">
-                            {/* 🌐 SUNTIKAN INTEGRASI BARU: TOMBOL PILIHAN BAHASA DI INDOOR DASBOR */}
                             <div className="flex items-center gap-2 bg-slate-100 rounded-full p-1 border border-slate-200 shadow-sm">
                                 {[
                                     {
@@ -291,12 +289,22 @@ export default function AuthenticatedLayout({
                                             <Settings className="w-3.5 h-3.5 text-gray-500" />{" "}
                                             Account Settings
                                         </Dropdown.Link>
+
+                                        {/* SUNTIKAN SINKRONISASI MANAJEMEN NEWS INTELLIGENCE */}
+                                        <Link
+                                            href={route("admin.news.index")}
+                                            className="flex items-center px-4 py-2.5 text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-white rounded-xl transition-colors gap-2"
+                                        >
+                                            <Newspaper className="w-3.5 h-3.5 text-amber-500" />
+                                            Manage Intelligence News
+                                        </Link>
+
                                         <Link
                                             href="/admin/import-kemendag"
-                                            className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                                            className="flex items-center px-4 py-2.5 text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-white rounded-xl transition-colors gap-2"
                                         >
                                             <svg
-                                                className="w-5 h-5 mr-3"
+                                                className="w-3.5 h-3.5 text-gray-500"
                                                 fill="none"
                                                 stroke="currentColor"
                                                 viewBox="0 0 24 24"
@@ -324,7 +332,7 @@ export default function AuthenticatedLayout({
                             </div>
                         </div>
 
-                        {/* TOMBOL MENU MOBILE HAMBURGER (RESPONSIVE VIEWPORT) */}
+                        {/* TOMBOL MENU MOBILE HAMBURGER */}
                         <div className="-me-2 flex items-center xl:hidden">
                             <button
                                 onClick={() =>
@@ -344,11 +352,11 @@ export default function AuthenticatedLayout({
                     </div>
                 </div>
 
-                {/* AREA PANEL NAVIGASI VERSI RESPONSIVE (MOBILE VIEW HIGH CONTRAST) */}
+                {/* AREA PANEL NAVIGASI VERSI RESPONSIVE (MOBILE VIEW) */}
                 <div
                     className={
                         (showingNavigationDropdown ? "block" : "hidden") +
-                        " sm:hidden bg-white border-t border-slate-200 border-t border-white/5 px-4 py-4 space-y-3 animate-fade-in"
+                        " sm:hidden bg-white border-t border-slate-200 px-4 py-4 space-y-3 animate-fade-in"
                     }
                 >
                     <ResponsiveNavLink
@@ -373,6 +381,18 @@ export default function AuthenticatedLayout({
                         Intelligence Center
                     </ResponsiveNavLink>
 
+                    {/* SINKRONISASI MOBILE: LINK CRUD BERITA INTELLIGENCE */}
+                    {user?.role === "admin" && (
+                        <ResponsiveNavLink
+                            href={route("admin.news.index")}
+                            active={route().current("admin.news.*")}
+                            className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-amber-600 bg-amber-50 border border-amber-200/50 flex items-center gap-2"
+                        >
+                            <Newspaper className="w-3.5 h-3.5" />
+                            Manage Intelligence News
+                        </ResponsiveNavLink>
+                    )}
+
                     <ResponsiveNavLink
                         href={route("rfqs.index")}
                         active={route().current("rfqs.*")}
@@ -382,7 +402,6 @@ export default function AuthenticatedLayout({
                         RFQ Marketplace
                     </ResponsiveNavLink>
 
-                    {/* SINKRONISASI MOBILE MENU: LIVE CONTAINER TRACKING GATEWAY */}
                     <ResponsiveNavLink
                         href={route("logistics.tracking")}
                         active={route().current("logistics.tracking")}
@@ -402,7 +421,7 @@ export default function AuthenticatedLayout({
                             Premium
                         </span>
                     </ResponsiveNavLink>
-                    {/* ✨ SUBMENU COLLECTIVE SOURCING VERSI MOBILE */}
+
                     <div className="pt-2 border-t border-white/5 space-y-1">
                         <div className="px-4 py-1 text-[9px] font-black text-amber-500/80 uppercase tracking-widest flex items-center gap-1.5">
                             <Layers className="w-3 h-3" /> Collective Sourcing
@@ -436,7 +455,6 @@ export default function AuthenticatedLayout({
                         </ResponsiveNavLink>
                     </div>
 
-                    {/* 🌐 SUNTIKAN REAKTIF: LANGUAGE SWITCHER KHUSUS MOBILE VIEWPORT DI INDOOR DASBOR */}
                     <div className="pt-2 border-t border-white/5">
                         <div className="flex bg-white/5 rounded-xl p-1 border border-white/5 w-fit">
                             {["id", "en"].map((lang) => (
@@ -457,14 +475,11 @@ export default function AuthenticatedLayout({
                 </div>
             </nav>
 
-            {/* --- AREA HEADER DINAMIS SUB-HALAMAN (SINKRONISASI TEMA DARK PREMIUM) --- */}
+            {/* --- AREA HEADER DINAMIS SUB-HALAMAN --- */}
             {header && (
                 <header className="bg-gradient-to-r from-[#0b1329] via-[#0f172a]/40 to-transparent border-b border-white/5 shadow-2xl relative overflow-hidden">
-                    {/* Ornamen Pendaran Cahaya Neon Emas di Sudut Belakang */}
                     <div className="absolute top-0 left-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -ml-20 -mt-20"></div>
-
                     <div className="mx-auto max-w-7xl px-6 py-6 sm:px-8 lg:px-10 relative z-10">
-                        {/* Garis Vertikal Emas Kokoh Sebagai Penopang Fokus Visual */}
                         <div className="border-l-4 border-amber-500 pl-4">
                             <h1 className="text-lg lg:text-xl font-black uppercase tracking-wider font-sans text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-gray-400 drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">
                                 {header}
@@ -474,10 +489,10 @@ export default function AuthenticatedLayout({
                 </header>
             )}
 
-            {/* --- AREA MAIN STREAM VIEWPORT UTAMA (ANIMASI SMOOTH LOADING) --- */}
+            {/* --- AREA MAIN STREAM VIEWPORT UTAMA --- */}
             <main className="relative z-10 animate-fade-in-up">{children}</main>
 
-            {/* --- PROTEKSI FOOTER LEGAL BADAN HUKUM PIHAK KETIGA INDEPENDEN --- */}
+            {/* --- PROTEKSI FOOTER LEGAL --- */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="border-t border-white/5 pt-8 pb-12 mt-12 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-500 font-medium font-mono">
                     <p>

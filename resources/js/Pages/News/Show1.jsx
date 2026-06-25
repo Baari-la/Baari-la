@@ -107,22 +107,20 @@ export default function Show({ news, company }) {
                         </span>
 
                         <div className="flex gap-4">
-                            {/* FIX WHATSAPP LINK - Memperbaiki format parameter text query string */}
+                            {/* FIX WHATSAPP LINK */}
                             <a
-                                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(displayTitle)}%20${encodeURIComponent(window.location.href)}`}
+                                href={`https://whatsapp.com{encodeURIComponent(displayTitle)}%20${encodeURIComponent(window.location.href)}`}
                                 target="_blank"
-                                rel="noopener noreferrer"
                                 className="flex items-center gap-3 bg-[#25D366] text-white px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg"
                             >
                                 <i className="fab fa-whatsapp text-sm"></i>{" "}
                                 WhatsApp
                             </a>
 
-                            {/* FIX LINKEDIN LINK - Memperbaiki parameter url query string */}
+                            {/* FIX LINKEDIN LINK */}
                             <a
-                                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+                                href={`https://linkedin.com{encodeURIComponent(window.location.href)}`}
                                 target="_blank"
-                                rel="noopener noreferrer"
                                 className="flex items-center gap-3 bg-[#0077B5] text-white px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg"
                             >
                                 <i className="fab fa-linkedin-in text-sm"></i>{" "}
@@ -148,8 +146,7 @@ export default function Show({ news, company }) {
                         </div>
                     </div>
 
-                    {/* NAVIGATION BACK */}
-                    <div className="mt-12 pt-6 border-t border-gray-100 flex gap-4">
+                    <div className="mt-12 pt-6 border-t border-gray-100">
                         <Link
                             href={route("home")}
                             className="text-[#0a192f] font-black text-xs uppercase tracking-widest hover:text-yellow-600 transition flex items-center gap-2"
@@ -157,17 +154,6 @@ export default function Show({ news, company }) {
                             <span>←</span>{" "}
                             {isEn ? "Back to Feed" : "Kembali ke Beranda"}
                         </Link>
-
-                        {/* Navigasi jalan pintas opsional jika diakses oleh Administrator */}
-                        {auth.user?.role === "admin" && (
-                            <Link
-                                href={route("admin.news.index")}
-                                className="text-blue-600 font-black text-xs uppercase tracking-widest hover:text-blue-800 transition flex items-center gap-2 border-l pl-4 border-gray-200"
-                            >
-                                <span>🛠️</span>{" "}
-                                {isEn ? "Manage News" : "Kelola Berita Admin"}
-                            </Link>
-                        )}
                     </div>
                 </div>
             </div>

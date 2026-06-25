@@ -1,24 +1,50 @@
-import ApplicationLogo from "@/components/applicationlogo";
-import Dropdown from "@/components/dropdown";
-import NavLink from "@/components/navlink";
-import ResponsiveNavLink from "@/components/responsivenavlink";
-import { Link, usePage } from "@inertiajs/react";
+import ApplicationLogo from "@/Components/ApplicationLogo";
+import Dropdown from "@/Components/Dropdown";
+import NavLink from "@/Components/NavLink";
+import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
+import { Link, usePage, router } from "@inertiajs/react";
 import { useState } from "react";
+import HoverDropdown from "@/Components/HoverDropdown";
 import {
     ShieldCheck,
     Menu,
     X,
     LayoutDashboard,
+    Globe,
+    Layers,
     Settings,
     LogOut,
+    FileText,
 } from "lucide-react";
 
-export default function AuthenticatedLayout({ header, children }) {
+export default function AuthenticatedLayout({
+    icon,
+    label,
+    header,
+    width = "w-72",
+    children,
+}) {
     const user = usePage().props.auth.user;
     const { locale } = usePage().props;
     const isEn = locale === "en";
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+
+    // 🌐 METODE PEMICU PERALIHAN BAHASA SECARA REAKTIF DI KONSOL INTERNAL
+    const toggleLanguage = (lang) => {
+        router.post(
+            route("language.switch", { locale: lang }),
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => setShowingNavigationDropdown(false),
+            },
+        );
+    };
+    const dashboardNavStyle =
+        "px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-700 hover:text-amber-500 transition-all duration-300";
+    const mobileNavStyle =
+        "block px-4 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-amber-500 transition";
 
     return (
         <div className="min-h-screen bg-[#030712] text-gray-100 font-sans selection:bg-amber-500 selection:text-black">
@@ -26,107 +52,269 @@ export default function AuthenticatedLayout({ header, children }) {
             <div className="h-1 w-full bg-gradient-to-r from-amber-600 via-yellow-500 to-emerald-500 shadow-[0_2px_20px_rgba(245,158,11,0.5)]"></div>
 
             {/* --- HEADER NAVIGASI GLASSMORPHISM PREMIUM --- */}
-            <nav className="bg-[#0b1329]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl sticky top-0 z-50">
+            <nav className="bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-20 items-center">
+                    <div className="grid grid-cols-[auto_1fr_auto] h-24 items-center gap-10">
                         <div className="flex items-center gap-10">
-                            {/* LOGO PERUSAHAAN UTAMA DENGAN LENCANA VERIFIKASI */}
+                            {/* LOGO PENYELARASAN BRANDING: API JAKARTA GLOBAL TRADE NODE */}
                             <div className="shrink-0 flex items-center">
                                 <Link
                                     href="/"
-                                    className="flex items-center gap-3 group"
+                                    className="flex flex-col items-start shrink-0"
                                 >
-                                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform duration-300">
-                                        <ShieldCheck className="w-5 h-5 text-[#030712] stroke-[2.5]" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-black tracking-tighter text-sm uppercase text-white leading-none">
-                                            DIGESTEX
+                                    <img
+                                        src="/images/logoWeb.png"
+                                        className="h-14 w-auto"
+                                        alt="Digestex Global"
+                                    />
+
+                                    <p className="mt-1 text-[9px] tracking-[0.15em] leading-none">
+                                        <span className="text-[#0B2E59]">
+                                            Where Textile Meets
+                                        </span>{" "}
+                                        <span className="text-[#F97316] font-semibold">
+                                            Intelligence
                                         </span>
-                                        <span className="text-[8px] text-amber-500 font-mono tracking-widest uppercase font-bold mt-1">
-                                            GLOBAL HUB
-                                        </span>
-                                    </div>
+                                    </p>
                                 </Link>
                             </div>
 
-                            {/* MENU UTAMA DESKTOP (PC LAYOUT) - PUTIH KABUT TAJAM */}
-                            <div className="hidden space-x-2 sm:flex items-center">
-                                <NavLink
-                                    href={route("home")}
-                                    active={route().current("home")}
-                                    className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all duration-300"
-                                >
-                                    Home
-                                </NavLink>
-                                <NavLink
-                                    href={route("dashboard")}
-                                    active={route().current("dashboard")}
-                                    className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all duration-300"
-                                >
-                                    Dashboard
-                                </NavLink>
-                                <NavLink
-                                    href={route("intelligence.center")}
-                                    active={route().current(
-                                        "intelligence.center",
-                                    )}
-                                    className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all duration-300"
-                                >
-                                    Intelligence Center
-                                </NavLink>
-                                <NavLink
-                                    href={route("tools.calculator")}
-                                    active={route().current("tools.calculator")}
-                                    className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-200 transition-all flex items-center gap-2 bg-white/5 border border-white/5 duration-300 hover:text-emerald-400 hover:bg-white/10 hover:border-emerald-500/30"
-                                >
-                                    <span>🧮</span>
-                                    <span>Industrial Toolbox</span>
-                                    <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[7px] text-[#030712] px-1.5 py-0.5 rounded-md font-black uppercase tracking-tighter shadow-sm">
-                                        Premium
-                                    </span>
-                                </NavLink>
+                            {/* MENU UTAMA DESKTOP (PC LAYOUT) - HIGH CONTRAST READABILITY & ADDITIONAL TERMINAL */}
+                            <div className="hidden xl:flex items-center gap-1">
+                                <div className="relative flex items-center">
+                                    <HoverDropdown
+                                        icon={
+                                            <Globe className="w-4 h-4 text-blue-500" />
+                                        }
+                                        label="Intelligence"
+                                    >
+                                        <Link
+                                            href={route("intelligence.center")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Intelligence Center
+                                        </Link>
+
+                                        <Link
+                                            href={route("market-intelligence")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Market Intelligence
+                                        </Link>
+                                    </HoverDropdown>
+                                </div>
+                                <div className="relative flex items-center">
+                                    <HoverDropdown
+                                        icon={
+                                            <FileText className="w-4 h-4 text-cyan-500" />
+                                        }
+                                        label="Trade Hub"
+                                    >
+                                        <Link
+                                            href={route("rfqs.index")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            RFQ Marketplace
+                                        </Link>
+
+                                        <Link
+                                            href={route(
+                                                "purchase-orders.index",
+                                            )}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Purchase Orders
+                                        </Link>
+
+                                        <Link
+                                            href={route("quotations.index")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            {isEn
+                                                ? "My Quotations"
+                                                : "Penawaran Saya"}
+                                        </Link>
+                                    </HoverDropdown>
+                                </div>
+                                {/* FITUR AMUNISI BARU: DIGITAL CONTAINER TRACKING JICT & NPCT1 */}
+                                {/* TOOLS */}
+
+                                <div className="relative flex items-center">
+                                    <HoverDropdown
+                                        icon={
+                                            <Layers className="w-4 h-4 text-amber-500" />
+                                        }
+                                        label="Sourcing Hub"
+                                    >
+                                        <Link
+                                            href={route(
+                                                "collective-sourcing.index",
+                                            )}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Open Demand Groups
+                                        </Link>
+
+                                        <Link
+                                            href={route(
+                                                "collective-sourcing.create",
+                                            )}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Create Requirement
+                                        </Link>
+
+                                        <Link
+                                            href={route(
+                                                "collective-sourcing.my-requests",
+                                            )}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            My Requests
+                                        </Link>
+
+                                        <div className="border-t border-slate-100 my-2"></div>
+                                    </HoverDropdown>
+                                </div>
+                                <div className="relative flex items-center">
+                                    <HoverDropdown
+                                        icon={<span>🏭</span>}
+                                        label="Directory"
+                                    >
+                                        <Link
+                                            href={route("companies.index")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Industry Directory
+                                        </Link>
+
+                                        <Link
+                                            href={route("companies.index")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Browse Companies
+                                        </Link>
+                                    </HoverDropdown>
+                                </div>
+                                <div className="relative flex items-center">
+                                    <HoverDropdown
+                                        icon={<span>🧮</span>}
+                                        label="Tools"
+                                    >
+                                        <Link
+                                            href={route("logistics.tracking")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Port Tracking
+                                        </Link>
+
+                                        <Link
+                                            href={route("tools.calculator")}
+                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                                        >
+                                            Industrial Toolbox
+                                        </Link>
+                                    </HoverDropdown>
+                                </div>
                             </div>
                         </div>
 
-                        {/* DROPDOWN USER EXECUTIVE (PC VIEW) */}
-                        <div className="hidden sm:flex sm:items-center sm:ms-6">
-                            <div className="bg-black/40 border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-4 shadow-xl backdrop-blur-md">
+                        {/* DROPDOWN USER EXECUTIVE (PC VIEW DENGAN BAHASA) */}
+                        <div className="hidden xl:flex items-center gap-1">
+                            {/* 🌐 SUNTIKAN INTEGRASI BARU: TOMBOL PILIHAN BAHASA DI INDOOR DASBOR */}
+                            <div className="flex items-center gap-2 bg-slate-100 rounded-full p-1 border border-slate-200 shadow-sm">
+                                {[
+                                    {
+                                        code: "id",
+                                        label: "Indonesia",
+                                        flag: "/images/id.png",
+                                    },
+                                    {
+                                        code: "en",
+                                        label: "English",
+                                        flag: "/images/en.png",
+                                    },
+                                ].map((lang, index) => (
+                                    <div
+                                        key={lang.code}
+                                        className="flex items-center"
+                                    >
+                                        {index > 0 && (
+                                            <div className="w-px h-5 bg-slate-300 mx-1" />
+                                        )}
+
+                                        <button
+                                            onClick={() =>
+                                                toggleLanguage(lang.code)
+                                            }
+                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-semibold transition-all duration-300 ${
+                                                (
+                                                    lang.code === "en"
+                                                        ? isEn
+                                                        : !isEn
+                                                )
+                                                    ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 shadow-md"
+                                                    : "text-slate-600 hover:bg-slate-200"
+                                            }`}
+                                        >
+                                            <img
+                                                src={lang.flag}
+                                                alt={lang.label}
+                                                className="w-4 h-4 rounded-full object-cover"
+                                            />
+
+                                            <span>{lang.label}</span>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="bg-slate-50 border border-slate-200 px-4 py-2 rounded-2xl flex items-center gap-4 shadow-sm">
                                 <Dropdown>
                                     <Dropdown.Trigger>
-                                        <button className="inline-flex items-center text-[11px] font-black uppercase tracking-widest text-slate-200 hover:text-amber-400 focus:outline-none transition cursor-pointer gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
-                                            {user
-                                                ? user.name
-                                                : "Executive Guest"}
-                                            <svg
-                                                className="h-3 w-3 text-slate-400"
-                                                xmlns="http://w3.org"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                            >
-                                                <path
-                                                    fillRule="evenodd"
-                                                    d="M5.293 7.293a1.414 1.414 0 011.414 0L10 10.586l3.293-3.293a1.414 1.414 0 111.414 1.414l-4 4a1.414 1.414 0 01-1.414 0l-4-4a1.414 1.414 0 010-1.414z"
-                                                    clipRule="evenodd"
-                                                />
-                                            </svg>
+                                        <button className="inline-flex items-center text-[11px] font-bold tracking-wide text-slate-700 hover:text-amber-500 focus:outline-none transition cursor-pointer">
+                                            <i className="fas fa-user-shield text-amber-500 mr-2 text-xs"></i>
+
+                                            <span className="max-w-[160px] truncate">
+                                                {user
+                                                    ? user.name
+                                                    : "Executive Guest"}
+                                            </span>
+
+                                            <i className="fas fa-chevron-down text-[8px] text-slate-500 ms-2"></i>
                                         </button>
                                     </Dropdown.Trigger>
-                                    <Dropdown.Content contentClasses="bg-[#0b1329] border border-white/10 rounded-2xl shadow-2xl p-1.5 mt-2 backdrop-blur-2xl">
+                                    <Dropdown.Content className="bg-[#0b1329] border border-white/10 rounded-2xl shadow-2xl p-1 mt-2">
                                         <Dropdown.Link
                                             href={route("profile.edit")}
-                                            className="text-xs font-bold text-slate-300 hover:bg-white/5 hover:text-amber-400 rounded-xl px-4 py-2.5 flex items-center gap-2 transition-all duration-200"
+                                            className="text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-white rounded-xl px-4 py-2.5 flex items-center gap-2"
                                         >
-                                            <Settings className="w-3.5 h-3.5 text-slate-400" />{" "}
+                                            <Settings className="w-3.5 h-3.5 text-gray-500" />{" "}
                                             Account Settings
                                         </Dropdown.Link>
-                                        <div className="h-px bg-white/5 my-1"></div>
+                                        <Link
+                                            href="/admin/import-kemendag"
+                                            className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                                        >
+                                            <svg
+                                                className="w-5 h-5 mr-3"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                                                />
+                                            </svg>
+                                            Import Data Kemendag
+                                        </Link>
                                         <Dropdown.Link
                                             href={route("logout")}
                                             method="post"
                                             as="button"
-                                            className="text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl px-4 py-2.5 flex items-center gap-2 w-full text-left transition-all duration-200"
+                                            className="text-xs font-bold text-red-400 hover:bg-red-500/10 rounded-xl px-4 py-2.5 flex items-center gap-2 w-full text-left"
                                         >
                                             <LogOut className="w-3.5 h-3.5" />{" "}
                                             Log Out
@@ -137,14 +325,14 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         {/* TOMBOL MENU MOBILE HAMBURGER (RESPONSIVE VIEWPORT) */}
-                        <div className="-me-2 flex items-center sm:hidden">
+                        <div className="-me-2 flex items-center xl:hidden">
                             <button
                                 onClick={() =>
                                     setShowingNavigationDropdown(
                                         !showingNavigationDropdown,
                                     )
                                 }
-                                className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 hover:text-amber-400 hover:bg-white/10 focus:outline-none transition duration-300"
+                                className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 border border-white/5 text-gray-400 hover:text-amber-400 focus:outline-none transition duration-300"
                             >
                                 {showingNavigationDropdown ? (
                                     <X className="w-5 h-5" />
@@ -156,65 +344,151 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 </div>
 
-                {/* AREA PANEL NAVIGASI VERSI RESPONSIVE (MOBILE VIEW) */}
+                {/* AREA PANEL NAVIGASI VERSI RESPONSIVE (MOBILE VIEW HIGH CONTRAST) */}
                 <div
                     className={
                         (showingNavigationDropdown ? "block" : "hidden") +
-                        " sm:hidden bg-[#0b1329]/95 backdrop-blur-xl border-t border-white/10 px-4 py-4 space-y-2"
+                        " sm:hidden bg-white border-t border-slate-200 border-t border-white/5 px-4 py-4 space-y-3 animate-fade-in"
                     }
                 >
                     <ResponsiveNavLink
                         href={route("home")}
                         active={route().current("home")}
-                        className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all duration-200"
+                        className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-white hover:text-amber-400"
                     >
                         Home Portal
                     </ResponsiveNavLink>
                     <ResponsiveNavLink
                         href={route("dashboard")}
                         active={route().current("dashboard")}
-                        className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all duration-200"
+                        className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-white hover:text-amber-400"
                     >
                         Data Dashboard
                     </ResponsiveNavLink>
                     <ResponsiveNavLink
                         href={route("intelligence.center")}
                         active={route().current("intelligence.center")}
-                        className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-slate-200 hover:text-amber-400 hover:bg-white/5 transition-all duration-200"
+                        className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-white hover:text-amber-400"
                     >
                         Intelligence Center
                     </ResponsiveNavLink>
+
+                    <ResponsiveNavLink
+                        href={route("rfqs.index")}
+                        active={route().current("rfqs.*")}
+                        className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-cyan-400 flex items-center gap-2"
+                    >
+                        <FileText className="w-3.5 h-3.5" />
+                        RFQ Marketplace
+                    </ResponsiveNavLink>
+
+                    {/* SINKRONISASI MOBILE MENU: LIVE CONTAINER TRACKING GATEWAY */}
+                    <ResponsiveNavLink
+                        href={route("logistics.tracking")}
+                        active={route().current("logistics.tracking")}
+                        className="rounded-xl text-[10px] font-black uppercase tracking-widest block py-3 px-4 text-amber-400 flex items-center gap-2"
+                    >
+                        <Globe className="w-3.5 h-3.5" />{" "}
+                        {isEn ? "Port Tracking" : "Pelacakan Kontainer"}
+                    </ResponsiveNavLink>
+
                     <ResponsiveNavLink
                         href={route("tools.calculator")}
                         active={route().current("tools.calculator")}
-                        className="rounded-xl text-[10px] font-black uppercase tracking-widest py-3 px-4 bg-white/5 border border-white/10 text-emerald-300 hover:text-emerald-400 hover:bg-white/10 flex items-center justify-between transition-all duration-200"
+                        className="rounded-xl text-[10px] font-black uppercase tracking-widest py-3 px-4 bg-white/5 border border-white/5 text-emerald-400 flex items-center justify-between"
                     >
-                        <span className="flex items-center gap-2">
-                            <span>🧮</span> Industrial Toolbox
-                        </span>
-                        <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[#030712] text-[7px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter shadow-sm">
+                        <span>🧮 Industrial Toolbox</span>
+                        <span className="bg-emerald-500 text-black text-[7px] font-black px-1.5 py-0.5 rounded uppercase">
                             Premium
                         </span>
                     </ResponsiveNavLink>
+                    {/* ✨ SUBMENU COLLECTIVE SOURCING VERSI MOBILE */}
+                    <div className="pt-2 border-t border-white/5 space-y-1">
+                        <div className="px-4 py-1 text-[9px] font-black text-amber-500/80 uppercase tracking-widest flex items-center gap-1.5">
+                            <Layers className="w-3 h-3" /> Collective Sourcing
+                        </div>
+                        <ResponsiveNavLink
+                            href={route("collective-sourcing.index")}
+                            active={route().current(
+                                "collective-sourcing.index",
+                            )}
+                            className="rounded-xl text-[10px] font-bold uppercase tracking-widest block py-2.5 px-6 text-gray-300 hover:text-white"
+                        >
+                            - Open Demand Groups
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("collective-sourcing.create")}
+                            active={route().current(
+                                "collective-sourcing.create",
+                            )}
+                            className="rounded-xl text-[10px] font-bold uppercase tracking-widest block py-2.5 px-6 text-gray-300 hover:text-white"
+                        >
+                            - Create Requirement
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("collective-sourcing.my-requests")}
+                            active={route().current(
+                                "collective-sourcing.my-requests",
+                            )}
+                            className="rounded-xl text-[10px] font-bold uppercase tracking-widest block py-2.5 px-6 text-gray-300 hover:text-white"
+                        >
+                            - My Requests
+                        </ResponsiveNavLink>
+                    </div>
+
+                    {/* 🌐 SUNTIKAN REAKTIF: LANGUAGE SWITCHER KHUSUS MOBILE VIEWPORT DI INDOOR DASBOR */}
+                    <div className="pt-2 border-t border-white/5">
+                        <div className="flex bg-white/5 rounded-xl p-1 border border-white/5 w-fit">
+                            {["id", "en"].map((lang) => (
+                                <button
+                                    key={lang}
+                                    onClick={() => toggleLanguage(lang)}
+                                    className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all duration-300 cursor-pointer ${
+                                        (lang === "en" ? isEn : !isEn)
+                                            ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-[#030712] shadow-md"
+                                            : "text-gray-400 hover:text-white"
+                                    }`}
+                                >
+                                    {lang}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </nav>
 
             {/* --- AREA HEADER DINAMIS SUB-HALAMAN (SINKRONISASI TEMA DARK PREMIUM) --- */}
             {header && (
-                <header className="bg-gradient-to-r from-[#0b1329] to-transparent border-b border-white/5 shadow-2xl relative overflow-hidden">
+                <header className="bg-gradient-to-r from-[#0b1329] via-[#0f172a]/40 to-transparent border-b border-white/5 shadow-2xl relative overflow-hidden">
+                    {/* Ornamen Pendaran Cahaya Neon Emas di Sudut Belakang */}
                     <div className="absolute top-0 left-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -ml-20 -mt-20"></div>
+
                     <div className="mx-auto max-w-7xl px-6 py-6 sm:px-8 lg:px-10 relative z-10">
-                        <div className="text-xl font-black uppercase tracking-tight text-white border-l-4 border-amber-500 pl-4 font-sans drop-shadow-[0_2px_8px_rgba(255,255,255,0.1)]">
-                            {header}
+                        {/* Garis Vertikal Emas Kokoh Sebagai Penopang Fokus Visual */}
+                        <div className="border-l-4 border-amber-500 pl-4">
+                            <h1 className="text-lg lg:text-xl font-black uppercase tracking-wider font-sans text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-gray-400 drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">
+                                {header}
+                            </h1>
                         </div>
                     </div>
                 </header>
             )}
 
-            {/* --- AREA MAIN STREAM VIEWPORT UTAMA --- */}
-            <main className="relative z-10 container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-                {children}
-            </main>
+            {/* --- AREA MAIN STREAM VIEWPORT UTAMA (ANIMASI SMOOTH LOADING) --- */}
+            <main className="relative z-10 animate-fade-in-up">{children}</main>
+
+            {/* --- PROTEKSI FOOTER LEGAL BADAN HUKUM PIHAK KETIGA INDEPENDEN --- */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="border-t border-white/5 pt-8 pb-12 mt-12 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-500 font-medium font-mono">
+                    <p>
+                        &copy; 2026{" "}
+                        <span className="text-amber-500/80 font-bold">
+                            PT. Digestex Global Intelligence
+                        </span>
+                        . All Rights Reserved.
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }
