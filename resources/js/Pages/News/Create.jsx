@@ -42,12 +42,11 @@ export default function Create({ auth }) {
                         text: data.title_id,
                     })
                     .then((res) => {
-                        // Gunakan fungsional update (prev) agar data lain (seperti image/content) tidak hilang
-                        setData((prev) => ({
-                            ...prev,
+                        setData({
+                            ...data,
                             title_en: res.data.translated,
                             slug: res.data.slug,
-                        }));
+                        });
                     })
                     .catch((err) => console.error(err))
                     .finally(() => setIsTranslating(false));
@@ -56,29 +55,29 @@ export default function Create({ auth }) {
         return () => clearTimeout(timer);
     }, [data.title_id]);
 
-    // AUTO-TRANSLATE SUMMARY
-
+    // 2. AUTO-TRANSLATE EXECUTIVE SUMMARY (Sudah digabung & dibersihkan dari duplikasi)
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (data.summary_id && data.summary_id.length > 20) {
+            if (data.summary_id && data.summary_id.length > 10) {
                 axios
                     .post(route("admin.news.translate"), {
                         text: data.summary_id,
                     })
                     .then((res) => {
-                        setData((prev) => ({
-                            ...prev,
+                        setData({
+                            ...data,
                             summary_en: res.data.translated,
-                        }));
+                        });
                     })
-                    .catch((err) => console.error(err));
+                    .catch((err) =>
+                        console.error("Summary Translation Error:", err),
+                    );
             }
-        }, 2000);
-
+        }, 2200); // Jeda aman setelah judul
         return () => clearTimeout(timer);
     }, [data.summary_id]);
 
-    // 2. AUTO-TRANSLATE ISI BERITA (Content)
+    // 3. AUTO-TRANSLATE ISI BERITA (Content)
     useEffect(() => {
         const timer = setTimeout(() => {
             if (data.content_id && data.content_id.length > 50) {
@@ -86,18 +85,29 @@ export default function Create({ auth }) {
                 axios
                     .post(route("admin.news.translate"), { text: plainText })
                     .then((res) => {
-                        setData((prev) => ({
-                            ...prev,
+                        setData({
+                            ...data,
                             content_en: `<p>${res.data.translated}</p>`,
-                        }));
-                    });
+                        });
+                    })
+                    .catch((err) => console.error(err));
             }
-        }, 3000);
+        }, 3500); // Jeda sedikit lebih lama untuk memproses teks artikel yang panjang
         return () => clearTimeout(timer);
     }, [data.content_id]);
 
+    // FUNGSI SUBMIT DENGAN SISTEM PENGAMAN DATA ASINKRONUS
     const submit = (e) => {
         e.preventDefault();
+
+        // JIKA Konten utama belum selesai diterjemahkan oleh AI, tahan submit agar database tidak error null
+        if (!data.content_en && data.content_id) {
+            alert(
+                "Mohon tunggu 1-2 detik, AI sedang merampungkan sinkronisasi draf terjemahan Bahasa Inggris...",
+            );
+            return;
+        }
+
         post(route("admin.news.store"));
     };
 

@@ -1,27 +1,29 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
-import { useState } from "react";
+import { Head, useForm, router } from "@inertiajs/react";
+import { useState, useEffect } from "react"; // Tambahkan useEffect untuk auto-translate jika diperlukan
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import axios from "axios";
+// import { router } from "@inertiajs/react";
 
-export default function Edit({ news }) {
+export default function Edit({ auth, news }) {
     const [lang, setLang] = useState("id");
-
+    const [isTranslating, setIsTranslating] = useState(false);
     const [preview, setPreview] = useState(
         news.image ? `/storage/${news.image}` : null,
     );
 
-    const [isTranslating, setIsTranslating] = useState(false);
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-
         if (file) {
             setData("image", file);
             setPreview(URL.createObjectURL(file));
         }
     };
+
     // Mengambil data lama dari database ke dalam form
-    const { data, setData, put, processing } = useForm({
+    const { data, setData, post, processing } = useForm({
+        _method: "PUT", // <--- KUNCI UTAMA: Beri tahu Laravel ini adalah aksi UPDATE/PUT
         category: news.category || "Industry News",
         title_id: news.title_id || "",
         summary_id: news.summary_id || "",
@@ -30,19 +32,114 @@ export default function Edit({ news }) {
         title_en: news.title_en || "",
         summary_en: news.summary_en || "",
         content_en: news.content_en || "",
-
         partner_name: news.partner_name || "",
         meta_title: news.meta_title || "",
         meta_description: news.meta_description || "",
         meta_keywords: news.meta_keywords || "",
-        image: null,
+        image: null, // Biarkan null jika pengguna tidak ingin mengganti gambar lama
     });
+
+    // --- BLOK AUTO TRANSLATE KHUSUS EDIT MODE (OPSIONAL, AMAN UNTUK GAMBAR) ---
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (
+                data.title_id &&
+                data.title_id !== news.title_id &&
+                data.title_id.length > 5
+            ) {
+                setIsTranslating(true);
+                axios
+                    .post(route("admin.news.translate"), {
+                        text: data.title_id,
+                    })
+                    .then((res) => {
+                        setData({
+                            ...data,
+                            title_en: res.data.translated,
+                            slug: res.data.slug,
+                        });
+                    })
+                    .catch((err) => console.error(err))
+                    .finally(() => setIsTranslating(false));
+            }
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, [data.title_id]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (
+                data.summary_id &&
+                data.summary_id !== news.summary_id &&
+                data.summary_id.length > 10
+            ) {
+                axios
+                    .post(route("admin.news.translate"), {
+                        text: data.summary_id,
+                    })
+                    .then((res) => {
+                        setData({
+                            ...data,
+                            summary_en: res.data.translated,
+                        });
+                    })
+                    .catch((err) => console.error(err));
+            }
+        }, 2200);
+        return () => clearTimeout(timer);
+    }, [data.summary_id]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (
+                data.content_id &&
+                data.content_id !== news.content_id &&
+                data.content_id.length > 50
+            ) {
+                const plainText = data.content_id.replace(/<[^>]*>?/gm, "");
+                axios
+                    .post(route("admin.news.translate"), { text: plainText })
+                    .then((res) => {
+                        setData({
+                            ...data,
+                            content_en: `<p>${res.data.translated}</p>`,
+                        });
+                    });
+            }
+        }, 3500);
+        return () => clearTimeout(timer);
+    }, [data.content_id]);
+    // --- END AUTO TRANSLATE ---
 
     const submit = (e) => {
         e.preventDefault();
-        console.log("UPDATE CLICKED");
-        put(route("admin.news.update", news.slug));
+        console.log("UPDATE CLICKED VIA POST METHOD SPOOFING");
+
+        // 1. Validasi Pengaman Data Kosong akibat asinkronus translasi
+        if (!data.content_en && data.content_id) {
+            alert(
+                "Mohon tunggu sebentar, AI sedang menyinkronkan draf terjemahan...",
+            );
+            return;
+        }
+
+        // 2. KUNCI UTAMA: Ambil snapshot data form saat ini ke objek baru
+        const payload = { ...data };
+
+        // 3. JIKA user tidak memilih gambar baru (nilainya masih null),
+        // hapus properti 'image' agar TIDAK dikirimkan ke Laravel.
+        // Dengan begitu, Laravel tidak akan sengaja menimpa nama gambar lama Anda di DB.
+        if (payload.image === null) {
+            delete payload.image;
+        }
+
+        // 4. Kirim menggunakan payload yang bersih melalui router Inertia secara manual
+        // Menggunakan metode post dari package Inertia langsung untuk mengizinkan kustomisasi payload
+
+        router.post(route("admin.news.update", news.slug), payload);
     };
+
+    // Sisa kode JSX UI Form (Return statement) Anda di bawah tetap sama persis seperti sebelumnya...
 
     return (
         <AuthenticatedLayout
