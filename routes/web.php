@@ -33,6 +33,7 @@ use App\Http\Controllers\IndustrySolutionController;
 use App\Http\Controllers\EcosystemPartnerController;
 use App\Http\Controllers\CompanyLocationController;
 use App\Http\Controllers\PartnerInsightController;
+use App\Http\Controllers\Admin\ImportKemendagController;
 
 
 /*
@@ -608,6 +609,18 @@ Route::middleware([
         '/companies/{company}/verify',
         [CompanyController::class, 'verify']
     )->name('companies.verify');
+
+// Impor Data
+Route::get(
+    '/import-kemendag',
+    [ImportKemendagController::class, 'index']
+)->name('import-kemendag');
+
+Route::post(
+    '/import-kemendag',
+    [ImportKemendagController::class, 'store']
+)->name('import-kemendag.store');
+
 
 // News
 Route::get('/news', [NewsController::class, 'index'])

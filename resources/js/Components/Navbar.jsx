@@ -272,7 +272,7 @@ export default function PublicNavbar() {
 
                         <hr className="border-slate-200 my-2" />
                         <Link
-                            href="/admin/import-kemendag"
+                            href={route("admin.import-kemendag")}
                             className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
                         >
                             <svg

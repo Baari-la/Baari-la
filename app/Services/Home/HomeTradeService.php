@@ -3,9 +3,13 @@
 namespace App\Services\Home;
 
 use Illuminate\Support\Facades\DB;
-
+use App\Services\Trade\ExecutiveReport\ExecutiveReportService;
 class HomeTradeService
 {
+    public function __construct(
+    protected ExecutiveReportService $executiveReportService
+) {
+}
     public function getData(): array
     {
         $garmentTradeData = DB::table('trade_master_annual_hscode')
@@ -65,11 +69,50 @@ $topProducts = DB::table('trade_master_annual_hscode')
             })->all();
         }
 
+//    Executive report 
+
+$filters = [
+
+    'title' => 'Indonesia Apparel & Made-up Textile Export Performance',
+
+    'subtitle' => 'HS 61–63',
+
+    'trade_flow' => 'export',
+
+    'base_year' => 2025,
+
+    'compare_year' => 2026,
+
+    'months' => [1,2,3,4],
+
+    'hs_prefix' => [
+
+        '61',
+
+        '62',
+
+        '63',
+
+    ],
+
+];
+
+$executiveReport = $this
+    ->executiveReportService
+    ->build($filters);
+
         return [
             'garmentTrade'      => $garmentTradeData,
             'totalGarment'      => (float) ($garmentTradeData->export_pcs ?? 0),
             'topProducts'       => $topProducts,
             'fiberIntelligence' => $fiberData,
+            /*
+    |--------------------------------------------------------------------------
+    | Executive Report
+    |--------------------------------------------------------------------------
+    */
+
+    'report'            => $executiveReport,
         ];
     }
 

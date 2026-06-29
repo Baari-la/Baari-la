@@ -24,7 +24,10 @@ import SponsoredInsightSection from "@/Components/Home/SponsoredInsightSection";
 import MarketTicker from "@/Components/MarketTicker";
 import LatestIntelligence from "@/Components/Home/LatestIntelligence";
 import IntelligenceOverview from "@/Components/Home/IntelligenceOverview";
-
+import HeroSection from "@/Components/Home/Hero/HeroSection";
+import ExecutiveReport from "@/Components/Trade/ExecutiveReport";
+import TodaysIndustrySnapshot from "@/Components/Home/TodaysIndustrySnapshot";
+import ExecutivePerformanceTable from "@/Components/Trade/ExecutiveReport/Summary/ExecutivePerformanceTable";
 export default function Home(props) {
     // 1. Ambil data trade mentah
     const garmentTrade = props.garmentTrade || { export_pcs: 0, import_pcs: 0 };
@@ -120,27 +123,30 @@ export default function Home(props) {
                     {/* <Navbar auth={auth} /> */}
                     <InaugurationPopup isEn={isEn} />
                     <StockTicker topStocks={topStocks} />
+                    <HeroSection />
+                    <TodaysIndustrySnapshot />
 
+                    <ExecutiveReport report={props.report} />
+
+                    <div id="industry-snapshot" />
+                    {/* <MaterialExchangePreview /> */}
                     {/* --- SECTION: HERO & SEARCH --- */}
                     <div className="px-6 pt-20 pb-16 text-center relative overflow-hidden">
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
                         <h1 className="text-6xl md:text-8xl font-black mb-6 leading-none uppercase tracking-tighter italic relative z-10">
-                           {isEn
-        ? "Global Textile Industry"
-        : "Ekosistem Industri Tekstil"}
+                            {isEn
+                                ? "Global Textile Industry"
+                                : "Ekosistem Industri Tekstil"}
 
-    <span className="text-yellow-500 leading-none block md:inline">
-        {isEn
-            ? " Ecosystem"
-            : " Global"}
-    </span>
+                            <span className="text-yellow-500 leading-none block md:inline">
+                                {isEn ? " Ecosystem" : " Global"}
+                            </span>
                         </h1>
                         <div className="max-w-4xl mx-auto mb-12 relative z-10">
                             <p className=" text-white text-lg md:text-2xl font-bold leading-relaxed tracking-tight">
                                 {isEn
                                     ? "Connecting manufacturers, suppliers, buyers, market intelligence, and business opportunities throughout the global textile value chain."
-                                    : "Menghubungkan produsen, pemasok, pembeli, market intelligence, dan peluang bisnis di seluruh rantai nilai industri tekstil global."
-}
+                                    : "Menghubungkan produsen, pemasok, pembeli, market intelligence, dan peluang bisnis di seluruh rantai nilai industri tekstil global."}
                             </p>
                             <p
                                 className="
@@ -289,9 +295,7 @@ export default function Home(props) {
                     />
                     <IndustrySolutionsSection isEn={isEn} />
 
-                    <SourcingHubPreview
-                    isEn={isEn}
-                    />
+                    <SourcingHubPreview isEn={isEn} />
 
                     {/* Batas Sourcing Hub dan Market Intelligecnce*/}
 

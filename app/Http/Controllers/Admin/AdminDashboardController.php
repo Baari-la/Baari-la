@@ -11,7 +11,7 @@ use App\Models\AuditLog;
 use App\Models\CompanyClaim;
 use App\Models\TradeAnalyticsVertical;
 use Maatwebsite\Excel\Facades\Excel; // Sesuaikan dengan library excel yang Anda gunakan (misal: Maatwebsite/Laravel-Excel)
-
+use App\Services\Trade\TradeAnalyticsService;
 
 
 class AdminDashboardController extends Controller
@@ -132,7 +132,9 @@ class AdminDashboardController extends Controller
     'healthStats'     => $healthStats,
     'industrialData'  => $industrialData, // Data hulu-hilir
     'pendingCount'    => Company::where('status_verifikasi', 'pending')->count(), // Registrasi baru
-]);
+
+'tradeDashboard' => $this->trade->dashboard(),
+    ]);
 
 
     }
@@ -238,6 +240,14 @@ logger('RELATIONAL SYNC EXECUTED', [
         'message',
         'Audit Berhasil: Data perusahaan telah diperbarui secara live.'
     );
+}
+
+protected TradeAnalyticsService $trade;
+
+public function __construct(
+    TradeAnalyticsService $trade
+) {
+    $this->trade = $trade;
 }
 
 public function approveClaim(

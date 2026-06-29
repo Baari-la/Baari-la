@@ -6,9 +6,17 @@ use App\Models\MarketHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Services\Trade\TradeAnalyticsService;
 
 class TradeDashboardController extends Controller
 {
+ public function __construct(
+
+        protected TradeAnalyticsService $trade
+
+    ) {
+    }
+
     public function index()
     {
 
@@ -164,6 +172,7 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
         // 'usd_idr' => $latest->usd_idr ?? 0,
             // Data Pendukung
             //  'annualTrend' => $this->getAnnualTrendData(), 
+              'tradeDashboard' => $this->trade->dashboard(),
             'memberStatus' => auth()->user()->is_premium ? 'Premium Member' : 'Regular Member',
             'exportValue' => '11.9', // Nanti bisa dihitung dinamis dari $annualTrend
             'lastUpdate' => now()->format('d M Y')

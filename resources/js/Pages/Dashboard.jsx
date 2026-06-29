@@ -5,14 +5,17 @@ import CottonCurrencyTrendChart from "@/Components/CottonCurrencyTrendChart";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
 import html2canvas from "html2canvas";
-import React from "react";
+import React, { useState } from "react";
 import AiForecastChart from "@/Components/AiForecastChart";
 import PredictiveCalculator from "@/Components/PredictiveCalculator";
 import PortTrackerWidget from "@/Components/PortTrackerWidget";
 import IkmTextileTools from "@/Components/IkmTextileTools";
 import DomesticEwsWidget from "@/Components/DomesticEwsWidget";
-import StatsCards from "@/Components/Dashboard/StatsCards";
+import StatsCards from "@/Components/Dashboard/Trade/StatsCards";
 import WelcomeBanner from "@/Components/Dashboard/WelcomeBanner";
+import DashboardHeader from "@/Components/Dashboard/Trade/DashboardHeader";
+import SummaryCards from "@/Components/Dashboard/Trade/SummaryCards";
+import DashboardFilterBar from "@/Components/Dashboard/Common/DashboardFilterBar";
 
 import {
     XAxis,
@@ -62,12 +65,30 @@ export default function Dashboard({
     cottonPrice,
     exportValue,
     totalCompanies,
-
+    tradeDashboard,
     memberStatus,
 }) {
     // AMBIL SEMUA DATA DARI usePage
     const { auth, locale } = usePage().props;
     const isEn = locale === "en" || auth?.user?.locale === "en";
+    const {
+        summary = {},
+        trend = [],
+        topCountries = [],
+        topHsCodes = [],
+    } = tradeDashboard ?? {};
+
+    const [filters, setFilters] = useState({
+        trade_flow: "",
+        year: "",
+    });
+
+    const handleFilterChange = (key, value) => {
+        setFilters((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
+    };
 
     // 🕵️ MATRIKS EKSTRAKSI OTOMATIS BARIS TERAKHIR TABEL MARKET_HISTORIES (ID 46)
     const latestHistoryRecord =
@@ -175,7 +196,19 @@ export default function Dashboard({
                         exportValue={exportValue}
                         totalCompanies={totalCompanies}
                     />
-
+                    <DashboardHeader
+                        summary={summary}
+                        filters={filters}
+                        onFilterChange={handleFilterChange}
+                    />
+                    <DashboardFilterBar
+                        filters={filters}
+                        setFilters={setFilters}
+                        years={[2025, 2026]}
+                        countries={[]}
+                        hsCodes={[]}
+                    />
+                    <SummaryCards summary={summary} />
                     {/* --- LINK CEPAT DEEP INTELLIGENCE --- */}
                     <Link
                         href={route("intelligence.center")}
