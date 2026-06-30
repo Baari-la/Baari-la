@@ -39,7 +39,9 @@ export default function ReportHeader({
                         Official Trade Statistics
                     </StatusBadge>
 
-                    <StatusBadge variant="success">AI Intelligence</StatusBadge>
+                    <StatusBadge variant="success">
+                        Powered by Digestex Intelligence
+                    </StatusBadge>
 
                     <StatusBadge variant="secondary">{generatedAt}</StatusBadge>
                 </div>

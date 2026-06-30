@@ -77,7 +77,7 @@ class ExecutiveReportService
         */
 
         'topCountries' => $this->countryAnalytics
-            ->topCountries($filters),
+    ->topGarmentCountries($filters),
 
         /*
         |--------------------------------------------------------------------------
@@ -85,8 +85,9 @@ class ExecutiveReportService
         |--------------------------------------------------------------------------
         */
 
-        'topProducts' => $this->hsCodeAnalytics
-            ->topHsCodes($filters),
+        'topProducts' =>
+$this->hsCodeAnalytics
+    ->topGarmentProducts($filters),
 
         /*
         |--------------------------------------------------------------------------

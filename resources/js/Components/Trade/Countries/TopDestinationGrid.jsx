@@ -92,10 +92,12 @@ export default function TopDestinationGrid({ countries = defaultCountries }) {
                     >
                         <div className="flex items-center justify-between">
                             <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">
-                                #{country.rank}
+                                🥇 TOP {country.rank}
                             </span>
 
-                            <Trend value={country.growth} />
+                            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
+                                {/* {country.share}% */}
+                            </span>
                         </div>
 
                         <h4 className="mt-5 text-lg font-bold text-slate-900">
@@ -107,7 +109,18 @@ export default function TopDestinationGrid({ countries = defaultCountries }) {
                         </p>
 
                         <p className="mt-1 text-2xl font-bold text-blue-700">
-                            {country.exportValue}
+                            US${" "}
+                            {Number(
+                                country.export_million ?? 0,
+                            ).toLocaleString()}{" "}
+                            M
+                        </p>
+                        <p className="mt-2 text-sm text-slate-500">
+                            Market Share
+                        </p>
+
+                        <p className="text-lg font-semibold text-emerald-600">
+                            {country.share}%
                         </p>
                     </div>
                 ))}

@@ -113,8 +113,8 @@ export default function ProductPerformanceTable({
                                 Export
                             </th>
 
-                            <th className="px-5 py-4 text-right text-xs font-bold uppercase tracking-wider text-slate-500">
-                                Growth
+                            <th className="w-24 px-5 py-4 text-center text-xs font-bold uppercase tracking-wider text-slate-500">
+                                Share
                             </th>
                         </tr>
                     </thead>
@@ -134,23 +134,34 @@ export default function ProductPerformanceTable({
                                 <td className="px-5 py-4">
                                     <div>
                                         <p className="font-semibold text-slate-900">
-                                            {item.product}
+                                            {item.product.length > 70
+                                                ? item.product.substring(
+                                                      0,
+                                                      70,
+                                                  ) + "..."
+                                                : item.product}
                                         </p>
                                     </div>
                                 </td>
 
                                 <td className="px-5 py-4">
-                                    <span className="rounded bg-slate-100 px-2 py-1 font-mono text-sm">
-                                        {item.hsCode}
+                                    <span className="rounded bg-slate-100 px-2 py-1 font-mono text-sm text-slate-900">
+                                        {item.hs_code}
                                     </span>
                                 </td>
 
                                 <td className="px-5 py-4 text-right font-semibold text-slate-900">
-                                    {item.exportValue}
+                                    US${" "}
+                                    {Number(
+                                        item.export_million ?? 0,
+                                    ).toLocaleString()}{" "}
+                                    M
                                 </td>
 
-                                <td className="px-5 py-4">
-                                    <GrowthIndicator value={item.growth} />
+                                <td className="w-24 px-5 py-4 text-center">
+                                    <span className="font-semibold text-emerald-600">
+                                        {item.share}%
+                                    </span>
                                 </td>
                             </tr>
                         ))}

@@ -101,17 +101,19 @@ export default function ExecutiveReport({ report }) {
                     </DashboardRow>
 
                     {/* =====================================================
-                        COUNTRIES vs PRODUCTS
-                    ====================================================== */}
+    TOP EXPORT DESTINATION COUNTRIES
+===================================================== */}
 
                     <DashboardRow>
-                        <DashboardColumn span={7}>
+                        <DashboardColumn span={12}>
                             <TopDestinationGrid
                                 countries={report.topCountries}
                             />
                         </DashboardColumn>
+                    </DashboardRow>
 
-                        <DashboardColumn span={5}>
+                    <DashboardRow>
+                        <DashboardColumn span={12}>
                             <ProductPerformanceTable
                                 products={report.topProducts}
                             />

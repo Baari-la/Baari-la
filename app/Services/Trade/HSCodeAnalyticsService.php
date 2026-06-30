@@ -59,4 +59,12 @@ public function topHsCodes(array $filters = []): array
         ->topHsCodes($filters)
         ->toArray();
 }
+/**
+ * Top Garment Products (HS 61–63)
+ */
+public function topGarmentProducts(array $filters = []): array
+{
+    return $this->repository
+        ->topGarmentProducts($filters);
+}
 }
