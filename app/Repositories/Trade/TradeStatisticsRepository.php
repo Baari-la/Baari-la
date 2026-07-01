@@ -568,6 +568,42 @@ public function topGarmentCountries(array $filters = [])
     return $this->repository
         ->topGarmentExportCountries($filters);
 }
+public function garmentTradeSummary(): object
+{
+    return DB::table('trade_master_annual_hscode')
+        ->selectRaw("
+            SUM(
+                CASE
+                    WHEN tipe_arus='ekspor' THEN
+                        CASE
+                            WHEN hs_code LIKE '6109%' THEN vol_2025*5.5
+                            WHEN hs_code LIKE '6110%' THEN vol_2025*2.5
+                            WHEN hs_code LIKE '6203%' OR hs_code LIKE '6204%' THEN vol_2025*1.8
+                            WHEN hs_code LIKE '6111%' OR hs_code LIKE '6209%' THEN vol_2025*8.0
+                            ELSE vol_2025*4.0
+                        END
+                    ELSE 0
+                END
+            ) AS export_pcs,
 
-
+            SUM(
+                CASE
+                    WHEN tipe_arus='impor' THEN
+                        CASE
+                            WHEN hs_code LIKE '6109%' THEN vol_2025*5.5
+                            WHEN hs_code LIKE '6110%' THEN vol_2025*2.5
+                            WHEN hs_code LIKE '6203%' OR hs_code LIKE '6204%' THEN vol_2025*1.8
+                            WHEN hs_code LIKE '6111%' OR hs_code LIKE '6209%' THEN vol_2025*8.0
+                            ELSE vol_2025*4.0
+                        END
+                    ELSE 0
+                END
+            ) AS import_pcs
+        ")
+        ->where(function ($q) {
+            $q->where('hs_code', 'like', '61%')
+              ->orWhere('hs_code', 'like', '62%');
+        })
+        ->first();
+}
 }

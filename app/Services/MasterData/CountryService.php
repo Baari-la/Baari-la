@@ -3,28 +3,45 @@
 namespace App\Services\MasterData;
 
 use App\Models\Country;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 
 class CountryService
 {
     /**
-     * Find country by ISO Alpha-2 code.
+     * Cache countries during current request.
+     */
+    protected Collection $countries;
+
+    public function __construct()
+    {
+        $this->countries = Country::active()
+            ->orderBy('country_name_en')
+            ->get()
+            ->keyBy(function ($country) {
+                return strtoupper($country->country_code);
+            });
+    }
+
+    /**
+     * Find country by ISO Alpha-2.
      */
     public function find(string $code): ?Country
     {
-        return Country::firstWhere('country_code', strtoupper($code));
+        return $this->countries->get(strtoupper($code));
     }
 
     /**
-     * Find country by ISO Alpha-3 code.
+     * Find country by ISO Alpha-3.
      */
     public function byIso3(string $iso3): ?Country
     {
-        return Country::firstWhere('iso3', strtoupper($iso3));
+        return $this->countries
+            ->first(fn ($country) => strtoupper($country->iso3) === strtoupper($iso3));
     }
 
     /**
-     * Get localized country name.
+     * Localized country name.
      */
     public function displayName(string $code, ?string $locale = null): string
     {
@@ -42,7 +59,7 @@ class CountryService
     }
 
     /**
-     * Get localized country name with flag.
+     * Country name with flag.
      */
     public function displayWithFlag(string $code, ?string $locale = null): string
     {
@@ -52,11 +69,14 @@ class CountryService
             return $code;
         }
 
-        return trim($country->flag_emoji . ' ' . $this->displayName($code, $locale));
+        return trim(
+            $country->flag_emoji . ' ' .
+            $this->displayName($code, $locale)
+        );
     }
 
     /**
-     * Get country flag emoji.
+     * Country flag.
      */
     public function flag(string $code): string
     {
@@ -64,42 +84,38 @@ class CountryService
     }
 
     /**
-     * Check whether country exists.
+     * Country exists.
      */
     public function exists(string $code): bool
     {
-        return Country::where('country_code', strtoupper($code))->exists();
+        return $this->find($code) !== null;
     }
 
     /**
-     * Get all active countries.
+     * Active countries.
      */
-    public function all()
+    public function all(): Collection
     {
-        return Country::active()
-            ->orderBy('country_name_en')
-            ->get();
+        return $this->countries;
     }
 
     /**
-     * Get countries by region.
+     * Countries by region.
      */
-    public function byRegion(string $region)
+    public function byRegion(string $region): Collection
     {
-        return Country::active()
+        return $this->countries
             ->where('region_code', strtoupper($region))
-            ->orderBy('country_name_en')
-            ->get();
+            ->values();
     }
 
     /**
-     * Get countries by sub region.
+     * Countries by sub region.
      */
-    public function bySubRegion(string $subRegion)
+    public function bySubRegion(string $subRegion): Collection
     {
-        return Country::active()
+        return $this->countries
             ->where('sub_region_en', $subRegion)
-            ->orderBy('country_name_en')
-            ->get();
+            ->values();
     }
 }

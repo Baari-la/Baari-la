@@ -2,120 +2,87 @@
 
 namespace App\Services\Home;
 
-use Illuminate\Support\Facades\DB;
+use App\Repositories\Trade\TradeStatisticsRepository;
 use App\Services\Trade\ExecutiveReport\ExecutiveReportService;
+
 class HomeTradeService
 {
     public function __construct(
-    protected ExecutiveReportService $executiveReportService
-) {
-}
+        protected TradeStatisticsRepository $tradeRepository,
+        protected ExecutiveReportService $executiveReportService,
+    ) {
+    }
+
     public function getData(): array
     {
-        $garmentTradeData = DB::table('trade_master_annual_hscode')
-            ->selectRaw("
-                SUM(CASE WHEN tipe_arus = 'ekspor' THEN 
-                    CASE 
-                        WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 * 5.5
-                        WHEN TRIM(hs_code) LIKE '6110%' THEN vol_2025 * 2.5
-                        WHEN TRIM(hs_code) LIKE '6203%' OR TRIM(hs_code) LIKE '6204%' THEN vol_2025 * 1.8
-                        WHEN TRIM(hs_code) LIKE '6111%' OR TRIM(hs_code) LIKE '6209%' THEN vol_2025 * 8.0
-                        ELSE vol_2025 * 4.0
-                    END ELSE 0 END) as export_pcs,
-                SUM(CASE WHEN tipe_arus = 'impor' THEN 
-                    CASE 
-                        WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 * 5.5
-                        ELSE vol_2025 * 4.0
-                    END ELSE 0 END) as import_pcs
-            ")
-            ->whereRaw("(TRIM(hs_code) LIKE '61%' OR TRIM(hs_code) LIKE '62%')")
-            ->first();
-$topProducts = DB::table('trade_master_annual_hscode')
-            ->selectRaw("
-                TRIM(hs_code) as hs_code_clean, 
-                uraian_hs, 
-                val_2025,
-                -- 🌟 Konversi Volume dari Kg ke Pcs sesuai rumpun HS Code
-                CASE 
-                    WHEN TRIM(hs_code) LIKE '6109%' THEN vol_2025 * 5.5
-                    WHEN TRIM(hs_code) LIKE '6110%' THEN vol_2025 * 2.5
-                    WHEN TRIM(hs_code) LIKE '6203%' OR TRIM(hs_code) LIKE '6204%' THEN vol_2025 * 1.8
-                    WHEN TRIM(hs_code) LIKE '6111%' OR TRIM(hs_code) LIKE '6209%' THEN vol_2025 * 8.0
-                    ELSE vol_2025 * 4.0
-                END as vol_2025,
-                -- Menghitung growth berdasarkan Value USD
-                CASE 
-                    WHEN val_2024 > 0 THEN ((val_2025 - val_2024) / val_2024) * 100 
-                    ELSE 0 
-                END as growth
-            ")
-            ->where('tipe_arus', 'ekspor')
-            ->where(function($q) {
-                $q->whereRaw("TRIM(hs_code) LIKE '61%'")->orWhereRaw("TRIM(hs_code) LIKE '62%'");
-            })
-            ->orderBy('val_2025', 'desc')
-            // ->take(15)
-            ->get();
+        /*
+        |--------------------------------------------------------------------------
+        | Trade Intelligence
+        |--------------------------------------------------------------------------
+        */
 
-        // Fiber Intelligence dengan proteksi autentikasi publik
+        $garmentTradeData = $this->tradeRepository->garmentTradeSummary();
+
+        $topProducts = $this->tradeRepository->topGarmentProducts();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Fiber Intelligence
+        |--------------------------------------------------------------------------
+        */
+
         $fiberData = $this->getRawFiberData();
+
         if (!auth()->check()) {
-            $fiberData = collect($fiberData)->map(function($item, $key) {
-                if ($key > 3) { 
-                    $item['cotton_vol'] = 0; $item['cotton_val'] = 0;
-                    $item['syn_vol'] = 0;    $item['syn_val'] = 0;
-                }
-                return $item;
-            })->all();
+            $fiberData = collect($fiberData)
+                ->map(function ($item, $index) {
+
+                    if ($index > 3) {
+                        $item['cotton_vol'] = 0;
+                        $item['cotton_val'] = 0;
+                        $item['syn_vol'] = 0;
+                        $item['syn_val'] = 0;
+                    }
+
+                    return $item;
+                })
+                ->all();
         }
 
-//    Executive report 
+        /*
+        |--------------------------------------------------------------------------
+        | Executive Report
+        |--------------------------------------------------------------------------
+        */
 
-$filters = [
+        $executiveReport = $this->executiveReportService->build([
+            'title' => 'Indonesia Apparel & Made-up Textile Export Performance',
+            'subtitle' => 'HS 61–63',
+            'trade_flow' => 'export',
+            'base_year' => 2025,
+            'compare_year' => 2026,
+            'months' => [1, 2, 3, 4],
+            'hs_prefix' => ['61', '62', '63'],
+        ]);
 
-    'title' => 'Indonesia Apparel & Made-up Textile Export Performance',
-
-    'subtitle' => 'HS 61–63',
-
-    'trade_flow' => 'export',
-
-    'base_year' => 2025,
-
-    'compare_year' => 2026,
-
-    'months' => [1,2,3,4],
-
-    'hs_prefix' => [
-
-        '61',
-
-        '62',
-
-        '63',
-
-    ],
-
-];
-
-$executiveReport = $this
-    ->executiveReportService
-    ->build($filters);
+        /*
+        |--------------------------------------------------------------------------
+        | Response
+        |--------------------------------------------------------------------------
+        */
 
         return [
             'garmentTrade'      => $garmentTradeData,
             'totalGarment'      => (float) ($garmentTradeData->export_pcs ?? 0),
             'topProducts'       => $topProducts,
             'fiberIntelligence' => $fiberData,
-            /*
-    |--------------------------------------------------------------------------
-    | Executive Report
-    |--------------------------------------------------------------------------
-    */
-
-    'report'            => $executiveReport,
+            'report'            => $executiveReport,
         ];
     }
 
+    /**
+     * Fiber Intelligence Dataset
+     */
     private function getRawFiberData(): array
     {
         return [

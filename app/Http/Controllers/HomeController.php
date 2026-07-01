@@ -24,12 +24,53 @@ class HomeController extends Controller
         HomePartnerService $partner,
         HomeIntelligenceService $intelligence
     ): Response {
+
+    $homeStart = microtime(true);
+
+    $start = microtime(true);
+    $marketData = $market->getData();
+    logger()->info('HomeMarketService', [
+        'time' => round((microtime(true) - $start) * 1000, 2) . ' ms'
+    ]);
+
+    $start = microtime(true);
+    $tradeData = $trade->getData();
+    logger()->info('HomeTradeService', [
+        'time' => round((microtime(true) - $start) * 1000, 2) . ' ms'
+    ]);
+
+    $start = microtime(true);
+    $directoryData = $directory->getData();
+    logger()->info('HomeDirectoryService', [
+        'time' => round((microtime(true) - $start) * 1000, 2) . ' ms'
+    ]);
+
+    $start = microtime(true);
+    $partnerData = $partner->getData();
+    logger()->info('HomePartnerService', [
+        'time' => round((microtime(true) - $start) * 1000, 2) . ' ms'
+    ]);
+
+    $start = microtime(true);
+    $intelligenceData = $intelligence->getData();
+    logger()->info('HomeIntelligenceService', [
+        'time' => round((microtime(true) - $start) * 1000, 2) . ' ms'
+    ]);
+
+    logger()->info('TOTAL HOME LOAD', [
+        'time' => round((microtime(true) - $homeStart) * 1000, 2) . ' ms'
+    ]);
         return Inertia::render('Home', array_merge(
-            $market->getData(),
-            $trade->getData(),
-            $directory->getData(),
-            $partner->getData(),
-            $intelligence->getData()
+            // $market->getData(),
+            // $trade->getData(),
+            // $directory->getData(),
+            // $partner->getData(),
+            // $intelligence->getData()
+            $marketData,
+        $tradeData,
+        $directoryData,
+        $partnerData,
+        $intelligenceData
         ));
     }
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Country extends Model
 {
@@ -64,4 +65,12 @@ class Country extends Model
     {
         return trim("{$this->flag_emoji} {$this->display_name}");
     }
+
+    /**
+ * Scope active countries.
+ */
+public function scopeActive(Builder $query): Builder
+{
+    return $query->where('is_active', true);
+}
 }
