@@ -1,28 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Trade\ExecutiveReport;
 
-use App\Services\Trade\TradeAnalyticsService;
-use App\Services\Trade\CountryAnalyticsService;
-use App\Services\Trade\HSCodeAnalyticsService;
-use App\Services\Trade\EarlyWarningService;
+use App\Services\Trade\Analytics\ExecutiveAnalyticsService;
 
 class ExecutiveReportService
 {
     public function __construct(
-        protected TradeAnalyticsService $tradeAnalytics,
-        protected CountryAnalyticsService $countryAnalytics,
-        protected HSCodeAnalyticsService $hsCodeAnalytics,
-        protected EarlyWarningService $earlyWarning
+        protected ExecutiveAnalyticsService $analytics,
     ) {
     }
 
     /**
+     * --------------------------------------------------------------------------
      * Build Executive Report
+     * --------------------------------------------------------------------------
      */
     public function build(array $filters = []): array
-{
-    return [
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Executive Analytics
+        |--------------------------------------------------------------------------
+        */
+
+        $analytics = $this->analytics->build($filters);
 
         /*
         |--------------------------------------------------------------------------
@@ -30,124 +34,95 @@ class ExecutiveReportService
         |--------------------------------------------------------------------------
         */
 
-        'title' => $filters['title']
-            ?? 'Indonesia Trade Executive Report',
-
-        'subtitle' => $filters['subtitle']
-            ?? 'Digestex Executive Intelligence',
-
-        'reportNumber' => $filters['report_number']
-            ?? 'TR-' . now()->format('Ym'),
-
-        'generatedAt' => now()->format('d F Y'),
-
-        'country' => $filters['country'] ?? 'Indonesia',
-
-        'period' => $filters['period']
-            ?? 'January–April 2026',
-
-        'compare' => $filters['compare']
-            ?? 'January–April 2025',
+        $header = $this->buildHeader(
+            $filters,
+            $analytics['metadata'] ?? []
+        );
 
         /*
         |--------------------------------------------------------------------------
-        | Executive KPI
+        | Executive Report
         |--------------------------------------------------------------------------
         */
 
-        'summary' => $this->tradeAnalytics
-            ->summary($filters),
+        return [
 
-        /*
-        |--------------------------------------------------------------------------
-        | Monthly Comparison
-        |--------------------------------------------------------------------------
-        */
+            ...$header,
 
-        'comparison' => $this->tradeAnalytics
-            ->monthlyComparison($filters),
+            /*
+            |--------------------------------------------------------------------------
+            | Executive Intelligence
+            |--------------------------------------------------------------------------
+            */
 
-        'comparisonPieces' => $this->tradeAnalytics
-    ->monthlyComparisonPieces($filters),
+            'summary' => $analytics['summary'] ?? [],
 
-        /*
-        |--------------------------------------------------------------------------
-        | Top Destination Countries
-        |--------------------------------------------------------------------------
-        */
+            'comparison' => $analytics['comparison'] ?? [],
 
-        'topCountries' => $this->countryAnalytics
-    ->topGarmentCountries($filters),
+            'comparisonPieces' => $analytics['comparisonPieces'] ?? [],
 
-        /*
-        |--------------------------------------------------------------------------
-        | Top HS Code
-        |--------------------------------------------------------------------------
-        */
+            'topCountries' => $analytics['topCountries'] ?? [],
 
-        'topProducts' =>
-$this->hsCodeAnalytics
-    ->topGarmentProducts($filters),
+            'topProducts' => $analytics['topProducts'] ?? [],
 
-        /*
-        |--------------------------------------------------------------------------
-        | Temporary Content
-        |--------------------------------------------------------------------------
-        */
+            'earlyWarnings' => $analytics['earlyWarnings'] ?? [],
 
-        'executiveSummary' => '',
+            /*
+            |--------------------------------------------------------------------------
+            | AI & Strategic Insight
+            |--------------------------------------------------------------------------
+            */
 
-        'keyFindings' => [],
+            'executiveSummary' => '',
 
-        'tradeRadar' => [],
+            'keyFindings' => [],
 
-        'opportunities' => [],
+            'tradeRadar' => [],
 
-        'risks' => [],
+            'opportunities' => [],
 
-        'recommendation' => [],
+            'risks' => [],
 
-    ];
-}
+            'recommendation' => [],
 
-    /**
-     * Executive Summary
-     */
-    protected function generateExecutiveSummary(): string
-    {
-        return
-            "Executive summary will be generated automatically from the latest trade statistics.";
+        ];
     }
 
     /**
-     * Key Findings
+     * --------------------------------------------------------------------------
+     * Build Report Header
+     * --------------------------------------------------------------------------
      */
-    protected function generateKeyFindings(): array
-    {
-        return [];
-    }
+    protected function buildHeader(
+        array $filters,
+        array $metadata = []
+    ): array {
 
-    /**
-     * Trade Radar
-     */
-    protected function generateTradeRadar(): array
-    {
-        return [];
-    }
+        return [
 
-    /**
-     * Opportunities
-     */
-    protected function generateOpportunities(): array
-    {
-        return [];
-    }
+            'title' => $filters['title']
+                ?? 'Indonesia Trade Executive Report',
 
-    /**
-     * Recommendation
-     */
-    protected function generateRecommendation(): array
-    {
-        return [];
+            'subtitle' => $filters['subtitle']
+                ?? 'Digestex Executive Intelligence',
+
+            'reportNumber' => $filters['report_number']
+                ?? 'TR-' . now()->format('Ym'),
+
+            'generatedAt' => $metadata['generated_at']
+                ?? now()->toDateTimeString(),
+
+            'metadata' => $metadata,
+
+            'country' => $filters['country']
+                ?? 'Indonesia',
+
+            'period' => $filters['period']
+                ?? ($metadata['latest_period'] ?? null),
+
+            'compare' => $filters['compare']
+                ?? null,
+
+        ];
     }
 }

@@ -6,7 +6,7 @@ use App\Models\MarketHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use App\Services\Trade\TradeAnalyticsService;
+use App\Services\Trade\Analytics\TradeAnalyticsService;
 
 class TradeDashboardController extends Controller
 {

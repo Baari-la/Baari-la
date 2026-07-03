@@ -11,7 +11,7 @@ use App\Models\AuditLog;
 use App\Models\CompanyClaim;
 use App\Models\TradeAnalyticsVertical;
 use Maatwebsite\Excel\Facades\Excel; // Sesuaikan dengan library excel yang Anda gunakan (misal: Maatwebsite/Laravel-Excel)
-use App\Services\Trade\TradeAnalyticsService;
+use App\Services\Trade\Analytics\TradeAnalyticsService;
 
 
 class AdminDashboardController extends Controller

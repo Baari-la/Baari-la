@@ -1,18 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Home;
 
-use App\Repositories\Trade\TradeStatisticsRepository;
+use App\Repositories\Trade\Dashboard\HomeTradeRepository;
 use App\Services\Trade\ExecutiveReport\ExecutiveReportService;
+use App\Services\Trade\Intelligence\Core\PiecesConversionService;
 
 class HomeTradeService
 {
     public function __construct(
-        protected TradeStatisticsRepository $tradeRepository,
+        protected HomeTradeRepository $repository,
+        protected PiecesConversionService $piecesConversionService,
         protected ExecutiveReportService $executiveReportService,
     ) {
     }
-
+    /**
+     * --------------------------------------------------------------------------
+     * Home Dashboard Data
+     * --------------------------------------------------------------------------
+     */
     public function getData(): array
     {
         /*
@@ -21,9 +29,55 @@ class HomeTradeService
         |--------------------------------------------------------------------------
         */
 
-        $garmentTradeData = $this->tradeRepository->garmentTradeSummary();
+        $tradeRows = $this->repository->tradeSummary([
+            'hs_prefix' => ['61', '62'],
+        ]);
 
-        $topProducts = $this->tradeRepository->topGarmentProducts();
+        /*
+        |--------------------------------------------------------------------------
+        | Estimated Pieces
+        |--------------------------------------------------------------------------
+        */
+
+        $totalPieces = 0;
+
+        foreach ($tradeRows as $row) {
+
+            if ($row->tipe_arus !== 'ekspor') {
+                continue;
+            }
+
+            $totalPieces += $this->piecesConversionService->toPieces(
+                $row->hs_code,
+                (float) $row->vol_2025
+            );
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Hero Summary
+        |--------------------------------------------------------------------------
+        */
+
+        $heroSummary = $this->repository->heroSummary();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Top Products
+        |--------------------------------------------------------------------------
+        */
+
+        // Akan dipindahkan ke ExecutiveProductRepository
+        $topProducts = [];
+
+        /*
+        |--------------------------------------------------------------------------
+        | Market Highlights
+        |--------------------------------------------------------------------------
+        */
+
+        $marketHighlights = $this->repository->marketHighlights();
 
         /*
         |--------------------------------------------------------------------------
@@ -34,35 +88,50 @@ class HomeTradeService
         $fiberData = $this->getRawFiberData();
 
         if (!auth()->check()) {
+
             $fiberData = collect($fiberData)
+
                 ->map(function ($item, $index) {
 
                     if ($index > 3) {
+
                         $item['cotton_vol'] = 0;
                         $item['cotton_val'] = 0;
                         $item['syn_vol'] = 0;
                         $item['syn_val'] = 0;
+
                     }
 
                     return $item;
+
                 })
+
                 ->all();
+
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Executive Report
+        | Executive Report Preview
         |--------------------------------------------------------------------------
         */
 
         $executiveReport = $this->executiveReportService->build([
+
             'title' => 'Indonesia Apparel & Made-up Textile Export Performance',
+
             'subtitle' => 'HS 61–63',
+
             'trade_flow' => 'export',
+
             'base_year' => 2025,
+
             'compare_year' => 2026,
+
             'months' => [1, 2, 3, 4],
+
             'hs_prefix' => ['61', '62', '63'],
+
         ]);
 
         /*
@@ -72,27 +141,47 @@ class HomeTradeService
         */
 
         return [
-            'garmentTrade'      => $garmentTradeData,
-            'totalGarment'      => (float) ($garmentTradeData->export_pcs ?? 0),
-            'topProducts'       => $topProducts,
+
+            'heroSummary' => $heroSummary,
+
+            'garmentTrade' => $tradeRows,
+
+            'totalGarment' => $totalPieces,
+
+            'marketHighlights' => $marketHighlights,
+
+            'topProducts' => $topProducts,
+
             'fiberIntelligence' => $fiberData,
-            'report'            => $executiveReport,
+
+            'report' => $executiveReport,
+
         ];
     }
 
     /**
-     * Fiber Intelligence Dataset
+     * --------------------------------------------------------------------------
+     * Temporary Fiber Dataset
+     * --------------------------------------------------------------------------
      */
     private function getRawFiberData(): array
     {
         return [
+
             ['year' => '2019', 'cotton_vol' => 320000, 'cotton_val' => 540000000, 'syn_vol' => 450000, 'syn_val' => 620000000],
+
             ['year' => '2020', 'cotton_vol' => 290000, 'cotton_val' => 480000000, 'syn_vol' => 410000, 'syn_val' => 580000000],
+
             ['year' => '2021', 'cotton_vol' => 340000, 'cotton_val' => 610000000, 'syn_vol' => 480000, 'syn_val' => 690000000],
+
             ['year' => '2022', 'cotton_vol' => 310000, 'cotton_val' => 590000000, 'syn_vol' => 460000, 'syn_val' => 660000000],
+
             ['year' => '2023', 'cotton_vol' => 330000, 'cotton_val' => 620000000, 'syn_vol' => 490000, 'syn_val' => 710000000],
+
             ['year' => '2024', 'cotton_vol' => 350000, 'cotton_val' => 650000000, 'syn_vol' => 520000, 'syn_val' => 750000000],
+
             ['year' => '2025', 'cotton_vol' => 370000, 'cotton_val' => 690000000, 'syn_vol' => 550000, 'syn_val' => 800000000],
+
         ];
     }
 }
