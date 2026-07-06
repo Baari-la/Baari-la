@@ -34,6 +34,7 @@ use App\Http\Controllers\EcosystemPartnerController;
 use App\Http\Controllers\CompanyLocationController;
 use App\Http\Controllers\PartnerInsightController;
 use App\Http\Controllers\Admin\ImportKemendagController;
+use App\Http\Controllers\CompanyPassportController;
 
 
 /*
@@ -521,7 +522,17 @@ Route::post(
             'companies.claim'
         );
 
-        });
+// Digital Passport
+Route::get('/companies/{company}/passport',[CompanyPassportController::class, 'show']
+    )->name('companies.passport');
+
+// API
+ Route::get('/companies/{company}/passport', [CompanyPassportController::class, 'data']);
+
+ });
+
+
+
 Route::get('/industry-solutions',[IndustrySolutionController::class, 'index'])->name('industry-solutions.index');
 Route::get('/industry-solutions/{category}',[IndustrySolutionController::class, 'show']
 )->name('industry-solutions.show');

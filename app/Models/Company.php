@@ -293,4 +293,97 @@ public function industryPartner()
         IndustryPartner::class
     );
 }
+
+public function factories()
+{
+    return $this->hasMany(
+        // CompanyFactory::class
+    );
+}
+public function socialCompliances()
+{
+    return $this->hasMany(
+        // CompanySocialCompliance::class
+    );
+}
+
+public function environmentalCompliances()
+{
+    return $this->hasMany(
+        // CompanyEnvironmentalCompliance::class
+    );
+}
+
+public function traceabilityRecords()
+{
+    return $this->hasMany(
+        // CompanyTraceability::class
+    );
+}
+
+public function audits()
+{
+    return $this->hasMany(
+        // CompanyAudit::class
+    );
+}
+
+/**
+ * Passport summary for dashboard cards.
+ */
+public function passportSummary(): array
+{
+    return [
+        'products' => $this->products()->count(),
+        'markets' => $this->markets()->count(),
+        'machines' => $this->machines()->count(),
+        'certifications' => $this->certifications()->count(),
+        'contacts' => $this->contacts()->count(),
+        'images' => $this->images()->count(),
+        'capacities' => $this->capacities()->count(),
+        'moqs' => $this->moqs()->count(),
+        'lead_times' => $this->leadTimes()->count(),
+    ];
+}
+public function scopeManaged($query)
+{
+    return $query->where(
+        'data_source',
+        'company_updated'
+    );
+}
+
+public function scopeVerified($query)
+{
+    return $query->where(
+        'data_source',
+        'verified_by_admin'
+    );
+}
+
+public function scopeClaimed($query)
+{
+    return $query->whereNotNull(
+        'claimed_by_user_id'
+    );
+}
+/**
+     * Relations required by Digital Company Passport.
+     */
+    public const PASSPORT_RELATIONS = [
+        'products',
+        'markets',
+        'machines',
+        'capacities',
+        'moqs',
+        'leadTimes',
+        'certifications',
+        'contacts',
+        'links',
+        'images',
+    ];
+    public function loadPassportRelations(): self
+    {
+        return $this->load(self::PASSPORT_RELATIONS);
+    }
 }
