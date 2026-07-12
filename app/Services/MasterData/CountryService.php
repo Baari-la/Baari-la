@@ -118,4 +118,43 @@ class CountryService
             ->where('sub_region_en', $subRegion)
             ->values();
     }
+/**
+ * --------------------------------------------------------------------------
+ * Dropdown Options
+ * --------------------------------------------------------------------------
+ */
+public function options(?string $locale = null): Collection
+{
+    $locale ??= App::getLocale();
+
+    return $this->countries
+
+        ->map(function ($country) use ($locale) {
+
+            $name = $locale === 'en'
+
+                ? $country->country_name_en
+
+                : ($country->country_name_id ?: $country->country_name_en);
+
+            return [
+
+                'code' => $country->country_code,
+
+                'name' => $name,
+
+                'flag' => $country->flag_emoji,
+
+                'label' => trim(
+
+                    $country->flag_emoji . ' ' . $name
+
+                ),
+
+            ];
+
+        })
+
+        ->values();
+}
 }

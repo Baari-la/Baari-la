@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Services\Company\Intelligence;
+use App\Services\Company\Intelligence\BuildMySupplyChainService;
 
 use App\Models\Company;
 use App\Services\Company\Passport\CompanyPassportAssembler;
@@ -79,13 +80,35 @@ class CompanyIntelligenceOrchestrator
 {
     public function __construct(
 
-        /*
+          /*
         |--------------------------------------------------------------------------
         | Core Intelligence Services
         |--------------------------------------------------------------------------
         */
-
+        
         protected CompanyProfileService $profile,
+
+        protected CompanyMetricsService $metrics,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Business Intelligence
+        |--------------------------------------------------------------------------
+        */
+
+        protected BusinessRoleService $role,
+
+        protected BusinessEcosystemService $ecosystem,
+
+        protected BusinessNeedService $needs,
+
+        protected CompanyMatchingService $matching,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Operational Intelligence
+        |--------------------------------------------------------------------------
+        */
 
         protected CompanyCapabilityService $capability,
 
@@ -97,97 +120,209 @@ class CompanyIntelligenceOrchestrator
 
         protected CompanyReadinessService $readiness,
 
-        protected CompanyScoreService $score,
-
         /*
         |--------------------------------------------------------------------------
-        | Passport Services
+        | Executive Intelligence
         |--------------------------------------------------------------------------
         */
 
+        protected CompanyScoreService $score,
+
         protected CompanyRecommendationService $recommendation,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Passport
+        |--------------------------------------------------------------------------
+        */
 
         protected CompanyPassportMetadata $metadata,
 
         protected CompanyPassportAssembler $assembler,
 
+        /*
+    |--------------------------------------------------------------------------
+    | Build My Supply Chain
+    |--------------------------------------------------------------------------
+    */
+
+    protected BuildMySupplyChainService $buildSupplyChain,
+
     ) {
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Company Profile
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Digital Company Profile
+     */
+    public function profile(
+        Company $company
+    ): array {
+
+        return $this->profile->all(
+            $company
+        );
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Company Metrics
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Executive Statistics
+     */
+    public function metrics(
+        Company $company
+    ): array {
+
+        return $this->metrics->generate(
+            $company
+        );
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Business Intelligence
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Resolve Business Role
+     */
+    public function role(
+        Company $company
+    ): string {
+
+        return $this->role->resolve(
+            $company
+        );
+
+    }
+
+    /**
+     * Resolve Business Ecosystem
+     */
+    public function ecosystem(
+        Company $company
+    ): array {
+
+        return $this->ecosystem->resolve(
+
+            $this->role($company)
+
+        );
+
+    }
+
+    /**
+     * Resolve Business Needs
+     */
+    public function needs(
+        Company $company
+    ): array {
+
+        return $this->needs->build(
+
+            $this->ecosystem($company)
+
+        );
+
+    }
+
+    /**
+     * Smart Business Matching
+     */
+    public function matching(
+        Company $company
+    ): array {
+
+        return $this->matching->all(
+            $company
+        );
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Operational Intelligence
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Company Capability
+     */
+    public function capability(
+        Company $company
+    ): array {
+
+        return $this->capability->all(
+            $company
+        );
+
+    }
+
+    /**
+     * Compliance Intelligence
+     */
+    public function compliance(
+        Company $company
+    ): array {
+
+        return $this->compliance->all(
+            $company
+        );
     }
         /**
      * --------------------------------------------------------------------------
-     * Company Profile
-     * --------------------------------------------------------------------------
-     *
-     * Digital identity and company master information.
-     */
-    public function profile(Company $company): array
-    {
-        return $this->profile->all($company);
-    }
-
-    /**
-     * --------------------------------------------------------------------------
-     * Capability Intelligence
-     * --------------------------------------------------------------------------
-     *
-     * Manufacturing capability, machinery, production,
-     * MOQ, lead time and operational readiness.
-     */
-    public function capability(Company $company): array
-    {
-        return $this->capability->all($company);
-    }
-
-    /**
-     * --------------------------------------------------------------------------
-     * Compliance Intelligence
-     * --------------------------------------------------------------------------
-     *
-     * Certifications, social compliance,
-     * environmental compliance and audit readiness.
-     */
-    public function compliance(Company $company): array
-    {
-        return $this->compliance->all($company);
-    }
-
-    /**
-     * --------------------------------------------------------------------------
      * Market Intelligence
      * --------------------------------------------------------------------------
-     *
-     * Export markets, market diversification,
-     * international presence and trade intelligence.
      */
-    public function market(Company $company): array
-    {
-        return $this->market->all($company);
+    public function market(
+        Company $company
+    ): array {
+
+        return $this->market->all(
+            $company
+        );
+
     }
 
     /**
      * --------------------------------------------------------------------------
      * Supply Chain Intelligence
      * --------------------------------------------------------------------------
-     *
-     * Factory capability, material sourcing,
-     * logistics, MOQ and lead time.
      */
-    public function supplyChain(Company $company): array
-    {
-        return $this->supplyChain->all($company);
-    }
+    public function supplyChain(
+        Company $company
+    ): array {
 
+        return $this->supplyChain->all(
+            $company
+        );
+
+    }
     /**
      * --------------------------------------------------------------------------
      * Business Readiness
      * --------------------------------------------------------------------------
-     *
-     * Overall operational readiness for
-     * international business.
      */
-    public function readiness(Company $company): array
-    {
-        return $this->readiness->all($company);
+    public function readiness(
+        Company $company
+    ): array {
+
+        return $this->readiness->all(
+            $company
+        );
+
     }
 
     /**
@@ -203,32 +338,31 @@ class CompanyIntelligenceOrchestrator
         return $this->score->all($company);
     }
 
-    /**
-     * --------------------------------------------------------------------------
-     * Company Recommendations
-     * --------------------------------------------------------------------------
-     *
-     * Business recommendations generated from
-     * Company Intelligence modules.
-     */
-    public function recommendations(
-        Company $company,
-        array $capability,
-        array $compliance,
-        array $market,
-        array $supplyChain,
-        array $readiness,
-    ): array {
+   /**
+ * --------------------------------------------------------------------------
+ * Executive Recommendations
+ * --------------------------------------------------------------------------
+ *
+ * NOTE:
+ * The additional intelligence parameters are intentionally prepared
+ * for Recommendation Engine v2.
+ *
+ * Current implementation still uses CompanyRecommendationService::all($company)
+ * to maintain backward compatibility.
+ */
+public function recommendations(
+    Company $company,
+    array $capability,
+    array $compliance,
+    array $market,
+    array $supplyChain,
+    array $readiness,
+): array {
 
-        return $this->recommendation->generate(
-            company: $company,
-            capability: $capability,
-            compliance: $compliance,
-            market: $market,
-            supplyChain: $supplyChain,
-            readiness: $readiness,
-        );
-    }
+    return $this->recommendation->all(
+        $company
+    );
+}
 
     /**
      * --------------------------------------------------------------------------
@@ -241,6 +375,24 @@ class CompanyIntelligenceOrchestrator
     {
         return $this->metadata->build($company);
     }
+
+/**
+ * --------------------------------------------------------------------------
+ * Build My Supply Chain
+ * --------------------------------------------------------------------------
+ */
+public function buildMySupplyChain(
+    Company $company,
+): array {
+
+    return $this->buildSupplyChain->build(
+
+        $company
+
+    );
+
+}
+    
         /**
      * --------------------------------------------------------------------------
      * Digital Company Passport
@@ -253,115 +405,165 @@ class CompanyIntelligenceOrchestrator
      * and delegates the final payload construction to the
      * CompanyPassportAssembler.
      */
-    public function passport(Company $company): array
-    {
-        /*
-        |--------------------------------------------------------------------------
-        | Core Intelligence
-        |--------------------------------------------------------------------------
-        */
+    public function passport(
+    Company $company,
+): array {
 
-        $profile = $this->profile($company);
+    /*
+    |--------------------------------------------------------------------------
+    | Core Intelligence
+    |--------------------------------------------------------------------------
+    */
 
-        $capability = $this->capability($company);
+    $capability = $this->capability->all($company);
 
-        $compliance = $this->compliance($company);
+    $compliance = $this->compliance->all($company);
 
-        $market = $this->market($company);
+    $market = $this->market->all($company);
 
-        $supplyChain = $this->supplyChain($company);
+    $supplyChain = $this->supplyChain->all($company);
 
-        $readiness = $this->readiness($company);
+    $readiness = $this->readiness->all($company);
 
-        $scores = $this->score($company);
+    $scores = $this->score->all($company);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Recommendation Engine
-        |--------------------------------------------------------------------------
-        */
+    $metrics = $this->metrics($company);
 
-        $recommendations = $this->recommendations(
-            company: $company,
-            capability: $capability,
-            compliance: $compliance,
-            market: $market,
-            supplyChain: $supplyChain,
-            readiness: $readiness,
-        );
+    /*
+    |--------------------------------------------------------------------------
+    | Business Intelligence
+    |--------------------------------------------------------------------------
+    */
 
-        /*
-        |--------------------------------------------------------------------------
-        | Passport Metadata
-        |--------------------------------------------------------------------------
-        */
+    $role = $this->role($company);
 
-        $metadata = $this->metadata($company);
+    $ecosystem = $this->ecosystem->resolve($role);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Intelligence Layer
-        |--------------------------------------------------------------------------
-        |
-        | Reserved for:
-        | - Market Intelligence
-        | - Matching Intelligence
-        | - Opportunity Intelligence
-        | - Executive Intelligence
-        |
-        */
+    $businessNeeds = $this->needs->build($ecosystem);
 
-        $intelligence = [
+    $matching = $this->matching($company);
 
-            'market' => [],
+    $buildSupplyChain = $this->buildMySupplyChain($company);
 
-            'matching' => [],
+    /*
+    |--------------------------------------------------------------------------
+    | Recommendation Engine
+    |--------------------------------------------------------------------------
+    */
 
-            'opportunities' => [],
+    $recommendations = $this->recommendations(
 
-            'executive' => [],
+        company: $company,
 
-        ];
+        capability: $capability,
 
-        /*
-        |--------------------------------------------------------------------------
-        | Build Passport
-        |--------------------------------------------------------------------------
-        */
+        compliance: $compliance,
 
-        $passport = $this->assembler->build(
+        market: $market,
 
-            company: $company,
+        supplyChain: $supplyChain,
 
-            capability: $capability,
+        readiness: $readiness,
 
-            compliance: $compliance,
+    );
 
-            market: $market,
+    /*
+    |--------------------------------------------------------------------------
+    | Passport Metadata
+    |--------------------------------------------------------------------------
+    */
 
-            supplyChain: $supplyChain,
+    $metadata = $this->metadata($company);
 
-            readiness: $readiness,
+    /*
+    |--------------------------------------------------------------------------
+    | Company Intelligence
+    |--------------------------------------------------------------------------
+    */
 
-            scores: $scores,
-
-            recommendations: $recommendations,
-
-            intelligence: $intelligence,
-
-            metadata: $metadata,
-
-        );
+    $companyIntelligence = [
 
         /*
         |--------------------------------------------------------------------------
-        | DTO
+        | Profile
         |--------------------------------------------------------------------------
         */
 
-        return method_exists($passport, 'toArray')
-            ? $passport->toArray()
-            : $passport;
-    }
+        'profile' => $this->profile($company),
+
+        'metrics' => $metrics,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Business Intelligence
+        |--------------------------------------------------------------------------
+        */
+
+        'role' => $role,
+
+        'ecosystem' => $ecosystem,
+
+        'business_needs' => $businessNeeds,
+
+        'matching' => $matching,
+
+        'build_supply_chain' => $buildSupplyChain,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Intelligence Modules
+        |--------------------------------------------------------------------------
+        */
+
+        'capability' => $capability,
+
+        'compliance' => $compliance,
+
+        'market' => $market,
+
+        'supply_chain' => $supplyChain,
+
+        'readiness' => $readiness,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Executive Intelligence
+        |--------------------------------------------------------------------------
+        */
+
+        'scores' => $scores,
+
+        'recommendations' => $recommendations,
+
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Build Passport
+    |--------------------------------------------------------------------------
+    */
+
+    $passport = $this->assembler->build(
+
+        $company,
+
+        $companyIntelligence,
+
+        $metadata,
+
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | DTO
+    |--------------------------------------------------------------------------
+    */
+
+    return method_exists($passport, 'toArray')
+
+        ? $passport->toArray()
+
+        : $passport;
+}
 
 }

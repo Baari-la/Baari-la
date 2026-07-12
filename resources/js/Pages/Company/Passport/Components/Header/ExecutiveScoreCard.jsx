@@ -1,98 +1,129 @@
-import {
-    Award,
-    Factory,
-    ShieldCheck,
-    Globe2,
-    Truck,
-    CheckCircle2,
-} from "lucide-react";
+import { Award, ShieldCheck, TrendingUp } from "lucide-react";
 
-export default function ExecutiveScoreCard({ scores = {} }) {
-    const overall = scores.overall ?? 0;
+export default function ExecutiveScoreCard({ passport }) {
+    const score = passport?.scores?.score ?? {};
 
-    const level = getLevel(overall);
+    const modules = [
+        {
+            label: "Capability",
+            value: score.capability ?? 0,
+        },
 
-    const items = [
         {
-            title: "Capability",
-            value: scores.capability ?? 0,
-            icon: Factory,
+            label: "Compliance",
+            value: score.compliance ?? 0,
         },
+
         {
-            title: "Compliance",
-            value: scores.compliance ?? 0,
-            icon: ShieldCheck,
+            label: "Market",
+            value: score.market ?? 0,
         },
+
         {
-            title: "Market",
-            value: scores.market ?? 0,
-            icon: Globe2,
+            label: "Supply Chain",
+            value: score.supply_chain ?? 0,
         },
+
         {
-            title: "Supply Chain",
-            value: scores.supply_chain ?? 0,
-            icon: Truck,
-        },
-        {
-            title: "Business Readiness",
-            value: scores.readiness ?? 0,
-            icon: CheckCircle2,
+            label: "Business Readiness",
+            value: score.readiness ?? 0,
         },
     ];
 
     return (
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-lg">
-            {/* Overall */}
+        <div className="rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 text-white shadow-xl">
+            {/* Header */}
 
-            <div className="text-center">
-                <div className="flex justify-center">
-                    <Award className="h-10 w-10 text-amber-400" />
-                </div>
+            <div className="flex items-center gap-3">
+                <Award className="h-6 w-6 text-amber-400" />
 
-                <div className="mt-2 text-xs uppercase tracking-[0.25em] text-slate-300">
-                    Executive Intelligence Score
-                </div>
+                <div>
+                    <div className="text-xs uppercase tracking-[0.25em] text-slate-300">
+                        Executive Intelligence Score
+                    </div>
 
-                <div className="mt-2 text-6xl font-bold text-white">
-                    {overall}
-                </div>
-
-                <div className="mt-2 inline-flex rounded-full bg-emerald-500/20 px-4 py-1 text-sm font-semibold text-emerald-300">
-                    {level}
+                    <div className="text-sm text-slate-400">
+                        DIGESTEX Company Intelligence
+                    </div>
                 </div>
             </div>
 
-            {/* Divider */}
+            {/* Score */}
 
-            <div className="my-6 border-t border-white/10" />
+            <div className="mt-8 text-center">
+                <div className="text-7xl font-black">{score.overall ?? 0}</div>
 
-            {/* Detail Scores */}
+                <div className="mt-2 text-2xl font-semibold">
+                    {score.level ?? "-"}
+                </div>
 
-            <div className="space-y-4">
-                {items.map((item) => (
-                    <ScoreRow key={item.title} {...item} />
+                <div className="mt-1 text-slate-300">
+                    Rating {score.rating ?? "-"}
+                </div>
+            </div>
+
+            {/* Progress */}
+
+            <div className="mt-8">
+                <div className="mb-2 flex justify-between text-sm">
+                    <span>Overall Performance</span>
+
+                    <span>{score.overall ?? 0}%</span>
+                </div>
+
+                <div className="h-3 rounded-full bg-white/10">
+                    <div
+                        className="h-3 rounded-full bg-emerald-400"
+                        style={{
+                            width: `${score.overall ?? 0}%`,
+                        }}
+                    />
+                </div>
+            </div>
+
+            {/* Breakdown */}
+
+            <div className="mt-8 space-y-4">
+                {modules.map((item) => (
+                    <ModuleProgress
+                        key={item.label}
+                        label={item.label}
+                        value={item.value}
+                    />
                 ))}
+            </div>
+
+            {/* Footer */}
+
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="flex items-center gap-2">
+                    <ShieldCheck className="h-5 w-5 text-emerald-400" />
+
+                    <span className="font-semibold">
+                        Executive Intelligence Certified
+                    </span>
+                </div>
             </div>
         </div>
     );
 }
 
-function ScoreRow({ title, value, icon: Icon }) {
+function ModuleProgress({
+    label,
+
+    value,
+}) {
     return (
         <div>
-            <div className="mb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Icon className="h-4 w-4 text-slate-300" />
+            <div className="mb-1 flex justify-between text-sm">
+                <span>{label}</span>
 
-                    <span className="text-sm text-slate-200">{title}</span>
-                </div>
-
-                <span className="font-semibold text-white">{value}</span>
+                <span>{value}</span>
             </div>
 
-            <div className="h-2 overflow-hidden rounded-full bg-white/10">
+            <div className="h-2 rounded-full bg-white/10">
                 <div
-                    className={progressColor(value)}
+                    className="h-2 rounded-full bg-cyan-400"
                     style={{
                         width: `${value}%`,
                     }}
@@ -100,32 +131,4 @@ function ScoreRow({ title, value, icon: Icon }) {
             </div>
         </div>
     );
-}
-
-function getLevel(score) {
-    if (score >= 95) return "World Class";
-
-    if (score >= 90) return "Excellent";
-
-    if (score >= 80) return "Export Ready";
-
-    if (score >= 70) return "Developing";
-
-    if (score >= 60) return "Emerging";
-
-    return "Needs Improvement";
-}
-
-function progressColor(score) {
-    if (score >= 95) return "h-full bg-emerald-400";
-
-    if (score >= 90) return "h-full bg-green-400";
-
-    if (score >= 80) return "h-full bg-blue-400";
-
-    if (score >= 70) return "h-full bg-amber-400";
-
-    if (score >= 60) return "h-full bg-orange-400";
-
-    return "h-full bg-red-500";
 }

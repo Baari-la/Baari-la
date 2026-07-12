@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Services\Company\Intelligence\CompanyIntelligenceOrchestrator;
+use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,42 +22,33 @@ class CompanyPassportController extends Controller
      * Digital Company Passport
      * --------------------------------------------------------------------------
      */
-    public function show(Company $company): Response
-{
-    $company->loadPassportRelations();
+    public function show(
+        Company $company
+    ): Response {
 
-    return Inertia::render(
-        'Company/Passport/Index',
-        [
-            'passport' => $this->intelligence->all($company),
-        ]
-    );
-}
+        $company->loadPassportRelations();
+
+        return Inertia::render(
+    'Company/Passport/Index',
+    [
+        'passport' => $this->intelligence->passport($company),
+    ]
+);
+    }
+
     /**
- * --------------------------------------------------------------------------
- * Passport Data API
- * --------------------------------------------------------------------------
- */
-public function data(Company $company)
-{
-    $company->load([
+     * --------------------------------------------------------------------------
+     * Passport API
+     * --------------------------------------------------------------------------
+     */
+    public function data(
+        Company $company
+    ): JsonResponse {
 
-        'products',
-        'markets',
-        'machines',
-        'capacities',
-        'moqs',
-        'leadTimes',
-        'certifications',
-        'contacts',
-        'links',
-        'images',
+        $company->loadPassportRelations();
 
-    ]);
-
-    return response()->json(
-        $this->intelligence->all($company)
-    );
-}
-
+        return response()->json(
+    $this->intelligence->passport($company)
+);
+    }
 }

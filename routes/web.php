@@ -523,12 +523,15 @@ Route::post(
         );
 
 // Digital Passport
-Route::get('/companies/{company}/passport',[CompanyPassportController::class, 'show']
-    )->name('companies.passport');
+Route::get(
+    '/companies/{company}/passport',
+    [CompanyPassportController::class, 'show']
+)->name('companies.passport');
 
-// API
- Route::get('/companies/{company}/passport', [CompanyPassportController::class, 'data']);
-
+Route::get(
+    '/companies/{company}/passport/data',
+    [CompanyPassportController::class, 'data']
+)->name('companies.passport.data');
  });
 
 

@@ -4,35 +4,207 @@ declare(strict_types=1);
 
 namespace App\Services\Company\DTO;
 
+/**
+ * ==========================================================================
+ * DIGESTEX CORE
+ * ==========================================================================
+ * Company Passport Data Transfer Object
+ * ==========================================================================
+ *
+ * Single data contract between Backend and Frontend.
+ *
+ * Consumed by:
+ *
+ * • Digital Company Passport
+ * • Executive Dashboard
+ * • Smart Business Matching™
+ * • Build My Supply Chain™
+ * • Buyer Discovery
+ * • Executive AI
+ * • REST API
+ * • Mobile Apps
+ *
+ * Version:
+ * DIGESTEX Intelligence Framework v2.0
+ */
 final readonly class CompanyPassportData
 {
     public function __construct(
-        public array $company,
-        public array $statistics,
-        public array $scores,
-        public array $passports,
-        public array $recommendations,
-        public array $intelligence,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Passport
+        |--------------------------------------------------------------------------
+        */
+
         public array $metadata,
+
+        public array $summary,
+
+        public array $passport,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Business Intelligence
+        |--------------------------------------------------------------------------
+        */
+
+        public ?string $role,
+
+        public array $ecosystem,
+
+        public array $business_needs,
+
+        public array $matching,
+
+        /*
+|--------------------------------------------------------------------------
+| Build My Supply Chain
+|--------------------------------------------------------------------------
+*/
+
+public array $build_supply_chain,
+
+/*
+|--------------------------------------------------------------------------
+| Executive Intelligence
+|--------------------------------------------------------------------------
+*/
+
+public array $scores,
+
+public array $recommendations,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Executive Intelligence
+        |--------------------------------------------------------------------------
+        */
+
+       
+        /*
+        |--------------------------------------------------------------------------
+        | Statistics
+        |--------------------------------------------------------------------------
+        */
+
+        public array $statistics,
+
     ) {
     }
 
     /**
      * --------------------------------------------------------------------------
-     * Convert DTO to Array
+     * Create DTO From Array
+     * --------------------------------------------------------------------------
+     */
+    public static function fromArray(array $data): self
+    {
+        return new self(
+
+            /*
+            |--------------------------------------------------------------------------
+            | Passport
+            |--------------------------------------------------------------------------
+            */
+
+            metadata: $data['metadata'] ?? [],
+
+            summary: $data['summary'] ?? [],
+
+            passport: $data['passport'] ?? [],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Business Intelligence
+            |--------------------------------------------------------------------------
+            */
+
+            role: $data['role'] ?? null,
+
+            ecosystem: $data['ecosystem'] ?? [],
+
+            business_needs: $data['business_needs'] ?? [],
+
+            matching: $data['matching'] ?? [],
+
+            build_supply_chain:
+            $data['build_supply_chain'] ?? [],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Executive Intelligence
+            |--------------------------------------------------------------------------
+            */
+
+            scores: $data['scores'] ?? [],
+
+            recommendations: $data['recommendations'] ?? [],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Statistics
+            |--------------------------------------------------------------------------
+            */
+
+            statistics: $data['statistics'] ?? [],
+
+        );
+    }
+
+    /**
+     * --------------------------------------------------------------------------
+     * Convert DTO To Array
      * --------------------------------------------------------------------------
      */
     public function toArray(): array
     {
         return [
 
-            'company' => $this->company,
-            'statistics' => $this->statistics,
-            'scores' => $this->scores,
-            'passports' => $this->passports,
-            'recommendations' => $this->recommendations,
-            'intelligence' => $this->intelligence,
+            /*
+            |--------------------------------------------------------------------------
+            | Passport
+            |--------------------------------------------------------------------------
+            */
+
             'metadata' => $this->metadata,
+
+            'summary' => $this->summary,
+
+            'passport' => $this->passport,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Business Intelligence
+            |--------------------------------------------------------------------------
+            */
+
+            'role' => $this->role,
+
+            'ecosystem' => $this->ecosystem,
+
+            'business_needs' => $this->business_needs,
+
+            'matching' => $this->matching,
+            'build_supply_chain' => $this->build_supply_chain,
+            /*
+            |--------------------------------------------------------------------------
+            | Executive Intelligence
+            |--------------------------------------------------------------------------
+            */
+
+            'scores' => $this->scores,
+
+            'recommendations' => $this->recommendations,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Statistics
+            |--------------------------------------------------------------------------
+            */
+
+            'statistics' => $this->statistics,
+
         ];
     }
 
@@ -41,10 +213,14 @@ final readonly class CompanyPassportData
      * Executive Score
      * --------------------------------------------------------------------------
      */
-    public function executiveScore(): int
+    public function executiveScore(): float
     {
-        return (int) (
-            $this->scores['overall'] ?? 0
+        return (float) (
+
+            $this->scores['score']['overall']
+
+            ?? 0
+
         );
     }
 
@@ -56,7 +232,27 @@ final readonly class CompanyPassportData
     public function companyName(): string
     {
         return (string) (
-            $this->company['company_name'] ?? ''
+
+            $this->summary['company_name']
+
+            ?? ''
+
+        );
+    }
+
+    /**
+     * --------------------------------------------------------------------------
+     * Company ID
+     * --------------------------------------------------------------------------
+     */
+    public function companyId(): int
+    {
+        return (int) (
+
+            $this->summary['company_id']
+
+            ?? 0
+
         );
     }
 
@@ -68,7 +264,11 @@ final readonly class CompanyPassportData
     public function passportId(): string
     {
         return (string) (
-            $this->metadata['passport_id'] ?? ''
+
+            $this->metadata['passport_id']
+
+            ?? ''
+
         );
     }
 
@@ -80,7 +280,11 @@ final readonly class CompanyPassportData
     public function frameworkVersion(): string
     {
         return (string) (
-            $this->metadata['framework_version'] ?? ''
+
+            $this->metadata['framework_version']
+
+            ?? ''
+
         );
     }
 
@@ -91,54 +295,70 @@ final readonly class CompanyPassportData
      */
     public function generatedAt(): ?string
     {
-        return $this->metadata['generated_at'] ?? null;
+        return
+
+            $this->metadata['generated_at']
+
+            ?? null;
     }
 
     /**
      * --------------------------------------------------------------------------
-     * Check Recommendation Availability
+     * Has Recommendations
      * --------------------------------------------------------------------------
      */
     public function hasRecommendations(): bool
     {
-        return !empty(
-            $this->recommendations
-        );
+        return ! empty($this->recommendations);
     }
 
     /**
      * --------------------------------------------------------------------------
-     * Check Market Intelligence
+     * Has Smart Business Matching
      * --------------------------------------------------------------------------
      */
-    public function hasMarketIntelligence(): bool
+    public function hasMatching(): bool
     {
-        return !empty(
-            $this->intelligence['market'] ?? []
-        );
+        return ! empty($this->matching);
     }
 
     /**
      * --------------------------------------------------------------------------
-     * Check Matching Intelligence
+     * Business Role
      * --------------------------------------------------------------------------
      */
-    public function hasMatchingIntelligence(): bool
+    public function businessRole(): ?string
     {
-        return !empty(
-            $this->intelligence['matching'] ?? []
-        );
+        return $this->role;
     }
 
     /**
      * --------------------------------------------------------------------------
-     * Check Opportunity Intelligence
+     * Ecosystem Categories
      * --------------------------------------------------------------------------
      */
-    public function hasOpportunityIntelligence(): bool
+    public function ecosystemCategories(): array
     {
-        return !empty(
-            $this->intelligence['opportunities'] ?? []
-        );
+        return $this->ecosystem;
     }
+
+    /**
+     * --------------------------------------------------------------------------
+     * Business Needs
+     * --------------------------------------------------------------------------
+     */
+    public function businessNeeds(): array
+    {
+        return $this->business_needs;
+    }
+/**
+ * --------------------------------------------------------------------------
+ * Build My Supply Chain
+ * --------------------------------------------------------------------------
+ */
+public function buildSupplyChain(): array
+{
+    return $this->build_supply_chain;
+}
+    
 }

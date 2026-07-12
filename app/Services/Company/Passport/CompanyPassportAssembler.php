@@ -12,9 +12,9 @@ use App\Services\Company\Intelligence\CompanyMarketService;
 use App\Services\Company\Intelligence\CompanySupplyChainService;
 use App\Services\Company\Intelligence\CompanyReadinessService;
 use App\Services\Company\Intelligence\CompanyScoreService;
-use App\Services\Company\Intelligence\CompanyRecommendationService;
+use App\Services\Company\Passport\CompanyRecommendationService;
 use App\Services\Company\Passport\CompanyPassportMetadata;
-use App\Services\Company\Intelligence\DTO\CompanyPassportData;
+use App\Services\Company\DTO\CompanyPassportData;
 
 
 /**
@@ -118,13 +118,15 @@ class CompanyPassportAssembler
      * Delegates metadata generation to the dedicated
      * CompanyPassportMetadata service.
      */
-    protected function metadata(
-        Company $company
-    ): array {
+//     public function build(
+//     Company $company,
+//     array $companyIntelligence,
+//     array $metadata = []
+// ): CompanyPassportData {
 
-        return $this->metadata->build($company);
+//         return $this->metadata->build($company);
 
-    }
+//     }
         /**
      * --------------------------------------------------------------------------
      * Passport Builder
@@ -350,14 +352,29 @@ class CompanyPassportAssembler
             |--------------------------------------------------------------------------
             */
 
-            'company_id' =>
+            'company_id' =>$company->id,
 
-                $company->id,
+            'company_name' => $company->nama_perusahaan,
 
-            'company_name' =>
+            /*
+|--------------------------------------------------------------------------
+| Company KPI
+|--------------------------------------------------------------------------
+*/
 
-                $company->nama_perusahaan,
+'employees' => $company->tenaga_kerja,
 
+'products' => $company->products->count(),
+
+'markets' => $company->markets->count(),
+
+'machines' => $company->machines->count(),
+
+'capacities' => $company->capacities->count(),
+
+'moqs' => $company->moqs->count(),
+
+'lead_times' => $company->leadTimes->count(),
             /*
             |--------------------------------------------------------------------------
             | Executive Score
@@ -431,68 +448,92 @@ class CompanyPassportAssembler
      * Main entry point.
      */
     public function build(
-        Company $company
-    ): array {
+    Company $company,
+    array $companyIntelligence,
+    array $metadata = []
+): CompanyPassportData{
 
-        /*
-        |--------------------------------------------------------------------------
-        | Metadata
-        |--------------------------------------------------------------------------
-        */
+        $capability = $companyIntelligence['capability'] ?? [];
 
-        $metadata =
+$compliance = $companyIntelligence['compliance'] ?? [];
 
-            $this->metadata($company);
+$market = $companyIntelligence['market'] ?? [];
 
-        /*
-        |--------------------------------------------------------------------------
-        | Passport
-        |--------------------------------------------------------------------------
-        */
+$supplyChain = $companyIntelligence['supply_chain'] ?? [];
 
-        $passport =
+$readiness = $companyIntelligence['readiness'] ?? [];
 
-            $this->passport($company);
+$scores = $companyIntelligence['scores'] ?? [];
 
-        /*
-        |--------------------------------------------------------------------------
-        | Executive Score
-        |--------------------------------------------------------------------------
-        */
+$recommendations = $companyIntelligence['recommendations'] ?? [];
+    
+/*
+|--------------------------------------------------------------------------
+| Business Intelligence
+|--------------------------------------------------------------------------
+*/
 
-        $scores =
+$role = $companyIntelligence['role'] ?? null;
 
-            $this->scores($company);
+$ecosystem = $companyIntelligence['ecosystem'] ?? [];
 
-        /*
-        |--------------------------------------------------------------------------
-        | Recommendations
-        |--------------------------------------------------------------------------
-        */
+$businessNeeds = $companyIntelligence['business_needs'] ?? [];
 
-        $recommendations =
+$matching = $companyIntelligence['matching'] ?? [];
+$buildSupplyChain = $companyIntelligence['build_supply_chain'] ?? [];
+      $passport = [
 
-            $this->recommendations($company);
+    'profile' => [
 
-        /*
-        |--------------------------------------------------------------------------
-        | Statistics
-        |--------------------------------------------------------------------------
-        */
+    'company_id'        => $company->id,
+    'company_name'      => $company->nama_perusahaan,
 
-        $statistics =
+    'membership_type'   => $company->membership_type,
 
-            $this->statistics(
+    'country_name'      => $company->country_name,
+    'country_code'      => $company->country_code,
 
-                $company,
+    'city'              => $company->city,
+    'sector'            => $company->sektor,
 
-                $scores,
+    'leader'            => $company->pimpinan,
 
-                $recommendations,
+    'employees'         => $company->tenaga_kerja,
 
-            );
+    'verification_status' => $company->verification_status,
 
-        /*
+    'claimed'           => $company->isClaimed(),
+
+    'verified_company'  => $company->isVerifiedProfile(),
+
+],
+
+    'capability' => $capability['passport'] ?? [],
+
+    'compliance' => $compliance['passport'] ?? [],
+
+    'market' => $market['passport'] ?? [],
+
+    'supply_chain' => $supplyChain['passport'] ?? [],
+
+    'readiness' => $readiness['passport'] ?? [],
+
+]; 
+     
+$statistics =
+
+    $this->statistics(
+
+        $company,
+
+        $scores,
+
+        $recommendations,
+
+    );
+            /*
+
+        
         |--------------------------------------------------------------------------
         | Executive Summary
         |--------------------------------------------------------------------------
@@ -516,34 +557,48 @@ class CompanyPassportAssembler
         |--------------------------------------------------------------------------
         */
 
-        return CompanyPassportData::fromArray([
+       return CompanyPassportData::fromArray([
+        'identity' => [
 
-            'metadata' =>
+        'company_id' => $company->id,
+        'company_name' => $company->nama_perusahaan,
+        'membership_type' => $company->membership_type,
+        'country_name' => $company->country_name,
+        'country_code' => $company->country_code,
+        'city' => $company->city,
+        'sector' => $company->sektor,
+        'leader' => $company->pimpinan,
+        'employees' => $company->tenaga_kerja,
 
-                $metadata,
+    ],
+    'metadata' => $metadata,
 
-            'summary' =>
+    'summary' => $summary,
 
-                $summary,
+    'passport' => $passport,
+ /*
+    |--------------------------------------------------------------------------
+    | Business Intelligence
+    |--------------------------------------------------------------------------
+    */
 
-            'passport' =>
+    'role' => $role,
 
-                $passport,
+'ecosystem' => $ecosystem,
 
-            'scores' =>
+'business_needs' => $businessNeeds,
 
-                $scores,
+'matching' => $matching,
 
-            'recommendations' =>
+'build_supply_chain' => $buildSupplyChain,
 
-                $recommendations,
+'scores' => $scores,
 
-            'statistics' =>
+'recommendations' => $recommendations,
 
-                $statistics,
+'statistics' => $statistics,
 
-        ])->toArray();
+]);
 
-    }
-
+}
 }

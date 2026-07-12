@@ -172,8 +172,11 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
         // 'usd_idr' => $latest->usd_idr ?? 0,
             // Data Pendukung
             //  'annualTrend' => $this->getAnnualTrendData(), 
-              'tradeDashboard' => $this->trade->dashboard(),
-            'memberStatus' => auth()->user()->is_premium ? 'Premium Member' : 'Regular Member',
+              'tradeSummary' => $this->trade->summary(),
+           'monthlyComparison' => $this->trade->monthlyComparison(),
+
+'monthlyComparisonPieces' => $this->trade->monthlyComparisonPieces(),
+              'memberStatus' => auth()->user()->is_premium ? 'Premium Member' : 'Regular Member',
             'exportValue' => '11.9', // Nanti bisa dihitung dinamis dari $annualTrend
             'lastUpdate' => now()->format('d M Y')
         ]);

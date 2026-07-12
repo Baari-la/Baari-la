@@ -14,8 +14,6 @@ import MarketsSection from "@/Components/Company/MarketsSection";
 import LeadTimesSection from "@/Components/Company/LeadTimesSection";
 
 export default function Edit({ auth, countries, company }) {
-    console.log(countries);
-
     const isEn = auth.locale === "en";
     const { data, setData, post, processing, errors } = useForm({
         _method: "post",
@@ -149,6 +147,7 @@ export default function Edit({ auth, countries, company }) {
             },
         });
     };
+    console.log("COUNTRIES", countries);
 
     return (
         <AuthenticatedLayout user={auth.user}>

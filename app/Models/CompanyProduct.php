@@ -17,8 +17,21 @@ class CompanyProduct extends Model
         'product_name_en',
         'hs_code',
         'description',
-         'is_primary',
-         'category',
+        'is_primary',
+        'category',
+        'application',
+        'status',
+          
+    ];
+        /**
+      * --------------------------------------------------------------------------
+     * Attribute Casting
+     * --------------------------------------------------------------------------
+     */
+    protected $casts = [
+
+        'is_primary' => 'boolean',
+
     ];
 
     public function company()

@@ -1,79 +1,76 @@
 import {
     Users,
-    Calendar,
+    Globe,
     Package,
-    Globe2,
     Factory,
     Gauge,
-    ShieldCheck,
+    Boxes,
+    Clock3,
 } from "lucide-react";
 
-export default function CompanyKPI({ company = {} }) {
+export default function CompanyKPI({ passport }) {
+    const stats = passport?.statistics ?? {};
+
     const items = [
         {
             label: "Employees",
-            value: company.employees ?? "-",
+            value: stats.employees ?? "-",
             icon: Users,
         },
-        {
-            label: "Established",
-            value: company.established ?? "-",
-            icon: Calendar,
-        },
-        {
-            label: "Products",
-            value: company.products ?? 0,
-            icon: Package,
-        },
+
         {
             label: "Markets",
-            value: company.markets ?? 0,
-            icon: Globe2,
+            value: stats.markets ?? 0,
+            icon: Globe,
         },
+
+        {
+            label: "Products",
+            value: stats.products ?? 0,
+            icon: Package,
+        },
+
         {
             label: "Machines",
-            value: company.machines ?? 0,
+            value: stats.machines ?? 0,
             icon: Factory,
         },
+
         {
             label: "Capacity",
-            value: company.capacity ?? "-",
+            value: stats.capacities ?? 0,
             icon: Gauge,
         },
+
         {
-            label: "Certifications",
-            value: company.certifications ?? 0,
-            icon: ShieldCheck,
+            label: "MOQ",
+            value: stats.moqs ?? 0,
+            icon: Boxes,
+        },
+
+        {
+            label: "Lead Time",
+            value: stats.lead_times ?? 0,
+            icon: Clock3,
         },
     ];
 
     return (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-4 xl:grid-cols-7">
             {items.map((item) => (
-                <KpiCard key={item.label} {...item} />
+                <div
+                    key={item.label}
+                    className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+                    <item.icon className="mb-3 h-6 w-6 text-slate-700" />
+
+                    <div className="text-2xl font-bold">{item.value}</div>
+
+                    <div className="mt-1 text-sm text-slate-500">
+                        {item.label}
+                    </div>
+                </div>
             ))}
-        </div>
-    );
-}
-
-function KpiCard({ icon: Icon, label, value }) {
-    return (
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
-            <div className="flex items-center justify-between">
-                <div>
-                    <div className="text-xs uppercase tracking-wider text-slate-500">
-                        {label}
-                    </div>
-
-                    <div className="mt-2 text-2xl font-bold text-slate-800">
-                        {value}
-                    </div>
-                </div>
-
-                <div className="rounded-xl bg-slate-100 p-3">
-                    <Icon className="h-5 w-5 text-slate-700" />
-                </div>
-            </div>
         </div>
     );
 }

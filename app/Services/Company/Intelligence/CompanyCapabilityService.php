@@ -388,5 +388,53 @@ class CompanyCapabilityService
 
         ];
     }
+    /**
+ * --------------------------------------------------------------------------
+ * Capability Level
+ * --------------------------------------------------------------------------
+ */
+protected function scoreLevel(float|int $score): string
+{
+    return match (true) {
+
+        $score >= 95 => 'World Class',
+
+        $score >= 90 => 'Excellent',
+
+        $score >= 80 => 'Export Ready',
+
+        $score >= 70 => 'Developing',
+
+        $score >= 60 => 'Emerging',
+
+        default => 'Needs Improvement',
+
+    };
+}
+/**
+ * --------------------------------------------------------------------------
+ * Capability Rating
+ * --------------------------------------------------------------------------
+ *
+ * Human readable rating for Executive Dashboard.
+ */
+protected function scoreRating(float|int $score): string
+{
+    return match (true) {
+
+        $score >= 95 => 'A+',
+
+        $score >= 90 => 'A',
+
+        $score >= 80 => 'B+',
+
+        $score >= 70 => 'B',
+
+        $score >= 60 => 'C',
+
+        default => 'D',
+
+    };
+}
 }
     

@@ -123,11 +123,15 @@ class CompanySupplyChainService
         |--------------------------------------------------------------------------
         */
 
-        $factory =
-            method_exists($company, 'factories')
-            && $company->factories->count() > 0
-                ? 20
-                : 0;
+       $factory =
+
+    $company->locations
+        ->where('location_type', 'factory')
+        ->count() > 0
+
+    ? 20
+
+    : 0;
 
         /*
         |--------------------------------------------------------------------------
@@ -255,15 +259,19 @@ class CompanySupplyChainService
 
             'factories' => [
 
-                'total' => method_exists($company, 'factories')
-                    ? $company->factories->count()
-                    : 0,
+    'total' =>
 
-                'items' => method_exists($company, 'factories')
-                    ? $company->factories
-                    : collect(),
+        $company->locations
+            ->where('location_type', 'factory')
+            ->count(),
 
-            ],
+    'items' =>
+
+        $company->locations
+            ->where('location_type', 'factory')
+            ->values(),
+
+],
 
             /*
             |--------------------------------------------------------------------------
@@ -287,8 +295,9 @@ class CompanySupplyChainService
 
                 'factory_registered' =>
 
-                    method_exists($company, 'factories')
-                    && $company->factories->count() > 0,
+                    $company->locations
+                    ->where('location_type','factory')
+                    ->count() > 0,
 
             ],
 
@@ -461,4 +470,29 @@ class CompanySupplyChainService
 
         ];
     }
+    /**
+ * --------------------------------------------------------------------------
+ * Executive Level
+ * --------------------------------------------------------------------------
+ */
+protected function scoreLevel(
+    int $score
+): string {
+
+    return match (true) {
+
+        $score >= 95 => 'World Class',
+
+        $score >= 90 => 'Enterprise',
+
+        $score >= 80 => 'Advanced',
+
+        $score >= 70 => 'Developing',
+
+        $score >= 60 => 'Basic',
+
+        default => 'Starter',
+
+    };
+}
 }

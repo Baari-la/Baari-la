@@ -2,9 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Company\Intelligenc\Passport;
+namespace App\Services\Company\Passport;
 
 use App\Models\Company;
+use App\Services\Company\Intelligence\CompanyCapabilityService;
+use App\Services\Company\Intelligence\CompanyComplianceService;
+use App\Services\Company\Intelligence\CompanyMarketService;
+use App\Services\Company\Intelligence\CompanySupplyChainService;
+use App\Services\Company\Intelligence\CompanyReadinessService;
+use App\Services\Company\Intelligence\CompanyScoreService;
 
 /**
  * ==========================================================================
@@ -269,100 +275,98 @@ class CompanyRecommendationService
         }
 
         /*
-        |--------------------------------------------------------------------------
-        | Social Compliance
-        |--------------------------------------------------------------------------
-        */
+|--------------------------------------------------------------------------
+| Company Claim
+|--------------------------------------------------------------------------
+*/
 
-        if ($passport['social']['total'] === 0) {
+if (!$passport['verification']['is_claimed']) {
 
-            $recommendations[] = [
+    $recommendations[] = [
 
-                'priority' => 'high',
+        'priority' => 'high',
 
-                'category' => 'Compliance',
+        'category' => 'Compliance',
 
-                'title' => 'Complete Social Compliance',
+        'title' => 'Claim Company Profile',
 
-                'description' =>
-                    'Provide labor and workplace compliance information.',
+        'description' =>
+            'Claim this company profile to manage and update company information.',
 
-                'action' => 'Add Social Compliance',
+        'action' => 'Claim Company',
 
-            ];
-        }
+    ];
+}
+       /*
+|--------------------------------------------------------------------------
+| Verification
+|--------------------------------------------------------------------------
+*/
 
-        /*
-        |--------------------------------------------------------------------------
-        | Environmental Compliance
-        |--------------------------------------------------------------------------
-        */
+if (!$passport['verification']['is_verified']) {
 
-        if ($passport['environmental']['total'] === 0) {
+    $recommendations[] = [
 
-            $recommendations[] = [
+        'priority' => 'medium',
 
-                'priority' => 'high',
+        'category' => 'Compliance',
 
-                'category' => 'Compliance',
+        'title' => 'Request Verification',
 
-                'title' => 'Complete Environmental Compliance',
+        'description' =>
+            'Submit company verification to improve buyer confidence.',
 
-                'description' =>
-                    'Add environmental management information and sustainability initiatives.',
+        'action' => 'Verify Company',
 
-                'action' => 'Add Environmental Compliance',
+    ];
+}
 
-            ];
-        }
+    /*
+|--------------------------------------------------------------------------
+| Company Managed
+|--------------------------------------------------------------------------
+*/
 
-        /*
-        |--------------------------------------------------------------------------
-        | Traceability
-        |--------------------------------------------------------------------------
-        */
+if (!$passport['verification']['is_company_managed']) {
 
-        if ($passport['traceability']['total'] === 0) {
+    $recommendations[] = [
 
-            $recommendations[] = [
+        'priority' => 'medium',
 
-                'priority' => 'medium',
+        'category' => 'Compliance',
 
-                'category' => 'Compliance',
+        'title' => 'Manage Company Profile',
 
-                'title' => 'Provide Traceability Information',
+        'description' =>
+            'Update company information to keep your business profile current.',
 
-                'description' =>
-                    'Traceability improves transparency across the textile supply chain.',
+        'action' => 'Update Profile',
 
-                'action' => 'Add Traceability',
-
-            ];
-        }
-
+    ];
+}
         /*
         |--------------------------------------------------------------------------
         | Audits
         |--------------------------------------------------------------------------
         */
 
-        if ($passport['audits']['total'] === 0) {
+        // if ($passport['audits']['total'] === 0) {
 
-            $recommendations[] = [
+        //     $recommendations[] = [
 
-                'priority' => 'medium',
+        //         'priority' => 'medium',
 
-                'category' => 'Compliance',
+        //         'category' => 'Compliance',
 
-                'title' => 'Upload Audit Information',
+        //         'title' => 'Upload Audit Information',
 
-                'description' =>
-                    'Audit reports strengthen supplier credibility for international buyers.',
+        //         'description' =>
+        //             'Audit reports strengthen supplier credibility for international buyers.',
 
-                'action' => 'Add Audit Records',
+        //         'action' => 'Add Audit Records',
 
-            ];
-        }
+        //     ];
+        // }
 
         return $recommendations;
     }

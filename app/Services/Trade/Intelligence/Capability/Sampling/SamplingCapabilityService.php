@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Trade\Intelligence\Capability\Commercial;
+namespace App\Services\Trade\Intelligence\Capability\Sampling;
 
 /**
  * ==========================================================================
@@ -58,7 +58,7 @@ namespace App\Services\Trade\Intelligence\Capability\Commercial;
  * - OpportunityEngine
  * - Company Intelligence
  */
-class CommercialCapabilityService
+class SamplingCapabilityService
 {
     /**
      * --------------------------------------------------------------------------

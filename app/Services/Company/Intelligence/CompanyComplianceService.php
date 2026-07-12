@@ -99,15 +99,13 @@ class CompanyComplianceService
  * $company->loadPassportRelations();
  */
 
-        $certifications = $company->certifications->count() > 0 ? 20 : 0;
+       $certifications = $company->certifications->count() > 0 ? 40 : 0;
 
-        $social = $company->socialCompliances->count() > 0 ? 20 : 0;
+$claimed = $company->isClaimed() ? 20 : 0;
 
-        $environmental = $company->environmentalCompliances->count() > 0 ? 20 : 0;
+$verified = $company->isVerifiedProfile() ? 20 : 0;
 
-        $traceability = $company->traceabilityRecords->count() > 0 ? 20 : 0;
-
-        $audits = $company->audits->count() > 0 ? 20 : 0;
+$companyManaged = $company->isCompanyManaged() ? 20 : 0;
 
         /*
         |--------------------------------------------------------------------------
@@ -116,11 +114,10 @@ class CompanyComplianceService
         */
 
         $overall =
-            $certifications +
-            $social +
-            $environmental +
-            $traceability +
-            $audits;
+    $certifications +
+    $claimed +
+    $verified +
+    $companyManaged;
 
         /*
         |--------------------------------------------------------------------------
@@ -133,10 +130,9 @@ class CompanyComplianceService
             'rating' => $this->scoreRating($overall),
             'components' => [
             'certifications' => $certifications,
-            'social' => $social,
-            'environmental' => $environmental,
-            'traceability' => $traceability,
-            'audits' => $audits,
+            'claimed' => $claimed,
+            'verified' => $verified,
+            'company_managed' => $companyManaged,
             ],
         ];
     }
@@ -177,20 +173,20 @@ class CompanyComplianceService
             | Social Compliance
             |--------------------------------------------------------------------------
             */
-            'social' => [
-                'total' => $company->socialCompliances->count(),
-                'items' => $company->socialCompliances,
-            ],
+            // 'social' => [
+            //     'total' => $company->socialCompliances->count(),
+            //     'items' => $company->socialCompliances,
+            // ],
 
             /*
             |--------------------------------------------------------------------------
             | Environmental Compliance
             |--------------------------------------------------------------------------
-            */
-            'environmental' => [
-                'total' => $company->environmentalCompliances->count(),
-                'items' => $company->environmentalCompliances,
-            ],
+            // */
+            // 'environmental' => [
+            //     'total' => $company->environmentalCompliances->count(),
+            //     'items' => $company->environmentalCompliances,
+            // ],
 
             /*
             |--------------------------------------------------------------------------
@@ -198,13 +194,13 @@ class CompanyComplianceService
             |--------------------------------------------------------------------------
             */
 
-            'traceability' => [
+            // 'traceability' => [
 
-                'total' => $company->traceabilityRecords->count(),
+            //     'total' => $company->traceabilityRecords->count(),
 
-                'items' => $company->traceabilityRecords,
+            //     'items' => $company->traceabilityRecords,
 
-            ],
+            // ],
 
             /*
             |--------------------------------------------------------------------------
@@ -212,14 +208,33 @@ class CompanyComplianceService
             |--------------------------------------------------------------------------
             */
 
-            'audits' => [
+            // 'audits' => [
 
-                'total' => $company->audits->count(),
+            //     'total' => $company->audits->count(),
 
-                'items' => $company->audits,
+            //     'items' => $company->audits,
 
-            ],
+            // ],
 
+            // Pergantian sesuai tabel relasi yang sudah ada
+            'verification' => [
+
+    'status' => $company->verification_status,
+
+    'last_verified_at' => optional(
+        $company->last_verified_at
+    )?->toDateString(),
+
+    'is_verified' => $company->isVerifiedProfile(),
+
+    'is_company_managed' => $company->isCompanyManaged(),
+
+    'is_claimed' => $company->isClaimed(),
+
+    'data_source' => $company->data_source,
+
+],
+            
             /*
             |--------------------------------------------------------------------------
             | Compliance Status
@@ -280,10 +295,9 @@ class CompanyComplianceService
             |--------------------------------------------------------------------------
             */
             'certifications' => $passport['certifications']['total'],
-            'social_compliances' => $passport['social']['total'],
-            'environmental_compliances' => $passport['environmental']['total'],
-            'traceability_records' => $passport['traceability']['total'],
-            'audits' => $passport['audits']['total'],
+            'is_claimed' => $passport['verification']['is_claimed'],
+            'is_verified' => $passport['verification']['is_verified'],
+            'is_company_managed' => $passport['verification']['is_company_managed'],
             /*
             |--------------------------------------------------------------------------
             | Verification
@@ -304,12 +318,11 @@ class CompanyComplianceService
 
                 collect([
 
-                    $passport['certifications']['total'] > 0,
-                    $passport['social']['total'] > 0,
-                    $passport['environmental']['total'] > 0,
-                    $passport['traceability']['total'] > 0,
-                    $passport['audits']['total'] > 0,
-                ])->filter()->count() / 5 * 100
+    $passport['certifications']['total'] > 0,
+    $passport['verification']['is_claimed'],
+    $passport['verification']['is_verified'],
+    $passport['verification']['is_company_managed'],
+    ])->filter()->count() / 4 * 100
 
             ),
 

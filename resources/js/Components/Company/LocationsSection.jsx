@@ -278,35 +278,34 @@ export default function CompanyLocationsSection({
 
                                 <select
                                     value={location.country_name || ""}
-                                    onChange={(e) => {
-                                        const selected = countries.find(
-                                            (country) =>
-                                                country.country_name ===
-                                                e.target.value,
-                                        );
-
+                                    onChange={(e) =>
                                         updateLocation(
                                             index,
                                             "country_name",
-                                            selected.country_name,
-                                        );
-                                    }}
+                                            e.target.value,
+                                        )
+                                    }
                                     className="
-            w-full
-            rounded-xl
-            border border-white/10
-            bg-black/20
-            px-4
-            py-3
-            text-white
-        "
+        w-full
+        rounded-xl
+        border border-white/10
+        bg-black/20
+        px-4
+        py-3
+        text-white
+    "
                                 >
+                                    <option value="" className="text-black">
+                                        Select Country
+                                    </option>
+
                                     {countries.map((country) => (
                                         <option
-                                            key={country.country_code}
-                                            value={country.country_name}
+                                            key={country.code}
+                                            value={country.name}
+                                            className="text-black"
                                         >
-                                            {country.country_name}
+                                            {country.label}
                                         </option>
                                     ))}
                                 </select>

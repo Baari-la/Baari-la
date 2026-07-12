@@ -294,23 +294,18 @@ public function industryPartner()
     );
 }
 
-public function factories()
-{
-    return $this->hasMany(
-        // CompanyFactory::class
-    );
-}
+
 public function socialCompliances()
 {
     return $this->hasMany(
-        // CompanySocialCompliance::class
+        CompanySocialCompliance::class
     );
 }
 
 public function environmentalCompliances()
 {
     return $this->hasMany(
-        // CompanyEnvironmentalCompliance::class
+        CompanyEnvironmentalCompliance::class
     );
 }
 
@@ -324,7 +319,7 @@ public function traceabilityRecords()
 public function audits()
 {
     return $this->hasMany(
-        // CompanyAudit::class
+        CompanyAudit::class
     );
 }
 

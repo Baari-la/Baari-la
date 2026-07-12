@@ -23,6 +23,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\CompanyProfileVisibilityService;
 use App\Services\CompanyMachineService;
+use App\Services\MasterData\CountryService;
 
 class CompanyController extends Controller
 {
@@ -1497,7 +1498,10 @@ $missingItems = [];
     ]);
 }
 
-public function edit(Company $company)
+public function edit(
+    Company $company,
+    CountryService $countryService,
+)
 {
     $user = auth()->user();
 
@@ -1539,9 +1543,13 @@ public function edit(Company $company)
         'leadTimes'
     ]);
 
-$countries = MstCountry::orderBy(
-    'country_name'
-)->get();
+/*
+    |--------------------------------------------------------------------------
+    | Master Data
+    |--------------------------------------------------------------------------
+    */
+
+    $countries = $countryService->options();
 
     /*
     |--------------------------------------------------------------------------
@@ -1550,9 +1558,13 @@ $countries = MstCountry::orderBy(
     */
 
     return Inertia::render('Company/Edit', [
+
         'company' => $company,
+
         'countries' => $countries,
+
     ]);
+
 }
 
 public function update(Request $request, Company $company)
@@ -1650,12 +1662,15 @@ public function update(Request $request, Company $company)
         */
 
         'products' => 'nullable|array',
+        'products.*.id' => 'nullable|integer',
         'products.*.product_name' => 'nullable|string',
         'products.*.product_name_en' => 'nullable|string',
         'products.*.hs_code' => 'nullable|string',
         'products.*.category' => 'nullable|string',
+        'products.*.application' => 'nullable|string|max:100',
         'products.*.description' => 'nullable|string',
         'products.*.is_primary' => 'nullable|boolean',
+        'products.*.status' => 'nullable|string|max:50',
 
         /*
         |--------------------------------------------------------------------------

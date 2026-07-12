@@ -7,7 +7,9 @@ import {
     Calendar,
 } from "lucide-react";
 
-export default function CompanyIdentity({ company }) {
+export default function CompanyIdentity({ passport }) {
+    const company = passport?.passport?.profile ?? {};
+
     const badges = [];
 
     if (company.membership_type) {
@@ -18,7 +20,7 @@ export default function CompanyIdentity({ company }) {
         badges.push("Verified Company");
     }
 
-    if (company.export_markets && company.export_markets.length > 0) {
+    if (company.export_markets?.length > 0) {
         badges.push("Multi-Market Supplier");
     }
 
@@ -46,10 +48,10 @@ export default function CompanyIdentity({ company }) {
                         </div>
                     )}
 
-                    {company.business_sector && (
+                    {company.sector && (
                         <div className="flex items-center gap-2">
                             <Factory className="h-4 w-4" />
-                            <span>{company.business_sector}</span>
+                            <span>{company.sector}</span>
                         </div>
                     )}
                 </div>

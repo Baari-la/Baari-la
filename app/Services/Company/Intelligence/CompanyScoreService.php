@@ -306,8 +306,8 @@ class CompanyScoreService
      * --------------------------------------------------------------------------
      */
     protected function scoreLevel(
-        int $score
-    ): string {
+    int|float $score
+): string {
 
         return match (true) {
 
@@ -331,8 +331,8 @@ class CompanyScoreService
      * --------------------------------------------------------------------------
      */
     protected function scoreRating(
-        int $score
-    ): string {
+    int|float $score
+): string {
 
         return match (true) {
 
