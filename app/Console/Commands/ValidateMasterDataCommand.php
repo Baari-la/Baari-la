@@ -43,28 +43,32 @@ protected function renderHeader(): void
      */
         
     public function handle(
-        MasterDataValidationService $validator
-    ): int
-    {
-        $start = microtime(true);
+    MasterDataValidationService $validator
+): int
+{
+    $start = microtime(true);
 
-        $this->renderHeader();
+    $this->renderHeader();
 
-        $this->info('Scanning Master Data...');
-        $this->newLine();
+    $this->info('Scanning Master Data...');
+    $this->newLine();
 
-        $report = $validator->healthReport();
+    // Jalankan validasi terlebih dahulu
+    $validator->validate();
 
-        $this->renderSummary($report);
+    // Baru ambil report
+    $report = $validator->healthReport();
 
-        $this->renderIssues($report);
+    $this->renderSummary($report);
 
-        $this->renderFooter($report, $start);
+    $this->renderIssues($report);
 
-        return $report['status'] === 'HEALTHY'
-            ? self::SUCCESS
-            : self::FAILURE;
-        }
+    $this->renderFooter($report, $start);
+
+    return $report['status'] === 'HEALTHY'
+        ? self::SUCCESS
+        : self::FAILURE;
+}
                 /**
      * =========================================================================
      * Validation Summary
@@ -140,26 +144,25 @@ protected function renderHeader(): void
 
         if (! empty($issues['errors'])) {
 
-            $this->error('ERRORS');
+    $this->error('ERRORS');
 
-            $this->line('');
+    $this->newLine();
 
-            foreach ($issues['errors'] as $error) {
+    foreach ($issues['errors'] as $file => $errors) {
 
-                $this->line(
-                    sprintf(
-                        '[ERROR] %s',
-                        $error['file']
-                    )
-                );
+        $this->line("[ERROR] {$file}");
 
-                $this->line(
-                    '  └─ ' . $error['message']
-                );
+        foreach ($errors as $error) {
 
-                $this->line('');
-            }
+            $this->line(
+                '  └─ ' . $error['message']
+            );
+
         }
+
+        $this->newLine();
+    }
+}
 
         /*
         |--------------------------------------------------------------------------
@@ -169,26 +172,25 @@ protected function renderHeader(): void
 
         if (! empty($issues['warnings'])) {
 
-            $this->warn('WARNINGS');
+    $this->warn('WARNINGS');
 
-            $this->line('');
+    $this->newLine();
 
-            foreach ($issues['warnings'] as $warning) {
+    foreach ($issues['warnings'] as $file => $warnings) {
 
-                $this->line(
-                    sprintf(
-                        '[WARNING] %s',
-                        $warning['file']
-                    )
-                );
+        $this->line("[WARNING] {$file}");
 
-                $this->line(
-                    '  └─ ' . $warning['message']
-                );
+        foreach ($warnings as $warning) {
 
-                $this->line('');
-            }
+            $this->line(
+                '  └─ ' . $warning['message']
+            );
+
         }
+
+        $this->newLine();
+    }
+}
 
         if (
             empty($issues['errors']) &&

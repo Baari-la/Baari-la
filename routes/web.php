@@ -35,6 +35,7 @@ use App\Http\Controllers\CompanyLocationController;
 use App\Http\Controllers\PartnerInsightController;
 use App\Http\Controllers\Admin\ImportKemendagController;
 use App\Http\Controllers\CompanyPassportController;
+use App\Http\Controllers\IntelligenceController;
 
 
 /*
@@ -568,9 +569,42 @@ Route::get('/market-intelligence', function () {
     Route::get('/trade', [IntelligenceController::class, 'trade'])->name('trade');
     Route::get('/policy', [IntelligenceController::class, 'policy'])->name('policy');
     Route::get('/country', [IntelligenceController::class, 'country'])->name('country');
-});
 
 
+
+    });
+
+Route::prefix('intelligence')
+    ->name('intelligence.')
+    ->group(function () {
+
+        Route::get(
+            '/executive',
+            [IntelligenceController::class, 'executive']
+        )->name('executive.index');
+
+        Route::get(
+            '/company',
+            [IntelligenceController::class, 'company']
+        )->name('company.index');
+
+        Route::get(
+            '/knowledge-graph',
+            [IntelligenceController::class, 'knowledgeGraph']
+        )->name('knowledge-graph.index');
+
+        Route::get(
+            '/master-data',
+            [IntelligenceController::class, 'masterData']
+        )->name('master-data.index');
+
+        Route::get(
+            '/visualization',
+            [IntelligenceController::class, 'visualization']
+        )->name('visualization.index');
+    });
+
+    
 /*
 
 |--------------------------------------------------------------------------

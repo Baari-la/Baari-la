@@ -1,6 +1,6 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { useState } from "react";
-// import { Menu, X } from "lucide-react";
+
 import { Menu, X, ChevronDown } from "lucide-react";
 
 export default function PublicNavbar() {
@@ -9,6 +9,7 @@ export default function PublicNavbar() {
     const isEn = props.locale === "en";
 
     const [isOpen, setIsOpen] = useState(false);
+
     const [isIntelOpen, setIsIntelOpen] = useState(false);
 
     const toggleLanguage = (lang) => {
@@ -24,40 +25,137 @@ export default function PublicNavbar() {
         );
     };
 
-    const navLinkStyle =
-        "relative text-[11px] font-bold uppercase tracking-widest text-slate-700 hover:text-amber-500 transition-all duration-300 group py-2";
-    const underlineStyle =
-        "absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-300 group-hover:w-full";
+    const navLinkStyle = `
+    relative
+    text-[11px]
+    font-bold
+    uppercase
+    tracking-widest
+    text-slate-700
+    hover:text-amber-500
+    transition-all
+    duration-300
+    group
+    py-2
+`;
+
+    const underlineStyle = `
+    absolute
+    bottom-0
+    left-0
+    w-0
+    h-0.5
+    bg-gradient-to-r
+    from-amber-500
+    to-yellow-400
+    transition-all
+    duration-300
+    group-hover:w-full
+`;
+
     const mobileNavLinkStyle =
         "text-[13px] font-bold uppercase tracking-wider text-slate-700 hover:text-amber-500 transition-colors duration-300";
-    const dropdownItemStyle =
-        "block px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-slate-700 hover:bg-slate-50 hover:text-amber-500 transition-colors duration-200";
+    const dropdownItemStyle = `
+    block
+    px-4
+    py-3
+    text-[11px]
+    font-semibold
+    uppercase
+    tracking-wider
+    text-slate-700
+    hover:bg-slate-50
+    hover:text-amber-500
+    transition-colors
+`;
 
     // List sub-menu Intelligence Center agar DRY (Don't Repeat Yourself)
     const intelligenceLinks = [
         {
+            section: "PLATFORM",
+        },
+
+        {
+            routeName: "intelligence.executive.index",
+
+            en: "Executive Dashboard",
+
+            id: "Dashboard Eksekutif",
+        },
+
+        {
+            routeName: "intelligence.company.index",
+
+            en: "Company Intelligence",
+
+            id: "Intelijen Perusahaan",
+        },
+
+        {
+            routeName: "intelligence.knowledge-graph.index",
+
+            en: "Knowledge Graph",
+
+            id: "Knowledge Graph",
+        },
+
+        {
+            routeName: "intelligence.master-data.index",
+
+            en: "Master Data",
+
+            id: "Master Data",
+        },
+
+        {
+            routeName: "intelligence.visualization.index",
+
+            en: "Visualization Lab",
+
+            id: "Visualization Lab",
+        },
+
+        {
+            section: "INSIGHTS",
+        },
+
+        {
             routeName: "intelligence.news",
+
             en: "News Intelligence",
+
             id: "Intelijen Berita",
         },
+
         {
             routeName: "intelligence.market",
+
             en: "Market Intelligence",
+
             id: "Intelijen Pasar",
         },
+
         {
             routeName: "intelligence.trade",
+
             en: "Trade Intelligence",
+
             id: "Intelijen Perdagangan",
         },
+
         {
             routeName: "intelligence.policy",
+
             en: "Policy Intelligence",
+
             id: "Intelijen Kebijakan",
         },
+
         {
             routeName: "intelligence.country",
+
             en: "Country Intelligence",
+
             id: "Intelijen Negara",
         },
     ];
@@ -93,6 +191,7 @@ export default function PublicNavbar() {
                     <div className="hidden lg:flex items-center gap-6 xl:ml-20">
                         <Link href={route("home")} className={navLinkStyle}>
                             {isEn ? "Home" : "Beranda"}
+
                             <span className={underlineStyle} />
                         </Link>
 
@@ -101,8 +200,109 @@ export default function PublicNavbar() {
                             className={navLinkStyle}
                         >
                             {isEn ? "Industry Directory" : "Direktori Industri"}
+
                             <span className={underlineStyle} />
                         </Link>
+                        <div
+                            className="relative pb-2"
+                            onMouseEnter={() => setIsIntelOpen(true)}
+                            onMouseLeave={() => setIsIntelOpen(false)}
+                        >
+                            <button className={navLinkStyle}>
+                                INTELLIGENCE
+                                <span
+                                    className="
+            ml-2
+            px-2
+            py-0.5
+            rounded-full
+            bg-indigo-100
+            text-indigo-700
+            text-[8px]
+            font-black
+        "
+                                >
+                                    AI
+                                </span>
+                                <ChevronDown
+                                    className="
+            inline
+            ml-1
+            w-3
+            h-3
+        "
+                                />
+                            </button>
+
+                            <div
+                                className={`
+        absolute
+        left-0
+        top-full
+
+        w-[340px]
+
+        bg-white
+        border
+        border-slate-200
+
+        rounded-2xl
+        shadow-2xl
+
+        overflow-hidden
+        origin-top-left
+
+        py-2
+        z-50
+
+        transition-all
+        duration-200
+
+        ${
+            isIntelOpen
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-95 pointer-events-none"
+        }
+    `}
+                            >
+                                {intelligenceLinks.map((item, index) => {
+                                    if (item.section) {
+                                        return (
+                                            <>
+                                                {index !== 0 && (
+                                                    <div className="border-t my-2" />
+                                                )}
+
+                                                <div
+                                                    key={index}
+                                                    className="
+                    px-4
+                    pt-2
+                    pb-1
+                    text-[10px]
+                    font-black
+                    tracking-[0.2em]
+                    text-slate-400
+                "
+                                                >
+                                                    {item.section}
+                                                </div>
+                                            </>
+                                        );
+                                    }
+
+                                    return (
+                                        <Link
+                                            key={index}
+                                            href={route(item.routeName)}
+                                            className={dropdownItemStyle}
+                                        >
+                                            {isEn ? item.en : item.id}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
 
                         <Link
                             href={route("sourcing-hub")}
@@ -113,35 +313,6 @@ export default function PublicNavbar() {
                             <span className="ml-2 text-[7px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">
                                 {isEn ? "COMING SOON" : "SEGERA HADIR"}
                             </span>
-
-                            <span className={underlineStyle} />
-                        </Link>
-
-                        {/* Dropdown Menu Panel */}
-                        <div
-                            className={`absolute left-0 mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl py-2 transition-all duration-200 origin-top-left ${
-                                isIntelOpen
-                                    ? "opacity-100 scale-100 pointer-events-auto"
-                                    : "opacity-0 scale-95 pointer-events-none"
-                            }`}
-                        >
-                            {intelligenceLinks.map((item, index) => (
-                                <Link
-                                    key={index}
-                                    href={route(item.routeName, item.params)} // 💡 Ditambahkan item.params di sini
-                                    className={dropdownItemStyle}
-                                >
-                                    {isEn ? item.en : item.id}
-                                </Link>
-                            ))}
-                        </div>
-
-                        {/* Partner Insights */}
-                        <Link
-                            href={route("partner-insights.index")}
-                            className={navLinkStyle}
-                        >
-                            {isEn ? "Partner Insights" : "Insight Mitra"}
 
                             <span className={underlineStyle} />
                         </Link>
