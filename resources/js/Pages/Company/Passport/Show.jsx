@@ -20,8 +20,6 @@ import BusinessReadinessPassport from "./Components/Passports/BusinessReadinessP
 import RecommendationPanel from "./Components/Recommendation/RecommendationPanel";
 
 export default function Show({ passport }) {
-    console.log(data);
-
     return (
         <AppLayout title="Digital Company Passport">
             <div className="mx-auto max-w-7xl space-y-8 px-6 py-8">

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 export default function CompanyKPI({ passport }) {
-    const stats = passport?.statistics ?? {};
+    const stats = passport?.summary ?? {};
 
     const items = [
         {
