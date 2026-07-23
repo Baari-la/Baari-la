@@ -158,7 +158,103 @@ export default function PublicNavbar() {
 
             id: "Intelijen Negara",
         },
+        {
+            section: "INSIGHTS",
+        },
+
+        {
+            routeName: "intelligence.weekly",
+
+            en: "Weekly Intelligence Report",
+
+            id: "Laporan Mingguan",
+        },
+
+        {
+            routeName: "intelligence.news",
+
+            en: "News Intelligence",
+
+            id: "Intelijen Berita",
+        },
     ];
+
+    const visibilityLinks = [
+        {
+            section: "VISIBILITY",
+        },
+
+        {
+            routeName: "companies.index",
+            en: "Industry Directory",
+            id: "Direktori Industri",
+        },
+
+        {
+            routeName: "passport.demo",
+            en: "Digital Company Passport",
+            id: "Paspor Digital Perusahaan",
+        },
+
+        {
+            routeName: "program.digital-directory-visibility",
+
+            en: "Visibility Program 2026",
+            id: "Program Visibility 2026",
+        },
+
+        {
+            routeName: "ranking.index",
+            en: "Executive Rankings",
+            id: "Peringkat Eksekutif",
+        },
+
+        {
+            routeName: "pricing.index",
+            en: "Membership",
+            id: "Keanggotaan",
+        },
+    ];
+    const ecosystemLinks = [
+        {
+            section: "ECOSYSTEM",
+        },
+
+        {
+            routeName: "smart-business-matching",
+
+            en: "Smart Business Matching™",
+
+            id: "Smart Business Matching™",
+        },
+
+        {
+            routeName: "build-my-supply-chain",
+
+            en: "Build My Supply Chain™",
+
+            id: "Build My Supply Chain™",
+        },
+
+        {
+            routeName: "buyer-discovery",
+
+            en: "Buyer Discovery™",
+
+            id: "Buyer Discovery™",
+        },
+
+        {
+            routeName: "sourcing-hub",
+
+            en: "Sourcing Hub",
+
+            id: "Sourcing Hub",
+        },
+    ];
+    const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
+
+    const [isEcosystemOpen, setIsEcosystemOpen] = useState(false);
 
     return (
         <nav className="bg-white/95 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50 shadow-sm">

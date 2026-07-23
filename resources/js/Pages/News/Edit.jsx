@@ -113,7 +113,6 @@ export default function Edit({ auth, news }) {
 
     const submit = (e) => {
         e.preventDefault();
-        console.log("UPDATE CLICKED VIA POST METHOD SPOOFING");
 
         // 1. Validasi Pengaman Data Kosong akibat asinkronus translasi
         if (!data.content_en && data.content_id) {

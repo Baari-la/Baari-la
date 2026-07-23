@@ -36,6 +36,16 @@ use App\Http\Controllers\PartnerInsightController;
 use App\Http\Controllers\Admin\ImportKemendagController;
 use App\Http\Controllers\CompanyPassportController;
 use App\Http\Controllers\IntelligenceController;
+use App\Http\Controllers\ExecutiveController;
+use App\Http\Controllers\BuildMySupplyChainController;
+use App\Http\Controllers\DigitalDirectoryProgramController;
+use App\Http\Controllers\Admin\DigitalDirectoryParticipantController;
+use App\Http\Controllers\Admin\AdminCompanyController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 
 
 /*
@@ -72,6 +82,10 @@ Route::get('/login', fn() => Inertia::render('Auth/Login'))->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+Route::get('/register', function () {
+    return Inertia::render('Auth/Register');
+})->name('register');
 
 // Tabel Direktory
 Route::post(
@@ -192,6 +206,19 @@ Route::prefix('api/v2')->group(function () {
 });
 
 // LEVEL 1: PUBLIK
+
+// Kapas
+
+
+Route::get(
+    '/future-of-digestex',
+    function () {
+        return Inertia::render(
+            'FutureOfDigestex'
+        );
+    }
+)->name('future-of-digestex');
+
 Route::get('/regulation', fn() => inertia('Regulation/Index'))->name('regulation.index');
 Route::get('/matchmaking', fn() => inertia('Matchmaking/Index'))->name('matchmaking.index');
 Route::post('/companies/register-umum', [CompanyController::class, 'publicRegister'])->name('companies.public_register');
@@ -535,6 +562,14 @@ Route::get(
 )->name('companies.passport.data');
  });
 
+Route::get('verify-email', EmailVerificationPromptController::class)
+    ->middleware('auth')
+    ->name('verification.notice');
+
+Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+    ->middleware(['auth', 'signed', 'throttle:6,1'])
+    ->name('verification.verify');
+
 
 
 Route::get('/industry-solutions',[IndustrySolutionController::class, 'index'])->name('industry-solutions.index');
@@ -604,102 +639,590 @@ Route::prefix('intelligence')
         )->name('visualization.index');
     });
 
-    
-/*
+// Ekspor impor intelligence /Executive Dashboard
+Route::get(
+    '/executive-dashboard',
+    [ExecutiveController::class, 'index']
+);
 
+Route::prefix('executive-dashboard')
+    ->name('executive.')
+    ->group(function () {
+        Route::get(
+            '/{sector?}',
+            [ExecutiveController::class, 'index']
+        )
+        ->name('dashboard');
+    });
+
+Route::get(
+    '/build-my-supply-chain',
+    [BuildMySupplyChainController::class, 'index']
+);
+
+Route::get(
+    '/build-my-supply-chain/{sector}',
+    [BuildMySupplyChainController::class, 'sector']
+);
+
+Route::get(
+    '/build-my-supply-chain/product/{product}',
+    [BuildMySupplyChainController::class, 'product']
+); 
+
+
+// Navbar
+Route::prefix('intelligence')
+    ->name('intelligence.')
+    ->group(function () {
+
+        Route::get(
+            '/weekly',
+            fn () => Inertia::render(
+                'ComingSoon'
+            )
+        )->name('weekly');
+
+        Route::get(
+            '/news',
+            fn () => Inertia::render(
+                'ComingSoon'
+            )
+        )->name('news');
+
+        Route::get(
+            '/market',
+            fn () => Inertia::render(
+                'ComingSoon'
+            )
+        )->name('market');
+
+        Route::get(
+            '/trade',
+            fn () => Inertia::render(
+                'ComingSoon'
+            )
+        )->name('trade');
+
+        Route::get(
+            '/policy',
+            fn () => Inertia::render(
+                'ComingSoon'
+            )
+        )->name('policy');
+
+        Route::get(
+            '/country',
+            fn () => Inertia::render(
+                'ComingSoon'
+            )
+        )->name('country');
+    });
+// Coming soon
+Route::get('/coming-soon/{module?}', function ($module = null) {
+    return Inertia::render('ComingSoon', [
+        'module' => $module,
+    ]);
+})->name('coming-soon');
+
+Route::get('/cotton-intelligence', function () {
+    return Inertia::render('Intelligence/Cotton/Index');
+})->name('cotton-intelligence');
+    
+// Digital Directory
+Route::middleware(['auth', 'verified'])
+    ->get('/welcome', function () {
+        return Inertia::render(
+            'Programs/DigitalDirectory/Step1Welcome'
+        );
+    })
+    ->name('welcome');
+    
+Route::prefix(
+    'program/digital-directory'
+)->group(function () {
+
+    Route::get(
+        '/',
+        [
+            DigitalDirectoryProgramController::class,
+            'step1',
+        ]
+    )->name(
+        'program.digital-directory'
+    );
+
+    Route::get(
+        '/package',
+        [
+            DigitalDirectoryProgramController::class,
+            'step2',
+        ]
+    )->name(
+        'program.digital-directory.package'
+    );
+
+    Route::get(
+        '/company-information',
+        [
+            DigitalDirectoryProgramController::class,
+            'step3',
+        ]
+    )->name(
+        'program.digital-directory.company-information'
+    );
+
+    Route::get(
+        '/review',
+        [
+            DigitalDirectoryProgramController::class,
+            'step4',
+        ]
+    )->name(
+        'program.digital-directory.review'
+    );
+
+    Route::get(
+        '/payment',
+        [
+            DigitalDirectoryProgramController::class,
+            'step5',
+        ]
+    )->name(
+        'program.digital-directory.payment'
+    );
+
+    Route::post(
+    '/program/digital-directory/payment/confirm',
+    [
+        DigitalDirectoryProgramController::class,
+        'confirmPayment',
+    ]
+)->name(
+    'program.digital-directory.payment.confirm'
+);
+
+    Route::get(
+        '/welcome',
+        [
+            DigitalDirectoryProgramController::class,
+            'step6',
+        ]
+    )->name(
+        'program.digital-directory.welcome'
+    );
+
+    Route::post(
+    '/company-information',
+    [
+        DigitalDirectoryProgramController::class,
+        'storeCompanyInformation',
+    ]
+)->name(
+    'program.digital-directory.company-information.store'
+);
+ });
+
+
+// Route::post(
+//     '/payment/confirm',
+//     [
+//         DigitalDirectoryProgramController::class,
+//         'confirmPayment',
+//     ]
+// )->name(
+//     'program.digital-directory.payment.confirm'
+// );
+// Route::get(
+//     '/program/digital-directory/review',
+//     [
+//         DigitalDirectoryProgramController::class,
+//         'review',
+//     ]
+// )->name(
+//     'program.digital-directory.review'
+// );
+/*
+/*
 |--------------------------------------------------------------------------
 | LEVEL 4: ADMIN ONLY
 |--------------------------------------------------------------------------
 */
-Route::middleware([
-    'auth',
-    'verified',
-    'admin'
-])
-->prefix('admin')
-->name('admin.')
-->group(function () {
+Route::middleware(['auth', 'verified', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    Route::get('dashboard', [AdminDashboardController::class, 'index'])
-    ->name('dashboard');
+        // --- Dashboard & Pending Actions ---
+        Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/pending-updates', [AdminDashboardController::class, 'pendingUpdates'])->name('pending-updates');
+        Route::post('/approve-update/{id}', [AdminDashboardController::class, 'approveUpdate'])->name('approve-update');
+        Route::post('/reject-update/{id}', [AdminDashboardController::class, 'rejectUpdate'])->name('reject-update');
 
-    Route::get(
-        '/pending-updates',
-        [AdminDashboardController::class, 'pendingUpdates']
-    )->name('pending-updates');
+        Route::post('/company-claims/{claim}/approve', [AdminDashboardController::class, 'approveClaim'])->name('company-claims.approve');
+        Route::post('/company-claims/{claim}/reject', [AdminDashboardController::class, 'rejectClaim'])->name('company-claims.reject');
 
-    Route::post(
-        '/approve-update/{id}',
-        [AdminDashboardController::class, 'approveUpdate']
-    )->name('approve-update');
+        // --- Gallery ---
+        Route::resource('gallery', GalleryController::class);
 
-    Route::post(
-        '/reject-update/{id}',
-        [AdminDashboardController::class, 'rejectUpdate']
-    )->name('reject-update');
+        // --- Impor Data Kemendag ---
+        Route::get('/import-kemendag', [ImportKemendagController::class, 'index'])->name('import-kemendag');
+        Route::post('/import-kemendag', [ImportKemendagController::class, 'store'])->name('import-kemendag.store');
 
-    Route::post(
-        '/company-claims/{claim}/approve',
-        [AdminDashboardController::class, 'approveClaim']
-    )->name('company-claims.approve');
+        // --- News Management ---
+        Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+        Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
+        Route::post('/news', [NewsController::class, 'store'])->name('news.store');
+        Route::post('/news/translate', [NewsController::class, 'translate'])->name('news.translate');
+        Route::post('/news/suggest-meta', [NewsController::class, 'suggestMeta'])->name('news.suggest-meta');
+        
+        // Dynamic / Wildcard News Routes (Wajib ditaruh di bawah)
+        Route::get('/news/{news:slug}/edit', [NewsController::class, 'edit'])->name('news.edit');
+        Route::put('/news/{news:slug}', [NewsController::class, 'update'])->name('news.update');
+        Route::delete('/news/{news:slug}', [NewsController::class, 'destroy'])->name('news.destroy');
 
-    Route::post(
-        '/company-claims/{claim}/reject',
-        [AdminDashboardController::class, 'rejectClaim']
-    )->name('company-claims.reject');
+        // --- Build My Supply Chain & General Views ---
+        Route::get('/build-my-supply-chain', function () {
+            return Inertia::render('BuildMySupplyChain/Index');
+        })->name('build-my-supply-chain.index');
 
-    Route::resource(
-        'gallery',
-        GalleryController::class
-    );
+        // --- Companies ---
+        Route::prefix('companies')->name('companies.')->group(function () {
+            Route::get('/', [AdminCompanyController::class, 'index'])->name('index');
+            Route::get('/pending', [AdminCompanyController::class, 'pending'])->name('pending');
+            Route::get('/updates', [AdminCompanyController::class, 'updates'])->name('updates');
+            Route::post('/updates/{id}/approve', [AdminDashboardController::class, 'approveUpdate'])->name('updates.approve');
+            Route::post('/updates/{update}/reject', [AdminDashboardController::class, 'rejectUpdate'])->name('updates.reject');
+            
+            Route::get('/claims', [AdminCompanyController::class, 'claims'])->name('claims');
+            Route::post('/claims/{claim}/approve', [AdminDashboardController::class, 'approveClaim'])->name('claims.approve');
+            Route::post('/claims/{claim}/reject', [AdminDashboardController::class, 'rejectClaim'])->name('claims.reject');
+            Route::post('/{company}/verify', [CompanyController::class, 'verify'])->name('verify');
+            
+            // Route wildcard '{company}' diletakkan paling bawah dalam grup ini
+            Route::get('/{company}', [AdminCompanyController::class, 'show'])->name('show');
+        });
 
-    Route::post(
-        '/companies/{company}/verify',
-        [CompanyController::class, 'verify']
-    )->name('companies.verify');
+        // --- Digital Directory ---
+        Route::prefix('digital-directory')->name('digital-directory.')->group(function () {
+            Route::get('/', [DigitalDirectoryParticipantController::class, 'index'])->name('index');
+            Route::get('/pending-payments', [DigitalDirectoryParticipantController::class, 'pendingPayments'])->name('pending-payments');
+            Route::get('/verified', [DigitalDirectoryParticipantController::class, 'verified'])->name('verified');
+            Route::get('/revenue', [DigitalDirectoryParticipantController::class, 'revenue'])->name('revenue');
+            Route::get('/package-analytics', [DigitalDirectoryParticipantController::class, 'packageAnalytics'])->name('package-analytics');
 
-// Impor Data
-Route::get(
-    '/import-kemendag',
-    [ImportKemendagController::class, 'index']
-)->name('import-kemendag');
+            Route::post('/{participant}/verify', [DigitalDirectoryParticipantController::class, 'verify'])->name('verify');
+            Route::post('/{participant}/reject', [DigitalDirectoryParticipantController::class, 'reject'])->name('reject');
+            Route::post('/{participant}/activate', [DigitalDirectoryParticipantController::class, 'activate'])->name('activate');
+            Route::post('/{participant}/deactivate', [DigitalDirectoryParticipantController::class, 'deactivate'])->name('deactivate');
 
-Route::post(
-    '/import-kemendag',
-    [ImportKemendagController::class, 'store']
-)->name('import-kemendag.store');
+            // Must always be the last route in this group
+            Route::get('/{participant}', [DigitalDirectoryParticipantController::class, 'show'])->name('show');
+        });
 
+        /*
+|--------------------------------------------------------------------------
+| PAYMENTS
+|--------------------------------------------------------------------------
+*/
 
-// News
-Route::get('/news', [NewsController::class, 'index'])
-    ->name('news.index');
-Route::post(
-    '/news/translate',
-    [NewsController::class, 'translate']
-)->name('news.translate');
-Route::post(
-    '/admin/news/suggest-meta',
-    [NewsController::class, 'suggestMeta']
-)->name('admin.news.suggest-meta');
+Route::prefix('payments')
+    ->name('payments.')
+    ->group(function () {
 
-Route::get('/news/create', [NewsController::class, 'create'])
-    ->name('news.create');
+        /*
+        |--------------------------------------------------------------------------
+        | Payment Dashboard
+        |--------------------------------------------------------------------------
+        */
 
-Route::post('/news', [NewsController::class, 'store'])
-    ->name('news.store');
+        Route::get(
+            '/',
+            [PaymentController::class,'index',])->name('index');
 
-Route::get('/news/{news:slug}/edit', [NewsController::class, 'edit'])
-    ->name('news.edit');
+        /*
+        |--------------------------------------------------------------------------
+        | Transactions
+        |--------------------------------------------------------------------------
+        */
 
-Route::put('/news/{news:slug}', [NewsController::class, 'update'])
-    ->name('news.update');
+        Route::get(
+            '/transactions',
+            [
+                PaymentController::class,
+                'transactions',
+            ]
+        )->name('transactions');
 
-Route::delete('/news/{news:slug}', [NewsController::class, 'destroy'])
-    ->name('news.destroy');
+        /*
+        |--------------------------------------------------------------------------
+        | QRIS
+        |--------------------------------------------------------------------------
+        */
 
-Route::get('/admin/import-kemendag', [AdminDashboardController::class, 'showImportForm'])->name('admin.import.show');
+        Route::get(
+            '/qris',
+            [
+                PaymentController::class,
+                'qris',
+            ]
+        )->name('qris');
 
-    // 2. Route untuk memproses upload excel (Tipe POST)
-    Route::post('/admin/import-kemendag', [AdminDashboardController::class, 'importDataKemendag'])->name('admin.import.kemendag');
+        /*
+        |--------------------------------------------------------------------------
+        | Manual Transfer
+        |--------------------------------------------------------------------------
+        */
 
-});
+        Route::get(
+            '/manual-transfer',
+            [
+                PaymentController::class,
+                'manualTransfer',
+            ]
+        )->name('manual-transfer');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Revenue Dashboard
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/revenue',
+            [
+                PaymentController::class,
+                'revenue',
+            ]
+        )->name('revenue');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Invoice Management
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/invoice-management',
+            [
+                PaymentController::class,
+                'invoiceManagement',
+            ]
+        )->name('invoice-management');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Invoice Actions
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post(
+            '/invoice/{participant}/mark-paid',
+            [
+                PaymentController::class,
+                'markPaid',
+            ]
+        )->name('mark-paid');
+
+        Route::post(
+            '/invoice/{participant}/void',
+            [
+                PaymentController::class,
+                'voidInvoice',
+            ]
+        )->name('void-invoice');
+
+        Route::post(
+            '/invoice/{participant}/resend',
+            [
+                PaymentController::class,
+                'resendInvoice',
+            ]
+        )->name('resend-invoice');
+
+        Route::get(
+            '/invoice/{participant}/download',
+            [
+                PaymentController::class,
+                'downloadInvoice',
+            ]
+        )->name('download-invoice');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Manual Transfer Actions
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post(
+            '/manual-transfer/{participant}/approve',
+            [
+                PaymentController::class,
+                'approveManualTransfer',
+            ]
+        )->name('manual-transfer.approve');
+
+        Route::post(
+            '/manual-transfer/{participant}/reject',
+            [
+                PaymentController::class,
+                'rejectManualTransfer',
+            ]
+        )->name('manual-transfer.reject');
+
+        /*
+        |--------------------------------------------------------------------------
+        | QRIS Actions
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post(
+            '/qris/{participant}/refresh',
+            [
+                PaymentController::class,
+                'refreshQrisStatus',
+            ]
+        )->name('qris.refresh');
+
+        Route::post(
+            '/qris/{participant}/expire',
+            [
+                PaymentController::class,
+                'expireQris',
+            ]
+        )->name('qris.expire');
+    });
+
+       /*
+|--------------------------------------------------------------------------
+| USERS
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('users')
+    ->name('users.')
+    ->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard Users
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/',
+            [
+                UserController::class,
+                'index',
+            ]
+        )->name('index');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Administrators
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/admins',
+            [
+                UserController::class,
+                'admins',
+            ]
+        )->name('admins');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Premium Users
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/premium',
+            [
+                UserController::class,
+                'premium',
+            ]
+        )->name('premium');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Company Owners
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/company-owners',
+            [
+                UserController::class,
+                'companyOwners',
+            ]
+        )->name('company-owners');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pending Verification
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/pending-verification',
+            [
+                UserController::class,
+                'pendingVerification',
+            ]
+        )->name('pending-verification');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Activity Logs
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/activity-logs',
+            [
+                UserController::class,
+                'activityLogs',
+            ]
+        )->name('activity-logs');
+    });
+// Settings
+Route::prefix('settings')
+    ->name('settings.')
+    ->group(function () {
+
+        Route::get('/', [SettingsController::class, 'index'])
+            ->name('index');
+
+        Route::get('/general', [SettingsController::class, 'general'])
+            ->name('general');
+
+        Route::get('/membership', [SettingsController::class, 'membership'])
+            ->name('membership');
+
+        Route::get('/payment-gateway', [SettingsController::class, 'paymentGateway'])
+            ->name('payment-gateway');
+
+        Route::get('/email', [SettingsController::class, 'email'])
+            ->name('email');
+
+        Route::get('/localization', [SettingsController::class, 'localization'])
+            ->name('localization');
+
+        Route::get('/security', [SettingsController::class, 'security'])
+            ->name('security');
+
+        Route::get('/storage', [SettingsController::class, 'storage'])
+            ->name('storage');
+
+        Route::get('/queue', [SettingsController::class, 'queue'])
+            ->name('queue');
+
+        Route::get('/system-health', [SettingsController::class, 'systemHealth'])
+            ->name('system-health');
+    });
+
+    });
+
+    require __DIR__.'/auth.php';

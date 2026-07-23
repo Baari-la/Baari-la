@@ -28,6 +28,12 @@ import HeroSection from "@/Components/Home/Hero/HeroSection";
 import ExecutiveReport from "@/Components/Trade/ExecutiveReport";
 import TodaysIndustrySnapshot from "@/Components/Home/TodaysIndustrySnapshot";
 import ExecutivePerformanceTable from "@/Components/Trade/ExecutiveReport/Summary/ExecutivePerformanceTable";
+import DigitalDirectoryVisibilityBanner from "@/Components/Program/DigitalDirectoryVisibilityBanner";
+import ThreePillarsSection from "@/Components/Home/ThreePillarsSection";
+import WeeklyIntelligenceBanner from "@/Components/Home/WeeklyIntelligenceBanner";
+import DigestexSolutions from "@/Components/Home/DigestexSolutions";
+import UpcomingPreview from "@/Components/Home/UpcomingPreview";
+
 export default function Home(props) {
     // 1. Ambil data trade mentah
     const garmentTrade = props.garmentTrade || { export_pcs: 0, import_pcs: 0 };
@@ -80,9 +86,7 @@ export default function Home(props) {
     };
 
     // Di dalam Home.jsx
-    useEffect(() => {
-        console.log("Cek Data Serat:", props.fiberIntelligence);
-    }, [props.fiberIntelligence]);
+    useEffect(() => {}, [props.fiberIntelligence]);
 
     // 5. Hooks
     useEffect(() => {
@@ -121,13 +125,35 @@ export default function Home(props) {
 
                 <main className="flex-1 overflow-hidden relative">
                     {/* <Navbar auth={auth} /> */}
+                    <DigitalDirectoryVisibilityBanner
+                        participatingCompanies={0}
+                        verifiedCompanies={0}
+                        goldMembers={0}
+                    />
+
+                    <div className="px-11">
+                        <UpcomingPreview />
+                    </div>
+                    {/* THREE PILLARS */}
+
+                    <ThreePillarsSection />
+
+                    {/* EXECUTIVE */}
+
+                    <TodaysIndustrySnapshot />
+                    {/* 
+                    <ExecutiveReport report={props.report} />
                     <InaugurationPopup isEn={isEn} />
                     <StockTicker topStocks={topStocks} />
                     <HeroSection />
-                    <TodaysIndustrySnapshot />
+                    <TodaysIndustrySnapshot /> */}
 
-                    <ExecutiveReport report={props.report} />
-
+                    <ExecutiveReport
+                        report={props.report}
+                        executiveTrade={props.executiveTrade}
+                    />
+                    <WeeklyIntelligenceBanner />
+                    <DigestexSolutions />
                     <div id="industry-snapshot" />
                     {/* <MaterialExchangePreview /> */}
                     {/* --- SECTION: HERO & SEARCH --- */}
@@ -264,7 +290,7 @@ export default function Home(props) {
                             </div>
                         </div>
 
-                        <LatestIntelligence
+                        {/* <LatestIntelligence
                             latestIntelligence={latestIntelligence}
                             marketIntelligence={marketIntelligence}
                             tradePolicy={tradePolicy}
@@ -272,7 +298,8 @@ export default function Home(props) {
                             technology={technology}
                             industryNews={industryNews}
                             intelligenceStats={intelligenceStats}
-                        />
+                        /> */}
+
                         <IntelligenceOverview isEn={isEn} />
                     </div>
                     <div className="mt-10">
@@ -289,17 +316,14 @@ export default function Home(props) {
                         />
                     </div>
 
+                    <DigestexSolutions />
+
                     <IndustryDirectorySnapshot
                         isEn={isEn}
                         stats={directoryStats}
                     />
-                    <IndustrySolutionsSection isEn={isEn} />
 
                     <SourcingHubPreview isEn={isEn} />
-
-                    {/* Batas Sourcing Hub dan Market Intelligecnce*/}
-
-                    {/* <MarketIntelligenceSection isEn={isEn} /> */}
 
                     <SponsoredInsightSection isEn={isEn} />
                     {/* --- SECTION: TOP PRODUCTS & PAYWALL --- */}

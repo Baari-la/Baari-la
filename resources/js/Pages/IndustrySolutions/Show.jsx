@@ -211,7 +211,6 @@ export default function Show({ category, partners }) {
 
                     <Link
                         href={route("ecosystem-partner.index")}
-                        onClick={() => console.log("clicked")}
                         className="
         relative
         z-[9999]

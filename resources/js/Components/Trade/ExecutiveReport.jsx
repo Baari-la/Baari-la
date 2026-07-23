@@ -11,28 +11,44 @@ import KeyFindings from "./Intelligence/KeyFindings";
 import ReportPeriod from "./Summary/ReportPeriod";
 import ReportSummaryCards from "./Summary/ReportSummaryCards";
 
-import ExportImportComparisonChart from "./Charts/ExportImportComparisonChart";
-import TradeRadar from "./Intelligence/TradeRadar";
-
-import TopDestinationGrid from "./Countries/TopDestinationGrid";
 import ProductPerformanceTable from "./Products/ProductPerformanceTable";
 
 import OpportunityCard from "./Intelligence/OpportunityCard";
 import RiskCard from "./Intelligence/RiskCard";
 import RecommendationCard from "./Intelligence/RecommendationCard";
+
 import ExecutivePerformanceTable from "./ExecutiveReport/Summary/ExecutivePerformanceTable";
 import ExecutivePerformancePiecesTable from "./ExecutiveReport/Summary/ExecutivePerformancePiecesTable";
+
 import ReportFooter from "./Footer/ReportFooter";
 
-export default function ExecutiveReport({ report }) {
-    // console.log("Executive Report", report);
+import ExecutiveIntelligenceTabs from "@/Components/Home/ExecutiveIntelligenceTabs";
+
+export default function ExecutiveReport({
+    report,
+    executiveTrade,
+    isEn = true,
+}) {
+    /*
+    |--------------------------------------------------------------------------
+    | Prevent White Screen
+    |--------------------------------------------------------------------------
+    */
+
+    if (!report) {
+        return null;
+
+        // atau:
+        // return <div>Loading Executive Report...</div>;
+    }
+
     return (
         <PageSection spacing="large">
             <ContentContainer size="7xl">
                 <DashboardBuilder>
                     {/* =====================================================
                         REPORT HEADER
-                    ====================================================== */}
+                    ===================================================== */}
 
                     <ReportHeader
                         title={report.title}
@@ -40,17 +56,24 @@ export default function ExecutiveReport({ report }) {
                         reportNumber={report.reportNumber}
                         generatedAt={report.generatedAt}
                     />
-                    {/* Executive Performance Summary */}
+
+                    {/* =====================================================
+                        EXECUTIVE PERFORMANCE
+                    ===================================================== */}
+
                     <div className="mt-8">
-                        <ExecutivePerformanceTable data={report.comparison} />
+                        <ExecutivePerformanceTable
+                            data={report.comparison ?? []}
+                        />
                     </div>
 
                     <ExecutivePerformancePiecesTable
-                        data={report.comparisonPieces}
+                        data={report.comparisonPieces ?? []}
                     />
+
                     {/* =====================================================
                         EXECUTIVE SUMMARY
-                    ====================================================== */}
+                    ===================================================== */}
 
                     <div className="mt-8">
                         <ExecutiveSummary summary={report.executiveSummary} />
@@ -58,15 +81,15 @@ export default function ExecutiveReport({ report }) {
 
                     {/* =====================================================
                         KEY FINDINGS
-                    ====================================================== */}
+                    ===================================================== */}
 
                     <div className="mt-8">
-                        <KeyFindings findings={report.keyFindings} />
+                        <KeyFindings findings={report.keyFindings ?? []} />
                     </div>
 
                     {/* =====================================================
                         REPORT PERIOD
-                    ====================================================== */}
+                    ===================================================== */}
 
                     <div className="mt-8">
                         <ReportPeriod
@@ -78,77 +101,76 @@ export default function ExecutiveReport({ report }) {
 
                     {/* =====================================================
                         SUMMARY KPI
-                    ====================================================== */}
+                    ===================================================== */}
 
                     <div className="mt-8">
-                        <ReportSummaryCards summary={report.summary} />
+                        <ReportSummaryCards summary={report.summary ?? {}} />
                     </div>
 
                     {/* =====================================================
-                        EXPORT vs IMPORT
-                    ====================================================== */}
-
-                    <DashboardRow>
-                        <DashboardColumn span={8}>
-                            <ExecutivePerformanceTable
-                                data={report.comparison}
-                            />
-                        </DashboardColumn>
-
-                        {/* <DashboardColumn span={4}>
-                            <TradeRadar radar={report.tradeRadar} />
-                        </DashboardColumn> */}
-                    </DashboardRow>
-
-                    {/* =====================================================
-    TOP EXPORT DESTINATION COUNTRIES
-===================================================== */}
+                        GLOBAL TEXTILE EXECUTIVE INTELLIGENCE
+                    ===================================================== */}
 
                     <DashboardRow>
                         <DashboardColumn span={12}>
-                            <TopDestinationGrid
-                                countries={report.topCountries}
+                            <ExecutiveIntelligenceTabs
+                                apparelCountries={
+                                    executiveTrade?.apparel?.topCountries ?? []
+                                }
+                                fabricCountries={
+                                    executiveTrade?.fabric?.topCountries ?? []
+                                }
+                                yarnCountries={
+                                    executiveTrade?.yarn?.topCountries ?? []
+                                }
+                                fiberCountries={
+                                    executiveTrade?.fiber?.topCountries ?? []
+                                }
                             />
                         </DashboardColumn>
                     </DashboardRow>
+
+                    {/* =====================================================
+                        TOP PRODUCTS
+                    ===================================================== */}
 
                     <DashboardRow>
                         <DashboardColumn span={12}>
                             <ProductPerformanceTable
-                                products={report.topProducts}
+                                products={report.topProducts ?? []}
                             />
                         </DashboardColumn>
                     </DashboardRow>
 
                     {/* =====================================================
-                        OPPORTUNITY vs RISK
-                    ====================================================== */}
+                        OPPORTUNITIES & RISKS
+                    ===================================================== */}
 
                     <DashboardRow>
                         <DashboardColumn span={6}>
                             <OpportunityCard
-                                opportunities={report.opportunities}
+                                opportunities={report.opportunities ?? []}
                             />
                         </DashboardColumn>
 
                         <DashboardColumn span={6}>
-                            <RiskCard risks={report.risks} />
+                            <RiskCard risks={report.risks ?? []} />
                         </DashboardColumn>
                     </DashboardRow>
 
                     {/* =====================================================
-                        EXECUTIVE RECOMMENDATION
-                    ====================================================== */}
+                        RECOMMENDATIONS
+                    ===================================================== */}
 
                     <div className="mt-10">
                         <RecommendationCard
-                            recommendation={report.recommendation}
+                            recommendation={report.recommendation ?? []}
                         />
                     </div>
 
                     {/* =====================================================
-                        REPORT FOOTER
-                    ====================================================== */}
+                        FOOTER
+                    ===================================================== */}
 
                     <div className="mt-10">
                         <ReportFooter report={report} />

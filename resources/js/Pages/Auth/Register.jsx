@@ -1,31 +1,67 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
 export default function Register() {
+    const { props } = usePage();
+
+    const isEn = props.locale === "en";
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
+        name: "",
+        email: "",
+        phone: "",
+        position: "",
+        password: "",
+        password_confirmation: "",
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+        post(route("register"), {
+            onFinish: () => reset("password", "password_confirmation"),
         });
     };
 
     return (
         <GuestLayout>
-            <Head title="Register" />
+            <Head title="Register | DIGESTEX" />
+            <div className="mb-8 text-center">
+                <h2
+                    className="
+                    text-2xl
+                    font-black
+                    uppercase
+                    italic
+                    tracking-tighter
+                    text-white
+                "
+                >
+                    {isEn ? "Create Your " : "Buat "}
 
-            <form onSubmit={submit}>
+                    <span className="text-yellow-500">DIGESTEX Account</span>
+                </h2>
+
+                <p
+                    className="
+                    mt-2
+                    text-[10px]
+                    font-bold
+                    uppercase
+                    tracking-[0.3em]
+                    text-gray-200
+                "
+                >
+                    {isEn
+                        ? "Join the Global Textile Intelligence Ecosystem"
+                        : "Bergabung dengan Global Textile Intelligence Ecosystem"}
+                </p>
+            </div>
+
+            <form onSubmit={submit} className="space-y-5">
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 
@@ -36,7 +72,7 @@ export default function Register() {
                         className="mt-1 block w-full"
                         autoComplete="name"
                         isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
+                        onChange={(e) => setData("name", e.target.value)}
                         required
                     />
 
@@ -53,13 +89,45 @@ export default function Register() {
                         value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
+                        onChange={(e) => setData("email", e.target.value)}
                         required
                     />
 
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
+                <div>
+                    <label
+                        className="
+            mb-2
+            block
+            text-[10px]
+            font-black
+            uppercase
+            tracking-widest
+            text-gray-200
+        "
+                    >
+                        {isEn ? "Phone Number" : "Nomor Telepon"}
+                    </label>
+
+                    <input
+                        type="text"
+                        value={data.phone}
+                        onChange={(e) => setData("phone", e.target.value)}
+                        className="
+            w-full
+            rounded-2xl
+            border
+            border-gray-300
+            bg-white
+            px-6
+            py-4
+            font-bold
+            text-black
+        "
+                    />
+                </div>
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
 
@@ -70,13 +138,46 @@ export default function Register() {
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
+                        onChange={(e) => setData("password", e.target.value)}
                         required
                     />
 
                     <InputError message={errors.password} className="mt-2" />
                 </div>
+                <div>
+                    <label
+                        className="
+            mb-2
+            block
+            text-[10px]
+            font-black
+            uppercase
+            tracking-widest
+            text-gray-200
+        "
+                    >
+                        {isEn ? "Position" : "Jabatan"}
+                    </label>
 
+                    <input
+                        type="text"
+                        value={data.position}
+                        onChange={(e) => setData("position", e.target.value)}
+                        className="
+            w-full
+            rounded-2xl
+            border
+            border-gray-300
+            bg-white
+            px-6
+            py-4
+            font-bold
+            text-black
+        "
+                    />
+
+                    <InputError message={errors.position} className="mt-2" />
+                </div>
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
@@ -91,7 +192,7 @@ export default function Register() {
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                         onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
+                            setData("password_confirmation", e.target.value)
                         }
                         required
                     />
@@ -102,19 +203,93 @@ export default function Register() {
                     />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                <div className="text-center">
+                    <p
+                        className="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-widest
+            text-gray-200
+        "
                     >
-                        Already registered?
-                    </Link>
+                        {isEn
+                            ? "Already have an account?"
+                            : "Sudah memiliki akun?"}
+                    </p>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
-                    </PrimaryButton>
+                    <Link
+                        href={route("login")}
+                        className="
+            mt-2
+            block
+            text-xs
+            font-black
+            uppercase
+            italic
+            text-yellow-500
+        "
+                    >
+                        {isEn ? "LOGIN TO DIGESTEX →" : "MASUK KE DIGESTEX →"}
+                    </Link>
+                </div>
+
+                <div className="pt-4">
+                    <button
+                        type="submit"
+                        disabled={processing}
+                        className="
+            w-full
+            rounded-2xl
+            bg-gradient-to-r
+            from-amber-500
+            to-yellow-500
+            px-6
+            py-4
+            text-sm
+            font-black
+            uppercase
+            tracking-wider
+            text-black
+            shadow-lg
+            transition
+            hover:scale-[1.02]
+            hover:shadow-amber-500/30
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+        "
+                    >
+                        {processing
+                            ? isEn
+                                ? "CREATING ACCOUNT..."
+                                : "MEMBUAT AKUN..."
+                            : isEn
+                              ? "CREATE ACCOUNT"
+                              : "BUAT AKUN"}
+                    </button>
                 </div>
             </form>
+            <div
+                className="
+        rounded-2xl
+        border
+        border-emerald-500/20
+        bg-emerald-500/10
+        p-5
+    "
+            >
+                <div className="font-black text-emerald-400">
+                    {isEn ? "WHAT YOU'LL GET" : "YANG AKAN ANDA DAPATKAN"}
+                </div>
+
+                <div className="mt-4 space-y-2 text-sm text-white">
+                    <div>✓ Digital Company Passport™</div>
+                    <div>✓ Executive Dashboard™</div>
+                    <div>✓ Smart Business Matching™</div>
+                    <div>✓ Build My Supply Chain™</div>
+                    <div>✓ Executive AI Insight™</div>
+                </div>
+            </div>
         </GuestLayout>
     );
 }

@@ -59,4 +59,33 @@ class TradeAnalyticsService
         return $this->comparisonRepository
             ->monthlyComparisonPieces($filters);
     }
+       /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
+    public function dashboard(
+        array $filters = []
+    ): array {
+
+        return [
+
+            'summary' =>
+                $this->summary(
+                    $filters
+                ),
+
+            'monthlyComparison' =>
+                $this->monthlyComparison(
+                    $filters
+                ),
+
+            'monthlyComparisonPieces' =>
+                $this->monthlyComparisonPieces(
+                    $filters
+                ),
+
+        ];
+    }
 }

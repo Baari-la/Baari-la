@@ -7,6 +7,7 @@ namespace App\Services\Trade\Analytics;
 use App\Repositories\Trade\Country\CountryTradeRepository;
 use App\Repositories\Trade\Executive\ExecutiveCountryRepository;
 use App\Services\MasterData\CountryService;
+use Illuminate\Support\Facades\App;
 
 /**
  * ==========================================================================
@@ -53,6 +54,7 @@ class CountryAnalyticsService
         array $filters = []
     ): array {
 
+    
         $country = $this->countryService->find($countryCode);
 
         return [
@@ -111,38 +113,116 @@ class CountryAnalyticsService
      * ['50','51','52','54','55']
      */
     public function topCountries(array $filters = []): array
-    {
-        return collect(
+{
+    return collect(
+        $this->executiveRepository
+            ->topCountries($filters)
+    )
 
-            $this->executiveRepository
-                ->topCountries($filters)
+    ->map(function ($row) {
 
-        )->map(function ($row) {
+    
+        $country = $this->countryService
+            ->find($row['country_code']);
+            
+       return [
 
-            return [
+    /*
+    |--------------------------------------------------------------------------
+    | Identity
+    |--------------------------------------------------------------------------
+    */
 
-                'country_code' => $row['country_code'],
+    'rank' =>
+        $row['rank'] ?? 0,
 
-                'country' => $this->countryService
-                    ->displayName($row['country_code']),
+    'country_code' =>
+        $row['country_code'],
 
-                'flag' => $this->countryService
-                    ->flag($row['country_code']),
+    'country_name_en' =>
+        $country?->country_name_en
+        ?? $row['country_code'],
 
-                'export_value' => $row['export_value'],
+    'country_name_id' =>
+        $country?->country_name_id
+        ?? $row['country_code'],
 
-                'export_million' => $row['export_million'] ?? null,
+    'flag' =>
+        $country?->flag_emoji ?? '',
 
-                'share' => $row['share'] ?? null,
+    /*
+    |--------------------------------------------------------------------------
+    | Export
+    |--------------------------------------------------------------------------
+    */
 
-                'growth' => $row['growth'] ?? null,
+    'export_value' =>
+        $row['export_value'] ?? 0,
 
-            ];
+    'export_million' =>
+        $row['export_million'] ?? 0,
 
-        })
+    'export_volume' =>
+        $row['export_volume'] ?? 0,
 
-        ->values()
+    /*
+    |--------------------------------------------------------------------------
+    | Import
+    |--------------------------------------------------------------------------
+    */
 
-        ->toArray();
-    }
+    'import_value' =>
+        $row['import_value'] ?? 0,
+
+    'import_volume' =>
+        $row['import_volume'] ?? 0,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trade Balance
+    |--------------------------------------------------------------------------
+    */
+
+    'trade_balance' =>
+        $row['trade_balance'] ?? 0,
+
+    'trade_balance_million' =>
+        $row['trade_balance_million'] ?? 0,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Intelligence
+    |--------------------------------------------------------------------------
+    */
+
+    'share' =>
+        $row['share'] ?? 0,
+
+    'growth' =>
+        $row['growth'] ?? null,
+
+    'growth_volume' =>
+        $row['growth_volume'] ?? null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Historical
+    |--------------------------------------------------------------------------
+    */
+
+    'previous_value' =>
+        $row['previous_value'] ?? 0,
+
+    'previous_volume' =>
+        $row['previous_volume'] ?? 0,
+];
+
+    })
+
+    ->values()
+
+    ->toArray();
+}
+
+
 }

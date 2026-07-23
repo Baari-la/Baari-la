@@ -73,10 +73,6 @@ public function deepAnalysis(Request $request)
         ['period' => 'Jan-Feb 2026', 'value' => round($monthlyData->v26/1000000, 2), 'volume' => round($monthlyData->q26/1000000, 2)]
     ];
 
-    // Cek hasil di layar
-//   dd($comparisonData);
-
-// Batas bulanan
 
 // To 5 countries
 $topCountries = DB::table('trade_master_annual_country')

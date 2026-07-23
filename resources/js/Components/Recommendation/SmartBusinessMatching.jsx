@@ -8,10 +8,6 @@ export default function SmartBusinessMatching({ matching }) {
 
     const categories = matching?.categories ?? [];
 
-    console.log("SMART BUSINESS MATCHING:", matching);
-
-    console.log("MATCHING CATEGORIES:", categories);
-
     return (
         <section className="space-y-6">
             {/* ======================================================

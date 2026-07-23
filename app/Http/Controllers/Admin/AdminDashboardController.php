@@ -90,31 +90,94 @@ class AdminDashboardController extends Controller
 
         
         // 4. Render ke Inertia
-       return Inertia::render('Admin/Dashboard', [
+   return Inertia::render('Admin/Dashboard', [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stats
+    |--------------------------------------------------------------------------
+    */
+
     'stats' => [
-        'total_companies' => $totalCompanies,
-        'gold_members'    => Company::where('membership_type', 'gold_member')->count(),
-        'premium_requests' => DB::table('premium_requests')->where('status', 'pending')->count(),
-        // Tambahkan hitungan angka untuk badge notifikasi
+
+        'total_companies' =>
+            $totalCompanies,
+
+        'gold_members' =>
+            Company::where(
+                'membership_type',
+                'gold_member'
+            )->count(),
+
+        'premium_requests' =>
+            DB::table(
+                'premium_requests'
+            )
+            ->where(
+                'status',
+                'pending'
+            )
+            ->count(),
+
         'pending_updates_count' =>
+            CompanyUpdate::where(
+                'status',
+                'pending'
+            )->count(),
+
+        'pending_claims_count' =>
+            CompanyClaim::where(
+                'status',
+                'pending'
+            )->count(),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard Counts
+    |--------------------------------------------------------------------------
+    */
+
+    'pendingPayments' => 0,
+
+    'pendingVerifications' =>
+        Company::where(
+            'status_verifikasi',
+            'pending'
+        )->count(),
+
+    'pendingUpdatesCount' =>
         CompanyUpdate::where(
             'status',
             'pending'
         )->count(),
 
-    'pending_claims_count' =>
+    'pendingClaimsCount' =>
         CompanyClaim::where(
             'status',
             'pending'
         )->count(),
-        
-        ],
-    
-    // Data list untuk tabel audit admin
-    'pendingUpdates'  => \App\Models\CompanyUpdate::with(['company', 'user'])
-                        ->where('status', 'pending')
-                        ->latest()
-                        ->get(),
+
+    'supplyChainRequests' => 0,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Lists
+    |--------------------------------------------------------------------------
+    */
+
+    'pendingUpdates' =>
+        CompanyUpdate::with([
+            'company',
+            'user'
+        ])
+        ->where(
+            'status',
+            'pending'
+        )
+        ->latest()
+        ->get(),
+
     'pendingClaims' =>
         CompanyClaim::with([
             'company',
@@ -127,14 +190,36 @@ class AdminDashboardController extends Controller
         ->latest()
         ->get(),
 
-    'recentCompanies' => Company::latest()->take(10)->get(),
-    'stockOverview'   => $stockOverview,
-    'healthStats'     => $healthStats,
-    'industrialData'  => $industrialData, // Data hulu-hilir
-    'pendingCount'    => Company::where('status_verifikasi', 'pending')->count(), // Registrasi baru
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard Data
+    |--------------------------------------------------------------------------
+    */
 
-'tradeDashboard' => $this->trade->dashboard(),
-    ]);
+    'recentCompanies' =>
+        Company::latest()
+            ->take(10)
+            ->get(),
+
+    'stockOverview' =>
+        $stockOverview,
+
+    'healthStats' =>
+        $healthStats,
+
+    'industrialData' =>
+        $industrialData,
+
+    'pendingCount' =>
+        Company::where(
+            'status_verifikasi',
+            'pending'
+        )->count(),
+
+    'tradeDashboard' =>
+        $this->trade->dashboard(),
+
+]);
 
 
     }

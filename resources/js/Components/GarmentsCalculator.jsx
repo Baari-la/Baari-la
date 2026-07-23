@@ -29,12 +29,6 @@ const GarmentCalculator = () => {
     useEffect(() => {
         // Hanya tampilkan log dan welcome jika user SUDAH login
         if (auth.user) {
-            console.log("Status Member API:", auth.user.is_api_member);
-            console.log(
-                "Nomor Anggota:",
-                auth.user.member_number || "Bukan Anggota",
-            );
-
             if (auth.user.is_api_member) {
                 setShowWelcome(true);
                 const timer = setTimeout(() => setShowWelcome(false), 5000);

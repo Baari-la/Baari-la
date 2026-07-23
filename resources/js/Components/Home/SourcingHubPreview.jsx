@@ -52,7 +52,7 @@ export default function SourcingHubPreview({ isEn }) {
                     <h2 className="text-4xl md:text-6xl font-black text-white mt-4 uppercase">
                         {isEn
                             ? "Smarter Textile Sourcing"
-                            : "Sourcing Tekstil Lebih Cerdas"}
+                            : "Sourcing Tekstil Cerdas"}
                     </h2>
 
                     <p className="max-w-3xl mx-auto mt-6 text-gray-400 leading-relaxed">

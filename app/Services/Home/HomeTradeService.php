@@ -110,36 +110,69 @@ class HomeTradeService
 
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Executive Report Preview
-        |--------------------------------------------------------------------------
-        */
+ /*
+|--------------------------------------------------------------------------
+| Executive Trade Intelligence
+|--------------------------------------------------------------------------
+*/
 
-        $executiveReport = $this->executiveReportService->build([
+$executiveTrade = [
 
-            'title' => 'Indonesia Apparel & Made-up Textile Export Performance',
+    'fiber' => $this->executiveReportService->build([
 
-            'subtitle' => 'HS 61–63',
+        'title' => 'Indonesia Fiber Export Performance',
+        'subtitle' => 'HS 50-53',
+        'trade_flow' => 'export',
+        'base_year' => 2025,
+        'compare_year' => 2026,
+        'months' => [1, 2, 3, 4],
+        'hs_prefix' => ['50', '51', '52', '53'],
 
-            'trade_flow' => 'export',
+    ]),
 
-            'base_year' => 2025,
+    'yarn' => $this->executiveReportService->build([
 
-            'compare_year' => 2026,
+        'title' => 'Indonesia Yarn Export Performance',
+        'subtitle' => 'HS 50,51,52,54,55',
+        'trade_flow' => 'export',
+        'base_year' => 2025,
+        'compare_year' => 2026,
+        'months' => [1, 2, 3, 4],
+        'hs_prefix' => ['50', '51', '52', '54', '55'],
 
-            'months' => [1, 2, 3, 4],
+    ]),
 
-            'hs_prefix' => ['61', '62', '63'],
+    'fabric' => $this->executiveReportService->build([
 
-        ]);
+        'title' => 'Indonesia Fabric Export Performance',
+        'subtitle' => 'HS 54,55,58,60',
+        'trade_flow' => 'export',
+        'base_year' => 2025,
+        'compare_year' => 2026,
+        'months' => [1, 2, 3, 4],
+        'hs_prefix' => ['54', '55', '58', '60'],
 
+    ]),
+
+    'apparel' => $this->executiveReportService->build([
+
+        'title' => 'Indonesia Apparel Export Performance',
+        'subtitle' => 'HS 61-63',
+        'trade_flow' => 'export',
+        'base_year' => 2025,
+        'compare_year' => 2026,
+        'months' => [1, 2, 3, 4],
+        'hs_prefix' => ['61', '62', '63'],
+
+    ]),
+
+]; 
         /*
         |--------------------------------------------------------------------------
         | Response
         |--------------------------------------------------------------------------
         */
-
+  
         return [
 
             'heroSummary' => $heroSummary,
@@ -154,7 +187,21 @@ class HomeTradeService
 
             'fiberIntelligence' => $fiberData,
 
-            'report' => $executiveReport,
+        /*
+            |--------------------------------------------------------------------------
+            | Temporary Backward Compatibility
+            |--------------------------------------------------------------------------
+            */
+
+            'report' => $executiveTrade['apparel'],
+                    
+            /*
+            |--------------------------------------------------------------------------
+            | Global Textile Executive Intelligence
+            |--------------------------------------------------------------------------
+            */
+
+            'executiveTrade' => $executiveTrade,
 
         ];
     }

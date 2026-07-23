@@ -21,6 +21,11 @@ class HomeIntelligenceService
         $intelligencePayload = [
             'latestNews'         => News::latest()->take(3)->get(),
             'latestIntelligence' => News::latest()->take(8)->get(),
+      
+            'textileTaxonomy'    => config(
+                'textile_taxonomy'
+            ),
+   
             'intelligenceStats'  => [
                 'reports'   => News::count(),
                 'companies' => Company::count(),

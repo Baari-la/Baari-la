@@ -4,7 +4,7 @@ export default function PublicFooter() {
             <div className="max-w-7xl mx-auto px-6 py-12">
                 <div className="grid md:grid-cols-4 gap-8">
                     <div>
-                        <h3 className="font-black text-lg">DIGTEX</h3>
+                        <h3 className="font-black text-lg">DIGESTEX</h3>
 
                         <p className="text-sm text-gray-400 mt-3">
                             Textile Industry Ecosystem

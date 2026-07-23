@@ -1,8 +1,6 @@
 import React from "react";
 
 export default function Trade({ annualTrend, monthlyCompare }) {
-    console.log(annualTrend); // Cek data di Inspect Element > Console
-
     return (
         <div className="p-8">
             <h1 className="text-2xl font-bold mb-4">
