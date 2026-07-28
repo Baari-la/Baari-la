@@ -1,73 +1,283 @@
+import {
+    Activity,
+    BarChart3,
+    Globe2,
+    Network,
+    Radar,
+    ShieldCheck,
+} from "lucide-react";
+
 export default function WelcomeBanner({ user, memberStatus }) {
     return (
-        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-[#0B1F3A] via-[#102C57] to-[#1B3B6F] p-8 lg:p-10 mb-8 shadow-2xl border border-white/10">
-            {/* Background Glow */}
-            <div className="absolute -top-20 -right-20 w-72 h-72 bg-cyan-400/10 rounded-full blur-3xl"></div>
-            <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-amber-400/10 rounded-full blur-3xl"></div>
+        <section
+            className="
+                relative
+                mb-8
+                overflow-hidden
+                rounded-[32px]
+                border
+                border-white/10
+                bg-gradient-to-r
+                from-[#0B1F3A]
+                via-[#102C57]
+                to-[#1B3B6F]
+                p-8
+                shadow-2xl
+                lg:p-10
+            "
+        >
+            {/* Background */}
 
-            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-                {/* LEFT SIDE */}
-                <div>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-400/20 text-cyan-300 text-[11px] font-bold uppercase tracking-widest mb-4">
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                        Intelligence System Online
+            <div
+                className="
+                    absolute
+                    -right-20
+                    -top-20
+                    h-72
+                    w-72
+                    rounded-full
+                    bg-cyan-400/10
+                    blur-3xl
+                "
+            />
+
+            <div
+                className="
+                    absolute
+                    -bottom-20
+                    -left-20
+                    h-72
+                    w-72
+                    rounded-full
+                    bg-amber-400/10
+                    blur-3xl
+                "
+            />
+
+            <div
+                className="
+                    relative
+                    z-10
+                    flex
+                    flex-col
+                    gap-10
+                    xl:flex-row
+                    xl:items-center
+                    xl:justify-between
+                "
+            >
+                {/* Main */}
+
+                <div className="max-w-4xl">
+                    <div
+                        className="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-full
+                            border
+                            border-cyan-400/20
+                            bg-cyan-500/10
+                            px-4
+                            py-2
+                            text-[11px]
+                            font-black
+                            uppercase
+                            tracking-[0.18em]
+                            text-cyan-300
+                        "
+                    >
+                        <Activity className="h-4 w-4" />
+                        DIGESTEX Intelligence System
                     </div>
 
-                    <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white">
-                        Welcome Back,
-                    </h1>
-
-                    <h2 className="text-2xl lg:text-4xl font-black text-amber-400 mt-1">
-                        {user?.name || "Executive Member"}
-                    </h2>
-
-                    <p className="mt-4 text-slate-300 max-w-2xl leading-relaxed">
-                        Access real-time textile market intelligence, trade
-                        analytics, sourcing opportunities, logistics monitoring,
-                        and industrial forecasting from a single command center.
+                    <p
+                        className="
+                            mt-7
+                            text-xs
+                            font-black
+                            uppercase
+                            tracking-[0.22em]
+                            text-slate-400
+                        "
+                    >
+                        Executive Intelligence Dashboard
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-3 mt-6">
-                        <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-semibold text-slate-300">
-                            🌎 Global Trade Monitor
+                    <h1
+                        className="
+                            mt-3
+                            text-3xl
+                            font-black
+                            tracking-tight
+                            text-white
+                            lg:text-5xl
+                        "
+                    >
+                        Welcome back,{" "}
+                        <span className="text-amber-400">
+                            {user?.name || "Member"}
                         </span>
+                    </h1>
 
-                        <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-semibold text-slate-300">
-                            📈 Market Intelligence
-                        </span>
+                    <p
+                        className="
+                            mt-5
+                            max-w-3xl
+                            text-base
+                            leading-7
+                            text-slate-300
+                        "
+                    >
+                        Monitor textile markets, trade flows, industrial
+                        signals, supply chains, and business opportunities
+                        across the DIGESTEX intelligence ecosystem.
+                    </p>
 
-                        <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-semibold text-slate-300">
-                            🚢 Logistics Radar
-                        </span>
+                    {/* Intelligence Areas */}
 
-                        <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-semibold text-slate-300">
-                            🤖 AI Forecast Engine
-                        </span>
+                    <div
+                        className="
+                            mt-7
+                            grid
+                            gap-3
+                            sm:grid-cols-2
+                            xl:grid-cols-4
+                        "
+                    >
+                        <IntelligenceItem icon={Globe2} title="Global Trade" />
+
+                        <IntelligenceItem
+                            icon={BarChart3}
+                            title="Market Intelligence"
+                        />
+
+                        <IntelligenceItem
+                            icon={Radar}
+                            title="Industrial Radar"
+                        />
+
+                        <IntelligenceItem icon={Network} title="Supply Chain" />
                     </div>
                 </div>
 
-                {/* RIGHT SIDE */}
-                <div className="flex flex-col gap-4 min-w-[260px]">
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
-                            Membership Status
-                        </p>
+                {/* Status */}
 
-                        <h3 className="text-xl font-black text-amber-400 mt-1">
-                            {memberStatus}
-                        </h3>
-                    </div>
+                <div
+                    className="
+                        grid
+                        min-w-0
+                        gap-4
+                        sm:grid-cols-2
+                        xl:w-[310px]
+                        xl:grid-cols-1
+                    "
+                >
+                    <StatusCard
+                        icon={ShieldCheck}
+                        label="Account Status"
+                        value={memberStatus || "Member"}
+                        valueClassName="text-amber-400"
+                    />
 
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
-                            Platform Status
-                        </p>
-
-                        <h3 className="text-lg font-black text-green-400 mt-1">
-                            All Systems Operational
-                        </h3>
-                    </div>
+                    <StatusCard
+                        icon={Activity}
+                        label="Intelligence Platform"
+                        value="Operational"
+                        valueClassName="text-emerald-400"
+                    />
                 </div>
+            </div>
+        </section>
+    );
+}
+
+function IntelligenceItem({ icon: Icon, title }) {
+    return (
+        <div
+            className="
+                flex
+                items-center
+                gap-3
+                rounded-2xl
+                border
+                border-white/10
+                bg-white/5
+                px-4
+                py-3
+                backdrop-blur-sm
+            "
+        >
+            <div
+                className="
+                    flex
+                    h-9
+                    w-9
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-white/10
+                    text-cyan-300
+                "
+            >
+                <Icon className="h-4 w-4" />
+            </div>
+
+            <span
+                className="
+                    text-xs
+                    font-bold
+                    text-slate-200
+                "
+            >
+                {title}
+            </span>
+        </div>
+    );
+}
+
+function StatusCard({
+    icon: Icon,
+    label,
+    value,
+    valueClassName = "text-white",
+}) {
+    return (
+        <div
+            className="
+                rounded-2xl
+                border
+                border-white/10
+                bg-white/5
+                p-5
+                backdrop-blur-sm
+            "
+        >
+            <div className="flex items-center gap-2 text-slate-400">
+                <Icon className="h-4 w-4" />
+
+                <p
+                    className="
+                        text-[10px]
+                        font-black
+                        uppercase
+                        tracking-[0.18em]
+                    "
+                >
+                    {label}
+                </p>
+            </div>
+
+            <div
+                className={`
+                    mt-3
+                    text-lg
+                    font-black
+                    ${valueClassName}
+                `}
+            >
+                {value}
             </div>
         </div>
     );

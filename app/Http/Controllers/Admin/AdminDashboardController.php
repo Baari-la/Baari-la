@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;  
 use App\Models\Company;
+use App\Models\DigitalDirectoryParticipant;
 use App\Models\CompanyUpdate;
 use Illuminate\Support\Facades\DB;
 use App\Models\AuditLog;
@@ -138,7 +139,38 @@ class AdminDashboardController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    'pendingPayments' => 0,
+    'pendingPayments' =>
+    DigitalDirectoryParticipant::where(
+        'payment_status',
+        'pending_verification'
+    )->count(),
+/*
+|--------------------------------------------------------------------------
+| Digital Directory Ownership Verification
+|--------------------------------------------------------------------------
+|
+| Ownership claims yang berasal dari user yang terhubung dengan
+| Digital Directory & Visibility Program.
+|
+*/
+
+'pendingProgramOwnerships' =>
+    CompanyClaim::query()
+        ->where(
+            'status',
+            'pending'
+        )
+        ->whereIn(
+            'user_id',
+            DigitalDirectoryParticipant::query()
+                ->whereNotNull(
+                    'user_id'
+                )
+                ->select(
+                    'user_id'
+                )
+        )
+        ->count(),
 
     'pendingVerifications' =>
         Company::where(
@@ -228,9 +260,7 @@ class AdminDashboardController extends Controller
 public function approveUpdate($id)
 {
     $update = CompanyUpdate::findOrFail($id);
-// dd([
-//     'raw_proposed_data' => $update->proposed_data,
-// ]);
+
     DB::transaction(function () use ($update) {
 
         $company = Company::findOrFail(
@@ -287,7 +317,7 @@ $companyFields['last_updated_at'] = now();
 $companyFields['data_source'] = 'verified_by_admin';
 
 $company->update($companyFields);
-// dd($newData['capacities'] ?? 'NO CAPACITIES');
+
 /*
 |--------------------------------------------------------------------------
 | RELATIONAL DATA
@@ -339,11 +369,44 @@ public function approveClaim(
     CompanyClaim $claim
 )
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Claim Must Be Linked To Company
+    |--------------------------------------------------------------------------
+    */
+
+    if (!$claim->company_id) {
+
+        return back()->with(
+            'error',
+            'This claim must be linked to a company before approval.'
+        );
+    }
+
+/*
+|--------------------------------------------------------------------------
+| Claim Must Be Pending
+|--------------------------------------------------------------------------
+*/
+
+if ($claim->status !== 'pending') {
+    return back()->with(
+        'error',
+        'This ownership claim is no longer pending.'
+    );
+}
+    
     $company = $claim->company;
 
-    if (
-        $company->claimed_by_user_id
-    ) {
+    if (!$company) {
+
+        return back()->with(
+            'error',
+            'The linked company could not be found.'
+        );
+    }
+
+    if ($company->claimed_by_user_id) {
 
         return back()->with(
             'error',
@@ -374,20 +437,42 @@ public function approveClaim(
                 now(),
         ]);
 
-        $claim->user->update([
+       $claim->user->update([
 
-            'company_id' =>
-                $company->id,
+    'company_id' =>
+        $company->id,
+]);
+
+/*
+|--------------------------------------------------------------------------
+| LINK DIGITAL DIRECTORY PARTICIPANT
+|--------------------------------------------------------------------------
+*/
+
+        DigitalDirectoryParticipant::where(
+            'user_id',
+            $claim->user_id
+        )
+        ->whereNull('company_id')
+        ->update([
+            'company_id' => $company->id,
         ]);
 
-        $claim->update([
 
-            'status' =>
-                'approved',
+       $claim->update([
 
-            'reviewed_at' =>
-                now(),
-        ]);
+    'status' =>
+        'approved',
+
+    'reviewed_at' =>
+        now(),
+
+    'reviewed_by' =>
+        auth()->id(),
+
+    'rejection_reason' =>
+        null,
+]);
 
         CompanyClaim::where(
             'company_id',
@@ -404,12 +489,18 @@ public function approveClaim(
         )
         ->update([
 
-            'status' =>
-                'rejected',
+    'status' =>
+        'rejected',
 
-            'reviewed_at' =>
-                now(),
-        ]);
+    'reviewed_at' =>
+        now(),
+
+    'reviewed_by' =>
+        auth()->id(),
+
+    'rejection_reason' =>
+        'Another ownership claim for this company was approved.',
+]);
 
         AuditLog::create([
     'user_id' => auth()->id(),
@@ -469,12 +560,15 @@ public function rejectClaim(
 
         $claim->update([
 
-            'status' =>
-                'rejected',
+    'status' =>
+        'rejected',
 
-            'reviewed_at' =>
-                now(),
-        ]);
+    'reviewed_at' =>
+        now(),
+
+    'reviewed_by' =>
+        auth()->id(),
+]);
 
         AuditLog::create([
     'user_id' => auth()->id(),

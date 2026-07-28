@@ -136,7 +136,7 @@ export default function Claims({ claims = [] }) {
                                                         <Link
                                                             method="post"
                                                             href={route(
-                                                                "admin.claims.approve",
+                                                                "admin.companies.claims.approve",
                                                                 claim.id,
                                                             )}
                                                             className="
@@ -153,7 +153,7 @@ export default function Claims({ claims = [] }) {
                                                         <Link
                                                             method="post"
                                                             href={route(
-                                                                "admin.claims.reject",
+                                                                "admin.companies.claims.reject",
                                                                 claim.id,
                                                             )}
                                                             className="

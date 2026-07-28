@@ -156,9 +156,7 @@ export default function Step1Welcome() {
 
                         <div className="mt-12 text-center">
                             <Link
-                                href={route(
-                                    "program.digital-directory.company-information",
-                                )}
+                                href={route("onboarding.company-information")}
                                 className="
                                     inline-flex
                                     items-center

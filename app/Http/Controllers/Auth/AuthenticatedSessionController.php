@@ -29,30 +29,87 @@ class AuthenticatedSessionController extends Controller
      */
    public function store(Request $request)
 {
-    // 1. Validasi input: Nama variabel HARUS 'login_identity' agar sinkron dengan React
     $request->validate([
-        'login_identity' => 'required|string', 
-        'password' => 'required|string',
+        'login_identity' => 'required|string',
+        'password'       => 'required|string',
     ]);
 
-    // 2. Ambil nilai dan bersihkan spasi (Penting untuk Nomor Anggota)
-    $loginValue = trim($request->login_identity);
+    $loginValue = trim(
+        $request->login_identity
+    );
 
-    // 3. Deteksi Email atau Nomor Anggota
-    $fieldType = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'member_number';
+    $fieldType =
+        filter_var(
+            $loginValue,
+            FILTER_VALIDATE_EMAIL
+        )
+            ? 'email'
+            : 'member_number';
 
-    // 4. Proses Login
-    if (!Auth::attempt([$fieldType => $loginValue, 'password' => $request->password], $request->remember)) {
+    if (
+        ! Auth::attempt(
+            [
+                $fieldType => $loginValue,
+                'password' => $request->password,
+            ],
+            $request->remember
+        )
+    ) {
         return back()->withErrors([
-            'login_identity' => 'Kredensial yang Anda masukkan tidak terdaftar di sistem Digestex.',
+            'login_identity' =>
+                'Kredensial yang Anda masukkan tidak terdaftar di sistem Digestex.',
         ]);
     }
 
     $request->session()->regenerate();
-return auth()->user()->role === 'admin'
-    ? redirect()->intended(route('admin.dashboard'))
-    : redirect()->intended('/dashboard');
-    return redirect()->intended('/dashboard'); 
+
+    $user = auth()->user();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        in_array(
+            $user->role,
+            [
+                'admin',
+                'super_admin',
+            ]
+        )
+    ) {
+        return redirect()->intended(
+            route(
+                'admin.dashboard'
+            )
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resume Onboarding™
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+    ! $user->isOnboardingCompleted()
+        ) {
+            return redirect()->to(
+                $user->getOnboardingRoute()
+            );
+        }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
+    return redirect()->intended(
+        route('dashboard')
+    );
 }
 
 

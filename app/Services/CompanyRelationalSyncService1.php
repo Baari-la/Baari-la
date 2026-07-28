@@ -104,8 +104,7 @@ public static function syncLocations(
     array $locations
 ): void {
 
-    // dd($locations);
-
+    
     $company->locations()->update([
         'is_primary' => false,
     ]);

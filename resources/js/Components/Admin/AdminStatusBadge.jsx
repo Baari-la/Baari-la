@@ -39,6 +39,24 @@ export default function AdminStatusBadge({ status = "draft" }) {
         },
 
         /*
+|--------------------------------------------------------------------------
+| Company Claims / Ownership Verification
+|--------------------------------------------------------------------------
+*/
+
+        pending: {
+            label: "Pending",
+            className: "bg-amber-100 text-amber-700",
+            icon: Clock3,
+        },
+
+        approved: {
+            label: "Approved",
+            className: "bg-emerald-100 text-emerald-700",
+            icon: CheckCircle2,
+        },
+
+        /*
         |--------------------------------------------------------------------------
         | Activation
         |--------------------------------------------------------------------------

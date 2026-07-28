@@ -11,7 +11,7 @@ class CompanyCapacityService
         Company $company,
         array $capacities
     ): void {
-// dd($capacities);
+
  if (empty($capacities)) {
         return;
     }

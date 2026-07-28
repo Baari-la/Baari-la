@@ -7,6 +7,8 @@ use App\Models\DigitalDirectoryParticipant;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\CompanyClaim;
+use Illuminate\Support\Facades\DB;
 
 class DigitalDirectoryParticipantController extends Controller
 {
@@ -16,48 +18,135 @@ class DigitalDirectoryParticipantController extends Controller
      * --------------------------------------------------------------------------
      */
     public function index(): Response
-    {
-        return Inertia::render(
-            'Admin/DigitalDirectory/Index',
-            [
-                'participants' =>
+{
+    /*
+    |--------------------------------------------------------------------------
+    | Participants
+    |--------------------------------------------------------------------------
+    |
+    | Load connected master company agar Admin menggunakan nama perusahaan
+    | resmi dari database setelah ownership/company connection selesai.
+    |
+    | participant.company_name tetap tersedia sebagai registration company
+    | name dan dapat digunakan sebagai fallback di React.
+    |
+    */
 
-                    DigitalDirectoryParticipant::query()
+    $participants =
+        DigitalDirectoryParticipant::query()
+            ->with([
+                'company:id,nama_perusahaan',
+            ])
+            ->latest()
+            ->paginate(20);
 
-                        ->latest()
+    /*
+    |--------------------------------------------------------------------------
+    | Statistics
+    |--------------------------------------------------------------------------
+    */
 
-                        ->paginate(20),
+    $stats = [
 
-                'stats' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Total Participants
+        |--------------------------------------------------------------------------
+        */
 
-                    'total' =>
+        'total' =>
+            DigitalDirectoryParticipant::count(),
 
-                        DigitalDirectoryParticipant::count(),
+        /*
+        |--------------------------------------------------------------------------
+        | Payment Status
+        |--------------------------------------------------------------------------
+        */
 
-                    'pending' =>
+        'pending' =>
+            DigitalDirectoryParticipant::where(
+                'payment_status',
+                'pending_verification'
+            )->count(),
 
-                        DigitalDirectoryParticipant::where(
-                            'payment_status',
-                            'pending_verification'
-                        )->count(),
+        'verified' =>
+            DigitalDirectoryParticipant::where(
+                'payment_status',
+                'verified'
+            )->count(),
 
-                    'verified' =>
+        /*
+        |--------------------------------------------------------------------------
+        | Activation Status
+        |--------------------------------------------------------------------------
+        */
 
-                        DigitalDirectoryParticipant::where(
-                            'payment_status',
-                            'verified'
-                        )->count(),
+        'active' =>
+            DigitalDirectoryParticipant::where(
+                'activation_status',
+                'active'
+            )->count(),
 
-                    'active' =>
+        /*
+        |--------------------------------------------------------------------------
+        | Package Statistics
+        |--------------------------------------------------------------------------
+        */
 
-                        DigitalDirectoryParticipant::where(
-                            'activation_status',
-                            'active'
-                        )->count(),
-                ],
-            ]
-        );
-    }
+        'executive' =>
+            DigitalDirectoryParticipant::where(
+                'package',
+                'Executive Partner'
+            )->count(),
+
+        'visibility' =>
+            DigitalDirectoryParticipant::where(
+                'package',
+                'Visibility Partner'
+            )->count(),
+
+        'verified_company' =>
+            DigitalDirectoryParticipant::where(
+                'package',
+                'Verified Company'
+            )->count(),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Revenue
+        |--------------------------------------------------------------------------
+        |
+        | Revenue hanya menghitung participant dengan payment yang sudah
+        | diverifikasi.
+        |
+        */
+
+        'revenue' =>
+            DigitalDirectoryParticipant::where(
+                'payment_status',
+                'verified'
+            )->sum(
+                'amount'
+            ),
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
+
+    return Inertia::render(
+        'Admin/DigitalDirectory/Index',
+        [
+            'participants' =>
+                $participants,
+
+            'stats' =>
+                $stats,
+        ]
+    );
+}
 
     /**
      * --------------------------------------------------------------------------
@@ -68,14 +157,40 @@ class DigitalDirectoryParticipantController extends Controller
     DigitalDirectoryParticipant $participant
 )
 {
-   
+    
+    $participant->load([
+        'company',
+    ]);
+    
     return Inertia::render(
         'Admin/DigitalDirectory/ParticipantDetails',
         [
             'participant' => [
                 'id' => $participant->id,
+            
+                'user_id' =>
+                    $participant->user_id,
 
-                'package' =>
+                'company_id' =>
+                    $participant->company_id,
+            
+                 'connected_company' =>
+            $participant->company
+                ? [
+                    'id' =>
+                        $participant->company->id,
+
+                    'name' =>
+                        $participant->company->nama_perusahaan,
+
+                    'verification_status' =>
+                        $participant->company->status_verifikasi,
+
+                    'membership_type' =>
+                        $participant->company->membership_type,
+                ]
+                : null,   
+                    'package' =>
                     $participant->package,
 
                 'company_name' =>
@@ -106,28 +221,46 @@ class DigitalDirectoryParticipantController extends Controller
                     $participant->city,
 
                 /*
-                |--------------------------------------------------------------------------
-                | Payment
-                |--------------------------------------------------------------------------
-                */
+            |--------------------------------------------------------------------------
+            | Payment
+            |--------------------------------------------------------------------------
+            */
 
-                'invoice_number' =>
-                    $participant->invoice_number,
+            'invoice_number' =>
+                $participant->invoice_number,
 
-                'amount' =>
-                    $participant->amount,
+            'amount' =>
+                $participant->amount,
 
-                'payment_method' =>
-                    $participant->payment_method,
+            'currency' =>
+                $participant->currency,
 
-                'payment_gateway' =>
-                    $participant->payment_gateway,
+            'payment_method' =>
+                $participant->payment_method,
 
-                'payment_status' =>
-                    $participant->payment_status,
+            'payment_gateway' =>
+                $participant->payment_gateway,
 
-                'payment_verified_at' =>
-                    $participant->payment_verified_at,
+            'payment_reference' =>
+                $participant->payment_reference,
+
+            'payment_receipt' =>
+                $participant->payment_receipt,
+
+            'payment_status' =>
+                $participant->payment_status,
+
+            'paid_at' =>
+                $participant->paid_at,
+
+            'payment_verified_at' =>
+                $participant->payment_verified_at,
+
+            'verified_by' =>
+                $participant->verified_by,
+
+            'admin_notes' =>
+                $participant->admin_notes,
 
                 /*
                 |--------------------------------------------------------------------------
@@ -221,35 +354,116 @@ class DigitalDirectoryParticipantController extends Controller
      */
     public function activate(
     DigitalDirectoryParticipant $participant
-)
-{
-    $participant->update([
+): RedirectResponse {
 
-        'activation_status' =>
-            'active',
+    /*
+    |--------------------------------------------------------------------------
+    | Payment Must Be Verified
+    |--------------------------------------------------------------------------
+    */
 
-        'activated_at' =>
-            now(),
+    if ($participant->payment_status !== 'verified') {
+        return back()->with(
+            'error',
+            'Program payment must be verified before activation.'
+        );
+    }
 
-        'visibility_score_active' =>
-            true,
+    /*
+    |--------------------------------------------------------------------------
+    | Company Must Be Connected
+    |--------------------------------------------------------------------------
+    */
 
-        'company_passport_active' =>
-            true,
+    if (!$participant->company_id) {
+        return back()->with(
+            'error',
+            'Company ownership must be verified before activation.'
+        );
+    }
 
-        'executive_dashboard_active' =>
-            true,
+    /*
+    |--------------------------------------------------------------------------
+    | Prevent Duplicate Activation
+    |--------------------------------------------------------------------------
+    */
 
-        'smart_matching_active' =>
-            true,
+    if ($participant->activation_status === 'active') {
+        return back()->with(
+            'error',
+            'Program is already active.'
+        );
+    }
 
-        'build_supply_chain_active' =>
-            true,
-    ]);
+    /*
+    |--------------------------------------------------------------------------
+    | Package Entitlements
+    |--------------------------------------------------------------------------
+    */
+
+    $services = match ($participant->package) {
+
+        'Verified Company' => [
+            'visibility_score_active' => true,
+            'company_passport_active' => true,
+            'executive_dashboard_active' => false,
+            'smart_matching_active' => false,
+            'build_supply_chain_active' => false,
+        ],
+
+        'Visibility Partner' => [
+            'visibility_score_active' => true,
+            'company_passport_active' => true,
+            'executive_dashboard_active' => true,
+            'smart_matching_active' => true,
+            'build_supply_chain_active' => false,
+        ],
+
+        'Executive Partner' => [
+            'visibility_score_active' => true,
+            'company_passport_active' => true,
+            'executive_dashboard_active' => true,
+            'smart_matching_active' => true,
+            'build_supply_chain_active' => true,
+        ],
+
+        default => null,
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validate Package
+    |--------------------------------------------------------------------------
+    */
+
+    if ($services === null) {
+        return back()->with(
+            'error',
+            'Program package is not recognized.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Activate Program
+    |--------------------------------------------------------------------------
+    */
+
+    DB::transaction(function () use (
+        $participant,
+        $services
+    ) {
+        $participant->update([
+            'activation_status' => 'active',
+            'activated_at' => now(),
+
+            ...$services,
+        ]);
+    });
 
     return back()->with(
         'success',
-        'Company activated.'
+        'Program activated successfully.'
     );
 }
 
@@ -259,20 +473,58 @@ class DigitalDirectoryParticipantController extends Controller
      * --------------------------------------------------------------------------
      */
     public function deactivate(
-        DigitalDirectoryParticipant $participant
-    ): RedirectResponse {
+    DigitalDirectoryParticipant $participant
+): RedirectResponse {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Program Must Be Active
+    |--------------------------------------------------------------------------
+    */
+
+    if ($participant->activation_status !== 'active') {
+        return back()->with(
+            'error',
+            'Program is not currently active.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Deactivate Program
+    |--------------------------------------------------------------------------
+    */
+
+    DB::transaction(function () use ($participant) {
 
         $participant->update([
 
             'activation_status' =>
                 'inactive',
-        ]);
 
-        return back()->with(
-            'success',
-            'Participant deactivated.'
-        );
-    }
+            'visibility_score_active' =>
+                false,
+
+            'company_passport_active' =>
+                false,
+
+            'executive_dashboard_active' =>
+                false,
+
+            'smart_matching_active' =>
+                false,
+
+            'build_supply_chain_active' =>
+                false,
+        ]);
+    });
+
+    return back()->with(
+        'success',
+        'Program deactivated successfully.'
+    );
+}
+
     public function pendingPayments()
 {
     return Inertia::render(
@@ -515,6 +767,61 @@ public function packageAnalytics()
         ]
     );
 }
+/*
+|--------------------------------------------------------------------------
+| Ownership Verification
+|--------------------------------------------------------------------------
+*/
 
+public function ownershipVerification(): Response
+{
+    $claims = CompanyClaim::query()
+
+        ->with([
+            'company',
+            'user',
+        ])
+
+        ->whereIn(
+            'user_id',
+            DigitalDirectoryParticipant::query()
+                ->whereNotNull('user_id')
+                ->select('user_id')
+        )
+
+        ->latest()
+
+        ->get();
+
+    return Inertia::render(
+        'Admin/DigitalDirectory/OwnershipVerification',
+        [
+            'claims' => $claims,
+
+            'stats' => [
+                'total' =>
+                    $claims->count(),
+
+                'pending' =>
+                    $claims->where(
+                        'status',
+                        'pending'
+                    )->count(),
+
+                'approved' =>
+                    $claims->where(
+                        'status',
+                        'approved'
+                    )->count(),
+
+                'rejected' =>
+                    $claims->where(
+                        'status',
+                        'rejected'
+                    )->count(),
+            ],
+        ]
+    );
+}
 
 }

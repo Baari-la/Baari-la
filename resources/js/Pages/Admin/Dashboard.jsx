@@ -24,6 +24,8 @@ export default function Dashboard({
     databaseStats = {},
 
     pendingPayments = 0,
+    pendingProgramOwnerships = 0,
+
     pendingVerifications = 0,
 
     pendingUpdatesCount = 0,
@@ -61,6 +63,7 @@ export default function Dashboard({
 
                 <DashboardQueues
                     pendingPayments={pendingPayments}
+                    pendingProgramOwnerships={pendingProgramOwnerships}
                     pendingVerifications={pendingVerifications}
                     pendingUpdates={pendingUpdatesCount}
                     pendingClaims={pendingClaimsCount}

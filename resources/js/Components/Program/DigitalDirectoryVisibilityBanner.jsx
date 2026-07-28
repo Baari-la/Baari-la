@@ -23,8 +23,8 @@ export default function DigitalDirectoryVisibilityBanner({
         "Build My Supply Chain™",
         "Visibility Score™",
         "Executive Dashboard™",
-        "Verified Company Badge",
-        isEn ? "Verified Company Badge" : "Lencana Perusahaan Terverifikasi",
+        "Verified Digital Company Intelligence™",
+        "Business Growth Journey™",
     ];
 
     return (
@@ -49,42 +49,86 @@ export default function DigitalDirectoryVisibilityBanner({
                 <div>
                     <div
                         className="
-                            inline-flex
-                            items-center
-                            gap-2
-                            rounded-full
-                            bg-emerald-500/20
-                            px-4
-                            py-2
-                            text-sm
-                            font-bold
-                            text-emerald-300
-                        "
+        inline-flex
+        items-center
+        gap-2
+        rounded-full
+        bg-emerald-500/15
+        border
+        border-emerald-400/30
+        px-4
+        py-2
+        text-xs
+        font-semibold
+        uppercase
+        tracking-[0.15em]
+        text-emerald-300
+    "
                     >
                         <Sparkles className="h-4 w-4" />
+
                         {isEn
-                            ? "NOW OPEN FOR PARTICIPATION"
-                            : "PENDAFTARAN TELAH DIBUKA"}
+                            ? "NOW ACCEPTING PARTICIPATING COMPANIES"
+                            : "PENDAFTARAN PERUSAHAAN DIBUKA"}
                     </div>
+                    <p
+                        className="
+        mt-8
+        max-w-3xl
+        text-3xl
+        font-light
+        leading-tight
+        tracking-tight
+        text-white
+        md:text-4xl
+    "
+                    >
+                        {isEn ? (
+                            <>
+                                <span className="font-semibold">
+                                    A Small Step Today,
+                                </span>
+
+                                <br />
+
+                                <span className="text-slate-300">
+                                    A Great Opportunity Tomorrow.
+                                </span>
+                            </>
+                        ) : (
+                            <>
+                                <span className="font-semibold">
+                                    Sebuah Langkah Kecil Hari Ini,
+                                </span>
+
+                                <br />
+
+                                <span className="text-slate-300">
+                                    Sebuah Peluang Besar di Masa Depan.
+                                </span>
+                            </>
+                        )}
+                    </p>
 
                     <h1
                         className="
-                            mt-6
-                            text-4xl
+                            mt-8
+                            text-5xl
                             font-black
                             leading-tight
                         "
                     >
                         DIGESTEX Digital Directory
-                        <br />& Visibility Program 2026
+                        <br />& Visibility Program
                     </h1>
                     <p
                         className="
         mt-4
         text-sm
+        font-medium
         uppercase
-        tracking-[0.2em]
-        text-emerald-300
+        tracking-[0.25em]
+        text-cyan-300
     "
                     >
                         Global Textile Intelligence Ecosystem
@@ -101,10 +145,18 @@ export default function DigitalDirectoryVisibilityBanner({
                             ? "Complete Your Profile. Increase Your Visibility. Unlock New Opportunities."
                             : "Lengkapi Profil Perusahaan Anda. Tingkatkan Visibilitas. Buka Peluang Baru."}
                     </p>
-                    <p className="mt-4 text-sm text-emerald-300">
+                    <p
+                        className="
+        mt-4
+        text-base
+        font-medium
+        tracking-wide
+        text-emerald-300
+    "
+                    >
                         {isEn
-                            ? "Powering the next generation of Textile Intelligence."
-                            : "Mendorong generasi baru Textile Intelligence."}
+                            ? "Build Your Digital Identity."
+                            : "Bangun Identitas Digital Perusahaan Anda."}
                     </p>
                     <div className="mt-8 grid gap-4 md:grid-cols-2">
                         {features.map((feature) => (
@@ -145,21 +197,25 @@ export default function DigitalDirectoryVisibilityBanner({
                         </Link>
 
                         <Link
-                            href="/company/passport/700"
+                            href={route("program.digital-directory")}
                             className="
-                                rounded-xl
-                                border
-                                border-white/30
-                                px-6
-                                py-3
-                                font-bold
-                                transition
-                                hover:bg-white/10
-                            "
+        inline-flex
+        items-center
+        rounded-xl
+        border
+        border-white/30
+        px-6
+        py-3
+        font-bold
+        transition-all
+        duration-200
+        hover:-translate-y-0.5
+        hover:bg-white/10
+    "
                         >
                             {isEn
-                                ? "VIEW SAMPLE PASSPORT"
-                                : "LIHAT CONTOH PASSPORT PERUSAHAAN"}
+                                ? "LEARN ABOUT THE PROGRAM"
+                                : "PELAJARI PROGRAM"}
                         </Link>
                     </div>
                 </div>
@@ -179,9 +235,12 @@ export default function DigitalDirectoryVisibilityBanner({
                     "
                 >
                     <h3 className="text-xl font-bold">
-                        {" "}
-                        {isEn ? "2026 Program Targets" : "Target Program 2026"}
+                        {isEn ? "Program Targets" : "Target Program"}
                     </h3>
+
+                    <p className="mt-1 text-sm uppercase tracking-wider text-emerald-300">
+                        {isEn ? "2026 Period" : "Periode 2026"}
+                    </p>
 
                     <div className="mt-8 space-y-6">
                         <div>

@@ -4,8 +4,6 @@ import CompanyLocationsSection from "@/Pages/Company/CompanyLocationsSection";
 import Swal from "sweetalert2";
 
 export default function Edit({ auth, company }) {
-    console.log(company.machines);
-    console.log("EDIT PAGE LOADED");
     const isEn = auth.locale === "en";
     const { data, setData, post, processing, errors } = useForm({
         _method: "post",

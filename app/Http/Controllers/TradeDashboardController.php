@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Company;
+use App\Models\DigitalDirectoryParticipant;
 use App\Models\MarketHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -70,6 +72,27 @@ foreach ($categories as $key => $productName) {
             ")
             ->groupBy('tipe_arus')
             ->get();
+
+            /*
+|--------------------------------------------------------------------------
+| National Trade Snapshot - 2025
+|--------------------------------------------------------------------------
+*/
+            $export2025 = (float) (
+                $annualTrend
+                    ->firstWhere('tipe_arus', 'ekspor')
+                    ?->{'2025'} ?? 0
+            );
+
+            $import2025 = (float) (
+                $annualTrend
+                    ->firstWhere('tipe_arus', 'impor')
+                    ?->{'2025'} ?? 0
+            );
+
+            $tradeBalance2025 =
+                $export2025 - $import2025;
+
 
         // 2. Ambil Data Perbandingan Jan-Feb (2025 vs 2026)
         $monthlyCompare = DB::table('trade_analytics_monthly')
@@ -143,9 +166,302 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
     // Jumlah perusahaan di Directory
 
       $totalCompanies = Company::count();
+
+      /*
+|--------------------------------------------------------------------------
+| User & Company Context
+|--------------------------------------------------------------------------
+*/
+
+$user = auth()->user();
+
+$company = null;
+
+if ($user?->company_id) {
+    $company = Company::query()
+        ->select([
+            'id',
+            'nama_perusahaan',
+            'membership_type',
+            'status_verifikasi',
+        ])
+        ->find($user->company_id);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Digital Directory Program
+|--------------------------------------------------------------------------
+*/
+
+$digitalDirectoryProgram =
+    DigitalDirectoryParticipant::query()
+        ->where(
+            'user_id',
+            $user->id
+        )
+        ->latest()
+        ->first();
         
+$annualSummary = [];
+
+foreach (range(2019, 2025) as $year) {
+
+    $column = "val_{$year}";
+
+    $export = (float) DB::table('trade_master_annual_hscode')
+        ->where('tipe_arus', 'ekspor')
+        ->sum($column);
+
+    $import = (float) DB::table('trade_master_annual_hscode')
+        ->where('tipe_arus', 'impor')
+        ->sum($column);
+
+    $annualSummary[(string) $year] = [
+        'exportValue' => $export,
+        'importValue' => $import,
+        'tradeBalance' => $export - $import,
+    ];
+}
+
+        
+/*
+|--------------------------------------------------------------------------
+| Trade Intelligence Dashboard
+|--------------------------------------------------------------------------
+*/
+
+$tradeDashboard = [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dataset Summary
+    |--------------------------------------------------------------------------
+    */
+    'annualSummary' => $annualSummary,
+    
+    'summary' => [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trade Value — Latest Complete Annual Dataset
+    |--------------------------------------------------------------------------
+    */
+
+    'exportValue' =>
+        $export2025,
+
+    'importValue' =>
+        $import2025,
+
+    'tradeBalance' =>
+        $tradeBalance2025,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dataset Coverage
+    |--------------------------------------------------------------------------
+    */
+
+    'countries' =>
+        DB::table('trade_master_annual_country')
+            ->whereNotNull('nama_negara')
+            ->whereRaw("TRIM(nama_negara) <> ''")
+            ->distinct()
+            ->count('nama_negara'),
+
+    'hsCodes' =>
+        DB::table('trade_master_annual_hscode')
+            ->whereNotNull('hs_code')
+            ->whereRaw("TRIM(hs_code) <> ''")
+            ->distinct()
+            ->count('hs_code'),
+
+    'records' =>
+        DB::table('trade_master_annual_hscode')
+            ->count(),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Metadata
+    |--------------------------------------------------------------------------
+    */
+
+    'lastUpdate' =>
+        now()->format('d M Y'),
+
+    'source' =>
+        'Kemendag RI',
+
+    'coverage' =>
+        '2019–2025',
+],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Annual Trade Trend
+    |--------------------------------------------------------------------------
+    */
+
+    'trend' => $annualTrend,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Top Countries
+    |--------------------------------------------------------------------------
+    */
+
+    'topCountries' =>
+        DB::table('trade_master_annual_country')
+            ->selectRaw("
+                TRIM(nama_negara) as name,
+                tipe_arus,
+                SUM(val_2025) as value
+            ")
+            ->whereNotNull('nama_negara')
+            ->groupBy(
+                'nama_negara',
+                'tipe_arus'
+            )
+            ->orderByDesc('value')
+            ->limit(20)
+            ->get(),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Top HS Codes
+    |--------------------------------------------------------------------------
+    */
+
+    'topHsCodes' =>
+    DB::table('trade_master_annual_hscode')
+        ->selectRaw("
+            hs_code as code,
+            TRIM(produk) as product,
+            tipe_arus,
+            SUM(val_2025) as value
+        ")
+        ->whereNotNull('hs_code')
+        ->groupBy(
+            'hs_code',
+            'produk',
+            'tipe_arus'
+        )
+        ->orderByDesc('value')
+        ->limit(20)
+        ->get(),
+
+/*
+|--------------------------------------------------------------------------
+| Filter Options
+|--------------------------------------------------------------------------
+*/
+
+'filterOptions' => [
+
+    'years' => [
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+    ],
+
+    'countries' =>
+        DB::table('trade_master_annual_country')
+            ->selectRaw("
+                id_negara as code,
+                TRIM(nama_negara) as name
+            ")
+            ->whereNotNull('nama_negara')
+            ->whereRaw("TRIM(nama_negara) <> ''")
+            ->groupBy(
+                'id_negara',
+                'nama_negara'
+            )
+            ->orderBy('nama_negara')
+            ->get(),
+
+    'hsCodes' =>
+        DB::table('trade_master_annual_hscode')
+            ->selectRaw("
+                hs_code as code,
+                TRIM(uraian_hs) as description
+            ")
+            ->whereNotNull('hs_code')
+            ->whereRaw("TRIM(hs_code) <> ''")
+            ->groupBy(
+                'hs_code',
+                'uraian_hs'
+            )
+            ->orderBy('hs_code')
+            ->get(),
+],
+
+];
         // Kirim data ke React (Dashboard.jsx)
         return Inertia::render('Dashboard', [
+            
+        'tradeDashboard' => $tradeDashboard,
+       
+        'companyContext' => [
+    'company' =>
+        $company
+            ? [
+                'id' =>
+                    $company->id,
+
+                'name' =>
+                    $company->nama_perusahaan,
+
+                'membership_type' =>
+                    $company->membership_type,
+
+                'verification_status' =>
+                    $company->status_verifikasi,
+            ]
+            : null,
+
+    'program' =>
+        $digitalDirectoryProgram
+            ? [
+                'id' =>
+                    $digitalDirectoryProgram->id,
+
+                'package' =>
+                    $digitalDirectoryProgram->package,
+
+                'payment_status' =>
+                    $digitalDirectoryProgram->payment_status,
+
+                'activation_status' =>
+                    $digitalDirectoryProgram->activation_status,
+
+                'company_passport_active' =>
+                    (bool) $digitalDirectoryProgram
+                        ->company_passport_active,
+
+                'visibility_score_active' =>
+                    (bool) $digitalDirectoryProgram
+                        ->visibility_score_active,
+
+                'executive_dashboard_active' =>
+                    (bool) $digitalDirectoryProgram
+                        ->executive_dashboard_active,
+
+                'smart_matching_active' =>
+                    (bool) $digitalDirectoryProgram
+                        ->smart_matching_active,
+
+                'build_supply_chain_active' =>
+                    (bool) $digitalDirectoryProgram
+                        ->build_supply_chain_active,
+            ]
+            : null,
+],
+        
         // Jumlah perusahaan di direktory
          'totalCompanies' => $totalCompanies,   
         // Data Analitik Perdagangan
@@ -177,10 +493,17 @@ $history = MarketHistory::orderBy('date', 'desc')->take(30)->get()->reverse()->v
 
 'monthlyComparisonPieces' => $this->trade->monthlyComparisonPieces(),
               'memberStatus' => auth()->user()->is_premium ? 'Premium Member' : 'Regular Member',
-            'exportValue' => '11.9', // Nanti bisa dihitung dinamis dari $annualTrend
+            'exportValue' => $export2025,
+
+            'importValue' => $import2025,
+
+            'tradeBalance' => $tradeBalance2025,
+
+            'tradeYear' => 2025, // Nanti bisa dihitung dinamis dari $annualTrend
+            
             'lastUpdate' => now()->format('d M Y')
-        ]);
-    }
+                    ]);
+                }
 private function getFiberIntelligence() 
 {
     $years = ['2019', '2020', '2021', '2022', '2023', '2024', '2025'];

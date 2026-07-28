@@ -1,5 +1,5 @@
 import { Link, usePage, router } from "@inertiajs/react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 import { Menu, X, ChevronDown } from "lucide-react";
 
@@ -7,6 +7,23 @@ export default function PublicNavbar() {
     const { props } = usePage();
 
     const isEn = props.locale === "en";
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication & Program
+    |--------------------------------------------------------------------------
+    */
+
+    const user = props.auth?.user ?? null;
+
+    const isLoggedIn = Boolean(user);
+
+    const hasDigitalDirectoryProgram = Boolean(
+        props.auth?.has_digital_directory_program,
+    );
+
+    const digitalDirectoryProgram =
+        props.auth?.digital_directory_program ?? null;
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -364,32 +381,33 @@ export default function PublicNavbar() {
                                 {intelligenceLinks.map((item, index) => {
                                     if (item.section) {
                                         return (
-                                            <>
+                                            <Fragment
+                                                key={`section-${item.section}-${index}`}
+                                            >
                                                 {index !== 0 && (
-                                                    <div className="border-t my-2" />
+                                                    <div className="my-2 border-t border-slate-200" />
                                                 )}
 
                                                 <div
-                                                    key={index}
                                                     className="
-                    px-4
-                    pt-2
-                    pb-1
-                    text-[10px]
-                    font-black
-                    tracking-[0.2em]
-                    text-slate-400
-                "
+                        px-4
+                        pt-2
+                        pb-1
+                        text-[10px]
+                        font-black
+                        tracking-[0.2em]
+                        text-slate-400
+                    "
                                                 >
                                                     {item.section}
                                                 </div>
-                                            </>
+                                            </Fragment>
                                         );
                                     }
 
                                     return (
                                         <Link
-                                            key={index}
+                                            key={`link-${item.routeName}-${index}`}
                                             href={route(item.routeName)}
                                             className={dropdownItemStyle}
                                         >
@@ -485,12 +503,93 @@ export default function PublicNavbar() {
 
                         {/* LOGIN BUTTON */}
 
-                        <Link
-                            href={route("login")}
-                            className="bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-md"
-                        >
-                            {isEn ? "Login" : "Masuk"}
-                        </Link>
+                        {/* AUTH / PROGRAM */}
+
+                        {!isLoggedIn ? (
+                            /*
+    |--------------------------------------------------------------------------
+    | Guest
+    |--------------------------------------------------------------------------
+    */
+
+                            <Link
+                                href={route("login")}
+                                className="
+            bg-gradient-to-r
+            from-amber-500
+            to-yellow-500
+            text-slate-900
+            px-6
+            py-2.5
+            rounded-xl
+            text-[10px]
+            font-black
+            uppercase
+            tracking-widest
+            hover:scale-105
+            transition-all
+            shadow-md
+        "
+                            >
+                                {isEn ? "Login" : "Masuk"}
+                            </Link>
+                        ) : (
+                            <div className="flex items-center gap-3">
+                                {/* Program Portal */}
+
+                                {hasDigitalDirectoryProgram && (
+                                    <Link
+                                        href={route(
+                                            "program.digital-directory.portal",
+                                        )}
+                                        className="
+                    rounded-xl
+                    border
+                    border-emerald-200
+                    bg-emerald-50
+                    px-4
+                    py-2.5
+                    text-[10px]
+                    font-black
+                    uppercase
+                    tracking-widest
+                    text-emerald-700
+                    transition
+                    hover:border-emerald-300
+                    hover:bg-emerald-100
+                "
+                                    >
+                                        {isEn
+                                            ? "Program Portal"
+                                            : "Portal Program"}
+                                    </Link>
+                                )}
+
+                                {/* Dashboard */}
+
+                                <Link
+                                    href={route("dashboard")}
+                                    className="
+                bg-gradient-to-r
+                from-amber-500
+                to-yellow-500
+                text-slate-900
+                px-5
+                py-2.5
+                rounded-xl
+                text-[10px]
+                font-black
+                uppercase
+                tracking-widest
+                hover:scale-105
+                transition-all
+                shadow-md
+            "
+                                >
+                                    {isEn ? "Dashboard" : "Dashboard"}
+                                </Link>
+                            </div>
+                        )}
                     </div>
 
                     {/* MOBILE BUTTON */}
@@ -592,12 +691,94 @@ export default function PublicNavbar() {
                             ))}
                         </div>
 
-                        <Link
-                            href={route("login")}
-                            className="mt-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 px-4 py-3 rounded-xl text-center font-bold"
-                        >
-                            {isEn ? "Login" : "Masuk"}
-                        </Link>
+                        {/* AUTH / PROGRAM */}
+
+                        {!isLoggedIn ? (
+                            <Link
+                                href={route("login")}
+                                className="
+            mt-2
+            bg-gradient-to-r
+            from-amber-500
+            to-yellow-500
+            text-slate-900
+            px-4
+            py-3
+            rounded-xl
+            text-center
+            font-bold
+        "
+                            >
+                                {isEn ? "Login" : "Masuk"}
+                            </Link>
+                        ) : (
+                            <div className="mt-2 space-y-3">
+                                {/* Program Portal */}
+
+                                {hasDigitalDirectoryProgram && (
+                                    <Link
+                                        href={route(
+                                            "program.digital-directory.portal",
+                                        )}
+                                        onClick={() => setIsOpen(false)}
+                                        className="
+                    block
+                    rounded-xl
+                    border
+                    border-emerald-200
+                    bg-emerald-50
+                    px-4
+                    py-3
+                    text-center
+                    text-sm
+                    font-black
+                    text-emerald-700
+                "
+                                    >
+                                        {isEn
+                                            ? "Program Portal"
+                                            : "Portal Program"}
+
+                                        {digitalDirectoryProgram?.package && (
+                                            <span
+                                                className="
+                            mt-1
+                            block
+                            text-[10px]
+                            font-semibold
+                            text-emerald-600
+                        "
+                                            >
+                                                {
+                                                    digitalDirectoryProgram.package
+                                                }
+                                            </span>
+                                        )}
+                                    </Link>
+                                )}
+
+                                {/* Dashboard */}
+
+                                <Link
+                                    href={route("dashboard")}
+                                    onClick={() => setIsOpen(false)}
+                                    className="
+                block
+                bg-gradient-to-r
+                from-amber-500
+                to-yellow-500
+                text-slate-900
+                px-4
+                py-3
+                rounded-xl
+                text-center
+                font-bold
+            "
+                                >
+                                    Dashboard
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

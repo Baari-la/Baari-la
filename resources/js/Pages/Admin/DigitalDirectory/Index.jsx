@@ -38,7 +38,12 @@ export default function Index({ participants, stats }) {
 
                     <StatCard
                         title="Revenue"
-                        value={`Rp ${stats.revenue}`}
+                        value={new Intl.NumberFormat("id-ID", {
+                            style: "currency",
+                            currency: "IDR",
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                        }).format(Number(stats.revenue ?? 0))}
                         icon={<CreditCard />}
                     />
 
@@ -143,7 +148,9 @@ export default function Index({ participants, stats }) {
                                 >
                                     <td className="p-5">
                                         <div className="font-bold">
-                                            {participant.company_name}
+                                            {participant.company
+                                                ?.nama_perusahaan ||
+                                                participant.company_name}
                                         </div>
 
                                         <div

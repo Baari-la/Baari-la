@@ -64,30 +64,51 @@ export default function Dashboard({
     usd_idr,
     cottonPrice,
     exportValue,
+    importValue,
+    tradeBalance,
+    tradeYear,
     totalCompanies,
     tradeDashboard,
     memberStatus,
+    companyContext = {},
 }) {
     // AMBIL SEMUA DATA DARI usePage
     const { auth, locale } = usePage().props;
     const isEn = locale === "en" || auth?.user?.locale === "en";
     const {
         summary = {},
+        annualSummary = {},
         trend = [],
         topCountries = [],
         topHsCodes = [],
+        filterOptions = {},
     } = tradeDashboard ?? {};
 
-    const [filters, setFilters] = useState({
-        trade_flow: "",
-        year: "",
-    });
+    const { years = [], countries = [], hsCodes = [] } = filterOptions;
 
-    const handleFilterChange = (key, value) => {
-        setFilters((prev) => ({
-            ...prev,
-            [key]: value,
-        }));
+    const [filters, setFilters] = useState({
+        year: "2025",
+        tradeFlow: "all",
+        country: "",
+        hsCode: "",
+        keyword: "",
+    });
+    const selectedAnnualSummary = annualSummary?.[filters.year] ?? {};
+
+    const filteredSummary = {
+        ...summary,
+
+        exportValue: Number(
+            selectedAnnualSummary.exportValue ?? summary.exportValue ?? 0,
+        ),
+
+        importValue: Number(
+            selectedAnnualSummary.importValue ?? summary.importValue ?? 0,
+        ),
+
+        tradeBalance: Number(
+            selectedAnnualSummary.tradeBalance ?? summary.tradeBalance ?? 0,
+        ),
     };
 
     // 🕵️ MATRIKS EKSTRAKSI OTOMATIS BARIS TERAKHIR TABEL MARKET_HISTORIES (ID 46)
@@ -124,6 +145,9 @@ export default function Dashboard({
         downloadLink.click();
     };
 
+    const company = companyContext?.company ?? null;
+    const program = companyContext?.program ?? null;
+
     return (
         <AuthenticatedLayout
             header={
@@ -136,53 +160,242 @@ export default function Dashboard({
 
             <div className="py-12 bg-gray-50">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {/* --- SECTION: UPDATE DATA PERUSAHAAN --- */}
-                    <div className="mb-10 bg-gradient-to-r from-[#0f172a] to-[#1e293b] p-8 rounded-[40px] border border-white/10 shadow-2xl flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex items-center gap-6">
-                            <div className="bg-yellow-500/20 w-16 h-16 rounded-3xl flex items-center justify-center border border-yellow-500/30">
-                                <i className="fas fa-building text-yellow-500 text-2xl"></i>
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">
-                                    {isEn
-                                        ? "Corporate Data Integrity"
-                                        : "Integritas Data Perusahaan"}
-                                </h2>
-                                <p className="text-gray-400 text-xs mt-1 max-w-md">
-                                    {isEn
-                                        ? "Keep your industrial profile updated to ensure Big Data accuracy for the national textile ecosystem."
-                                        : "Pastikan profil industri Anda mutakhir untuk akurasi Big Data ekosistem pertekstilan nasional."}
-                                </p>
-                            </div>
-                        </div>
-                        {auth.user.company_id && (
-                            <Link
-                                href={route(
-                                    "companies.edit",
-                                    auth.user.company_id,
-                                )}
-                                className="group bg-yellow-500 text-[#0a192f] px-10 py-4 rounded-full font-black text-[11px] uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-xl shadow-yellow-500/10 flex items-center gap-3 whitespace-nowrap"
-                            >
-                                <i className="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-500"></i>
-                                {isEn
-                                    ? "Update Corporate Profile"
-                                    : "Update Profil Perusahaan"}
-                            </Link>
-                        )}
-
-                        {/* OPSIONAL: TAMPILKAN PESAN JIKA TIDAK ADA COMPANY ID */}
-                        {!auth.user.company_id && (
-                            <p className="text-amber-500 text-[10px] font-bold italic">
-                                *Data profil belum terhubung. Hubungi Admin API.
-                            </p>
-                        )}
-                    </div>
-
                     {/* --- WELCOME BANNER --- */}
                     <WelcomeBanner
                         user={auth.user}
                         memberStatus={memberStatus}
                     />
+
+                    {/* --- SECTION: UPDATE DATA PERUSAHAAN --- */}
+                    {/* =========================================================
+    YOUR COMPANY
+========================================================= */}
+
+                    <section
+                        className="
+        mb-8
+        overflow-hidden
+        rounded-[32px]
+        border
+        border-slate-200
+        bg-white
+        shadow-sm
+    "
+                    >
+                        {/* Header */}
+
+                        <div
+                            className="
+            flex
+            flex-col
+            gap-6
+            border-b
+            border-slate-100
+            px-7
+            py-6
+            lg:flex-row
+            lg:items-center
+            lg:justify-between
+        "
+                        >
+                            <div>
+                                <p
+                                    className="
+                    text-[11px]
+                    font-black
+                    uppercase
+                    tracking-[0.2em]
+                    text-slate-400
+                "
+                                >
+                                    {isEn ? "Your Company" : "Perusahaan Anda"}
+                                </p>
+
+                                <div className="mt-2 flex flex-wrap items-center gap-3">
+                                    <h2
+                                        className="
+                        text-2xl
+                        font-black
+                        tracking-tight
+                        text-slate-900
+                        lg:text-3xl
+                    "
+                                    >
+                                        {company?.name ||
+                                            (isEn
+                                                ? "No company connected"
+                                                : "Belum ada perusahaan terhubung")}
+                                    </h2>
+
+                                    {company?.verification_status ===
+                                        "verified" && (
+                                        <span
+                                            className="
+                            inline-flex
+                            items-center
+                            rounded-full
+                            bg-emerald-50
+                            px-3
+                            py-1
+                            text-[10px]
+                            font-black
+                            uppercase
+                            tracking-wider
+                            text-emerald-700
+                        "
+                                        >
+                                            {isEn
+                                                ? "Verified"
+                                                : "Terverifikasi"}
+                                        </span>
+                                    )}
+                                </div>
+
+                                <p className="mt-2 text-sm text-slate-500">
+                                    {company
+                                        ? isEn
+                                            ? "Your connected company in the DIGESTEX industrial ecosystem."
+                                            : "Perusahaan Anda yang terhubung dalam ekosistem industri DIGESTEX."
+                                        : isEn
+                                          ? "Connect your company to access company intelligence and business services."
+                                          : "Hubungkan perusahaan untuk mengakses intelligence perusahaan dan layanan bisnis."}
+                                </p>
+                            </div>
+
+                            {/* Actions */}
+
+                            {company && (
+                                <div className="flex flex-wrap gap-3">
+                                    <Link
+                                        href={route(
+                                            "companies.edit",
+                                            company.id,
+                                        )}
+                                        className="
+                        inline-flex
+                        items-center
+                        rounded-xl
+                        border
+                        border-slate-200
+                        bg-white
+                        px-5
+                        py-3
+                        text-xs
+                        font-black
+                        uppercase
+                        tracking-wider
+                        text-slate-700
+                        transition
+                        hover:border-slate-300
+                        hover:bg-slate-50
+                    "
+                                    >
+                                        {isEn
+                                            ? "Company Profile"
+                                            : "Profil Perusahaan"}
+                                    </Link>
+
+                                    {program && (
+                                        <Link
+                                            href={route(
+                                                "program.digital-directory.portal",
+                                            )}
+                                            className="
+                            inline-flex
+                            items-center
+                            rounded-xl
+                            bg-slate-900
+                            px-5
+                            py-3
+                            text-xs
+                            font-black
+                            uppercase
+                            tracking-wider
+                            text-white
+                            transition
+                            hover:bg-slate-800
+                        "
+                                        >
+                                            {isEn
+                                                ? "Program Portal →"
+                                                : "Portal Program →"}
+                                        </Link>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Company / Program Overview */}
+
+                        {company && (
+                            <div
+                                className="
+                grid
+                divide-y
+                divide-slate-100
+                sm:grid-cols-2
+                sm:divide-x
+                sm:divide-y-0
+                lg:grid-cols-4
+            "
+                            >
+                                <CompanyMetric
+                                    label={
+                                        isEn
+                                            ? "Company Status"
+                                            : "Status Perusahaan"
+                                    }
+                                    value={
+                                        company.verification_status ===
+                                        "verified"
+                                            ? isEn
+                                                ? "Verified Company"
+                                                : "Perusahaan Terverifikasi"
+                                            : company.verification_status || "-"
+                                    }
+                                />
+
+                                <CompanyMetric
+                                    label={isEn ? "Program" : "Program"}
+                                    value={
+                                        program?.package ||
+                                        (isEn
+                                            ? "Not Enrolled"
+                                            : "Belum Terdaftar")
+                                    }
+                                />
+
+                                <CompanyMetric
+                                    label={
+                                        isEn
+                                            ? "Program Status"
+                                            : "Status Program"
+                                    }
+                                    value={
+                                        program?.activation_status
+                                            ? program.activation_status
+                                                  .charAt(0)
+                                                  .toUpperCase() +
+                                              program.activation_status.slice(1)
+                                            : "-"
+                                    }
+                                    active={
+                                        program?.activation_status === "active"
+                                    }
+                                />
+
+                                <CompanyMetric
+                                    label="Digital Company Passport™"
+                                    value={
+                                        program?.company_passport_active
+                                            ? "Active"
+                                            : "Inactive"
+                                    }
+                                    active={program?.company_passport_active}
+                                />
+                            </div>
+                        )}
+                    </section>
 
                     <div className="mb-8">
                         <StockTicker topStocks={[]} />
@@ -194,21 +407,21 @@ export default function Dashboard({
                         cottonTrend={cottonTrend}
                         liveExchangeRate={liveExchangeRate}
                         exportValue={exportValue}
+                        importValue={importValue}
+                        tradeBalance={tradeBalance}
+                        tradeYear={tradeYear}
                         totalCompanies={totalCompanies}
                     />
-                    <DashboardHeader
-                        summary={summary}
-                        filters={filters}
-                        onFilterChange={handleFilterChange}
-                    />
+                    <DashboardHeader summary={summary} />
                     <DashboardFilterBar
                         filters={filters}
                         setFilters={setFilters}
-                        years={[2025, 2026]}
-                        countries={[]}
-                        hsCodes={[]}
+                        years={years}
+                        countries={countries}
+                        hsCodes={hsCodes}
                     />
-                    <SummaryCards summary={summary} />
+
+                    <SummaryCards summary={filteredSummary} />
                     {/* --- LINK CEPAT DEEP INTELLIGENCE --- */}
                     <Link
                         href={route("intelligence.center")}
@@ -361,5 +574,61 @@ export default function Dashboard({
                 </div>
             </div>
         </AuthenticatedLayout>
+    );
+}
+/*
+|--------------------------------------------------------------------------
+| Company Metric
+|--------------------------------------------------------------------------
+*/
+
+function CompanyMetric({ label, value, active = false }) {
+    return (
+        <div
+            className="
+                min-w-0
+                px-6
+                py-5
+                transition
+                hover:bg-slate-50/70
+            "
+        >
+            <p
+                className="
+                    text-[10px]
+                    font-black
+                    uppercase
+                    tracking-[0.16em]
+                    text-slate-400
+                "
+            >
+                {label}
+            </p>
+
+            <div className="mt-2 flex min-w-0 items-center gap-2">
+                {active && (
+                    <span
+                        className="
+                            h-2
+                            w-2
+                            shrink-0
+                            rounded-full
+                            bg-emerald-500
+                        "
+                    />
+                )}
+
+                <p
+                    className={`
+                        min-w-0
+                        text-sm
+                        font-black
+                        ${active ? "text-emerald-700" : "text-slate-800"}
+                    `}
+                >
+                    {value || "-"}
+                </p>
+            </div>
+        </div>
     );
 }

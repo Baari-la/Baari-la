@@ -15,12 +15,8 @@ export default function ProgramNavbar({ currentStep = 1 }) {
             {
                 preserveScroll: true,
                 preserveState: true,
-                onSuccess: () => {
-                    console.log("Language changed to:", lang);
-                },
-                onError: (errors) => {
-                    console.log(errors);
-                },
+                onSuccess: () => {},
+                onError: (errors) => {},
             },
         );
     };

@@ -29,7 +29,6 @@ class PurchaseOrderPaymentController extends Controller
                     'Only buyer can upload payment.',
             ]);
         }
-// dd($request->all());
        $validated = $request->validate([
     'amount' => [
         'required',

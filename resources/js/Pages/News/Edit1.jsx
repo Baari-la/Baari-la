@@ -40,7 +40,7 @@ export default function Edit({ news }) {
 
     const submit = (e) => {
         e.preventDefault();
-        console.log("UPDATE CLICKED");
+
         put(route("admin.news.update", news.slug));
     };
 

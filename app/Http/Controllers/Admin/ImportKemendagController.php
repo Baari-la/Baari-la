@@ -36,7 +36,6 @@ class ImportKemendagController extends Controller
         ]);
 
         try {
-// dd('SEBELUM IMPORT');
         
             $summary = $importService->import(
                 $request->file('file_excel')->getRealPath()

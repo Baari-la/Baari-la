@@ -288,45 +288,61 @@ export default function Show({ participant }) {
                         Reject
                     </button>
 
-                    <button
-                        onClick={() =>
-                            router.post(
-                                route(
-                                    "admin.digital-directory.activate",
-                                    participant.id,
-                                ),
-                            )
-                        }
-                        className="
-                            rounded-2xl
-                            border
-                            px-6
-                            py-4
-                            font-bold
-                        "
-                    >
-                        Activate
-                    </button>
+                    {participant.activation_status !== "active" && (
+                        <button
+                            onClick={() =>
+                                router.post(
+                                    route(
+                                        "admin.digital-directory.activate",
+                                        participant.id,
+                                    ),
+                                )
+                            }
+                            className="
+            rounded-2xl
+            bg-emerald-600
+            px-6
+            py-4
+            font-bold
+            text-white
+            transition
+            hover:bg-emerald-700
+        "
+                        >
+                            Activate
+                        </button>
+                    )}
 
-                    <button
-                        onClick={() =>
-                            router.post(
-                                route(
-                                    "admin.digital-directory.deactivate",
-                                    participant.id,
-                                ),
-                            )
-                        }
-                        className="
-                            rounded-2xl
-                            border
-                            px-6
-                            py-4
-                            font-bold
-                        "
-                    >
-                        Deactivate
-                    </button>
+                    {participant.activation_status === "active" && (
+                        <button
+                            onClick={() => {
+                                if (
+                                    window.confirm(
+                                        "Deactivate this program? Program services will be disabled.",
+                                    )
+                                ) {
+                                    router.post(
+                                        route(
+                                            "admin.digital-directory.deactivate",
+                                            participant.id,
+                                        ),
+                                    );
+                                }
+                            }}
+                            className="
+            rounded-2xl
+            bg-red-50
+            px-6
+            py-4
+            font-bold
+            text-red-700
+            transition
+            hover:bg-red-100
+        "
+                        >
+                            Deactivate
+                        </button>
+                    )}
                 </div>
             </div>
         </AdminLayout>

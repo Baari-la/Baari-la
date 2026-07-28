@@ -10,8 +10,9 @@ import {
 export default function SummaryCards({ summary = {} }) {
     const exportValue = Number(summary.exportValue ?? 0);
     const importValue = Number(summary.importValue ?? 0);
-
-    const tradeBalance = exportValue - importValue;
+    const tradeBalance = Number(
+        summary.tradeBalance ?? exportValue - importValue,
+    );
 
     const formatCurrency = (value) => {
         return new Intl.NumberFormat("en-US", {
@@ -39,7 +40,10 @@ export default function SummaryCards({ summary = {} }) {
 
         {
             title: "Trade Balance",
-            value: `$ ${formatCurrency(tradeBalance)}`,
+            value:
+                tradeBalance >= 0
+                    ? `+$ ${formatCurrency(tradeBalance)}`
+                    : `-$ ${formatCurrency(Math.abs(tradeBalance))}`,
             icon: Scale,
             color: tradeBalance >= 0 ? "text-blue-600" : "text-orange-600",
             bg: tradeBalance >= 0 ? "bg-blue-50" : "bg-orange-50",

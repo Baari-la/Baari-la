@@ -202,8 +202,7 @@ class RfqController extends Controller
         'quotations.company',
     ]);
 
-    //  dd($rfq->toArray());
-
+    
     return Inertia::render(
         'RFQ/Show',
         [

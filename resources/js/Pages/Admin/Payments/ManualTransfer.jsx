@@ -1,6 +1,6 @@
 import AdminLayout from "@/Layouts/AdminLayout";
 
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 
 import {
     Landmark,
@@ -8,6 +8,7 @@ import {
     XCircle,
     Clock3,
     ArrowRight,
+    FileText,
 } from "lucide-react";
 
 export default function ManualTransfer({
@@ -15,6 +16,40 @@ export default function ManualTransfer({
         data: [],
     },
 }) {
+    /*
+|--------------------------------------------------------------------------
+| Payment Actions
+|--------------------------------------------------------------------------
+*/
+
+    const approvePayment = (item) => {
+        if (!window.confirm(`Approve payment from ${item.company_name}?`)) {
+            return;
+        }
+
+        router.post(
+            route("admin.payments.manual-transfer.approve", item.id),
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    };
+
+    const rejectPayment = (item) => {
+        if (!window.confirm(`Reject payment from ${item.company_name}?`)) {
+            return;
+        }
+
+        router.post(
+            route("admin.payments.manual-transfer.reject", item.id),
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    };
+
     return (
         <AdminLayout>
             <div className="space-y-8">

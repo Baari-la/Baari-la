@@ -46,6 +46,11 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\DirectoryVisibilityProgramController;
+use App\Http\Controllers\ProgramPortalController;
+
+
 
 
 /*
@@ -542,13 +547,42 @@ Route::post(
     [SupplierReviewController::class, 'store']
 )->name('purchase-orders.review.store');
 
+
+// Claim compnaies
+/*
+|--------------------------------------------------------------------------
+| Ownership Verification
+|--------------------------------------------------------------------------
+*/
+
+// Manual company
+Route::get(
+    '/onboarding/ownership-verification',
+    [CompanyClaimController::class, 'createManual']
+)->name('companies.claim.create-manual');
+
+
+// Submit ownership verification
 Route::post(
-            '/companies/{company}/claim',
-            [CompanyClaimController::class, 'store']
-        )
-        ->name(
-            'companies.claim'
-        );
+    '/onboarding/ownership-verification',
+    [CompanyClaimController::class, 'store']
+)->name('companies.claim.store');
+
+
+// Success / pending page
+// HARUS sebelum /{company}
+Route::get(
+    '/onboarding/ownership-verification/submitted',
+    [CompanyClaimController::class, 'submitted']
+)->name('companies.claim.submitted');
+
+
+// Existing company
+// Letakkan PALING BAWAH
+Route::get(
+    '/onboarding/ownership-verification/{company}',
+    [CompanyClaimController::class, 'create']
+)->name('companies.claim.create');
 
 // Digital Passport
 Route::get(
@@ -729,7 +763,133 @@ Route::get('/cotton-intelligence', function () {
     return Inertia::render('Intelligence/Cotton/Index');
 })->name('cotton-intelligence');
     
+// Login program digital directory
+
+Route::get(
+    '/program/digital-directory/portal',
+    [
+        ProgramPortalController::class,
+        'index',
+    ]
+)
+    ->middleware('auth')
+    ->name(
+        'program.digital-directory.portal'
+    );
+
+
+
 // Digital Directory
+Route::middleware([
+    'auth',
+    'verified',
+])->group(function () {
+
+    Route::get(
+        '/onboarding/company-information',
+        function () {
+            return Inertia::render(
+                'Onboarding/CompanyInformation'
+            );
+        }
+    )->name('onboarding.company-information');
+
+    Route::get(
+    '/onboarding/company-lookup',
+    [OnboardingController::class, 'companyLookup']
+)->name('onboarding.company-lookup');
+
+Route::get(
+    '/claims',
+    [AdminCompanyController::class, 'claims']
+)->name('claims');
+
+Route::post(
+    '/claims/{claim}/approve',
+    [AdminDashboardController::class, 'approveClaim']
+)->name('claims.approve');
+
+Route::post(
+    '/claims/{claim}/reject',
+    [AdminDashboardController::class, 'rejectClaim']
+)->name('claims.reject');
+
+Route::post(
+    '/onboarding/company-information',
+    [OnboardingController::class,
+    'storeCompanyInformation']
+)->name(
+    'onboarding.company-information.store'
+);
+
+Route::post(
+    '/onboarding/business-information',
+    [OnboardingController::class,
+    'storeBusinessInformation']
+)->name(
+    'onboarding.business-information.store'
+);
+
+Route::post(
+    '/onboarding/capabilities',
+    [OnboardingController::class,
+    'storeCapabilities']
+)->name(
+    'onboarding.capabilities.store'
+);
+
+Route::post(
+    '/onboarding/manufacturing',
+    [OnboardingController::class,
+    'storeManufacturing']
+)->name(
+    'onboarding.manufacturing.store'
+);
+
+Route::post(
+    '/onboarding/media-catalog',
+    [OnboardingController::class,
+    'storeMediaCatalog']
+)->name(
+    'onboarding.media-catalog.store'
+);
+
+Route::post(
+    '/onboarding/review-submit',
+    [OnboardingController::class,
+    'submitReview']
+)->name(
+    'onboarding.review-submit.store'
+);
+     
+ Route::get(
+        '/onboarding/business-information',
+        [OnboardingController::class, 'businessInformation']
+    )->name('onboarding.business-information');
+
+    Route::get(
+        '/onboarding/capabilities',
+        [OnboardingController::class, 'capabilities']
+    )->name('onboarding.capabilities');
+
+    Route::get(
+        '/onboarding/manufacturing',
+        [OnboardingController::class, 'manufacturing']
+    )->name('onboarding.manufacturing');
+
+    Route::get(
+        '/onboarding/media-catalog',
+        [OnboardingController::class, 'mediaCatalog']
+    )->name('onboarding.media-catalog');
+
+    Route::get(
+        '/onboarding/review-submit',
+        [OnboardingController::class, 'reviewSubmit']
+    )->name('onboarding.review-submit');
+});
+
+// Direktory digital
+
 Route::middleware(['auth', 'verified'])
     ->get('/welcome', function () {
         return Inertia::render(
@@ -738,9 +898,27 @@ Route::middleware(['auth', 'verified'])
     })
     ->name('welcome');
     
-Route::prefix(
-    'program/digital-directory'
-)->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Landing Page
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/program/digital-directory',
+    [
+        DirectoryVisibilityProgramController::class,
+        'index',
+    ]
+)->name('program.digital-directory');
+
+/*
+|--------------------------------------------------------------------------
+| Registration Wizard
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('program/digital-directory/register')->group(function () {
 
     Route::get(
         '/',
@@ -748,9 +926,7 @@ Route::prefix(
             DigitalDirectoryProgramController::class,
             'step1',
         ]
-    )->name(
-        'program.digital-directory'
-    );
+    )->name('program.digital-directory.register');
 
     Route::get(
         '/package',
@@ -758,9 +934,7 @@ Route::prefix(
             DigitalDirectoryProgramController::class,
             'step2',
         ]
-    )->name(
-        'program.digital-directory.package'
-    );
+    )->name('program.digital-directory.package');
 
     Route::get(
         '/company-information',
@@ -768,9 +942,15 @@ Route::prefix(
             DigitalDirectoryProgramController::class,
             'step3',
         ]
-    )->name(
-        'program.digital-directory.company-information'
-    );
+    )->name('program.digital-directory.company-information');
+
+    Route::post(
+        '/company-information',
+        [
+            DigitalDirectoryProgramController::class,
+            'storeCompanyInformation',
+        ]
+    )->name('program.digital-directory.company-information.store');
 
     Route::get(
         '/review',
@@ -778,9 +958,7 @@ Route::prefix(
             DigitalDirectoryProgramController::class,
             'step4',
         ]
-    )->name(
-        'program.digital-directory.review'
-    );
+    )->name('program.digital-directory.review');
 
     Route::get(
         '/payment',
@@ -788,19 +966,15 @@ Route::prefix(
             DigitalDirectoryProgramController::class,
             'step5',
         ]
-    )->name(
-        'program.digital-directory.payment'
-    );
+    )->name('program.digital-directory.payment');
 
     Route::post(
-    '/program/digital-directory/payment/confirm',
-    [
-        DigitalDirectoryProgramController::class,
-        'confirmPayment',
-    ]
-)->name(
-    'program.digital-directory.payment.confirm'
-);
+        '/payment/confirm',
+        [
+            DigitalDirectoryProgramController::class,
+            'confirmPayment',
+        ]
+    )->name('program.digital-directory.payment.confirm');
 
     Route::get(
         '/welcome',
@@ -808,20 +982,9 @@ Route::prefix(
             DigitalDirectoryProgramController::class,
             'step6',
         ]
-    )->name(
-        'program.digital-directory.welcome'
-    );
+    )->name('program.digital-directory.welcome');
 
-    Route::post(
-    '/company-information',
-    [
-        DigitalDirectoryProgramController::class,
-        'storeCompanyInformation',
-    ]
-)->name(
-    'program.digital-directory.company-information.store'
-);
- });
+});
 
 
 // Route::post(
@@ -910,6 +1073,20 @@ Route::middleware(['auth', 'verified', 'admin'])
             Route::get('/verified', [DigitalDirectoryParticipantController::class, 'verified'])->name('verified');
             Route::get('/revenue', [DigitalDirectoryParticipantController::class, 'revenue'])->name('revenue');
             Route::get('/package-analytics', [DigitalDirectoryParticipantController::class, 'packageAnalytics'])->name('package-analytics');
+/*
+|--------------------------------------------------------------------------
+| Ownership Verification
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/ownership-verification',
+    [
+        DigitalDirectoryParticipantController::class,
+        'ownershipVerification',
+    ]
+)->name('ownership-verification');
+
 
             Route::post('/{participant}/verify', [DigitalDirectoryParticipantController::class, 'verify'])->name('verify');
             Route::post('/{participant}/reject', [DigitalDirectoryParticipantController::class, 'reject'])->name('reject');
@@ -981,6 +1158,14 @@ Route::prefix('payments')
                 'manualTransfer',
             ]
         )->name('manual-transfer');
+        
+        Route::get(
+            '/manual-transfer/{participant}/receipt',
+            [
+                PaymentController::class,
+                'viewManualTransferReceipt',
+            ]
+        )->name('manual-transfer.receipt');
 
         /*
         |--------------------------------------------------------------------------

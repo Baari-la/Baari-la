@@ -154,7 +154,7 @@ public function edit(News $news)
 
 public function update(Request $request, News $news)
 {
-    //   dd($request->all());
+    
     $request->validate([
         'title_id' => 'required',
         'summary_id' => 'nullable|string|max:2000',

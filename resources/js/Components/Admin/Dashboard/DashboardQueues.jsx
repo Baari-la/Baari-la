@@ -12,6 +12,7 @@ import {
 
 export default function DashboardQueues({
     pendingPayments = 0,
+    pendingProgramOwnerships = 0,
     pendingVerifications = 0,
     pendingUpdates = 0,
     pendingClaims = 0,
@@ -31,6 +32,17 @@ export default function DashboardQueues({
             href: route("admin.digital-directory.index", {
                 status: "pending_verification",
             }),
+        },
+        {
+            title: "Ownership Verification",
+
+            value: pendingProgramOwnerships,
+
+            icon: ShieldCheck,
+
+            color: "bg-orange-100 text-orange-700",
+
+            href: route("admin.digital-directory.ownership-verification"),
         },
 
         {
@@ -54,7 +66,7 @@ export default function DashboardQueues({
 
             color: "bg-violet-100 text-violet-700",
 
-            href: route("admin.dashboard"),
+            href: route("admin.pending-updates"),
         },
 
         {
@@ -66,7 +78,7 @@ export default function DashboardQueues({
 
             color: "bg-indigo-100 text-indigo-700",
 
-            href: route("admin.dashboard"),
+            href: route("admin.companies.claims"),
         },
 
         {
@@ -78,7 +90,7 @@ export default function DashboardQueues({
 
             color: "bg-pink-100 text-pink-700",
 
-            href: route("admin.dashboard"),
+            href: route("admin.users.premium"),
         },
 
         {
@@ -90,7 +102,7 @@ export default function DashboardQueues({
 
             color: "bg-emerald-100 text-emerald-700",
 
-            href: route("build-my-supply-chain.index"),
+            href: route("admin.build-my-supply-chain.index"),
         },
     ];
 

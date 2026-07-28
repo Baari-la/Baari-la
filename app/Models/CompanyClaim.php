@@ -3,12 +3,27 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CompanyClaim extends Model
 {
     protected $fillable = [
 
+        /*
+        |--------------------------------------------------------------------------
+        | Company
+        |--------------------------------------------------------------------------
+        */
+
         'company_id',
+        'claimed_company_name',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Applicant
+        |--------------------------------------------------------------------------
+        */
+
         'user_id',
 
         'full_name',
@@ -17,12 +32,44 @@ class CompanyClaim extends Model
         'email',
         'phone',
 
+        /*
+        |--------------------------------------------------------------------------
+        | Ownership Verification
+        |--------------------------------------------------------------------------
+        */
+
+        'nib',
+
+        'verification_document_type',
+        'verification_document',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notes
+        |--------------------------------------------------------------------------
+        */
+
         'notes',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Status
+        |--------------------------------------------------------------------------
+        */
 
         'status',
 
         'submitted_at',
         'reviewed_at',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Admin Review
+        |--------------------------------------------------------------------------
+        */
+
+        'reviewed_by',
+        'rejection_reason',
     ];
 
     protected $casts = [
@@ -40,17 +87,25 @@ class CompanyClaim extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(
             Company::class
         );
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(
             User::class
+        );
+    }
+
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(
+            User::class,
+            'reviewed_by'
         );
     }
 

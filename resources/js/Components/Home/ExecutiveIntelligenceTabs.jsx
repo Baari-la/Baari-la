@@ -102,10 +102,7 @@ export default function ExecutiveIntelligenceTabs({
             countries: apparelCountries,
         },
     };
-    console.log(fiberCountries[0]);
-    console.log(yarnCountries[0]);
-    console.log(fabricCountries[0]);
-    console.log(apparelCountries[0]);
+
     return (
         <section className="py-16">
             <div className="max-w-7xl mx-auto px-6">

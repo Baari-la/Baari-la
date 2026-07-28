@@ -147,7 +147,6 @@ export default function Edit({ auth, countries, company }) {
             },
         });
     };
-    // console.log("COUNTRIES", countries);
 
     return (
         <AuthenticatedLayout user={auth.user}>

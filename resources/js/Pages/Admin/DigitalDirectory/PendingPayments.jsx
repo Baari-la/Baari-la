@@ -169,17 +169,29 @@ export default function PendingPayments({ participants = [] }) {
                                                     </Link>
 
                                                     <Link
+                                                        as="button"
                                                         method="post"
                                                         href={route(
-                                                            "admin.digital-directory.verify",
+                                                            "admin.payments.manual-transfer.approve",
                                                             participant.id,
                                                         )}
+                                                        preserveScroll
+                                                        title="Verify Payment"
                                                         className="
-                                                                rounded-xl
-                                                                bg-emerald-500
-                                                                p-2
-                                                                text-white
-                                                            "
+        inline-flex
+        items-center
+        justify-center
+        rounded-xl
+        bg-emerald-500
+        p-2
+        text-white
+        transition
+        hover:bg-emerald-600
+        focus:outline-none
+        focus:ring-2
+        focus:ring-emerald-500
+        focus:ring-offset-2
+    "
                                                     >
                                                         <CheckCircle2 className="h-4 w-4" />
                                                     </Link>

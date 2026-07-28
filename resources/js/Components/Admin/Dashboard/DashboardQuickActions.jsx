@@ -29,21 +29,21 @@ export default function DashboardQuickActions() {
             title: "Transactions",
             description: "View payment transactions.",
             icon: CreditCard,
-            href: "#",
+            href: route("admin.payments.transactions"),
         },
 
         {
             title: "Build My Supply Chain™",
             description: "Generate supply chain intelligence.",
             icon: Network,
-            href: route("build-my-supply-chain.index"),
+            href: route("admin.build-my-supply-chain.index"),
         },
 
         {
             title: "Users",
             description: "Manage platform users.",
             icon: Users,
-            href: route("users.index"),
+            href: route("admin.users.index"),
         },
 
         {
@@ -96,23 +96,11 @@ export default function DashboardQuickActions() {
                                 <Icon className="h-7 w-7" />
                             </div>
 
-                            <h3
-                                className="
-                                    mt-6
-                                    text-xl
-                                    font-black
-                                "
-                            >
+                            <h3 className="mt-6 text-xl font-black">
                                 {action.title}
                             </h3>
 
-                            <p
-                                className="
-                                    mt-2
-                                    text-sm
-                                    text-slate-500
-                                "
-                            >
+                            <p className="mt-2 text-sm text-slate-500">
                                 {action.description}
                             </p>
                         </Link>

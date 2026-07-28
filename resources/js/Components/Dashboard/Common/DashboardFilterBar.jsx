@@ -55,7 +55,19 @@ export default function DashboardFilterBar({
                             onChange={(e) =>
                                 handleChange("year", e.target.value)
                             }
-                            className="w-full rounded-xl border border-slate-200 py-2 pl-10 pr-3 focus:border-blue-500 focus:outline-none"
+                            className="
+        w-full
+        rounded-xl
+        border
+        border-slate-200
+        bg-white
+        py-2
+        pl-10
+        pr-3
+        font-semibold
+        text-slate-800
+        focus:border-blue-500
+        focus:outline-none"
                         >
                             {years.map((year) => (
                                 <option key={year} value={year}>
@@ -136,6 +148,7 @@ export default function DashboardFilterBar({
                         {hsCodes.map((hs) => (
                             <option key={hs.code} value={hs.code}>
                                 {hs.code}
+                                {hs.description ? ` — ${hs.description}` : ""}
                             </option>
                         ))}
                     </select>

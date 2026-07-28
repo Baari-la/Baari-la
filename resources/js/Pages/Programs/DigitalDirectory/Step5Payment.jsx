@@ -17,7 +17,7 @@ export default function Step5Payment({ company }) {
 
     const isEn = locale === "en";
 
-    const [method, setMethod] = useState("QRIS");
+    const [method, setMethod] = useState("Bank Transfer");
     const [receipt, setReceipt] = useState(null);
 
     const prices = {
@@ -33,6 +33,7 @@ export default function Step5Payment({ company }) {
             name: "QRIS",
 
             icon: QrCode,
+            disabled: true,
         },
 
         {

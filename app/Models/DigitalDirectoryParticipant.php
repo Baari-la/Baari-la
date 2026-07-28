@@ -167,7 +167,8 @@ class DigitalDirectoryParticipant extends Model
             'boolean',
 
         'smart_matching_active' =>
-            'boolean',
+                    'boolean',
+    'activated_at' => 'datetime',
 
         'build_supply_chain_active' =>
             'boolean',

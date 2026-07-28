@@ -1,4 +1,6 @@
 import AdminLayout from "@/Layouts/AdminLayout";
+import { router } from "@inertiajs/react";
+import AdminStatusBadge from "@/Components/Admin/AdminStatusBadge";
 
 import {
     Building2,
@@ -11,9 +13,36 @@ import {
     CheckCircle2,
     Calendar,
     User,
+    Clock3,
+    XCircle,
+    FileText,
 } from "lucide-react";
 
 export default function ParticipantDetails({ participant }) {
+    /*
+|--------------------------------------------------------------------------
+| Payment Verification
+|--------------------------------------------------------------------------
+*/
+
+    const verifyPayment = () => {
+        if (
+            !window.confirm(`Verify payment for ${participant.company_name}?`)
+        ) {
+            return;
+        }
+
+        router.post(
+            route("admin.payments.manual-transfer.approve", participant.id),
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    };
+    const displayCompanyName =
+        participant.connected_company?.name || participant.company_name || "-";
+
     return (
         <AdminLayout>
             <div className="space-y-8">
@@ -42,7 +71,7 @@ export default function ParticipantDetails({ participant }) {
                             </p>
 
                             <h1 className="mt-3 text-5xl font-black">
-                                {participant.company_name}
+                                {displayCompanyName}
                             </h1>
 
                             <p className="mt-4 text-lg text-slate-300">
@@ -59,7 +88,9 @@ export default function ParticipantDetails({ participant }) {
                                 font-black
                             "
                         >
-                            {participant.activation_status}
+                            <AdminStatusBadge
+                                status={participant.activation_status}
+                            />
                         </div>
                     </div>
                 </div>
@@ -72,7 +103,15 @@ export default function ParticipantDetails({ participant }) {
                         items={[
                             {
                                 icon: Building2,
-                                label: "Company",
+                                label: "Connected Company",
+                                value:
+                                    participant.connected_company?.name ||
+                                    "Not connected",
+                            },
+
+                            {
+                                icon: Building2,
+                                label: "Registration Company Name",
                                 value: participant.company_name,
                             },
 
@@ -116,9 +155,9 @@ export default function ParticipantDetails({ participant }) {
                                 label: "Amount",
                                 value:
                                     "Rp " +
-                                    (participant.amount ?? 0).toLocaleString(
-                                        "id-ID",
-                                    ),
+                                    Number(
+                                        participant.amount ?? 0,
+                                    ).toLocaleString("id-ID"),
                             },
 
                             {
@@ -132,7 +171,37 @@ export default function ParticipantDetails({ participant }) {
                                 label: "Gateway",
                                 value: participant.payment_gateway,
                             },
+                            {
+                                icon: FileText,
+                                label: "Payment Reference",
+                                value: participant.payment_reference ?? "-",
+                            },
 
+                            {
+                                icon: Calendar,
+                                label: "Payment Submitted",
+                                value: participant.paid_at
+                                    ? new Date(
+                                          participant.paid_at,
+                                      ).toLocaleString("id-ID")
+                                    : "-",
+                            },
+                            {
+                                icon:
+                                    participant.payment_status === "verified"
+                                        ? CheckCircle2
+                                        : Clock3,
+
+                                label: "Payment Status",
+
+                                value:
+                                    participant.payment_status === "verified"
+                                        ? "Verified"
+                                        : participant.payment_status ===
+                                            "pending_verification"
+                                          ? "Pending Verification"
+                                          : participant.payment_status,
+                            },
                             {
                                 icon: Calendar,
                                 label: "Verified At",
@@ -141,7 +210,86 @@ export default function ParticipantDetails({ participant }) {
                         ]}
                     />
                 </div>
+                {/* Payment Receipt */}
 
+                {participant.payment_receipt && (
+                    <div
+                        className="
+            rounded-3xl
+            border
+            border-slate-200
+            bg-white
+            p-6
+            shadow-sm
+        "
+                    >
+                        <div
+                            className="
+                flex
+                flex-col
+                gap-5
+                sm:flex-row
+                sm:items-center
+                sm:justify-between
+            "
+                        >
+                            <div className="flex items-center gap-4">
+                                <div
+                                    className="
+                        rounded-2xl
+                        bg-emerald-50
+                        p-3
+                        text-emerald-600
+                    "
+                                >
+                                    <FileText className="h-6 w-6" />
+                                </div>
+
+                                <div>
+                                    <div className="font-black text-slate-900">
+                                        Payment Receipt
+                                    </div>
+
+                                    <p className="mt-1 text-sm text-slate-500">
+                                        Bank transfer receipt submitted by the
+                                        participant.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <a
+                                href={route(
+                                    "admin.payments.manual-transfer.receipt",
+                                    participant.id,
+                                )}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="
+                    inline-flex
+                    items-center
+                    justify-center
+                    gap-2
+                    rounded-2xl
+                    border
+                    border-slate-200
+                    bg-white
+                    px-5
+                    py-3
+                    text-sm
+                    font-bold
+                    text-slate-700
+                    transition
+                    hover:border-emerald-300
+                    hover:bg-emerald-50
+                    hover:text-emerald-700
+                "
+                            >
+                                <FileText className="h-4 w-4" />
+                                View Receipt
+                            </a>
+                        </div>
+                    </div>
+                )}
                 {/* Services */}
 
                 <div className="rounded-3xl border bg-white p-8">
@@ -178,60 +326,114 @@ export default function ParticipantDetails({ participant }) {
                 {/* Admin Actions */}
 
                 <div className="rounded-3xl border bg-white p-8">
-                    <h2 className="text-2xl font-black">Admin Actions</h2>
+                    <div>
+                        <h2 className="text-2xl font-black">Admin Actions</h2>
+
+                        <p className="mt-2 text-sm text-slate-500">
+                            Manage payment verification and program activation
+                            for this participant.
+                        </p>
+                    </div>
 
                     <div className="mt-6 flex flex-wrap gap-4">
-                        <button
-                            className="
-                                rounded-2xl
-                                bg-emerald-500
-                                px-6
-                                py-3
-                                font-bold
-                                text-white
-                            "
-                        >
-                            Activate Participant
-                        </button>
+                        {/* Verify Manual Transfer */}
 
-                        <button
-                            className="
-                                rounded-2xl
-                                bg-sky-500
-                                px-6
-                                py-3
-                                font-bold
-                                text-white
-                            "
-                        >
-                            Verify Payment
-                        </button>
+                        {participant.payment_method === "Bank Transfer" &&
+                            participant.payment_status ===
+                                "pending_verification" && (
+                                <button
+                                    type="button"
+                                    onClick={verifyPayment}
+                                    className="
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-2xl
+                        bg-sky-500
+                        px-6
+                        py-3
+                        font-bold
+                        text-white
+                        transition
+                        hover:bg-sky-600
+                    "
+                                >
+                                    <CheckCircle2 className="h-5 w-5" />
+                                    Verify Payment
+                                </button>
+                            )}
 
-                        <button
-                            className="
-                                rounded-2xl
-                                bg-amber-500
-                                px-6
-                                py-3
-                                font-bold
-                                text-white
-                            "
-                        >
-                            Generate Invoice
-                        </button>
+                        {/* Activate Program */}
 
-                        <button
-                            className="
-                                rounded-2xl
-                                bg-red-500
-                                px-6
-                                py-3
-                                font-bold
-                                text-white
-                            "
-                        >
-                            Suspend
-                        </button>
+                        {participant.payment_status === "verified" &&
+                            participant.company_id &&
+                            participant.activation_status !== "active" && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        router.post(
+                                            route(
+                                                "admin.digital-directory.activate",
+                                                participant.id,
+                                            ),
+                                        )
+                                    }
+                                    className="
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-2xl
+                        bg-emerald-600
+                        px-6
+                        py-3
+                        font-bold
+                        text-white
+                        transition
+                        hover:bg-emerald-700
+                    "
+                                >
+                                    <CheckCircle2 className="h-5 w-5" />
+
+                                    {participant.activation_status ===
+                                    "inactive"
+                                        ? "Reactivate Program"
+                                        : "Activate Program"}
+                                </button>
+                            )}
+
+                        {/* Deactivate Program */}
+
+                        {participant.activation_status === "active" && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (
+                                        window.confirm(
+                                            "Deactivate this program? All active program services will be disabled.",
+                                        )
+                                    ) {
+                                        router.post(
+                                            route(
+                                                "admin.digital-directory.deactivate",
+                                                participant.id,
+                                            ),
+                                        );
+                                    }
+                                }}
+                                className="
+                    rounded-2xl
+                    bg-red-50
+                    px-6
+                    py-3
+                    font-bold
+                    text-red-700
+                    transition
+                    hover:bg-red-100
+                "
+                            >
+                                Deactivate Program
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

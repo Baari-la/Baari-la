@@ -56,6 +56,11 @@ class User extends Authenticatable implements MustVerifyEmail
         */
 
         'company_id',
+
+        'onboarding_step',
+        'onboarding_completed',
+        'onboarding_completed_at',
+        
     ];
 
     /*
@@ -90,6 +95,10 @@ class User extends Authenticatable implements MustVerifyEmail
             */
 
             'is_premium'        => 'boolean',
+
+            'onboarding_completed' => 'boolean',
+            'onboarding_completed_at' => 'datetime',
+            
         ];
     }
 
@@ -253,4 +262,82 @@ class User extends Authenticatable implements MustVerifyEmail
             default            => 'Free Member',
         };
     }
+
+/*
+|--------------------------------------------------------------------------
+| Resume Onboarding™
+|--------------------------------------------------------------------------
+*/
+
+
+    public function getOnboardingRoute(): string
+{
+    return match ($this->onboarding_step) {
+
+        0 => route(
+            'onboarding.company-lookup'
+        ),
+
+        1 => route(
+            'onboarding.company-information'
+        ),
+
+        2 => route(
+            'onboarding.business-information'
+        ),
+
+        3 => route(
+            'onboarding.capabilities'
+        ),
+
+        4 => route(
+            'onboarding.manufacturing'
+        ),
+
+        5 => route(
+            'onboarding.media-catalog'
+        ),
+
+        6 => route(
+            'onboarding.review-submit'
+        ),
+
+        default => route('dashboard'),
+    };
+}
+public function isOnboardingCompleted(): bool
+{
+    return (bool) $this->onboarding_completed;
+}
+
+public function getOnboardingProgressAttribute(): int
+{
+    return match ($this->onboarding_step) {
+
+        0 => 0,
+        1 => 15,
+        2 => 30,
+        3 => 45,
+        4 => 60,
+        5 => 80,
+        6 => 95,
+
+        default => 100,
+    };
+}
+public function getOnboardingStatusAttribute(): string
+{
+    return match ($this->onboarding_step) {
+
+        0 => 'Company Lookup',
+        1 => 'Company Information',
+        2 => 'Business Information',
+        3 => 'Capabilities',
+        4 => 'Manufacturing',
+        5 => 'Media & Catalog',
+        6 => 'Review & Submit',
+
+        default => 'Completed',
+    };
+}
 }

@@ -1992,7 +1992,7 @@ public function update(Request $request, Company $company)
         'status' => 'pending',
     ]);
 
-// dd($validated['capacities']);
+
 
     return redirect()
         ->route('intelligence.center')

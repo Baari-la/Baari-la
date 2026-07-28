@@ -66,6 +66,13 @@ export default function AdminSidebar() {
                 },
 
                 {
+                    title: "Ownership Verification",
+                    href: route(
+                        "admin.digital-directory.ownership-verification",
+                    ),
+                },
+
+                {
                     title: "Verified Participants",
                     href: route("admin.digital-directory.verified"),
                 },
