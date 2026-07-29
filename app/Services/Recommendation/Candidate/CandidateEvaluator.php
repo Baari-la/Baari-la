@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Recommendation\Candidate;
 
 use App\Models\Company;
+use App\Services\Company\Intelligence\BusinessRoleService;
 use Illuminate\Support\Collection;
 
 /**
@@ -14,15 +15,28 @@ use Illuminate\Support\Collection;
  * Candidate Evaluator
  * ==========================================================================
  *
- * Normalizes candidate data before entering the Recommendation Engine.
+ * Normalizes and classifies candidate companies before they enter DRIE.
  *
- * This service DOES NOT calculate scores.
+ * Responsibilities:
+ *
+ * - Normalize candidate company data
+ * - Resolve ecosystem role
+ * - Resolve canonical business role
+ * - Preserve specific business roles
+ * - Preserve classification evidence and confidence
+ *
+ * This service DOES NOT calculate recommendation scores.
  *
  * Version:
- * 1.0
+ * 2.0
  */
 class CandidateEvaluator
 {
+    public function __construct(
+        protected BusinessRoleService $businessRole,
+    ) {
+    }
+
     /**
      * --------------------------------------------------------------------------
      * Evaluate Candidates
@@ -35,8 +49,16 @@ class CandidateEvaluator
     ): Collection {
 
         return $candidates
-
             ->map(function (Company $candidate) {
+
+                /*
+                |--------------------------------------------------------------------------
+                | Business Role Classification
+                |--------------------------------------------------------------------------
+                */
+
+                $classification =
+                    $this->businessRole->classify($candidate);
 
                 return [
 
@@ -68,6 +90,30 @@ class CandidateEvaluator
 
                     /*
                     |--------------------------------------------------------------------------
+                    | Business Role Intelligence
+                    |--------------------------------------------------------------------------
+                    */
+
+                    'ecosystem_role' =>
+                        $classification['ecosystem_role'] ?? null,
+
+                    'canonical_role' =>
+                        $classification['canonical_role'] ?? null,
+
+                    'specific_roles' =>
+                        $classification['specific_roles'] ?? [],
+
+                    'role_confidence' =>
+                        $classification['confidence'] ?? 0,
+
+                    'role_source' =>
+                        $classification['source'] ?? null,
+
+                    'role_evidence' =>
+                        $classification['evidence'] ?? [],
+
+                    /*
+                    |--------------------------------------------------------------------------
                     | Relations
                     |--------------------------------------------------------------------------
                     */
@@ -86,10 +132,11 @@ class CandidateEvaluator
                     |--------------------------------------------------------------------------
                     | Recommendation
                     |--------------------------------------------------------------------------
-                    |
-                    | Filled by subsequent services.
-                    |
                     */
+
+                    'eligible' => true,
+
+                    'eligibility_reasons' => [],
 
                     'compatibility_score' => 0,
 
@@ -100,12 +147,9 @@ class CandidateEvaluator
                     'ranking_score' => 0,
 
                     'reasons' => [],
-
                 ];
 
             })
-
             ->values();
-
     }
 }

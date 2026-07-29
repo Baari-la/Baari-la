@@ -208,6 +208,22 @@ class CompanyIntelligenceOrchestrator
 
     }
 
+/**
+ * --------------------------------------------------------------------------
+ * Business Role Classification
+ * --------------------------------------------------------------------------
+ *
+ * Structured DIGESTEX business role intelligence.
+ */
+public function roleClassification(
+    Company $company
+): array {
+
+    return $this->role->classify(
+        $company
+    );
+}
+    
     /**
      * Resolve Business Ecosystem
      */
@@ -436,6 +452,7 @@ public function buildMySupplyChain(
     */
 
     $role = $this->role($company);
+    $roleClassification = $this->roleClassification($company);
 
     $ecosystem = $this->ecosystem->resolve($role);
 
@@ -500,6 +517,8 @@ public function buildMySupplyChain(
         */
 
         'role' => $role,
+
+        'role_classification' => $roleClassification,
 
         'ecosystem' => $ecosystem,
 

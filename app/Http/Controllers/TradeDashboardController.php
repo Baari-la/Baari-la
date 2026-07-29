@@ -207,21 +207,243 @@ $annualSummary = [];
 
 foreach (range(2019, 2025) as $year) {
 
-    $column = "val_{$year}";
+    $valueColumn = "val_{$year}";
 
-    $export = (float) DB::table('trade_master_annual_hscode')
+    /*
+    |--------------------------------------------------------------------------
+    | Trade Values
+    |--------------------------------------------------------------------------
+    */
+
+    $exportValue = (float) DB::table('trade_master_annual_hscode')
         ->where('tipe_arus', 'ekspor')
-        ->sum($column);
+        ->sum($valueColumn);
 
-    $import = (float) DB::table('trade_master_annual_hscode')
+    $importValue = (float) DB::table('trade_master_annual_hscode')
         ->where('tipe_arus', 'impor')
-        ->sum($column);
+        ->sum($valueColumn);
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALL Trade Flow
+    |--------------------------------------------------------------------------
+    */
+
+    $allCountries = DB::table('trade_master_annual_country')
+        ->whereNotNull('nama_negara')
+        ->whereRaw("TRIM(nama_negara) <> ''")
+        ->where($valueColumn, '>', 0)
+        ->distinct()
+        ->count('nama_negara');
+
+    $allHsCodes = DB::table('trade_master_annual_hscode')
+        ->whereNotNull('hs_code')
+        ->whereRaw("TRIM(hs_code) <> ''")
+        ->where($valueColumn, '>', 0)
+        ->distinct()
+        ->count('hs_code');
+
+    $allRecords = DB::table('trade_master_annual_hscode')
+        ->where($valueColumn, '>', 0)
+        ->count();
+
+    /*
+    |--------------------------------------------------------------------------
+    | EXPORT Trade Flow
+    |--------------------------------------------------------------------------
+    */
+
+    $exportCountries = DB::table('trade_master_annual_country')
+        ->where('tipe_arus', 'ekspor')
+        ->whereNotNull('nama_negara')
+        ->whereRaw("TRIM(nama_negara) <> ''")
+        ->where($valueColumn, '>', 0)
+        ->distinct()
+        ->count('nama_negara');
+
+    $exportHsCodes = DB::table('trade_master_annual_hscode')
+        ->where('tipe_arus', 'ekspor')
+        ->whereNotNull('hs_code')
+        ->whereRaw("TRIM(hs_code) <> ''")
+        ->where($valueColumn, '>', 0)
+        ->distinct()
+        ->count('hs_code');
+
+    $exportRecords = DB::table('trade_master_annual_hscode')
+        ->where('tipe_arus', 'ekspor')
+        ->where($valueColumn, '>', 0)
+        ->count();
+
+    /*
+    |--------------------------------------------------------------------------
+    | IMPORT Trade Flow
+    |--------------------------------------------------------------------------
+    */
+
+    $importCountries = DB::table('trade_master_annual_country')
+        ->where('tipe_arus', 'impor')
+        ->whereNotNull('nama_negara')
+        ->whereRaw("TRIM(nama_negara) <> ''")
+        ->where($valueColumn, '>', 0)
+        ->distinct()
+        ->count('nama_negara');
+
+    $importHsCodes = DB::table('trade_master_annual_hscode')
+        ->where('tipe_arus', 'impor')
+        ->whereNotNull('hs_code')
+        ->whereRaw("TRIM(hs_code) <> ''")
+        ->where($valueColumn, '>', 0)
+        ->distinct()
+        ->count('hs_code');
+
+    $importRecords = DB::table('trade_master_annual_hscode')
+        ->where('tipe_arus', 'impor')
+        ->where($valueColumn, '>', 0)
+        ->count();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Annual Analytical Summary
+    |--------------------------------------------------------------------------
+    */
 
     $annualSummary[(string) $year] = [
-        'exportValue' => $export,
-        'importValue' => $import,
-        'tradeBalance' => $export - $import,
+
+        'all' => [
+            'exportValue' => $exportValue,
+            'importValue' => $importValue,
+            'tradeBalance' => $exportValue - $importValue,
+
+            'countries' => $allCountries,
+            'hsCodes' => $allHsCodes,
+            'records' => $allRecords,
+        ],
+
+        'export' => [
+            'exportValue' => $exportValue,
+            'importValue' => null,
+            'tradeBalance' => null,
+
+            'countries' => $exportCountries,
+            'hsCodes' => $exportHsCodes,
+            'records' => $exportRecords,
+        ],
+
+        'import' => [
+            'exportValue' => null,
+            'importValue' => $importValue,
+            'tradeBalance' => null,
+
+            'countries' => $importCountries,
+            'hsCodes' => $importHsCodes,
+            'records' => $importRecords,
+        ],
     ];
+}
+
+/*
+|--------------------------------------------------------------------------
+| Sector Trade Intelligence 2019-2025
+|--------------------------------------------------------------------------
+*/
+
+$sectorSummary = [];
+
+$sectors = DB::table('trade_master_annual_country')
+    ->selectRaw('TRIM(produk) as sector')
+    ->whereNotNull('produk')
+    ->whereRaw("TRIM(produk) <> ''")
+    ->distinct()
+    ->orderBy('sector')
+    ->pluck('sector')
+    ->values();
+
+foreach (range(2019, 2025) as $year) {
+
+    $valueColumn = "val_{$year}";
+
+    $sectorSummary[(string) $year] = [];
+
+    foreach ($sectors as $sector) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sector Export
+        |--------------------------------------------------------------------------
+        */
+
+        $sectorExport = (float) DB::table('trade_master_annual_country')
+            ->whereRaw('TRIM(produk) = ?', [$sector])
+            ->where('tipe_arus', 'ekspor')
+            ->sum($valueColumn);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sector Import
+        |--------------------------------------------------------------------------
+        */
+
+        $sectorImport = (float) DB::table('trade_master_annual_country')
+            ->whereRaw('TRIM(produk) = ?', [$sector])
+            ->where('tipe_arus', 'impor')
+            ->sum($valueColumn);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Active Countries
+        |--------------------------------------------------------------------------
+        */
+
+        $allCountries = DB::table('trade_master_annual_country')
+            ->whereRaw('TRIM(produk) = ?', [$sector])
+            ->where($valueColumn, '>', 0)
+            ->distinct()
+            ->count('id_negara');
+
+        $exportCountries = DB::table('trade_master_annual_country')
+            ->whereRaw('TRIM(produk) = ?', [$sector])
+            ->where('tipe_arus', 'ekspor')
+            ->where($valueColumn, '>', 0)
+            ->distinct()
+            ->count('id_negara');
+
+        $importCountries = DB::table('trade_master_annual_country')
+            ->whereRaw('TRIM(produk) = ?', [$sector])
+            ->where('tipe_arus', 'impor')
+            ->where($valueColumn, '>', 0)
+            ->distinct()
+            ->count('id_negara');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sector Summary by Trade Flow
+        |--------------------------------------------------------------------------
+        */
+
+        $sectorSummary[(string) $year][$sector] = [
+
+            'all' => [
+                'exportValue' => $sectorExport,
+                'importValue' => $sectorImport,
+                'tradeBalance' => $sectorExport - $sectorImport,
+                'countries' => $allCountries,
+            ],
+
+            'export' => [
+                'exportValue' => $sectorExport,
+                'importValue' => null,
+                'tradeBalance' => null,
+                'countries' => $exportCountries,
+            ],
+
+            'import' => [
+                'exportValue' => null,
+                'importValue' => $sectorImport,
+                'tradeBalance' => null,
+                'countries' => $importCountries,
+            ],
+        ];
+    }
 }
 
         
@@ -238,8 +460,19 @@ $tradeDashboard = [
     | Dataset Summary
     |--------------------------------------------------------------------------
     */
+
     'annualSummary' => $annualSummary,
-    
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sector Intelligence
+    |--------------------------------------------------------------------------
+    */
+
+    'sectorSummary' => $sectorSummary,
+
+    'sectors' => $sectors,
+
     'summary' => [
 
     /*

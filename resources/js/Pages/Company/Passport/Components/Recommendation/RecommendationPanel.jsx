@@ -1,243 +1,393 @@
 import {
-    CheckCircle2,
     AlertTriangle,
-    TrendingUp,
     ArrowRight,
-    ShieldCheck,
-    Factory,
-    Globe,
+    CheckCircle2,
+    CircleAlert,
+    Target,
+    TrendingUp,
 } from "lucide-react";
 
-export default function RecommendationPanel({ passport }) {
+export default function RecommendationPanel({ passport, isEn = true }) {
     /*
     |--------------------------------------------------------------------------
-    | Temporary Recommendation
+    | Readiness Intelligence
     |--------------------------------------------------------------------------
-    | Sprint 1
+    */
+
+    const readiness = passport?.passport?.readiness ?? {};
+
+    const summary = readiness?.summary ?? {};
+
+    const missingIntelligence = Array.isArray(readiness?.missing_intelligence)
+        ? readiness.missing_intelligence
+        : [];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Language
+    |--------------------------------------------------------------------------
+    */
+
+    const language = isEn ? "en" : "id";
+
+    /*
+    |--------------------------------------------------------------------------
+    | Next Best Actions
+    |--------------------------------------------------------------------------
     |
-    | Future:
-    | Recommendation will come from Executive AI.
+    | Backend remains the SSOT.
+    |
+    | React only:
+    | - displays the action
+    | - sorts by potential score gain
+    | - handles presentation
     |
     */
 
-    const recommendations = [
-        {
-            title: "Upload Factory Photos",
+    const actions = [...missingIntelligence].sort(
+        (a, b) =>
+            Number(b?.potential_gain ?? 0) - Number(a?.potential_gain ?? 0),
+    );
 
-            priority: "High",
-        },
+    /*
+    |--------------------------------------------------------------------------
+    | Helpers
+    |--------------------------------------------------------------------------
+    */
 
-        {
-            title: "Add Production Capacity",
+    const formatNumber = (value) => {
+        const number = Number(value ?? 0);
 
-            priority: "High",
-        },
+        if (Number.isInteger(number)) {
+            return number.toFixed(0);
+        }
 
-        {
-            title: "Complete Lead Time",
+        return number.toFixed(2);
+    };
 
-            priority: "Medium",
-        },
+    const getLocalizedValue = (value, fallback = "") => {
+        if (!value) {
+            return fallback;
+        }
 
-        {
-            title: "Add GRS Certificate",
+        if (typeof value === "string") {
+            return value;
+        }
 
-            priority: "High",
-        },
+        return value?.[language] ?? value?.en ?? value?.id ?? fallback;
+    };
 
-        {
-            title: "Complete Export Markets",
+    const getPriorityLabel = (priority) => {
+        const labels = {
+            critical: {
+                en: "Critical",
+                id: "Kritis",
+            },
 
-            priority: "Medium",
-        },
-    ];
+            high: {
+                en: "High Priority",
+                id: "Prioritas Tinggi",
+            },
+
+            medium: {
+                en: "Medium Priority",
+                id: "Prioritas Menengah",
+            },
+
+            low: {
+                en: "Low Priority",
+                id: "Prioritas Rendah",
+            },
+        };
+
+        return labels?.[priority]?.[language] ?? priority ?? "-";
+    };
+
+    const getPriorityClass = (priority) => {
+        if (priority === "critical") {
+            return "border-red-200 bg-red-50 text-red-700";
+        }
+
+        if (priority === "high") {
+            return "border-orange-200 bg-orange-50 text-orange-700";
+        }
+
+        if (priority === "medium") {
+            return "border-amber-200 bg-amber-50 text-amber-700";
+        }
+
+        return "border-slate-200 bg-slate-50 text-slate-600";
+    };
+
+    const getProgressClass = (status) => {
+        if (status === "complete") {
+            return "bg-emerald-500";
+        }
+
+        if (status === "partial") {
+            return "bg-amber-500";
+        }
+
+        return "bg-slate-400";
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | Summary
+    |--------------------------------------------------------------------------
+    */
+
+    const overallScore = Number(summary?.overall_score ?? 0);
+
+    const level = summary?.level ?? "Developing";
+
+    const completed = summary?.completed_dimensions ?? 0;
+
+    const partial = summary?.partial_dimensions ?? 0;
+
+    const missing = summary?.missing_dimensions ?? 0;
 
     return (
-        <div className="space-y-6">
-            {/* ==========================================================
-                Executive Recommendation
-            ========================================================== */}
+        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            {/* =========================================================
+                HEADER
+            ========================================================= */}
 
-            <div className="rounded-2xl border bg-white shadow-sm">
-                <div className="border-b px-6 py-5">
-                    <div className="flex items-center gap-3">
-                        <TrendingUp className="h-6 w-6 text-blue-600" />
+            <div className="border-b border-slate-100 px-6 py-6 md:px-8">
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex items-start gap-4">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white">
+                            <Target className="h-5 w-5" />
+                        </div>
 
                         <div>
-                            <h2 className="text-2xl font-bold">
-                                Executive Recommendation
+                            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                                {isEn
+                                    ? "Intelligence Recommendations"
+                                    : "Rekomendasi Intelligence"}
+                            </p>
+
+                            <h2 className="mt-1 text-2xl font-bold text-slate-900">
+                                {isEn
+                                    ? "Next Best Actions"
+                                    : "Tindakan Prioritas Berikutnya"}
                             </h2>
 
-                            <p className="mt-1 text-sm text-slate-500">
-                                Business recommendations generated from Digital
-                                Company Passport.
+                            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                                {isEn
+                                    ? "Prioritized actions based on missing intelligence and their potential impact on your Intelligence Readiness Score."
+                                    : "Tindakan yang diprioritaskan berdasarkan intelligence yang belum lengkap dan potensi dampaknya terhadap Intelligence Readiness Score."}
                             </p>
                         </div>
                     </div>
-                </div>
 
-                <div className="grid gap-6 p-6 lg:grid-cols-3">
-                    {/* Priority */}
-
-                    <div className="rounded-xl bg-emerald-50 p-6">
-                        <div className="flex items-center gap-3">
-                            <CheckCircle2 className="h-6 w-6 text-emerald-600" />
-
-                            <h3 className="font-bold">Current Status</h3>
-                        </div>
-
-                        <div className="mt-5">
-                            <span className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">
-                                Export Ready
-                            </span>
-                        </div>
-
-                        <p className="mt-5 text-sm leading-6 text-slate-600">
-                            The company has established a solid digital profile
-                            and is ready to improve its competitiveness by
-                            completing the remaining business information.
-                        </p>
-                    </div>
-
-                    {/* Strength */}
-
-                    <div className="rounded-xl bg-blue-50 p-6">
-                        <div className="flex items-center gap-3">
-                            <ShieldCheck className="h-6 w-6 text-blue-600" />
-
-                            <h3 className="font-bold">Strengths</h3>
-                        </div>
-
-                        <ul className="mt-5 space-y-3 text-sm">
-                            <li className="flex gap-2">
-                                <ArrowRight className="mt-0.5 h-4 w-4 text-blue-600" />
-                                Manufacturing Capability
-                            </li>
-
-                            <li className="flex gap-2">
-                                <ArrowRight className="mt-0.5 h-4 w-4 text-blue-600" />
-                                Business Profile
-                            </li>
-
-                            <li className="flex gap-2">
-                                <ArrowRight className="mt-0.5 h-4 w-4 text-blue-600" />
-                                Export Experience
-                            </li>
-
-                            <li className="flex gap-2">
-                                <ArrowRight className="mt-0.5 h-4 w-4 text-blue-600" />
-                                Global Visibility
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Improvement */}
-
-                    <div className="rounded-xl bg-amber-50 p-6">
-                        <div className="flex items-center gap-3">
-                            <AlertTriangle className="h-6 w-6 text-amber-600" />
-
-                            <h3 className="font-bold">Improvement Focus</h3>
-                        </div>
-
-                        <ul className="mt-5 space-y-3 text-sm">
-                            <li className="flex gap-2">
-                                <ArrowRight className="mt-0.5 h-4 w-4 text-amber-600" />
-                                Complete Compliance Profile
-                            </li>
-
-                            <li className="flex gap-2">
-                                <ArrowRight className="mt-0.5 h-4 w-4 text-amber-600" />
-                                Add Factory Verification
-                            </li>
-
-                            <li className="flex gap-2">
-                                <ArrowRight className="mt-0.5 h-4 w-4 text-amber-600" />
-                                Improve Supply Chain Data
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            {/* ==========================================================
-                Next Recommended Actions
-            ========================================================== */}
-
-            <div className="rounded-2xl border bg-white shadow-sm">
-                <div className="border-b px-6 py-5">
-                    <div className="flex items-center gap-3">
-                        <Factory className="h-6 w-6 text-indigo-600" />
+                    <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
+                        <TrendingUp className="h-5 w-5 text-blue-600" />
 
                         <div>
-                            <h2 className="text-2xl font-bold">
-                                Next Recommended Actions
-                            </h2>
-
-                            <p className="mt-1 text-sm text-slate-500">
-                                Recommended improvements to increase your
-                                Digital Company Passport quality.
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                {isEn
+                                    ? "Current Readiness"
+                                    : "Kesiapan Saat Ini"}
                             </p>
-                        </div>
-                    </div>
-                </div>
 
-                <div className="divide-y">
-                    {recommendations.map((item) => (
-                        <div
-                            key={item.title}
-                            className="flex items-center justify-between px-6 py-5"
-                        >
-                            <div className="flex items-center gap-4">
-                                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                            <div className="mt-1 flex items-center gap-2">
+                                <span className="text-xl font-black text-slate-900">
+                                    {formatNumber(overallScore)}%
+                                </span>
 
-                                <span>{item.title}</span>
+                                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-700">
+                                    {level}
+                                </span>
                             </div>
-
-                            <span
-                                className={
-                                    item.priority === "High"
-                                        ? "rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700"
-                                        : "rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700"
-                                }
-                            >
-                                {item.priority}
-                            </span>
                         </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* ==========================================================
-                Future Executive AI
-            ========================================================== */}
-
-            <div className="rounded-2xl border bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 text-white shadow-sm">
-                <div className="flex items-center gap-3">
-                    <Globe className="h-7 w-7 text-cyan-400" />
-
-                    <div>
-                        <h2 className="text-2xl font-bold">
-                            Executive AI Insight
-                        </h2>
-
-                        <p className="mt-2 text-slate-300">
-                            Available in the next intelligence phase.
-                        </p>
                     </div>
                 </div>
 
-                <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6">
-                    <p className="leading-8 text-slate-200">
-                        Executive AI will analyze your company profile,
-                        manufacturing capability, compliance, sustainability,
-                        export experience, supply chain readiness, buyer
-                        matching, business opportunities, and market
-                        intelligence to generate executive-level
-                        recommendations.
-                    </p>
+                {/* SUMMARY */}
+
+                <div className="mt-6 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">
+                        {completed} {isEn ? "Complete" : "Lengkap"}
+                    </span>
+
+                    <span className="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700">
+                        {partial} {isEn ? "Partial" : "Sebagian"}
+                    </span>
+
+                    <span className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600">
+                        {missing} {isEn ? "Missing" : "Belum Lengkap"}
+                    </span>
                 </div>
             </div>
-        </div>
+
+            {/* =========================================================
+                ACTIONS
+            ========================================================= */}
+
+            <div className="p-6 md:p-8">
+                {actions.length === 0 ? (
+                    <div className="flex items-start gap-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
+                        <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0 text-emerald-600" />
+
+                        <div>
+                            <h3 className="font-bold text-emerald-900">
+                                {isEn
+                                    ? "Intelligence profile complete"
+                                    : "Profil intelligence lengkap"}
+                            </h3>
+
+                            <p className="mt-1 text-sm leading-6 text-emerald-700">
+                                {isEn
+                                    ? "All intelligence dimensions are currently complete."
+                                    : "Seluruh dimensi intelligence saat ini telah lengkap."}
+                            </p>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {actions.map((item, index) => {
+                            const label = getLocalizedValue(
+                                item?.label,
+                                item?.dimension ?? "Intelligence",
+                            );
+
+                            const action = getLocalizedValue(
+                                item?.action,
+                                label,
+                            );
+
+                            const completion = Number(item?.completion ?? 0);
+
+                            const potentialGain = Number(
+                                item?.potential_gain ?? 0,
+                            );
+
+                            const priority = item?.priority ?? "low";
+
+                            const status = item?.status ?? "missing";
+
+                            return (
+                                <article
+                                    key={item?.dimension ?? index}
+                                    className="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-slate-300 hover:shadow-sm md:p-6"
+                                >
+                                    <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                                        {/* LEFT */}
+
+                                        <div className="flex min-w-0 gap-4">
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-black text-slate-600">
+                                                {String(index + 1).padStart(
+                                                    2,
+                                                    "0",
+                                                )}
+                                            </div>
+
+                                            <div className="min-w-0">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <h3 className="font-bold text-slate-900">
+                                                        {label}
+                                                    </h3>
+
+                                                    <span
+                                                        className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${getPriorityClass(
+                                                            priority,
+                                                        )}`}
+                                                    >
+                                                        {getPriorityLabel(
+                                                            priority,
+                                                        )}
+                                                    </span>
+                                                </div>
+
+                                                <div className="mt-2 flex items-start gap-2">
+                                                    <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+
+                                                    <p className="text-sm font-medium leading-5 text-slate-700">
+                                                        {action}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* SCORE IMPACT */}
+
+                                        <div className="flex shrink-0 items-center gap-5 lg:pl-6">
+                                            <div className="text-right">
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                                    {isEn
+                                                        ? "Potential Gain"
+                                                        : "Potensi Kenaikan"}
+                                                </p>
+
+                                                <p className="mt-1 text-xl font-black tabular-nums text-emerald-600">
+                                                    +
+                                                    {formatNumber(
+                                                        potentialGain,
+                                                    )}{" "}
+                                                    pts
+                                                </p>
+                                            </div>
+
+                                            <div className="hidden h-10 w-px bg-slate-200 sm:block" />
+
+                                            <CircleAlert className="hidden h-5 w-5 text-slate-400 sm:block" />
+                                        </div>
+                                    </div>
+
+                                    {/* PROGRESS */}
+
+                                    <div className="mt-5 border-t border-slate-100 pt-4">
+                                        <div className="mb-2 flex items-center justify-between">
+                                            <span className="text-xs font-medium text-slate-500">
+                                                {isEn
+                                                    ? "Dimension completion"
+                                                    : "Kelengkapan dimensi"}
+                                            </span>
+
+                                            <span className="text-xs font-bold tabular-nums text-slate-700">
+                                                {formatNumber(completion)}%
+                                            </span>
+                                        </div>
+
+                                        <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                                            <div
+                                                className={`h-full rounded-full transition-all duration-500 ${getProgressClass(
+                                                    status,
+                                                )}`}
+                                                style={{
+                                                    width: `${Math.min(
+                                                        100,
+                                                        Math.max(0, completion),
+                                                    )}%`,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* =========================================================
+                FOOTER NOTE
+            ========================================================= */}
+
+            {actions.length > 0 && (
+                <div className="border-t border-slate-100 bg-slate-50 px-6 py-4 md:px-8">
+                    <div className="flex items-start gap-3">
+                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+
+                        <p className="text-xs leading-5 text-slate-500">
+                            {isEn
+                                ? "Potential gain represents the maximum contribution of each intelligence dimension to the overall readiness score when the dimension becomes complete."
+                                : "Potensi kenaikan menunjukkan kontribusi maksimum setiap dimensi intelligence terhadap skor kesiapan keseluruhan apabila dimensi tersebut menjadi lengkap."}
+                        </p>
+                    </div>
+                </div>
+            )}
+        </section>
     );
 }

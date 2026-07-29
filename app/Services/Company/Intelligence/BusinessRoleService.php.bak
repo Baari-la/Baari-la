@@ -202,357 +202,100 @@ public function classify(Company $company): array
     |--------------------------------------------------------------------------
     | Legacy Ecosystem Role
     |--------------------------------------------------------------------------
+    |
+    | Backward compatibility for BusinessEcosystemService,
+    | Build My Supply Chain and existing matching services.
+    |
     */
 
     $ecosystemRole = $this->resolve($company);
 
-    $scores = [];
+    /*
+    |--------------------------------------------------------------------------
+    | Evidence
+    |--------------------------------------------------------------------------
+    */
+
     $evidence = [];
-    $sources = [];
 
     /*
     |--------------------------------------------------------------------------
     | 1. Explicit Company Role
     |--------------------------------------------------------------------------
-    |
-    | Explicit structured company role remains authoritative, but must first
-    | pass through the canonical resolver.
-    |
     */
 
-    if (filled($company->company_role)) {
+    $explicitRole = filled($company->company_role)
+        ? trim((string) $company->company_role)
+        : null;
 
-        $explicitRole = trim((string) $company->company_role);
+    if ($explicitRole !== null) {
 
         $canonicalRole =
             $this->canonicalResolver->resolve($explicitRole);
 
         if ($canonicalRole !== null) {
 
-            $this->addRoleScore(
-                $scores,
-                $canonicalRole,
-                100
-            );
+            $evidence[] = 'company_role:' . $explicitRole;
 
-            $evidence[] =
-                'company_role:' . $explicitRole;
-
-            $sources[] =
-                'explicit_company_role';
+            return [
+                'ecosystem_role' => $ecosystemRole,
+                'canonical_role' => $canonicalRole,
+                'specific_roles' => [$canonicalRole],
+                'confidence' => 1.0,
+                'source' => 'explicit_company_role',
+                'evidence' => $evidence,
+            ];
         }
     }
 
     /*
     |--------------------------------------------------------------------------
-    | 2. Structured Products
+    | 2. Structured Product Intelligence
     |--------------------------------------------------------------------------
-    |
-    | Primary products receive stronger weight than secondary products.
-    |
     */
 
-    $products = $company->relationLoaded('products')
+    $productTexts = $company->relationLoaded('products')
         ? $company->products
-        : collect();
+            ->pluck('product_name')
+            ->filter()
+            ->map(fn ($value) => strtolower(trim((string) $value)))
+            ->values()
+            ->all()
+        : [];
 
-    foreach ($products as $product) {
-
-        if (! filled($product->product_name)) {
-            continue;
-        }
-
-        $text =
-            strtolower(
-                trim((string) $product->product_name)
-            );
-
-        $isPrimary =
-            (bool) ($product->is_primary ?? false);
-
-        $weight =
-            $isPrimary
-                ? 50
-                : 30;
-
-        $roles =
-            $this->inferRolesFromText($text);
-
-        foreach ($roles as $role) {
-
-            $this->addRoleScore(
-                $scores,
-                $role,
-                $weight
-            );
-        }
-
-        $evidence[] =
-            ($isPrimary ? 'primary_product:' : 'product:')
-            . $text;
-
-        $sources[] =
-            $isPrimary
-                ? 'primary_structured_product'
-                : 'structured_product';
+    foreach ($productTexts as $product) {
+        $evidence[] = 'product:' . $product;
     }
 
     /*
     |--------------------------------------------------------------------------
-    | 3. Sector
+    | 3. Legacy Evidence
     |--------------------------------------------------------------------------
     */
 
     if (filled($company->sektor)) {
-
-        $sector =
-            strtolower(
-                trim((string) $company->sektor)
-            );
-
-        foreach (
-            $this->inferRolesFromText($sector)
-            as $role
-        ) {
-
-            $this->addRoleScore(
-                $scores,
-                $role,
-                25
-            );
-        }
-
-        $evidence[] =
-            'sector:' . trim((string) $company->sektor);
-
-        $sources[] =
-            'sector_inference';
+        $evidence[] = 'sector:' . trim((string) $company->sektor);
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 4. Legacy Product
-    |--------------------------------------------------------------------------
-    */
 
     if (filled($company->produk)) {
-
-        $legacyProduct =
-            strtolower(
-                trim((string) $company->produk)
-            );
-
-        foreach (
-            $this->inferRolesFromText($legacyProduct)
-            as $role
-        ) {
-
-            $this->addRoleScore(
-                $scores,
-                $role,
-                15
-            );
-        }
-
-        $evidence[] =
-            'legacy_product:' . trim((string) $company->produk);
-
-        $sources[] =
-            'legacy_product_inference';
+        $evidence[] = 'legacy_product:' . trim((string) $company->produk);
     }
 
     /*
     |--------------------------------------------------------------------------
-    | 5. Ecosystem Fallback
-    |--------------------------------------------------------------------------
-    |
-    | Gives the legacy ecosystem classification a small supporting score.
-    | It must never overpower strong structured evidence.
-    |
-    */
-
-    $fallbackRole =
-        $this->canonicalFromEcosystemRole(
-            $ecosystemRole
-        );
-
-    if ($fallbackRole !== null) {
-
-        $this->addRoleScore(
-            $scores,
-            $fallbackRole,
-            10
-        );
-
-        $sources[] =
-            'ecosystem_fallback';
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validate Canonical Roles
+    | 4. Infer Canonical Roles
     |--------------------------------------------------------------------------
     */
 
-    $scores = collect($scores)
-        ->filter(
-            fn ($score, $role) =>
-                $this->canonicalResolver->isCanonical($role)
-        )
-        ->sortDesc()
-        ->all();
+    $text = strtolower(
+        implode(' ', array_filter([
+            $company->sektor,
+            $company->produk,
+            ...$productTexts,
+        ]))
+    );
 
-    /*
-    |--------------------------------------------------------------------------
-    | Canonical Primary Role
-    |--------------------------------------------------------------------------
-    */
-
-    $canonicalRole =
-        array_key_first($scores)
-        ?? $fallbackRole;
-
-    /*
-    |--------------------------------------------------------------------------
-    | Specific Roles
-    |--------------------------------------------------------------------------
-    |
-    | Preserve meaningful secondary roles, but prevent weak incidental
-    | evidence from polluting the business-role profile.
-    |
-    */
-
-    $specificRoles = collect($scores)
-        ->filter(
-            fn ($score) => $score >= 25
-        )
-        ->keys()
-        ->values()
-        ->all();
-
-    if (
-        $canonicalRole !== null &&
-        ! in_array(
-            $canonicalRole,
-            $specificRoles,
-            true
-        )
-    ) {
-        array_unshift(
-            $specificRoles,
-            $canonicalRole
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Confidence
-    |--------------------------------------------------------------------------
-    */
-
-    $topScore =
-        $canonicalRole !== null
-            ? ($scores[$canonicalRole] ?? 0)
-            : 0;
-
-    $confidence =
-        $this->confidenceFromScore(
-            $topScore
-        );
-
-    /*
-    |--------------------------------------------------------------------------
-    | Source
-    |--------------------------------------------------------------------------
-    */
-
-    $source = match (true) {
-
-        in_array(
-            'explicit_company_role',
-            $sources,
-            true
-        ) =>
-            'explicit_company_role',
-
-        in_array(
-            'primary_structured_product',
-            $sources,
-            true
-        ) =>
-            'structured_product_inference',
-
-        in_array(
-            'structured_product',
-            $sources,
-            true
-        ) =>
-            'structured_product_inference',
-
-        in_array(
-            'sector_inference',
-            $sources,
-            true
-        ) =>
-            'sector_inference',
-
-        in_array(
-            'legacy_product_inference',
-            $sources,
-            true
-        ) =>
-            'legacy_inference',
-
-        default =>
-            'ecosystem_fallback',
-    };
-
-    return [
-
-        'ecosystem_role' =>
-            $ecosystemRole,
-
-        'canonical_role' =>
-            $canonicalRole,
-
-        'specific_roles' =>
-            $specificRoles,
-
-        'confidence' =>
-            $confidence,
-
-        'source' =>
-            $source,
-
-        'evidence' =>
-            array_values(
-                array_unique($evidence)
-            ),
-
-        'role_scores' =>
-            $scores,
-    ];
-}
-
-/**
- * ==========================================================================
- * INFER CANONICAL ROLES FROM TEXT
- * ==========================================================================
- */
-protected function inferRolesFromText(
-    string $text
-): array {
-
-    $text =
-        Str::lower(
-            trim($text)
-        );
-
-    if ($text === '') {
-        return [];
-    }
-
-    $roles = [];
+    $specificRoles = [];
 
     /*
     |--------------------------------------------------------------------------
@@ -564,38 +307,21 @@ protected function inferRolesFromText(
         str_contains($text, 'viscose') ||
         str_contains($text, 'rayon')
     ) {
-        $roles[] =
-            'viscose_producer';
+        $specificRoles[] = 'viscose_producer';
     }
 
     if (
         str_contains($text, 'staple fiber') ||
         str_contains($text, 'staple fibre')
     ) {
-        $roles[] =
-            'staple_fiber_manufacturer';
+        $specificRoles[] = 'staple_fiber_manufacturer';
     }
 
     if (
         str_contains($text, 'polyester fiber') ||
         str_contains($text, 'polyester fibre')
     ) {
-        $roles[] =
-            'synthetic_fiber_manufacturer';
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Generic Fiber
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        str_contains($text, 'fiber') ||
-        str_contains($text, 'fibre')
-    ) {
-        $roles[] =
-            'fiber_manufacturer';
+        $specificRoles[] = 'synthetic_fiber_manufacturer';
     }
 
     /*
@@ -608,23 +334,18 @@ protected function inferRolesFromText(
         str_contains($text, 'spinning') ||
         str_contains($text, 'spun yarn')
     ) {
-        $roles[] =
-            'yarn_spinner';
+        $specificRoles[] = 'yarn_spinner';
     }
 
-    if (
-        str_contains($text, 'ring spinning')
-    ) {
-        $roles[] =
-            'ring_spinning_mill';
+    if (str_contains($text, 'ring spinning')) {
+        $specificRoles[] = 'ring_spinning_mill';
     }
 
     if (
         str_contains($text, 'open end') ||
         str_contains($text, 'open-end')
     ) {
-        $roles[] =
-            'open_end_spinning_mill';
+        $specificRoles[] = 'open_end_spinning_mill';
     }
 
     /*
@@ -637,44 +358,22 @@ protected function inferRolesFromText(
         str_contains($text, 'weaving') ||
         str_contains($text, 'woven fabric')
     ) {
-        $roles[] =
-            'weaving_mill';
+        $specificRoles[] = 'weaving_mill';
     }
 
     if (
         str_contains($text, 'knitting') ||
         str_contains($text, 'knitted fabric')
     ) {
-        $roles[] =
-            'knitting_mill';
+        $specificRoles[] = 'knitting_mill';
     }
 
-    if (
-        str_contains($text, 'warp knitting')
-    ) {
-        $roles[] =
-            'warp_knitting_mill';
+    if (str_contains($text, 'warp knitting')) {
+        $specificRoles[] = 'warp_knitting_mill';
     }
 
-    if (
-        str_contains($text, 'circular knitting')
-    ) {
-        $roles[] =
-            'circular_knitting_mill';
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Nonwoven
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        str_contains($text, 'nonwoven') ||
-        str_contains($text, 'non-woven')
-    ) {
-        $roles[] =
-            'nonwoven_manufacturer';
+    if (str_contains($text, 'circular knitting')) {
+        $specificRoles[] = 'circular_knitting_mill';
     }
 
     /*
@@ -687,21 +386,13 @@ protected function inferRolesFromText(
         str_contains($text, 'dyeing') ||
         str_contains($text, 'finishing')
     ) {
-        $roles[] =
-            'dyeing_finishing_mill';
+        $specificRoles[] = 'dyeing_finishing_mill';
     }
 
-    if (
-        str_contains($text, 'digital printing')
-    ) {
-        $roles[] =
-            'digital_printing_company';
-
-    } elseif (
-        str_contains($text, 'printing')
-    ) {
-        $roles[] =
-            'printing_mill';
+    if (str_contains($text, 'digital printing')) {
+        $specificRoles[] = 'digital_printing_company';
+    } elseif (str_contains($text, 'printing')) {
+        $specificRoles[] = 'printing_mill';
     }
 
     /*
@@ -714,17 +405,16 @@ protected function inferRolesFromText(
         str_contains($text, 'garment') ||
         str_contains($text, 'apparel')
     ) {
-        $roles[] =
-            'garment_manufacturer';
+        $specificRoles[] = 'garment_manufacturer';
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Validate
+    | Validate Against Canonical Taxonomy
     |--------------------------------------------------------------------------
     */
 
-    return collect($roles)
+    $specificRoles = collect($specificRoles)
         ->filter(
             fn ($role) =>
                 $this->canonicalResolver->isCanonical($role)
@@ -732,55 +422,57 @@ protected function inferRolesFromText(
         ->unique()
         ->values()
         ->all();
-}
 
-/**
- * ==========================================================================
- * ADD ROLE SCORE
- * ==========================================================================
- */
-protected function addRoleScore(
-    array &$scores,
-    string $role,
-    int $weight
-): void {
+    /*
+    |--------------------------------------------------------------------------
+    | Canonical Primary Role
+    |--------------------------------------------------------------------------
+    */
 
-    if (
-        ! $this->canonicalResolver->isCanonical($role)
-    ) {
-        return;
-    }
+    $canonicalRole =
+        $specificRoles[0]
+        ?? $this->canonicalFromEcosystemRole($ecosystemRole);
 
-    $scores[$role] =
-        ($scores[$role] ?? 0)
-        + $weight;
-}
+    /*
+    |--------------------------------------------------------------------------
+    | Confidence
+    |--------------------------------------------------------------------------
+    */
 
-/**
- * ==========================================================================
- * CONFIDENCE FROM SCORE
- * ==========================================================================
- */
-protected function confidenceFromScore(
-    int $score
-): float {
+    $confidence = match (true) {
 
-    return match (true) {
+        count($specificRoles) >= 2 => 0.90,
 
-        $score >= 100 => 1.00,
+        count($specificRoles) === 1 => 0.80,
 
-        $score >= 80 => 0.95,
-
-        $score >= 60 => 0.90,
-
-        $score >= 40 => 0.80,
-
-        $score >= 25 => 0.70,
-
-        $score >= 10 => 0.60,
+        $canonicalRole !== null => 0.60,
 
         default => 0.0,
     };
+
+    $source = match (true) {
+
+        count($productTexts) > 0 =>
+            'structured_product_inference',
+
+        filled($company->produk) ||
+        filled($company->sektor) =>
+            'legacy_inference',
+
+        default =>
+            'ecosystem_fallback',
+    };
+
+    return [
+        'ecosystem_role' => $ecosystemRole,
+        'canonical_role' => $canonicalRole,
+        'specific_roles' => $specificRoles,
+        'confidence' => $confidence,
+        'source' => $source,
+        'evidence' => array_values(
+            array_unique($evidence)
+        ),
+    ];
 }
 
 /**

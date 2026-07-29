@@ -481,9 +481,9 @@ export default function AuthenticatedLayout({
                     <div className="absolute top-0 left-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -ml-20 -mt-20"></div>
                     <div className="mx-auto max-w-7xl px-6 py-6 sm:px-8 lg:px-10 relative z-10">
                         <div className="border-l-4 border-amber-500 pl-4">
-                            <h1 className="text-lg lg:text-xl font-black uppercase tracking-wider font-sans text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-gray-400 drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">
+                            <div className="text-lg lg:text-xl font-black uppercase tracking-wider font-sans text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-gray-400 drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">
                                 {header}
-                            </h1>
+                            </div>
                         </div>
                     </div>
                 </header>

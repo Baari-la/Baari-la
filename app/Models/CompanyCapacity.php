@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompanyCapacity extends Model
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Mass Assignable Fields
+    |--------------------------------------------------------------------------
+    */
+
     protected $fillable = [
         'company_id',
         'capacity_type',
@@ -18,9 +24,33 @@ class CompanyCapacity extends Model
         'notes',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | Attribute Casting
+    |--------------------------------------------------------------------------
+    |
+    | Standardize numeric values used by:
+    |
+    | - Digital Company Passport
+    | - Company Intelligence
+    | - Readiness Engine
+    | - Matching Engine
+    |
+    */
+
+    protected $casts = [
+        'capacity_value' => 'decimal:2',
+        'machine_count' => 'integer',
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
-    
 }

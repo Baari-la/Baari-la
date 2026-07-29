@@ -180,92 +180,123 @@ class CompanyMarketService
      * market profile and international business coverage.
      */
     protected function marketPassport(
-        Company $company
-    ): array {
+    Company $company
+): array {
 
-        return [
+    /*
+    |--------------------------------------------------------------------------
+    | Normalized Markets
+    |--------------------------------------------------------------------------
+    */
 
-            /*
-            |--------------------------------------------------------------------------
-            | Export Markets
-            |--------------------------------------------------------------------------
-            */
+    $markets = $company->markets;
 
-            'markets' => [
+    $exportMarkets = $markets
+        ->filter(function ($market) {
+            return strtolower(
+                trim((string) $market->market_type)
+            ) === 'export';
+        })
+        ->values();
 
-                'total' => $company->markets->count(),
+    /*
+    |--------------------------------------------------------------------------
+    | Export Market Items
+    |--------------------------------------------------------------------------
+    */
 
-                'items' => $company->markets,
+    $exportMarketItems = $exportMarkets
+        ->map(function ($market) {
+            return [
+                'id' => $market->id,
+                'country_name' => $market->country_name,
+                'market_type' => $market->market_type,
+            ];
+        })
+        ->values()
+        ->all();
 
-            ],
+    return [
 
-            /*
-            |--------------------------------------------------------------------------
-            | Product Portfolio
-            |--------------------------------------------------------------------------
-            */
+        /*
+        |--------------------------------------------------------------------------
+        | Markets
+        |--------------------------------------------------------------------------
+        */
 
-            'products' => [
+        'markets' => [
 
-                'total' => $company->products->count(),
+            'total' => $markets->count(),
 
-                'items' => $company->products,
+            'items' => $markets,
 
-            ],
+        ],
 
-            /*
-            |--------------------------------------------------------------------------
-            | Country Information
-            |--------------------------------------------------------------------------
-            */
+        /*
+        |--------------------------------------------------------------------------
+        | Product Portfolio
+        |--------------------------------------------------------------------------
+        */
 
-            'country' => [
+        'products' => [
 
-                'code' => $company->country_code,
+            'total' => $company->products->count(),
 
-                'name' => $company->country_name,
+            'items' => $company->products,
 
-                'city' => $company->city,
+        ],
 
-            ],
+        /*
+        |--------------------------------------------------------------------------
+        | Country Information
+        |--------------------------------------------------------------------------
+        */
 
-            /*
-            |--------------------------------------------------------------------------
-            | Export Experience
-            |--------------------------------------------------------------------------
-            */
+        'country' => [
 
-            'export_experience' => [
+            'code' => $company->country_code,
 
-                'markets' => $company->pasar_ekspor,
+            'name' => $company->country_name,
 
-            ],
+            'city' => $company->city,
 
-            /*
-            |--------------------------------------------------------------------------
-            | Market Status
-            |--------------------------------------------------------------------------
-            */
+        ],
 
-            'status' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Export Experience
+        |--------------------------------------------------------------------------
+        */
 
-                'international_presence' =>
+        'export_experience' => [
 
-                    $company->markets->count() > 1,
+            'market_count' => $exportMarkets->count(),
 
-                'has_export_market' =>
+            'markets' => $exportMarketItems,
 
-                    filled($company->pasar_ekspor),
+        ],
 
-                'verified_company' =>
+        /*
+        |--------------------------------------------------------------------------
+        | Market Status
+        |--------------------------------------------------------------------------
+        */
 
-                    $company->isVerifiedProfile(),
+        'status' => [
 
-            ],
+            'international_presence' =>
+                $exportMarkets->isNotEmpty(),
 
-        ];
-    }
-    
+            'has_export_market' =>
+                $exportMarkets->isNotEmpty(),
+
+            'verified_company' =>
+                $company->isVerifiedProfile(),
+
+        ],
+
+    ];
+}
         /**
      * --------------------------------------------------------------------------
      * Executive Summary

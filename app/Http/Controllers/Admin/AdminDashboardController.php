@@ -311,8 +311,8 @@ $companyFields = collect($newData)
     ])
     ->toArray();
 
-$companyFields['status_verifikasi'] = 'verified';
-$companyFields['last_verified_at'] = now();
+// $companyFields['status_verifikasi'] = 'verified';
+// $companyFields['last_verified_at'] = now();
 $companyFields['last_updated_at'] = now();
 $companyFields['data_source'] = 'verified_by_admin';
 

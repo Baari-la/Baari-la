@@ -475,6 +475,9 @@ $recommendations = $companyIntelligence['recommendations'] ?? [];
 
 $role = $companyIntelligence['role'] ?? null;
 
+$roleClassification =
+    $companyIntelligence['role_classification'] ?? [];
+
 $ecosystem = $companyIntelligence['ecosystem'] ?? [];
 
 $businessNeeds = $companyIntelligence['business_needs'] ?? [];
@@ -485,28 +488,84 @@ $buildSupplyChain = $companyIntelligence['build_supply_chain'] ?? [];
 
     'profile' => [
 
-    'company_id'        => $company->id,
-    'company_name'      => $company->nama_perusahaan,
+    'company_id' => $company->id,
+    'company_name' => $company->nama_perusahaan,
 
-    'membership_type'   => $company->membership_type,
+    'membership_type' => $company->membership_type,
 
-    'country_name'      => $company->country_name,
-    'country_code'      => $company->country_code,
+    /*
+    |--------------------------------------------------------------------------
+    | Company Location
+    |--------------------------------------------------------------------------
+    */
 
-    'city'              => $company->city,
-    'sector'            => $company->sektor,
+    'country_name' => $company->country_name,
+    'country_code' => $company->country_code,
 
-    'leader'            => $company->pimpinan,
+    'city' => $company->city,
+    'sector' => $company->sektor,
 
-    'employees'         => $company->tenaga_kerja,
+    /*
+    |--------------------------------------------------------------------------
+    | Company Identity
+    |--------------------------------------------------------------------------
+    */
+
+    'leader' => $company->pimpinan,
+
+    'employees' => $company->tenaga_kerja,
+
+    'established' => $company->tahun_berdiri,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Export Markets
+    |--------------------------------------------------------------------------
+    */
+
+    'export_market_count' => $company->markets
+        ->where('market_type', 'export')
+        ->count(),
+
+    'export_markets' => $company->markets
+        ->where('market_type', 'export')
+        ->map(function ($market) {
+            return [
+                'id' => $market->id,
+                'country_name' => $market->country_name,
+                'market_type' => $market->market_type,
+            ];
+        })
+        ->values()
+        ->all(),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Verification
+    |--------------------------------------------------------------------------
+    */
 
     'verification_status' => $company->verification_status,
 
-    'claimed'           => $company->isClaimed(),
+    'claimed' => $company->isClaimed(),
 
-    'verified_company'  => $company->isVerifiedProfile(),
+    'verified_company' => $company->isVerifiedProfile(),
 
 ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Business Intelligence
+    |--------------------------------------------------------------------------
+    */
+
+    'role' => $role,
+
+    'role_classification' => $roleClassification,
+
+    'ecosystem' => $ecosystem,
+
+    'business_needs' => $businessNeeds,
 
     'capability' => $capability['passport'] ?? [],
 
@@ -516,7 +575,7 @@ $buildSupplyChain = $companyIntelligence['build_supply_chain'] ?? [];
 
     'supply_chain' => $supplyChain['passport'] ?? [],
 
-    'readiness' => $readiness['passport'] ?? [],
+    'readiness' => $readiness,
 
 ]; 
      

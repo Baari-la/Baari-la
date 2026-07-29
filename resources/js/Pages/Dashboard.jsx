@@ -78,6 +78,8 @@ export default function Dashboard({
     const {
         summary = {},
         annualSummary = {},
+        sectorSummary = {},
+        sectors = [],
         trend = [],
         topCountries = [],
         topHsCodes = [],
@@ -89,26 +91,36 @@ export default function Dashboard({
     const [filters, setFilters] = useState({
         year: "2025",
         tradeFlow: "all",
+        sector: "",
         country: "",
         hsCode: "",
         keyword: "",
     });
-    const selectedAnnualSummary = annualSummary?.[filters.year] ?? {};
+
+    const selectedSummary = filters.sector
+        ? (sectorSummary?.[filters.year]?.[filters.sector]?.[
+              filters.tradeFlow
+          ] ?? {})
+        : (annualSummary?.[filters.year]?.[filters.tradeFlow] ?? {});
 
     const filteredSummary = {
         ...summary,
 
-        exportValue: Number(
-            selectedAnnualSummary.exportValue ?? summary.exportValue ?? 0,
-        ),
+        exportValue: selectedSummary.exportValue ?? 0,
 
-        importValue: Number(
-            selectedAnnualSummary.importValue ?? summary.importValue ?? 0,
-        ),
+        importValue: selectedSummary.importValue ?? 0,
 
-        tradeBalance: Number(
-            selectedAnnualSummary.tradeBalance ?? summary.tradeBalance ?? 0,
-        ),
+        tradeBalance: selectedSummary.tradeBalance ?? 0,
+
+        countries: selectedSummary.countries ?? summary.countries ?? 0,
+
+        hsCodes: filters.sector
+            ? "-"
+            : (selectedSummary.hsCodes ?? summary.hsCodes ?? 0),
+
+        records: filters.sector
+            ? "-"
+            : (selectedSummary.records ?? summary.records ?? 0),
     };
 
     // 🕵️ MATRIKS EKSTRAKSI OTOMATIS BARIS TERAKHIR TABEL MARKET_HISTORIES (ID 46)
@@ -417,11 +429,15 @@ export default function Dashboard({
                         filters={filters}
                         setFilters={setFilters}
                         years={years}
+                        sectors={sectors}
                         countries={countries}
                         hsCodes={hsCodes}
                     />
 
-                    <SummaryCards summary={filteredSummary} />
+                    <SummaryCards
+                        summary={filteredSummary}
+                        tradeFlow={filters.tradeFlow}
+                    />
                     {/* --- LINK CEPAT DEEP INTELLIGENCE --- */}
                     <Link
                         href={route("intelligence.center")}

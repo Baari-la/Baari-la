@@ -7,12 +7,37 @@ import {
     Scale,
 } from "lucide-react";
 
-export default function SummaryCards({ summary = {} }) {
+export default function SummaryCards({ summary = {}, tradeFlow = "all" }) {
+    /*
+    |--------------------------------------------------------------------------
+    | Trade Values
+    |--------------------------------------------------------------------------
+    */
+
     const exportValue = Number(summary.exportValue ?? 0);
     const importValue = Number(summary.importValue ?? 0);
+
     const tradeBalance = Number(
         summary.tradeBalance ?? exportValue - importValue,
     );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trade Flow Visibility
+    |--------------------------------------------------------------------------
+    */
+
+    const showExport = tradeFlow === "all" || tradeFlow === "export";
+
+    const showImport = tradeFlow === "all" || tradeFlow === "import";
+
+    const showBalance = tradeFlow === "all";
+
+    /*
+    |--------------------------------------------------------------------------
+    | Formatter
+    |--------------------------------------------------------------------------
+    */
 
     const formatCurrency = (value) => {
         return new Intl.NumberFormat("en-US", {
@@ -21,32 +46,59 @@ export default function SummaryCards({ summary = {} }) {
         }).format(value);
     };
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cards
+    |--------------------------------------------------------------------------
+    */
+
     const cards = [
         {
             title: "Export",
-            value: `$ ${formatCurrency(exportValue)}`,
+
+            value: showExport ? `$ ${formatCurrency(exportValue)}` : "—",
+
             icon: ArrowUpRight,
-            color: "text-green-600",
-            bg: "bg-green-50",
+
+            color: showExport ? "text-green-600" : "text-slate-400",
+
+            bg: showExport ? "bg-green-50" : "bg-slate-50",
         },
 
         {
             title: "Import",
-            value: `$ ${formatCurrency(importValue)}`,
+
+            value: showImport ? `$ ${formatCurrency(importValue)}` : "—",
+
             icon: ArrowDownRight,
-            color: "text-red-600",
-            bg: "bg-red-50",
+
+            color: showImport ? "text-red-600" : "text-slate-400",
+
+            bg: showImport ? "bg-red-50" : "bg-slate-50",
         },
 
         {
             title: "Trade Balance",
-            value:
-                tradeBalance >= 0
+
+            value: showBalance
+                ? tradeBalance >= 0
                     ? `+$ ${formatCurrency(tradeBalance)}`
-                    : `-$ ${formatCurrency(Math.abs(tradeBalance))}`,
+                    : `-$ ${formatCurrency(Math.abs(tradeBalance))}`
+                : "—",
+
             icon: Scale,
-            color: tradeBalance >= 0 ? "text-blue-600" : "text-orange-600",
-            bg: tradeBalance >= 0 ? "bg-blue-50" : "bg-orange-50",
+
+            color: showBalance
+                ? tradeBalance >= 0
+                    ? "text-blue-600"
+                    : "text-orange-600"
+                : "text-slate-400",
+
+            bg: showBalance
+                ? tradeBalance >= 0
+                    ? "bg-blue-50"
+                    : "bg-orange-50"
+                : "bg-slate-50",
         },
 
         {
@@ -67,12 +119,18 @@ export default function SummaryCards({ summary = {} }) {
 
         {
             title: "Records",
-            value: Number(summary.records ?? 0).toLocaleString(),
+            value: Number(summary.records ?? 0).toLocaleString("en-US"),
             icon: Database,
             color: "text-slate-700",
             bg: "bg-slate-100",
         },
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
 
     return (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -82,7 +140,15 @@ export default function SummaryCards({ summary = {} }) {
                 return (
                     <div
                         key={card.title}
-                        className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md"
+                        className="
+                            rounded-2xl
+                            border border-slate-200
+                            bg-white
+                            p-6
+                            shadow-sm
+                            transition
+                            hover:shadow-md
+                        "
                     >
                         <div className="flex items-center justify-between">
                             <div>

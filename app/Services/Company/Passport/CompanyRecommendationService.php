@@ -656,111 +656,124 @@ if (!$passport['verification']['is_company_managed']) {
      * Generate recommendations based on Business Readiness Intelligence.
      */
     protected function businessReadinessRecommendations(
-        Company $company
-    ): array {
+    Company $company
+): array {
 
-        $readiness = $this->readiness->all($company);
+    /*
+    |--------------------------------------------------------------------------
+    | Company Intelligence Readiness
+    |--------------------------------------------------------------------------
+    |
+    | Readiness Engine is the SSOT for profile completeness and
+    | priority intelligence actions.
+    |
+    */
 
-        $passport = $readiness['passport'];
+    $readiness = $this->readiness->all($company);
 
-        $recommendations = [];
+    $missingIntelligence =
+        $readiness['missing_intelligence'] ?? [];
 
-        /*
-        |--------------------------------------------------------------------------
-        | Contacts
-        |--------------------------------------------------------------------------
-        */
+    $recommendations = [];
 
-        if ($passport['contacts']['total'] === 0) {
+    /*
+    |--------------------------------------------------------------------------
+    | Convert Priority Intelligence Actions → Recommendations
+    |--------------------------------------------------------------------------
+    */
 
-            $recommendations[] = [
+    foreach ($missingIntelligence as $item) {
 
-                'priority' => 'critical',
-
-                'category' => 'Business Readiness',
-
-                'title' => 'Complete Business Contacts',
-
-                'description' =>
-                    'Provide complete contact information so buyers can easily reach your company.',
-
-                'action' => 'Add Contacts',
-
-            ];
-        }
+        $dimension =
+            $item['dimension'] ?? null;
 
         /*
         |--------------------------------------------------------------------------
-        | Company Links
+        | Only Business Profile Dimensions
         |--------------------------------------------------------------------------
+        |
+        | Other intelligence modules already generate their own
+        | capability, compliance, market and supply-chain recommendations.
+        |
         */
 
-        if ($passport['commercial']['links']['total'] === 0) {
-
-            $recommendations[] = [
-                'priority' => 'high',
-                'category' => 'Business Readiness',
-                'title' => 'Add Company Website & Social Links',
-                'description' =>
-                    'A complete online presence improves buyer trust and supplier visibility.',
-                'action' => 'Add Company Links',
-
-            ];
+        if (!in_array(
+            $dimension,
+            [
+                '01_identity',
+                '02_facilities',
+                '03_products',
+                '04_capacity',
+                '05_machinery',
+                '06_commercial',
+                '08_compliance',
+                '09_contacts',
+                '10_media',
+            ],
+            true
+        )) {
+            continue;
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Images
-        |--------------------------------------------------------------------------
-        */
+        $priority =
+            match ($item['priority'] ?? 'low') {
 
-        if ($passport['commercial']['images']['total'] === 0) {
+                'high' =>
+                    'high',
 
-            $recommendations[] = [
-                'priority' => 'high',
-                'category' => 'Business Readiness',
-                'title' => 'Upload Company Images',
-                'description' =>
-                    'Factory, product and company images help buyers understand your business.',
-                'action' => 'Upload Images',
-            ];
-        }
+                'medium' =>
+                    'medium',
 
-        /*
-        |--------------------------------------------------------------------------
-        | Export Markets
-        |--------------------------------------------------------------------------
-        */
-        if ($passport['export']['markets']['total'] === 0) {
-            $recommendations[] = [
-                'priority' => 'medium',
-                'category' => 'Business Readiness',
-                'title' => 'Expand Export Market Profile',
-                'description' =>
-                    'Include export destinations to improve international visibility.',
-                'action' => 'Update Export Markets',
-            ];
-        }
+                default =>
+                    'low',
+            };
 
-        /*
-        |--------------------------------------------------------------------------
-        | Website
-        |--------------------------------------------------------------------------
-        */
+        $label =
+            $item['label']['en']
+            ?? $dimension
+            ?? 'Company Profile';
 
-        if (!$passport['digital']['website_available']) {
-            $recommendations[] = [
-                'priority' => 'medium',
-                'category' => 'Business Readiness',
-                'title' => 'Add Company Website',
-                'description' =>
-                    'A professional website increases buyer confidence.',
-                'action' => 'Add Website',
-            ];
-        }
+        $action =
+            $item['action']['en']
+            ?? 'Complete company information';
 
-        return $recommendations;
+        $recommendations[] = [
+
+            'priority' =>
+                $priority,
+
+            'category' =>
+                'Company Intelligence',
+
+            'dimension' =>
+                $dimension,
+
+            'title' =>
+                $label,
+
+            'description' =>
+                $action,
+
+            'action' =>
+                $action,
+
+            'completion' =>
+                (float) (
+                    $item['completion']
+                    ?? 0
+                ),
+
+            'potential_gain' =>
+                (float) (
+                    $item['potential_gain']
+                    ?? 0
+                ),
+
+        ];
     }
+
+    return $recommendations;
+}
         /**
      * --------------------------------------------------------------------------
      * Executive Recommendations

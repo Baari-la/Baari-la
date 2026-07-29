@@ -3,11 +3,9 @@ import { Calendar, Globe, Search, Filter } from "lucide-react";
 export default function DashboardFilterBar({
     filters,
     setFilters,
-
     years = [],
-
+    sectors = [],
     countries = [],
-
     hsCodes = [],
 }) {
     const handleChange = (field, value) => {
@@ -36,7 +34,7 @@ export default function DashboardFilterBar({
                 </div>
             </div>
 
-            <div className="grid gap-4 p-6 md:grid-cols-2 xl:grid-cols-5">
+            <div className="grid gap-4 p-6 md:grid-cols-2 xl:grid-cols-6">
                 {/* Year */}
 
                 <div>
@@ -97,6 +95,28 @@ export default function DashboardFilterBar({
                         <option value="export">Export</option>
 
                         <option value="import">Import</option>
+                    </select>
+                </div>
+
+                {/* Sector */}
+
+                <div>
+                    <label className="mb-2 block text-xs font-bold uppercase text-slate-500">
+                        Sector
+                    </label>
+
+                    <select
+                        value={filters.sector ?? ""}
+                        onChange={(e) => handleChange("sector", e.target.value)}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 bg-white focus:border-blue-500 focus:outline-none"
+                    >
+                        <option value="">All Sectors</option>
+
+                        {sectors.map((sector) => (
+                            <option key={sector} value={sector}>
+                                {sector}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
