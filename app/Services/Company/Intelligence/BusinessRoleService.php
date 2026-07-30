@@ -555,48 +555,224 @@ protected function inferRolesFromText(
     $roles = [];
 
     /*
-    |--------------------------------------------------------------------------
-    | Fiber
-    |--------------------------------------------------------------------------
-    */
+|--------------------------------------------------------------------------
+| Synthetic Polymer
+|--------------------------------------------------------------------------
+|
+| Polymer roles require explicit polymer / chips / resin evidence.
+| Yarn or fiber terminology alone must not imply polymer production.
+|
+*/
 
-    if (
-        str_contains($text, 'viscose') ||
-        str_contains($text, 'rayon')
-    ) {
-        $roles[] =
-            'viscose_producer';
-    }
+if (
+    str_contains($text, 'pet chip') ||
+    str_contains($text, 'pet chips') ||
+    str_contains($text, 'polyester chip') ||
+    str_contains($text, 'polyester chips') ||
+    str_contains($text, 'polyester polymer')
+) {
+    $roles[] =
+        'polyester_polymer_producer';
+}
 
-    if (
-        str_contains($text, 'staple fiber') ||
-        str_contains($text, 'staple fibre')
-    ) {
-        $roles[] =
-            'staple_fiber_manufacturer';
-    }
+/*
+|--------------------------------------------------------------------------
+| Nylon / Polyamide Polymer
+|--------------------------------------------------------------------------
+*/
 
-    if (
-        str_contains($text, 'polyester fiber') ||
-        str_contains($text, 'polyester fibre')
-    ) {
-        $roles[] =
-            'synthetic_fiber_manufacturer';
-    }
+if (
+    str_contains($text, 'nylon polymer') ||
+    str_contains($text, 'nylon chip') ||
+    str_contains($text, 'nylon chips') ||
+    str_contains($text, 'polyamide polymer') ||
+    str_contains($text, 'polyamide chip') ||
+    str_contains($text, 'polyamide chips') ||
+    str_contains($text, 'polyamid chip') ||
+    str_contains($text, 'polyamid chips') ||
+    str_contains($text, 'chip polyamide') ||
+    str_contains($text, 'chips polyamide') ||
+    str_contains($text, 'chip polyamid') ||
+    str_contains($text, 'chips polyamid')
+) {
+    $roles[] = 'nylon_polymer_producer';
+}
 
-    /*
-    |--------------------------------------------------------------------------
-    | Generic Fiber
-    |--------------------------------------------------------------------------
-    */
+if (
+    str_contains($text, 'acrylic polymer')
+) {
+    $roles[] =
+        'acrylic_polymer_producer';
+}
 
-    if (
+if (
+    str_contains($text, 'synthetic polymer')
+) {
+    $roles[] =
+        'synthetic_polymer_producer';
+}
+    
+   /*
+|--------------------------------------------------------------------------
+| Fiber
+|--------------------------------------------------------------------------
+|
+| Prefer the most specific canonical role available.
+| Generic fiber_manufacturer is used only when no more specific
+| fiber classification can be inferred from the same evidence.
+|
+*/
+
+$fiberSpecificRoleFound = false;
+
+/*
+|--------------------------------------------------------------------------
+| Viscose Producer
+|--------------------------------------------------------------------------
+|
+| Viscose yarn / rayon yarn does not imply viscose fiber production.
+|--------------------------------------------------------------------------
+*/
+
+if (
+    str_contains($text, 'viscose fiber') ||
+    str_contains($text, 'viscose fibers') ||
+    str_contains($text, 'viscose fibre') ||
+    str_contains($text, 'viscose fibres') ||
+    str_contains($text, 'fiber viscose') ||
+    str_contains($text, 'fibre viscose') ||
+    str_contains($text, 'viscose staple fiber') ||
+    str_contains($text, 'viscose staple fibre') ||
+    str_contains($text, 'viscose rayon staple fiber') ||
+    str_contains($text, 'viscose rayon staple fibres') ||
+    str_contains($text, 'rayon staple fiber') ||
+    str_contains($text, 'rayon staple fibre')
+) {
+    $roles[] = 'viscose_producer';
+
+    $fiberSpecificRoleFound = true;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Staple Fiber
+|--------------------------------------------------------------------------
+*/
+
+if (
+    str_contains($text, 'staple fiber') ||
+    str_contains($text, 'staple fibre')
+) {
+    $roles[] =
+        'staple_fiber_manufacturer';
+
+    $fiberSpecificRoleFound = true;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Synthetic / Polyester Fiber
+|--------------------------------------------------------------------------
+*/
+
+if (
+    str_contains($text, 'polyester fiber') ||
+    str_contains($text, 'polyester fibre')
+) {
+    $roles[] =
+        'synthetic_fiber_manufacturer';
+
+    $fiberSpecificRoleFound = true;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Acrylic Fiber
+|--------------------------------------------------------------------------
+*/
+
+if (
+    str_contains($text, 'acrylic fiber') ||
+    str_contains($text, 'acrylic fibre') ||
+    str_contains($text, 'acrylic fibers') ||
+    str_contains($text, 'acrylic fibres')
+) {
+    $roles[] =
+        'synthetic_fiber_manufacturer';
+
+    $fiberSpecificRoleFound = true;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Generic Fiber
+|--------------------------------------------------------------------------
+|
+| Only use the generic parent when this evidence does not provide
+| a more specific fiber classification.
+|
+*/
+
+if (
+    ! $fiberSpecificRoleFound &&
+    (
         str_contains($text, 'fiber') ||
         str_contains($text, 'fibre')
-    ) {
-        $roles[] =
-            'fiber_manufacturer';
-    }
+    )
+) {
+    $roles[] =
+        'fiber_manufacturer';
+}
+
+/*
+|--------------------------------------------------------------------------
+| Filament
+|--------------------------------------------------------------------------
+*/
+
+if (
+    str_contains($text, 'filament yarn') ||
+    str_contains($text, 'filament yarns') ||
+    str_contains($text, 'multifilament') ||
+    str_contains($text, 'monofilament')
+) {
+    $roles[] =
+        'filament_fiber_manufacturer';
+}
+
+/*
+|--------------------------------------------------------------------------
+| Filament Yarn Types
+|--------------------------------------------------------------------------
+*/
+
+if (
+    preg_match('/\bpoy\b/i', $text)
+) {
+    $roles[] =
+        'poy_producer';
+}
+
+if (
+    preg_match('/\bfdy\b/i', $text)
+) {
+    $roles[] =
+        'fdy_producer';
+}
+
+if (
+    preg_match('/\bdty\b/i', $text)
+) {
+    $roles[] =
+        'dty_producer';
+}
+
+if (
+    preg_match('/\baty\b/i', $text)
+) {
+    $roles[] =
+        'aty_producer';
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -626,6 +802,62 @@ protected function inferRolesFromText(
         $roles[] =
             'open_end_spinning_mill';
     }
+
+    /*
+|--------------------------------------------------------------------------
+| Sewing Thread
+|--------------------------------------------------------------------------
+*/
+
+if (
+    str_contains($text, 'sewing thread') ||
+    str_contains($text, 'sewing threads')
+) {
+    $roles[] = 'sewing_thread_manufacturer';
+}
+
+/*
+|--------------------------------------------------------------------------
+| Yarn Twisting
+|--------------------------------------------------------------------------
+*/
+
+if (
+    str_contains($text, 'twisting') ||
+    str_contains($text, 'twist yarn') ||
+    str_contains($text, 'twist yarns') ||
+    str_contains($text, 'twisted yarn')
+) {
+    $roles[] = 'yarn_twisting';
+}
+
+/*
+|--------------------------------------------------------------------------
+| Texturizing
+|--------------------------------------------------------------------------
+|
+| Detects yarn texturizing activities.
+|
+| Examples:
+| - Texturized Yarn
+| - Texturized Yarns
+| - Textured Yarn
+| - Texturizing
+|--------------------------------------------------------------------------
+*/
+
+if (
+    str_contains($text, 'texturized yarn') ||
+    str_contains($text, 'texturized yarns') ||
+    str_contains($text, 'texturised yarn') ||
+    str_contains($text, 'texturised yarns') ||
+    str_contains($text, 'textured yarn') ||
+    str_contains($text, 'textured yarns') ||
+    str_contains($text, 'texturizing') ||
+    str_contains($text, 'texturising')
+) {
+    $roles[] = 'texturizing_company';
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -676,6 +908,22 @@ protected function inferRolesFromText(
         $roles[] =
             'nonwoven_manufacturer';
     }
+
+    /*
+|--------------------------------------------------------------------------
+| Technical Textile
+|--------------------------------------------------------------------------
+*/
+
+if (
+    str_contains($text, 'tire cord') ||
+    str_contains($text, 'tyre cord') ||
+    str_contains($text, 'technical textile') ||
+    str_contains($text, 'geotextile')
+) {
+    $roles[] =
+        'technical_textile_manufacturer';
+}
 
     /*
     |--------------------------------------------------------------------------

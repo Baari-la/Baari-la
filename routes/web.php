@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PortTrackerController;
+use App\Http\Controllers\Api\RecommendationController;
 use Inertia\Inertia;
 use App\Models\Company;
 use App\Http\Controllers\RfqController;
@@ -49,6 +50,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\DirectoryVisibilityProgramController;
 use App\Http\Controllers\ProgramPortalController;
+
 
 
 
@@ -202,12 +204,46 @@ Route::delete(
 
 
 
-/// 🚢 PERLUASAN PIPA DATA: Menambahkan endpoint penarik status EWS Domestik untuk React Frontend
-Route::prefix('api/v2')->group(function () {
-    Route::post('/port-tracker/stream-input', [PortTrackerController::class, 'storeFeedData'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
-    
-    // Endpoint Baru penarik data agregat EWS riil
-    Route::get('/ews/domestic-status', [PortTrackerController::class, 'getLiveEwsStatus']);
+/*
+|--------------------------------------------------------------------------
+| API Routes: PT. Digestex Global Intelligence v2.0
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('v2')->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Port Tracker
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/port-tracker/stream-input',
+        [PortTrackerController::class, 'storeFeedData']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Early Warning System
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/ews/domestic-status',
+        [PortTrackerController::class, 'getLiveEwsStatus']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | DIGESTEX Recommendation Intelligence
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/recommendations/companies/{company}',
+        [RecommendationController::class, 'index']
+    );
 });
 
 // LEVEL 1: PUBLIK
@@ -887,6 +923,8 @@ Route::post(
         [OnboardingController::class, 'reviewSubmit']
     )->name('onboarding.review-submit');
 });
+
+
 
 // Direktory digital
 

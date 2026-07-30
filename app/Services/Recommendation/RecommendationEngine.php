@@ -17,9 +17,9 @@ use App\Services\Recommendation\Score\CompatibilityScoreService;
 use App\Services\Recommendation\Score\ConfidenceScoreService;
 use App\Services\Recommendation\Score\RecommendationScoreService;
 
-use App\Services\Recommendation\Reason\RecommendationReasonService;
-
 use App\Services\Recommendation\Ranking\RecommendationRankingService;
+use App\Services\Recommendation\Reason\RecommendationReasonService;
+use App\Services\Recommendation\Explanation\RecommendationExplanationService;
 
 use App\Services\Recommendation\Metadata\RecommendationMetadataService;
 
@@ -35,82 +35,62 @@ use App\Services\Recommendation\Metadata\RecommendationMetadataService;
  *
  * This engine powers:
  *
- * • Smart Business Matching™
- * • Build My Supply Chain™
- * • Buyer Discovery™
- * • RFQ Intelligence™
- * • Opportunity Intelligence™
- * • Executive AI™
+ * - Smart Business Matching
+ * - Build My Supply Chain
+ * - Buyer Discovery
+ * - RFQ Intelligence
+ * - Opportunity Intelligence
+ * - Executive AI
  *
- * Architecture
+ * Architecture:
  *
  * Candidate Loader
- *          ↓
+ *      ↓
  * Candidate Evaluation
- *          ↓
+ *      ↓
+ * Eligibility Gate
+ *      ↓
+ * Discovery Mode Gate
+ *      ↓
  * Compatibility Score
- *          ↓
+ *      ↓
  * Recommendation Score
- *          ↓
- * Recommendation Reason
- *          ↓
+ *      ↓
  * Confidence Score
- *          ↓
+ *      ↓
  * Ranking
+ *      ↓
+ * Assign Rank
+ *      ↓
+ * Recommendation Reasons
+ *      ↓
+ * Recommendation Explanation
+ *      ↓
+ * Metadata
+ *      ↓
+ * Recommendation Result
  *
  * Version:
- * 1.0
+ * 2.1
  */
 class RecommendationEngine implements RecommendationEngineContract
 {
     public function __construct(
-
-        /*
-        |--------------------------------------------------------------------------
-        | Candidate
-        |--------------------------------------------------------------------------
-        */
-
         protected CandidateLoader $loader,
-
         protected CandidateEvaluator $evaluator,
-
-        /*
-        |--------------------------------------------------------------------------
-        | Score
-        |--------------------------------------------------------------------------
-        */
-
         protected CompatibilityScoreService $compatibility,
-
         protected RecommendationScoreService $score,
-
         protected ConfidenceScoreService $confidence,
-
-        /*
-        |--------------------------------------------------------------------------
-        | Recommendation
-        |--------------------------------------------------------------------------
-        */
-
-        protected RecommendationReasonService $reason,
-
         protected RecommendationRankingService $ranking,
-
-        /*
-        |--------------------------------------------------------------------------
-        | Metadata
-        |--------------------------------------------------------------------------
-        */
-
+        protected RecommendationReasonService $reason,
+        protected RecommendationExplanationService $explanation,
         protected RecommendationMetadataService $metadata,
-
     ) {
     }
 
     /**
      * --------------------------------------------------------------------------
-     * Generate Recommendation
+     * Generate Recommendations
      * --------------------------------------------------------------------------
      */
     public function recommend(
@@ -120,152 +100,221 @@ class RecommendationEngine implements RecommendationEngineContract
 
         /*
         |--------------------------------------------------------------------------
-        | Step 1
-        | Load Candidate Companies
+        | Step 1 — Load Candidate Companies
         |--------------------------------------------------------------------------
         */
 
         $candidates = $this->loader->load(
-
             company: $company,
-
             context: $context,
-
         );
 
         /*
         |--------------------------------------------------------------------------
-        | Step 2
-        | Evaluate Candidates
+        | Step 2 — Evaluate Candidates
         |--------------------------------------------------------------------------
         */
 
-        $evaluated = $this->evaluator->evaluate(
-
+        $recommendations = $this->evaluator->evaluate(
             company: $company,
-
             candidates: $candidates,
-
             context: $context,
-
         );
+
+        $evaluatedCount = $recommendations->count();
 
         /*
         |--------------------------------------------------------------------------
-        | Step 3
-        | Compatibility Score
+        | Step 3 — Eligibility Gate
         |--------------------------------------------------------------------------
         */
 
-        $evaluated = $this->compatibility->calculate(
+        $recommendations = $recommendations
+            ->filter(
+                fn (array $candidate): bool =>
+                    (bool) ($candidate['eligible'] ?? false)
+            )
+            ->values();
 
-            company: $company,
-
-            candidates: $evaluated,
-
-            context: $context,
-
-        );
+        $eligibleCount = $recommendations->count();
 
         /*
         |--------------------------------------------------------------------------
-        | Step 4
-        | Recommendation Score
+        | Step 4 — Discovery Mode Gate
         |--------------------------------------------------------------------------
         */
 
-        $evaluated = $this->score->calculate(
+        $discoveryMode = $context['discovery_mode'] ?? null;
 
-            company: $company,
+        if (
+            is_string($discoveryMode)
+            && trim($discoveryMode) !== ''
+        ) {
+            $discoveryMode = strtolower(
+                trim($discoveryMode)
+            );
 
-            candidates: $evaluated,
+            $recommendations = $recommendations
+                ->filter(
+                    fn (array $candidate): bool =>
+                        ($candidate['discovery_mode'] ?? null)
+                        === $discoveryMode
+                )
+                ->values();
+        }
 
-            context: $context,
-
-        );
+        $discoveryMatchedCount = $recommendations->count();
 
         /*
         |--------------------------------------------------------------------------
-        | Step 5
-        | Recommendation Reasons
+        | Step 5 — Compatibility Score
         |--------------------------------------------------------------------------
         */
 
-        $evaluated = $this->reason->build(
-
+        $recommendations = $this->compatibility->calculate(
             company: $company,
-
-            candidates: $evaluated,
-
+            candidates: $recommendations,
             context: $context,
-
         );
 
         /*
         |--------------------------------------------------------------------------
-        | Step 6
-        | Confidence Score
+        | Step 6 — Recommendation Score
         |--------------------------------------------------------------------------
         */
 
-        $evaluated = $this->confidence->calculate(
-
+        $recommendations = $this->score->calculate(
             company: $company,
-
-            candidates: $evaluated,
-
+            candidates: $recommendations,
             context: $context,
-
         );
-
-       /*
-|--------------------------------------------------------------------------
-| Step 7
-| Ranking
-|--------------------------------------------------------------------------
-/*
-|--------------------------------------------------------------------------
-| Step 7
-| Ranking
-|--------------------------------------------------------------------------
-*/
-
-$recommendations = $this->ranking->rank(
-
-    $evaluated
-
-);
 
         /*
         |--------------------------------------------------------------------------
-        | Step 8
-        | Metadata
+        | Step 7 — Confidence Score
+        |--------------------------------------------------------------------------
+        */
+
+        $recommendations = $this->confidence->calculate(
+            company: $company,
+            candidates: $recommendations,
+            context: $context,
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Step 8 — Ranking
+        |--------------------------------------------------------------------------
+        */
+
+        $recommendations = $this->ranking->rank(
+            $recommendations
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Step 9 — Assign Rank
+        |--------------------------------------------------------------------------
+        |
+        | Ranking score and ordering have already been determined.
+        | This step only assigns the visible ordinal rank.
+        |
+        */
+
+        $recommendations = $recommendations
+            ->values()
+            ->map(
+                function (
+                    array $recommendation,
+                    int $index
+                ): array {
+
+                    $recommendation['rank'] =
+                        $index + 1;
+
+                    return $recommendation;
+                }
+            );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Step 10 — Recommendation Reasons
+        |--------------------------------------------------------------------------
+        |
+        | Produces deterministic evidence-based reasons from intelligence
+        | already generated by the upstream recommendation pipeline.
+        |
+        */
+
+        $recommendations = $this->reason->build(
+            company: $company,
+            candidates: $recommendations,
+            context: $context,
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Step 11 — Recommendation Explanation
+        |--------------------------------------------------------------------------
+        |
+        | Converts structured recommendation intelligence and evidence into
+        | concise human-readable business explanations.
+        |
+        | This step does not modify scoring or ranking.
+        |
+        */
+
+        $recommendations = $this->explanation->build(
+            company: $company,
+            candidates: $recommendations,
+            context: $context,
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Step 12 — Metadata
         |--------------------------------------------------------------------------
         */
 
         $metadata = $this->metadata->build(
-
             company: $company,
-
             recommendations: $recommendations,
-
             context: $context,
-
         );
 
         /*
-|--------------------------------------------------------------------------
-| Convert Collection to Array
-|--------------------------------------------------------------------------
-*/
+        |--------------------------------------------------------------------------
+        | Statistics
+        |--------------------------------------------------------------------------
+        */
 
-$recommendations =
+        $statistics = [
+            'candidate_count' =>
+                $candidates->count(),
 
-    $recommendations
+            'evaluated_count' =>
+                $evaluatedCount,
 
-        ->values()
+            'eligible_count' =>
+                $eligibleCount,
 
-        ->all();
+            'discovery_matched_count' =>
+                $discoveryMatchedCount,
+
+            'recommended_count' =>
+                $recommendations->count(),
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | Convert Collection to Array
+        |--------------------------------------------------------------------------
+        */
+
+        $recommendationArray = $recommendations
+            ->values()
+            ->all();
+
         /*
         |--------------------------------------------------------------------------
         | Result
@@ -273,27 +322,13 @@ $recommendations =
         */
 
         return new RecommendationResult(
-
             engine: 'DIGESTEX Recommendation Intelligence Engine',
-
-            version: '1.0',
-
+            version: '2.1',
             companyId: $company->id,
-
             generatedAt: Carbon::now(),
-
-            recommendations: $recommendations,
-
-            statistics: [
-
-                'candidate_count' => count($candidates),
-
-                'recommended_count' => count($recommendations),
-
-            ],
-
+            recommendations: $recommendationArray,
+            statistics: $statistics,
             metadata: $metadata,
-
         );
     }
 }
