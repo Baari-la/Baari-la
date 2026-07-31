@@ -29,7 +29,7 @@ use Illuminate\Support\Collection;
  * This service DOES NOT calculate recommendation scores.
  *
  * Version:
- * 3.0
+ * 3.1
  */
 class CandidateEvaluator
 {
@@ -296,6 +296,41 @@ if (
                     'role_scores' =>
                         $classification['role_scores']
                         ?? [],
+
+                            /*
+                |--------------------------------------------------------------------------
+                | Matched Role Intelligence
+                |--------------------------------------------------------------------------
+                |
+                | canonical_role represents the candidate's primary classified role.
+                |
+                | matched_role represents the exact candidate capability responsible
+                | for the selected primary business relationship.
+                |
+                | source_matched_role represents the exact source-company capability
+                | participating in that relationship.
+                |
+                | These fields are intentionally derived from primary_relationship,
+                | not canonical_role, because both source and candidate may operate
+                | across multiple textile ecosystem roles.
+                |
+                */
+
+                'matched_role' =>
+                    $primaryRelationship[
+                        'candidate_role'
+                    ] ?? (
+                        $supplyChain['target_role']
+                        ?? null
+                    ),
+
+                'source_matched_role' =>
+                    $primaryRelationship[
+                        'company_role'
+                    ] ?? (
+                        $supplyChain['source_role']
+                        ?? null
+                    ), 
 
                     /*
                     |--------------------------------------------------------------------------

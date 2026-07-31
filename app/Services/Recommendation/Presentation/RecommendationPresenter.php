@@ -33,7 +33,7 @@ use App\Services\Recommendation\DTO\RecommendationResult;
  * - generate explanations
  *
  * Version:
- * 1.0
+ * 1.1
  */
 class RecommendationPresenter
 {
@@ -130,8 +130,37 @@ class RecommendationPresenter
                     $candidate['semantic_type']
                     ?? null,
 
+                /*
+                |--------------------------------------------------------------------------
+                | Role Intelligence
+                |--------------------------------------------------------------------------
+                |
+                | role:
+                | Primary/canonical classification of the candidate.
+                |
+                | matched_role:
+                | Exact candidate capability responsible for this recommendation.
+                |
+                | source_matched_role:
+                | Exact source-company capability participating in the match.
+                |
+                | specific_roles:
+                | All identified capabilities of the candidate.
+                |
+                */
+
                 'role' =>
                     $candidate['canonical_role']
+                    ?? null,
+
+                'matched_role' =>
+                    $candidate['matched_role']
+                    ?? $candidate['supply_chain_target_role']
+                    ?? null,
+
+                'source_matched_role' =>
+                    $candidate['source_matched_role']
+                    ?? $candidate['supply_chain_source_role']
                     ?? null,
 
                 'specific_roles' =>

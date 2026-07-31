@@ -32,7 +32,7 @@ use Illuminate\Support\Collection;
  * It only explains intelligence already produced by upstream services.
  *
  * Version:
- * 1.0
+ * 1.1
  */
 class RecommendationExplanationService
 {
@@ -55,7 +55,43 @@ class RecommendationExplanationService
                 $sourceName = $company->nama_perusahaan
                     ?: 'the source company';
 
-                $candidateRole = $candidate['canonical_role'] ?? null;
+                /*
+                |--------------------------------------------------------------------------
+                | Matched Role Intelligence
+                |--------------------------------------------------------------------------
+                |
+                | canonicalRole:
+                | Primary/display classification of the candidate.
+                |
+                | matchedRole:
+                | Exact candidate capability responsible for this recommendation.
+                |
+                | sourceMatchedRole:
+                | Exact source-company capability participating in the relationship.
+                |
+                */
+
+                $canonicalRole =
+                    $candidate['canonical_role']
+                    ?? null;
+
+                $matchedRole =
+                    $candidate['matched_role']
+                    ?? $candidate['supply_chain_target_role']
+                    ?? $canonicalRole;
+
+                $sourceMatchedRole =
+                    $candidate['source_matched_role']
+                    ?? $candidate['supply_chain_source_role']
+                    ?? null;
+
+                $direction =
+                    $candidate['supply_chain_direction']
+                    ?? $candidate['relationship_direction']
+                    ?? data_get(
+                        $candidate,
+                        'primary_relationship.direction'
+                    );
 
                 $candidateRelationship =
                     $candidate['inverse_relationship']
@@ -103,7 +139,7 @@ class RecommendationExplanationService
                 $summary = $this->buildSummary(
                     sourceName: $sourceName,
                     candidateName: $candidateName,
-                    candidateRole: $candidateRole,
+                    matchedRole: $matchedRole,
                     candidateRelationship: $candidateRelationship,
                 );
 
@@ -113,6 +149,9 @@ class RecommendationExplanationService
                     semanticType: $semanticType,
                     depth: $depth,
                     depthClass: $depthClass,
+                    direction: $direction,
+                    sourceMatchedRole: $sourceMatchedRole,
+                    matchedRole: $matchedRole,
                 );
 
                 $evidence = $this->buildEvidenceExplanation(
@@ -213,39 +252,39 @@ class RecommendationExplanationService
      * Build Summary
      * --------------------------------------------------------------------------
      */
-    private function buildSummary(
-        string $sourceName,
-        string $candidateName,
-        mixed $candidateRole,
-        mixed $candidateRelationship,
-    ): string {
+            private function buildSummary(
+            string $sourceName,
+            string $candidateName,
+            mixed $matchedRole,
+            mixed $candidateRelationship,
+        ): string {
 
-        $role = is_string($candidateRole)
-            && trim($candidateRole) !== ''
-                ? $this->humanizeRole($candidateRole)
-                : 'textile ecosystem company';
+            $role = is_string($matchedRole)
+                && trim($matchedRole) !== ''
+                    ? $this->humanizeRole($matchedRole)
+                    : 'textile ecosystem';
 
-        return match ($candidateRelationship) {
+            return match ($candidateRelationship) {
 
-            'buyer' =>
-                "{$candidateName} is identified as a potential buyer for {$sourceName}, with relevant {$role} capability.",
+                'buyer' =>
+                    "{$candidateName} is identified as a potential buyer for {$sourceName} through its {$role} capability.",
 
-            'supplier' =>
-                "{$candidateName} is identified as a potential supplier for {$sourceName}, with relevant {$role} capability.",
+                'supplier' =>
+                    "{$candidateName} is identified as a potential supplier for {$sourceName} through its {$role} capability.",
 
-            'solution_partner' =>
-                "{$candidateName} is identified as a relevant solution partner for {$sourceName}, with {$role} capability.",
+                'solution_partner' =>
+                    "{$candidateName} is identified as a relevant solution partner for {$sourceName} through its {$role} capability.",
 
-            'technology_partner' =>
-                "{$candidateName} is identified as a relevant technology partner for {$sourceName}, with {$role} capability.",
+                'technology_partner' =>
+                    "{$candidateName} is identified as a relevant technology partner for {$sourceName} through its {$role} capability.",
 
-            'partner' =>
-                "{$candidateName} is identified as a potential business partner for {$sourceName}.",
+                'partner' =>
+                    "{$candidateName} is identified as a potential business partner for {$sourceName}.",
 
-            default =>
-                "{$candidateName} is identified as a relevant company for {$sourceName} within the textile ecosystem.",
-        };
-    }
+                default =>
+                    "{$candidateName} is identified as a relevant company for {$sourceName} within the textile ecosystem.",
+            };
+        }
 
     /**
      * --------------------------------------------------------------------------
@@ -253,57 +292,132 @@ class RecommendationExplanationService
      * --------------------------------------------------------------------------
      */
     private function buildRelationshipExplanation(
-        string $sourceName,
-        string $candidateName,
-        mixed $semanticType,
-        ?int $depth,
-        mixed $depthClass,
-    ): ?string {
+    string $sourceName,
+    string $candidateName,
+    mixed $semanticType,
+    ?int $depth,
+    mixed $depthClass,
+    mixed $direction,
+    mixed $sourceMatchedRole,
+    mixed $matchedRole,
+): ?string {
 
-        $proximity = match ($depth) {
+    $proximity = match ($depth) {
 
-            1 =>
-                'a direct ecosystem relationship',
+        1 =>
+            'a direct ecosystem relationship',
 
-            2 =>
-                'a strategic two-step ecosystem relationship',
+        2 =>
+            'a strategic two-step ecosystem relationship',
 
-            3 =>
-                'an extended three-step ecosystem relationship',
+        3 =>
+            'an extended three-step ecosystem relationship',
 
-            default =>
-                is_string($depthClass)
-                && trim($depthClass) !== ''
-                    ? 'a '
-                        . $this->humanizeRole($depthClass)
-                        . ' ecosystem relationship'
-                    : null,
-        };
+        default =>
+            is_string($depthClass)
+            && trim($depthClass) !== ''
+                ? 'a '
+                    . $this->humanizeRole($depthClass)
+                    . ' ecosystem relationship'
+                : null,
+    };
 
-        if ($semanticType === 'material_flow') {
+    $sourceRoleLabel =
+        is_string($sourceMatchedRole)
+        && trim($sourceMatchedRole) !== ''
+            ? $this->humanizeRole($sourceMatchedRole)
+            : null;
 
-            return $proximity !== null
-                ? "{$sourceName} and {$candidateName} are connected through {$proximity} within the textile material flow."
-                : "{$sourceName} and {$candidateName} are connected through the textile material flow.";
+    $matchedRoleLabel =
+        is_string($matchedRole)
+        && trim($matchedRole) !== ''
+            ? $this->humanizeRole($matchedRole)
+            : null;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Material Flow
+    |--------------------------------------------------------------------------
+    */
+
+    if ($semanticType === 'material_flow') {
+
+        if (
+            $sourceRoleLabel !== null
+            && $matchedRoleLabel !== null
+        ) {
+
+            $directionLabel = match ($direction) {
+
+                'upstream' =>
+                    'upstream',
+
+                'downstream' =>
+                    'downstream',
+
+                default =>
+                    null,
+            };
+
+            $relationshipLabel =
+                $proximity
+                ?? 'an ecosystem relationship';
+
+            $directionText =
+                $directionLabel !== null
+                    ? " {$directionLabel}"
+                    : '';
+
+            return "{$sourceName}'s {$sourceRoleLabel} capability and {$candidateName}'s {$matchedRoleLabel} capability are connected through {$relationshipLabel} in the{$directionText} textile material flow.";
         }
 
-        if ($semanticType === 'solution_supply') {
-
-            return $proximity !== null
-                ? "{$candidateName} is connected to {$sourceName} through {$proximity} in the textile solution ecosystem."
-                : "{$candidateName} has a relevant solution-supply relationship with {$sourceName}.";
-        }
-
-        if ($semanticType === 'technology_solution') {
-
-            return $proximity !== null
-                ? "{$candidateName} is connected to {$sourceName} through {$proximity} in the textile technology ecosystem."
-                : "{$candidateName} has a relevant technology relationship with {$sourceName}.";
-        }
-
-        return null;
+        return $proximity !== null
+            ? "{$sourceName} and {$candidateName} are connected through {$proximity} within the textile material flow."
+            : "{$sourceName} and {$candidateName} are connected through the textile material flow.";
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Solution Supply
+    |--------------------------------------------------------------------------
+    */
+
+    if ($semanticType === 'solution_supply') {
+
+        if ($matchedRoleLabel !== null) {
+
+            return $proximity !== null
+                ? "{$candidateName}'s {$matchedRoleLabel} capability is connected to {$sourceName} through {$proximity} in the textile solution ecosystem."
+                : "{$candidateName}'s {$matchedRoleLabel} capability has a relevant solution-supply relationship with {$sourceName}.";
+        }
+
+        return $proximity !== null
+            ? "{$candidateName} is connected to {$sourceName} through {$proximity} in the textile solution ecosystem."
+            : "{$candidateName} has a relevant solution-supply relationship with {$sourceName}.";
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Technology Solution
+    |--------------------------------------------------------------------------
+    */
+
+    if ($semanticType === 'technology_solution') {
+
+        if ($matchedRoleLabel !== null) {
+
+            return $proximity !== null
+                ? "{$candidateName}'s {$matchedRoleLabel} capability is connected to {$sourceName} through {$proximity} in the textile technology ecosystem."
+                : "{$candidateName}'s {$matchedRoleLabel} capability has a relevant technology relationship with {$sourceName}.";
+        }
+
+        return $proximity !== null
+            ? "{$candidateName} is connected to {$sourceName} through {$proximity} in the textile technology ecosystem."
+            : "{$candidateName} has a relevant technology relationship with {$sourceName}.";
+    }
+
+    return null;
+}
     /**
      * --------------------------------------------------------------------------
      * Build Evidence Explanation

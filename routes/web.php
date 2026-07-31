@@ -612,6 +612,15 @@ Route::get(
     [CompanyClaimController::class, 'submitted']
 )->name('companies.claim.submitted');
 
+// Canonical
+
+Route::get(
+    '/onboarding/ownership-verification/identity/{companyIdentity}',
+    [CompanyClaimController::class, 'createIdentity']
+)
+    ->name('companies.claim.create-identity');
+
+
 
 // Existing company
 // Letakkan PALING BAWAH

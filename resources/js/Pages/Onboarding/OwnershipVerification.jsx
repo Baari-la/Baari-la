@@ -18,6 +18,8 @@ import {
 
 export default function OwnershipVerification({
     company = null,
+    companyIdentityId = null,
+    canonicalCompany = false,
     manualCompany = false,
     claimedCompanyName = "",
     existingClaim = null,
@@ -49,7 +51,22 @@ export default function OwnershipVerification({
     */
 
     const { data, setData, post, processing, errors, progress } = useForm({
-        company_id: company?.id ?? null,
+        /*
+    |--------------------------------------------------------------------------
+    | Company Identity
+    |--------------------------------------------------------------------------
+    */
+
+        company_identity_id: canonicalCompany ? companyIdentityId : null,
+
+        /*
+    |--------------------------------------------------------------------------
+    | Legacy Company
+    |--------------------------------------------------------------------------
+    */
+
+        company_id:
+            !canonicalCompany && !manualCompany ? (company?.id ?? null) : null,
 
         claimed_company_name: initialCompanyName,
 
@@ -62,7 +79,7 @@ export default function OwnershipVerification({
         nib: existingClaim?.nib ?? "",
 
         verification_document_type:
-            existingClaim?.verification_document_type ?? (isEn ? "" : ""),
+            existingClaim?.verification_document_type ?? "",
 
         verification_document: null,
 
@@ -161,7 +178,8 @@ export default function OwnershipVerification({
                                     : "Untuk melindungi informasi perusahaan, DIGESTEX memverifikasi kewenangan Anda untuk mewakili perusahaan sebelum memberikan akses pengelolaan profil."}
                             </p>
                         </section>
-
+                        <InputError message={errors.company_identity_id} />
+                        <InputError message={errors.company_id} />
                         {/* Existing Pending Claim */}
 
                         {existingClaim && (

@@ -14,22 +14,31 @@ use Illuminate\Support\Collection;
  * Recommendation Reason Service
  * ==========================================================================
  *
- * Converts recommendation intelligence produced by upstream services into
- * deterministic, evidence-based, human-readable explanations.
+ * Converts recommendation intelligence into human-readable business reasons.
  *
  * IMPORTANT:
+ * This service does not calculate recommendation scores, relationships,
+ * supply-chain paths, or company classifications.
  *
- * This service DOES NOT:
+ * It explains intelligence already produced by upstream DRIE services.
  *
- * - calculate recommendation scores
- * - infer business relationships
- * - classify companies
- * - calculate supply-chain paths
+ * Role semantics:
  *
- * It explains intelligence already produced by the recommendation pipeline.
+ * - canonical_role
+ *   Primary classified role of the candidate company.
+ *
+ * - matched_role
+ *   Exact candidate capability responsible for the recommendation.
+ *
+ * - source_matched_role
+ *   Exact source-company capability participating in the relationship.
+ *
+ * Recommendation reasons MUST prioritize matched-role intelligence because
+ * multi-role companies may be recommended through a capability different
+ * from their canonical role.
  *
  * Version:
- * 3.0
+ * 2.1
  */
 class RecommendationReasonService
 {
@@ -84,8 +93,34 @@ class RecommendationReasonService
                         'primary_relationship.direction'
                     );
 
+                /*
+                |--------------------------------------------------------------------------
+                | Role Intelligence
+                |--------------------------------------------------------------------------
+                |
+                | canonicalRole:
+                | Primary/display classification of the candidate.
+                |
+                | matchedRole:
+                | Exact candidate capability responsible for this recommendation.
+                |
+                | sourceMatchedRole:
+                | Exact source-company capability participating in the match.
+                |
+                */
+
                 $canonicalRole =
                     $candidate['canonical_role']
+                    ?? null;
+
+                $matchedRole =
+                    $candidate['matched_role']
+                    ?? $candidate['supply_chain_target_role']
+                    ?? $canonicalRole;
+
+                $sourceMatchedRole =
+                    $candidate['source_matched_role']
+                    ?? $candidate['supply_chain_source_role']
                     ?? null;
 
                 $specificRoles =
@@ -221,24 +256,64 @@ class RecommendationReasonService
 
                 /*
                 |--------------------------------------------------------------------------
-                | 4. Role Relevance
+                | 4. Matched Role Relevance
                 |--------------------------------------------------------------------------
+                |
+                | IMPORTANT:
+                |
+                | Explain the capability that actually produced the business
+                | relationship, not merely the candidate's canonical role.
+                |
+                | Example:
+                |
+                | canonical_role       = dyeing_finishing_mill
+                | matched_role         = yarn_spinner
+                | source_matched_role  = weaving_mill
+                |
+                | Reason:
+                | Relevant yarn spinner capability
+                |
                 */
 
                 if (
-                    is_string($canonicalRole)
-                    && $canonicalRole !== ''
+                    is_string($matchedRole)
+                    && trim($matchedRole) !== ''
                 ) {
 
                     $reasons[] = sprintf(
                         'Relevant %s capability',
-                        $this->humanizeRole($canonicalRole)
+                        $this->humanizeRole($matchedRole)
                     );
                 }
 
                 /*
                 |--------------------------------------------------------------------------
-                | 5. Multi-Role Intelligence
+                | 5. Matched Capability Connection
+                |--------------------------------------------------------------------------
+                |
+                | When both exact roles are known, expose the business-capability
+                | connection responsible for the recommendation.
+                |
+                */
+
+                if (
+                    is_string($sourceMatchedRole)
+                    && trim($sourceMatchedRole) !== ''
+                    && is_string($matchedRole)
+                    && trim($matchedRole) !== ''
+                    && $sourceMatchedRole !== $matchedRole
+                ) {
+
+                    $reasons[] = sprintf(
+                        'Business match connects %s with %s capability',
+                        $this->humanizeRole($sourceMatchedRole),
+                        $this->humanizeRole($matchedRole)
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | 6. Multi-Role Intelligence
                 |--------------------------------------------------------------------------
                 */
 
@@ -278,7 +353,7 @@ class RecommendationReasonService
 
                 /*
                 |--------------------------------------------------------------------------
-                | 6. Multiple Relationship Evidence
+                | 7. Multiple Relationship Evidence
                 |--------------------------------------------------------------------------
                 */
 
@@ -295,7 +370,7 @@ class RecommendationReasonService
 
                 /*
                 |--------------------------------------------------------------------------
-                | 7. Relationship Confidence
+                | 8. Relationship Confidence
                 |--------------------------------------------------------------------------
                 */
 
@@ -317,7 +392,7 @@ class RecommendationReasonService
 
                 /*
                 |--------------------------------------------------------------------------
-                | 8. Product Intelligence
+                | 9. Product Intelligence
                 |--------------------------------------------------------------------------
                 */
 
@@ -358,7 +433,7 @@ class RecommendationReasonService
 
                 /*
                 |--------------------------------------------------------------------------
-                | 9. Export Market Intelligence
+                | 10. Export Market Intelligence
                 |--------------------------------------------------------------------------
                 */
 
@@ -388,7 +463,7 @@ class RecommendationReasonService
 
                 /*
                 |--------------------------------------------------------------------------
-                | 10. Certifications
+                | 11. Certifications
                 |--------------------------------------------------------------------------
                 */
 
@@ -407,7 +482,7 @@ class RecommendationReasonService
 
                 /*
                 |--------------------------------------------------------------------------
-                | 11. Machinery Intelligence
+                | 12. Machinery Intelligence
                 |--------------------------------------------------------------------------
                 */
 
@@ -426,7 +501,7 @@ class RecommendationReasonService
 
                 /*
                 |--------------------------------------------------------------------------
-                | 12. Production Capacity
+                | 13. Production Capacity
                 |--------------------------------------------------------------------------
                 */
 
@@ -445,7 +520,7 @@ class RecommendationReasonService
 
                 /*
                 |--------------------------------------------------------------------------
-                | 13. Recommendation Strength
+                | 14. Recommendation Strength
                 |--------------------------------------------------------------------------
                 */
 
@@ -473,7 +548,7 @@ class RecommendationReasonService
 
                 /*
                 |--------------------------------------------------------------------------
-                | 14. Finalize Reasons
+                | 15. Finalize Reasons
                 |--------------------------------------------------------------------------
                 */
 
@@ -507,18 +582,22 @@ class RecommendationReasonService
 
     /**
      * --------------------------------------------------------------------------
-     * Normalize Confidence
+     * Normalize Relationship Confidence
      * --------------------------------------------------------------------------
      */
     private function normalizeConfidence(
-        mixed $confidence
+        mixed $value
     ): float {
 
+        if (! is_numeric($value)) {
+            return 0.0;
+        }
+
         return max(
-            0,
+            0.0,
             min(
-                1,
-                (float) $confidence
+                1.0,
+                (float) $value
             )
         );
     }
@@ -529,14 +608,18 @@ class RecommendationReasonService
      * --------------------------------------------------------------------------
      */
     private function normalizeScore(
-        mixed $score
+        mixed $value
     ): float {
 
+        if (! is_numeric($value)) {
+            return 0.0;
+        }
+
         return max(
-            0,
+            0.0,
             min(
-                100,
-                (float) $score
+                100.0,
+                (float) $value
             )
         );
     }

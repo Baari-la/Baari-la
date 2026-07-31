@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Company;
+use App\Services\Company\Identity\CompanyIdentityLookupService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\Request;
 
 class OnboardingController extends Controller
 {
@@ -15,92 +15,226 @@ class OnboardingController extends Controller
     |--------------------------------------------------------------------------
     */
 
-  public function companyLookup(Request $request)
-{
+  public function companyLookup(
+    Request $request,
+    CompanyIdentityLookupService $lookup
+): Response {
+    /*
+    |--------------------------------------------------------------------------
+    | Search Keyword
+    |--------------------------------------------------------------------------
+    */
+
     $keyword = trim(
-        $request->keyword ?? ''
-    );
-
-    /*
-    |--------------------------------------------------------------------------
-    | Normalize Search Keyword
-    |--------------------------------------------------------------------------
-    |
-    | Contoh:
-    |
-    | PT Indorama       → Indorama
-    | PT. Indorama      → Indorama
-    | Indorama, PT      → Indorama
-    | Indorama, PT.     → Indorama
-    | CV Sinar Textile  → Sinar Textile
-    |
-    */
-
-    $searchKeyword = $keyword;
-
-    // Hapus badan usaha di depan
-    $searchKeyword = preg_replace(
-        '/^(pt|cv)\.?\s+/i',
-        '',
-        $searchKeyword
-    );
-
-    // Hapus badan usaha di belakang
-    $searchKeyword = preg_replace(
-        '/\s*,?\s*(pt|cv)\.?$/i',
-        '',
-        $searchKeyword
-    );
-
-    $searchKeyword = trim(
-        $searchKeyword
-    );
-
-    /*
-    |--------------------------------------------------------------------------
-    | Search Companies
-    |--------------------------------------------------------------------------
-    */
-
-    $companies = Company::query()
-        ->select([
-            'id',
-            'nama_perusahaan',
-            'category',
-            'company_type',
-            'company_role',
-            'city',
-            'country_name',
-            'produk',
-            'pasar_ekspor',
-            'membership_type',
-            'status_verifikasi',
-            'photo_url',
-            'last_verified_at',
-            'tahun_berdiri',
-        ])
-        ->when(
-            $searchKeyword !== '',
-            function ($query) use ($searchKeyword) {
-
-                $query->where(
-                    'nama_perusahaan',
-                    'like',
-                    "%{$searchKeyword}%"
-                );
-            }
+        (string) $request->input(
+            'keyword',
+            ''
         )
-        ->orderBy('nama_perusahaan')
-        ->limit(20)
-        ->get();
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Canonical Company Identity Search
+    |--------------------------------------------------------------------------
+    |
+    | IMPORTANT:
+    |
+    | Company lookup no longer searches the legacy `companies` table
+    | directly.
+    |
+    | Search flow:
+    |
+    | User keyword
+    |      ↓
+    | CompanyIdentityLookupService
+    |      ↓
+    | company_identities
+    |      ↓
+    | company_identity_sources
+    |      ↓
+    | legacy companies
+    |
+    | Name normalization is handled by the identity resolver/service.
+    |
+    */
+
+    $identities = collect();
+
+    if ($keyword !== '') {
+
+        $identities = $lookup
+            ->search(
+                $keyword,
+                20
+            )
+            ->loadMissing([
+                'capabilities',
+                'sources',
+            ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Build Lookup Results
+    |--------------------------------------------------------------------------
+    |
+    | Frontend receives canonical companies, not duplicate legacy records.
+    |
+    | `id` below intentionally represents company_identity_id.
+    |
+    */
+
+    $companies = $identities
+        ->map(function ($identity) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Capabilities
+            |--------------------------------------------------------------------------
+            */
+
+            $capabilities = $identity
+                ->capabilities
+                ->pluck('capability')
+                ->filter()
+                ->unique()
+                ->sort()
+                ->values();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Legacy Source IDs
+            |--------------------------------------------------------------------------
+            |
+            | These remain available for traceability.
+            |
+            */
+
+            $sourceCompanyIds = $identity
+                ->sources
+                ->pluck('company_id')
+                ->filter()
+                ->unique()
+                ->values();
+
+            return [
+
+                /*
+                |--------------------------------------------------------------------------
+                | Canonical Identity
+                |--------------------------------------------------------------------------
+                */
+
+                'id' =>
+                    $identity->id,
+
+                'company_identity_id' =>
+                    $identity->id,
+
+                'name' =>
+                    $identity->canonical_name,
+
+                'canonical_name' =>
+                    $identity->canonical_name,
+
+                'normalized_name' =>
+                    $identity->normalized_name,
+
+                /*
+                |--------------------------------------------------------------------------
+                | Location
+                |--------------------------------------------------------------------------
+                */
+
+                'country_code' =>
+                    $identity->country_code,
+
+                'country_name' =>
+                    $identity->country_name,
+
+                /*
+                |--------------------------------------------------------------------------
+                | Identity Status
+                |--------------------------------------------------------------------------
+                */
+
+                'identity_status' =>
+                    $identity->identity_status,
+
+                'verification_status' =>
+                    $identity->verification_status,
+
+                'verified_at' =>
+                    $identity->verified_at,
+
+                /*
+                |--------------------------------------------------------------------------
+                | Capabilities
+                |--------------------------------------------------------------------------
+                */
+
+                'capabilities' =>
+                    $capabilities->all(),
+
+                'capability_count' =>
+                    $capabilities->count(),
+
+                /*
+                |--------------------------------------------------------------------------
+                | Legacy Evidence
+                |--------------------------------------------------------------------------
+                */
+
+                'source_company_ids' =>
+                    $sourceCompanyIds->all(),
+
+                'source_count' =>
+                    $sourceCompanyIds->count(),
+
+                /*
+                |--------------------------------------------------------------------------
+                | Compatibility Marker
+                |--------------------------------------------------------------------------
+                */
+
+                'record_type' =>
+                    'company_identity',
+            ];
+        })
+        ->values();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
 
     return Inertia::render(
         'Onboarding/Step0CompanyLookup',
         [
-            'companies' => $companies,
+            'companies' =>
+                $companies,
 
             'filters' => [
-                'keyword' => $keyword,
+                'keyword' =>
+                    $keyword,
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Lookup Metadata
+            |--------------------------------------------------------------------------
+            */
+
+            'lookup' => [
+                'source' =>
+                    'company_identities',
+
+                'canonical' =>
+                    true,
+
+                'result_count' =>
+                    $companies->count(),
             ],
         ]
     );

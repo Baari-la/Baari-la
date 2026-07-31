@@ -203,6 +203,43 @@ public function locations()
         return $this->hasMany(CompanyProduct::class);
     }
 
+    public function identitySource()
+        {
+            return $this->hasOne(
+                CompanyIdentitySource::class,
+                'company_id'
+            );
+}
+  
+/*
+|--------------------------------------------------------------------------
+| Company Capabilities
+|--------------------------------------------------------------------------
+|
+| Structured business capabilities for a single company identity.
+|
+| One company may operate across multiple textile sectors/capabilities.
+|
+| Examples:
+| - fiber_manufacturer
+| - yarn_spinner
+| - weaving_mill
+| - knitting_mill
+| - dyeing_finishing_mill
+| - printing_mill
+| - garment_manufacturer
+| - textile_machinery_supplier
+|
+*/
+public function capabilities()
+{
+    return $this->hasMany(
+        CompanyCapability::class,
+        'company_id'
+    );
+}
+
+
     // Export / Import Markets
     public function markets()
     {

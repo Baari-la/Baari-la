@@ -10,10 +10,19 @@ import {
     ArrowRight,
     CheckCircle,
     ShieldCheck,
+    Layers3,
+    MapPin,
+    Database,
+    BadgeCheck,
 } from "lucide-react";
 
 export default function Step0CompanyLookup() {
-    const { companies = [], filters = {}, locale } = usePage().props;
+    const {
+        companies = [],
+        filters = {},
+        lookup = {},
+        locale,
+    } = usePage().props;
 
     const isEn = locale === "en";
 
@@ -23,7 +32,7 @@ export default function Step0CompanyLookup() {
 
     /*
     |--------------------------------------------------------------------------
-    | Live Company Search
+    | Live Canonical Company Search
     |--------------------------------------------------------------------------
     */
 
@@ -69,7 +78,7 @@ export default function Step0CompanyLookup() {
                     preserveScroll: true,
                     replace: true,
 
-                    only: ["companies", "filters"],
+                    only: ["companies", "filters", "lookup"],
                 },
             );
         }, 400);
@@ -79,16 +88,68 @@ export default function Step0CompanyLookup() {
 
     /*
     |--------------------------------------------------------------------------
-    | Select Existing Company
+    | Select Canonical Company Identity
     |--------------------------------------------------------------------------
     */
 
     const selectCompany = (company) => {
+        const companyIdentityId = company.company_identity_id ?? company.id;
+
+        if (!companyIdentityId) {
+            return;
+        }
+
         router.visit(
-            route("companies.claim.create", {
-                company: company.id,
+            route("companies.claim.create-identity", {
+                companyIdentity: companyIdentityId,
             }),
         );
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | Capability Label
+    |--------------------------------------------------------------------------
+    */
+
+    const capabilityLabel = (capability) => {
+        const labels = {
+            fiber_manufacturer: isEn ? "Fiber Manufacturer" : "Produsen Serat",
+
+            yarn_spinner: isEn ? "Yarn Spinner" : "Pemintalan Benang",
+
+            weaving_mill: isEn ? "Weaving Mill" : "Pabrik Tenun",
+
+            knitting_mill: isEn ? "Knitting Mill" : "Pabrik Rajut",
+
+            dyeing_finishing_mill: isEn
+                ? "Dyeing & Finishing"
+                : "Dyeing & Finishing",
+
+            printing_mill: isEn ? "Printing Mill" : "Printing",
+
+            garment_manufacturer: isEn
+                ? "Garment Manufacturer"
+                : "Produsen Garmen",
+
+            trading_company: isEn ? "Trading Company" : "Perusahaan Trading",
+
+            testing_laboratory: isEn
+                ? "Testing Laboratory"
+                : "Laboratorium Pengujian",
+
+            certification_body: isEn
+                ? "Certification Body"
+                : "Lembaga Sertifikasi",
+        };
+
+        if (labels[capability]) {
+            return labels[capability];
+        }
+
+        return capability
+            .replaceAll("_", " ")
+            .replace(/\b\w/g, (character) => character.toUpperCase());
     };
 
     return (
@@ -125,8 +186,8 @@ export default function Step0CompanyLookup() {
 
                         <p className="mx-auto mt-6 max-w-3xl text-lg text-slate-500">
                             {isEn
-                                ? "DIGESTEX may already know your company. Search our directory before creating a new profile."
-                                : "DIGESTEX mungkin sudah mengenal perusahaan Anda. Cari terlebih dahulu sebelum membuat profil baru."}
+                                ? "Search the DIGESTEX company identity directory before creating or verifying a new company profile."
+                                : "Cari identitas perusahaan di Direktori DIGESTEX sebelum membuat atau memverifikasi profil perusahaan baru."}
                         </p>
                     </div>
 
@@ -174,269 +235,321 @@ export default function Step0CompanyLookup() {
                                 "
                             />
                         </div>
+
+                        {data.keyword.trim() !== "" && lookup?.canonical && (
+                            <div className="mt-3 flex items-center justify-center gap-2 text-xs font-bold text-slate-400">
+                                <Database className="h-4 w-4" />
+
+                                {isEn
+                                    ? "Searching canonical DIGESTEX company identities"
+                                    : "Mencari identitas perusahaan canonical DIGESTEX"}
+                            </div>
+                        )}
                     </div>
 
                     {/* Company Search Results */}
 
                     {companies.length > 0 && (
                         <div className="mx-auto mt-10 max-w-4xl space-y-4">
-                            {companies.map((company) => (
-                                <div
-                                    key={company.id}
-                                    className="
-                                            rounded-3xl
-                                            border
-                                            border-slate-200
-                                            bg-white
-                                            p-6
-                                            shadow-sm
-                                            transition
-                                            hover:border-emerald-300
-                                            hover:shadow-md
-                                            md:p-8
-                                        "
-                                >
+                            {companies.map((company) => {
+                                const capabilities = Array.isArray(
+                                    company.capabilities,
+                                )
+                                    ? company.capabilities
+                                    : [];
+
+                                const sourceCount = Number(
+                                    company.source_count ?? 0,
+                                );
+
+                                const verified =
+                                    company.verification_status === "verified";
+
+                                return (
                                     <div
+                                        key={
+                                            company.company_identity_id ??
+                                            company.id
+                                        }
                                         className="
-                                                flex
-                                                flex-col
-                                                gap-6
-                                                lg:flex-row
-                                                lg:items-start
-                                                lg:justify-between
+                                                rounded-3xl
+                                                border
+                                                border-slate-200
+                                                bg-white
+                                                p-6
+                                                shadow-sm
+                                                transition
+                                                hover:border-emerald-300
+                                                hover:shadow-md
+                                                md:p-8
                                             "
                                     >
-                                        {/* Clickable Company */}
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                selectCompany(company)
-                                            }
+                                        <div
                                             className="
-                                                    group
                                                     flex
-                                                    min-w-0
-                                                    flex-1
-                                                    items-start
-                                                    gap-4
-                                                    text-left
+                                                    flex-col
+                                                    gap-6
+                                                    lg:flex-row
+                                                    lg:items-start
+                                                    lg:justify-between
                                                 "
                                         >
-                                            {/* Icon */}
+                                            {/* Company */}
 
-                                            <div
-                                                className="
-                                                        flex
-                                                        h-16
-                                                        w-16
-                                                        shrink-0
-                                                        items-center
-                                                        justify-center
-                                                        rounded-2xl
-                                                        bg-emerald-100
-                                                        transition
-                                                        group-hover:bg-emerald-200
-                                                    "
-                                            >
-                                                <Building2 className="h-8 w-8 text-emerald-600" />
-                                            </div>
-
-                                            {/* Company Details */}
-
-                                            <div className="min-w-0 flex-1">
-                                                <h3
-                                                    className="
-                                                            text-2xl
-                                                            font-black
-                                                            text-slate-900
-                                                            transition
-                                                            group-hover:text-emerald-700
-                                                        "
-                                                >
-                                                    {company.nama_perusahaan}
-                                                </h3>
-
-                                                {/* Directory Status */}
-
-                                                <div
-                                                    className="
-                                                            mt-3
-                                                            inline-flex
-                                                            items-center
-                                                            gap-2
-                                                            rounded-full
-                                                            bg-emerald-50
-                                                            px-3
-                                                            py-1.5
-                                                            text-xs
-                                                            font-black
-                                                            uppercase
-                                                            tracking-wide
-                                                            text-emerald-700
-                                                        "
-                                                >
-                                                    <CheckCircle className="h-4 w-4" />
-
-                                                    {isEn
-                                                        ? "Found in DIGESTEX Directory"
-                                                        : "Ditemukan di Direktori DIGESTEX"}
-                                                </div>
-
-                                                {/* Type / Role */}
-
-                                                {(company.company_type ||
-                                                    company.company_role) && (
-                                                    <p className="mt-4 text-sm font-semibold text-slate-600">
-                                                        {[
-                                                            company.company_type,
-                                                            company.company_role,
-                                                        ]
-                                                            .filter(Boolean)
-                                                            .join(" • ")}
-                                                    </p>
-                                                )}
-
-                                                {/* Location */}
-
-                                                {(company.city ||
-                                                    company.country_name) && (
-                                                    <p className="mt-1 text-sm text-slate-500">
-                                                        {[
-                                                            company.city,
-                                                            company.country_name,
-                                                        ]
-                                                            .filter(Boolean)
-                                                            .join(", ")}
-                                                    </p>
-                                                )}
-
-                                                {/* Products */}
-
-                                                {company.produk && (
-                                                    <div className="mt-4">
-                                                        <div className="text-xs font-black uppercase tracking-wide text-slate-400">
-                                                            {isEn
-                                                                ? "Products"
-                                                                : "Produk"}
-                                                        </div>
-
-                                                        <p className="mt-1 text-sm leading-6 text-slate-600">
-                                                            {company.produk}
-                                                        </p>
-                                                    </div>
-                                                )}
-
-                                                {/* Membership */}
-
-                                                {company.membership_type && (
-                                                    <div className="mt-3">
-                                                        <span
-                                                            className="
-                                                                    inline-flex
-                                                                    rounded-full
-                                                                    bg-sky-50
-                                                                    px-3
-                                                                    py-1
-                                                                    text-xs
-                                                                    font-bold
-                                                                    text-sky-700
-                                                                "
-                                                        >
-                                                            {
-                                                                company.membership_type
-                                                            }
-                                                        </span>
-                                                    </div>
-                                                )}
-
-                                                {/* Selection Hint */}
-
-                                                <div className="mt-5 flex items-center gap-2 text-sm font-black text-emerald-600">
-                                                    {isEn
-                                                        ? "Select this company"
-                                                        : "Pilih perusahaan ini"}
-
-                                                    <ArrowRight
-                                                        className="
-                                                                h-4
-                                                                w-4
-                                                                transition
-                                                                group-hover:translate-x-1
-                                                            "
-                                                    />
-                                                </div>
-                                            </div>
-                                        </button>
-
-                                        {/* CTA */}
-
-                                        <div className="shrink-0">
                                             <button
                                                 type="button"
                                                 onClick={() =>
                                                     selectCompany(company)
                                                 }
                                                 className="
-                                                        inline-flex
-                                                        w-full
-                                                        items-center
-                                                        justify-center
-                                                        gap-2
-                                                        rounded-2xl
-                                                        bg-emerald-600
-                                                        px-6
-                                                        py-4
-                                                        text-sm
-                                                        font-black
-                                                        uppercase
-                                                        text-white
-                                                        transition
-                                                        hover:bg-emerald-700
-                                                        lg:w-auto
+                                                        group
+                                                        flex
+                                                        min-w-0
+                                                        flex-1
+                                                        items-start
+                                                        gap-4
+                                                        text-left
                                                     "
                                             >
-                                                {isEn
-                                                    ? "VERIFY OWNERSHIP"
-                                                    : "VERIFIKASI KEPEMILIKAN"}
+                                                {/* Icon */}
 
-                                                <ArrowRight className="h-4 w-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Verification Notice */}
-
-                                    <div
-                                        className="
-                                                mt-6
-                                                rounded-2xl
-                                                border
-                                                border-slate-200
-                                                bg-slate-50
-                                                p-4
-                                            "
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
-
-                                            <div>
-                                                <div className="text-xs font-black uppercase tracking-wide text-slate-500">
-                                                    {isEn
-                                                        ? "Ownership Verification Required"
-                                                        : "Memerlukan Verifikasi Kepemilikan"}
+                                                <div
+                                                    className="
+                                                            flex
+                                                            h-16
+                                                            w-16
+                                                            shrink-0
+                                                            items-center
+                                                            justify-center
+                                                            rounded-2xl
+                                                            bg-emerald-100
+                                                            transition
+                                                            group-hover:bg-emerald-200
+                                                        "
+                                                >
+                                                    <Building2 className="h-8 w-8 text-emerald-600" />
                                                 </div>
 
-                                                <p className="mt-2 text-sm leading-6 text-slate-600">
+                                                {/* Details */}
+
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex flex-wrap items-center gap-3">
+                                                        <h3
+                                                            className="
+                                                                    text-2xl
+                                                                    font-black
+                                                                    text-slate-900
+                                                                    transition
+                                                                    group-hover:text-emerald-700
+                                                                "
+                                                        >
+                                                            {company.canonical_name ??
+                                                                company.name}
+                                                        </h3>
+
+                                                        {verified && (
+                                                            <BadgeCheck className="h-5 w-5 text-emerald-600" />
+                                                        )}
+                                                    </div>
+
+                                                    {/* Directory Status */}
+
+                                                    <div
+                                                        className="
+                                                                mt-3
+                                                                inline-flex
+                                                                items-center
+                                                                gap-2
+                                                                rounded-full
+                                                                bg-emerald-50
+                                                                px-3
+                                                                py-1.5
+                                                                text-xs
+                                                                font-black
+                                                                uppercase
+                                                                tracking-wide
+                                                                text-emerald-700
+                                                            "
+                                                    >
+                                                        <CheckCircle className="h-4 w-4" />
+
+                                                        {isEn
+                                                            ? "DIGESTEX Company Identity"
+                                                            : "Identitas Perusahaan DIGESTEX"}
+                                                    </div>
+
+                                                    {/* Country */}
+
+                                                    {company.country_name && (
+                                                        <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+                                                            <MapPin className="h-4 w-4 shrink-0" />
+
+                                                            {
+                                                                company.country_name
+                                                            }
+                                                        </div>
+                                                    )}
+
+                                                    {/* Capabilities */}
+
+                                                    {capabilities.length >
+                                                        0 && (
+                                                        <div className="mt-5">
+                                                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-slate-400">
+                                                                <Layers3 className="h-4 w-4" />
+
+                                                                {isEn
+                                                                    ? "Capabilities"
+                                                                    : "Kapabilitas"}
+                                                            </div>
+
+                                                            <div className="mt-3 flex flex-wrap gap-2">
+                                                                {capabilities.map(
+                                                                    (
+                                                                        capability,
+                                                                    ) => (
+                                                                        <span
+                                                                            key={
+                                                                                capability
+                                                                            }
+                                                                            className="
+                                                                                    rounded-full
+                                                                                    bg-slate-100
+                                                                                    px-3
+                                                                                    py-1.5
+                                                                                    text-xs
+                                                                                    font-bold
+                                                                                    text-slate-700
+                                                                                "
+                                                                        >
+                                                                            {capabilityLabel(
+                                                                                capability,
+                                                                            )}
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Evidence */}
+
+                                                    {sourceCount > 0 && (
+                                                        <div className="mt-5 text-xs leading-5 text-slate-400">
+                                                            {isEn
+                                                                ? `${sourceCount} directory source record${sourceCount === 1 ? "" : "s"} consolidated into this company identity.`
+                                                                : `${sourceCount} record sumber direktori dikonsolidasikan ke dalam identitas perusahaan ini.`}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Selection Hint */}
+
+                                                    <div className="mt-5 flex items-center gap-2 text-sm font-black text-emerald-600">
+                                                        {isEn
+                                                            ? "Select this company"
+                                                            : "Pilih perusahaan ini"}
+
+                                                        <ArrowRight
+                                                            className="
+                                                                    h-4
+                                                                    w-4
+                                                                    transition
+                                                                    group-hover:translate-x-1
+                                                                "
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </button>
+
+                                            {/* CTA */}
+
+                                            <div className="shrink-0">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        selectCompany(company)
+                                                    }
+                                                    className="
+                                                            inline-flex
+                                                            w-full
+                                                            items-center
+                                                            justify-center
+                                                            gap-2
+                                                            rounded-2xl
+                                                            bg-emerald-600
+                                                            px-6
+                                                            py-4
+                                                            text-sm
+                                                            font-black
+                                                            uppercase
+                                                            text-white
+                                                            transition
+                                                            hover:bg-emerald-700
+                                                            lg:w-auto
+                                                        "
+                                                >
                                                     {isEn
-                                                        ? "Selecting this company will use the official company name stored in the DIGESTEX Directory. Ownership must be verified before management access is granted."
-                                                        : "Dengan memilih perusahaan ini, nama resmi yang tersimpan di Direktori DIGESTEX akan digunakan. Kepemilikan harus diverifikasi sebelum akses pengelolaan diberikan."}
-                                                </p>
+                                                        ? "VERIFY OWNERSHIP"
+                                                        : "VERIFIKASI KEPEMILIKAN"}
+
+                                                    <ArrowRight className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Verification Notice */}
+
+                                        <div
+                                            className="
+                                                    mt-6
+                                                    rounded-2xl
+                                                    border
+                                                    border-slate-200
+                                                    bg-slate-50
+                                                    p-4
+                                                "
+                                        >
+                                            <div className="flex items-start gap-3">
+                                                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+
+                                                <div>
+                                                    <div className="text-xs font-black uppercase tracking-wide text-slate-500">
+                                                        {isEn
+                                                            ? "Ownership Verification Required"
+                                                            : "Memerlukan Verifikasi Kepemilikan"}
+                                                    </div>
+
+                                                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                                                        {isEn
+                                                            ? "This is a canonical DIGESTEX company identity. Ownership must be verified before management access is granted."
+                                                            : "Ini merupakan identitas perusahaan canonical DIGESTEX. Kepemilikan harus diverifikasi sebelum akses pengelolaan diberikan."}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* No Result */}
+
+                    {data.keyword.trim() !== "" && companies.length === 0 && (
+                        <div className="mx-auto mt-10 max-w-3xl rounded-3xl border border-slate-200 bg-white p-8 text-center">
+                            <Building2 className="mx-auto h-10 w-10 text-slate-300" />
+
+                            <h3 className="mt-4 text-xl font-black text-slate-800">
+                                {isEn
+                                    ? "No matching company identity found"
+                                    : "Identitas perusahaan tidak ditemukan"}
+                            </h3>
+
+                            <p className="mt-2 text-sm leading-6 text-slate-500">
+                                {isEn
+                                    ? "Check the company name or continue below to submit the company for verification."
+                                    : "Periksa kembali nama perusahaan atau lanjutkan di bawah untuk mengajukan perusahaan untuk verifikasi."}
+                            </p>
                         </div>
                     )}
 
@@ -467,15 +580,11 @@ export default function Step0CompanyLookup() {
                                 md:p-12
                             "
                         >
-                            {/* Icon */}
-
                             <div className="flex justify-center">
                                 <div className="rounded-full bg-white/10 p-6">
                                     <CheckCircle className="h-12 w-12 text-emerald-400" />
                                 </div>
                             </div>
-
-                            {/* Title */}
 
                             <h2 className="mt-8 text-3xl font-black md:text-4xl">
                                 {isEn
@@ -483,15 +592,13 @@ export default function Step0CompanyLookup() {
                                     : "Tidak Menemukan Perusahaan yang Tepat?"}
                             </h2>
 
-                            {/* Description */}
-
                             <p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-300">
                                 {isEn
-                                    ? "If your company is not listed above, you can continue using the company name you entered. DIGESTEX will verify the company and your authority to represent it before granting management access."
-                                    : "Jika perusahaan Anda tidak ditemukan di atas, Anda dapat melanjutkan menggunakan nama perusahaan yang telah dimasukkan. DIGESTEX akan memverifikasi perusahaan dan kewenangan Anda untuk mewakilinya sebelum memberikan akses pengelolaan."}
+                                    ? "If your company is not listed above, continue with the company name you entered. DIGESTEX will verify the company and your authority to represent it."
+                                    : "Jika perusahaan Anda tidak ditemukan di atas, lanjutkan menggunakan nama perusahaan yang telah dimasukkan. DIGESTEX akan memverifikasi perusahaan dan kewenangan Anda untuk mewakilinya."}
                             </p>
 
-                            {/* Company Name Preview */}
+                            {/* Company Name */}
 
                             <div
                                 className="
@@ -525,7 +632,7 @@ export default function Step0CompanyLookup() {
                                 </div>
                             </div>
 
-                            {/* Verification Notice */}
+                            {/* Notice */}
 
                             <div
                                 className="
@@ -542,11 +649,9 @@ export default function Step0CompanyLookup() {
                                 "
                             >
                                 {isEn
-                                    ? "This does not create a new company profile yet. You will first be asked to provide your NIB or company registration information and supporting verification document."
-                                    : "Tahap ini belum membuat profil perusahaan baru. Anda akan diminta memberikan NIB atau informasi registrasi perusahaan beserta dokumen pendukung untuk proses verifikasi."}
+                                    ? "This does not create a new company identity yet. Company registration information and supporting documents will be reviewed first."
+                                    : "Tahap ini belum membuat identitas perusahaan baru. Informasi registrasi perusahaan dan dokumen pendukung akan diperiksa terlebih dahulu."}
                             </div>
-
-                            {/* Manual Action */}
 
                             <Link
                                 href={route("companies.claim.create-manual", {
@@ -577,8 +682,8 @@ export default function Step0CompanyLookup() {
 
                             <p className="mt-5 text-xs leading-5 text-slate-400">
                                 {isEn
-                                    ? "Please check the search results above carefully before continuing."
-                                    : "Pastikan terlebih dahulu bahwa perusahaan Anda memang tidak terdapat pada hasil pencarian di atas."}
+                                    ? "Please check the canonical search results above carefully before continuing."
+                                    : "Pastikan terlebih dahulu bahwa perusahaan Anda memang tidak terdapat pada hasil pencarian canonical di atas."}
                             </p>
                         </div>
                     )}
