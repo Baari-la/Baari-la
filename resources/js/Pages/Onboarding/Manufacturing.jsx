@@ -1,33 +1,63 @@
 import OnboardingLayout from "@/Layouts/OnboardingLayout";
 import OnboardingNavbar from "@/Components/Onboarding/OnboardingNavbar";
 
+import FactoryInformationCard from "@/Components/Onboarding/FactoryInformationCard";
+import PrimaryMachineCard from "@/Components/Onboarding/PrimaryMachineCard";
+import FactorySummaryCard from "@/Components/Onboarding/FactorySummaryCard";
+import StepNavigation from "@/Components/Onboarding/StepNavigation";
+
 import { Head, useForm, usePage } from "@inertiajs/react";
 
-import {
-    Factory,
-    Cog,
-    Calendar,
-    Globe,
-    Shield,
-    ArrowRight,
-} from "lucide-react";
-
 export default function Manufacturing() {
-    const { locale } = usePage().props;
+    const { locale, company } = usePage().props;
 
     const isEn = locale === "en";
 
     const { data, setData, post, processing } = useForm({
-        machinery_category: "",
-        machinery_brand: "",
-        machinery_quantity: "",
-        year_installed: "",
-        country_origin: "",
-        factory_area: "",
-        production_lines: "",
-        shifts: "",
-        qc_system: "",
-        compliance: "",
+        factory: {
+            factory_name: company?.factory?.factory_name ?? "",
+
+            factory_type: company?.factory?.factory_type ?? "MANUFACTURING",
+
+            country: company?.factory?.country ?? "",
+
+            province: company?.factory?.province ?? "",
+
+            city: company?.factory?.city ?? "",
+
+            production_lines: company?.factory?.production_lines ?? "",
+
+            number_of_shifts: company?.factory?.number_of_shifts ?? "",
+
+            quality_control_system:
+                company?.factory?.quality_control_system ?? "",
+
+            compliance_standards: company?.factory?.compliance_standards ?? "",
+        },
+
+        primary_machine: {
+            machine_category: company?.primary_machine?.machine_category ?? "",
+
+            machine_type: company?.primary_machine?.machine_type ?? "",
+
+            machine_brand: company?.primary_machine?.machine_brand ?? "",
+
+            machine_model: company?.primary_machine?.machine_model ?? "",
+
+            quantity: company?.primary_machine?.quantity ?? 1,
+
+            year_installed: company?.primary_machine?.year_installed ?? "",
+
+            country_origin: company?.primary_machine?.country_origin ?? "",
+
+            production_capacity:
+                company?.primary_machine?.production_capacity ?? "",
+
+            capacity_unit: company?.primary_machine?.capacity_unit ?? "",
+
+            automation_level:
+                company?.primary_machine?.automation_level ?? "SEMI_AUTOMATIC",
+        },
     });
 
     const submit = (e) => {
@@ -36,6 +66,7 @@ export default function Manufacturing() {
         post(route("onboarding.manufacturing.store"));
     };
 
+    console.dir(company);
     return (
         <OnboardingLayout>
             <Head title="Manufacturing" />
@@ -50,125 +81,54 @@ export default function Manufacturing() {
                                 STEP 4
                             </p>
 
-                            <h1 className="mt-4 text-5xl font-black">
-                                {isEn ? "Manufacturing" : "Manufaktur"}
-                            </h1>
+                            <div className="mt-10 rounded-3xl bg-indigo-50 p-6">
+                                <div className="font-black text-indigo-700">
+                                    Manufacturing Intelligence™
+                                </div>
 
-                            <p className="mt-4 text-slate-500">
-                                {isEn
-                                    ? "Tell us about your manufacturing capabilities."
-                                    : "Beritahu kami tentang fasilitas manufaktur perusahaan Anda."}
-                            </p>
+                                <p className="mt-3 text-sm leading-7 text-slate-600">
+                                    {isEn
+                                        ? "The information you provide will power the following DIGESTEX intelligence services:"
+                                        : "Informasi yang Anda berikan akan menjadi dasar bagi layanan intelijen DIGESTEX berikut:"}
+                                </p>
+
+                                <ul className="mt-5 space-y-2 text-sm text-slate-700">
+                                    <li>✓ Digital Factory Passport™</li>
+
+                                    <li>✓ Executive Dashboard™</li>
+
+                                    <li>✓ Smart Business Matching™</li>
+
+                                    <li>✓ Factory Verification™</li>
+
+                                    <li>✓ Supply Chain Intelligence™</li>
+
+                                    <li>✓ Build My Supply Chain™</li>
+                                </ul>
+                            </div>
                         </div>
 
                         <form onSubmit={submit} className="mt-10 space-y-6">
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <Input
-                                    icon={Factory}
-                                    label="Machinery Category"
-                                    value={data.machinery_category}
-                                    onChange={(e) =>
-                                        setData(
-                                            "machinery_category",
-                                            e.target.value,
-                                        )
-                                    }
-                                />
+                            <div className="grid gap-8 lg:grid-cols-3">
+                                <div className="space-y-8 lg:col-span-2">
+                                    <FactoryInformationCard
+                                        data={data.factory}
+                                        setData={(factory) =>
+                                            setData("factory", factory)
+                                        }
+                                    />
 
-                                <Input
-                                    icon={Cog}
-                                    label="Machinery Brand"
-                                    value={data.machinery_brand}
-                                    onChange={(e) =>
-                                        setData(
-                                            "machinery_brand",
-                                            e.target.value,
-                                        )
-                                    }
-                                />
+                                    <PrimaryMachineCard
+                                        data={data.primary_machine}
+                                        setData={(machine) =>
+                                            setData("primary_machine", machine)
+                                        }
+                                    />
+                                </div>
 
-                                <Input
-                                    icon={Cog}
-                                    label="Quantity"
-                                    value={data.machinery_quantity}
-                                    onChange={(e) =>
-                                        setData(
-                                            "machinery_quantity",
-                                            e.target.value,
-                                        )
-                                    }
-                                />
-
-                                <Input
-                                    icon={Calendar}
-                                    label="Year Installed"
-                                    value={data.year_installed}
-                                    onChange={(e) =>
-                                        setData(
-                                            "year_installed",
-                                            e.target.value,
-                                        )
-                                    }
-                                />
-
-                                <Input
-                                    icon={Globe}
-                                    label="Country of Origin"
-                                    value={data.country_origin}
-                                    onChange={(e) =>
-                                        setData(
-                                            "country_origin",
-                                            e.target.value,
-                                        )
-                                    }
-                                />
-
-                                <Input
-                                    icon={Factory}
-                                    label="Factory Area (m²)"
-                                    value={data.factory_area}
-                                    onChange={(e) =>
-                                        setData("factory_area", e.target.value)
-                                    }
-                                />
-
-                                <Input
-                                    icon={Factory}
-                                    label="Production Lines"
-                                    value={data.production_lines}
-                                    onChange={(e) =>
-                                        setData(
-                                            "production_lines",
-                                            e.target.value,
-                                        )
-                                    }
-                                />
-
-                                <Input
-                                    icon={Factory}
-                                    label="Number of Shifts"
-                                    value={data.shifts}
-                                    onChange={(e) =>
-                                        setData("shifts", e.target.value)
-                                    }
-                                />
-
-                                <Input
-                                    icon={Shield}
-                                    label="Quality Control System"
-                                    value={data.qc_system}
-                                    onChange={(e) =>
-                                        setData("qc_system", e.target.value)
-                                    }
-                                />
-
-                                <Input
-                                    icon={Shield}
-                                    label="Compliance Standards"
-                                    value={data.compliance}
-                                    onChange={(e) =>
-                                        setData("compliance", e.target.value)
-                                    }
+                                <FactorySummaryCard
+                                    factory={data.factory}
+                                    machine={data.primary_machine}
                                 />
                             </div>
 
@@ -185,25 +145,11 @@ export default function Manufacturing() {
                             </div>
 
                             <div className="flex justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="
-                                        inline-flex
-                                        items-center
-                                        gap-2
-                                        rounded-2xl
-                                        bg-emerald-600
-                                        px-8
-                                        py-4
-                                        font-black
-                                        text-white
-                                    "
-                                >
-                                    {isEn ? "CONTINUE" : "LANJUTKAN"}
-
-                                    <ArrowRight className="h-5 w-5" />
-                                </button>
+                                <StepNavigation
+                                    currentStep={4}
+                                    processing={processing}
+                                    onBack={() => window.history.back()}
+                                />
                             </div>
                         </form>
                     </div>

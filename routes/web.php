@@ -831,13 +831,10 @@ Route::middleware([
 ])->group(function () {
 
     Route::get(
-        '/onboarding/company-information',
-        function () {
-            return Inertia::render(
-                'Onboarding/CompanyInformation'
-            );
-        }
-    )->name('onboarding.company-information');
+    '/onboarding/company-information',
+    [OnboardingController::class, 'companyInformation']
+)->name('onboarding.company-information');
+
 
     Route::get(
     '/onboarding/company-lookup',

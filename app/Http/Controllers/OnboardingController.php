@@ -2,7 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
+
 use App\Services\Company\Identity\CompanyIdentityLookupService;
+use App\Services\Company\Identity\CanonicalCompanyProfileService;
+use App\Services\Company\Identity\CanonicalCompanyCapabilityService;
+use App\Services\Company\Identity\CanonicalCompanyFactoryService;
+use App\Services\Business\BusinessClassificationService;
+use App\Models\CompanyIdentityCapabilityProfile;
+use App\Models\CompanyIdentityBusiness;
+use App\Services\Company\Identity\CanonicalCompanyBusinessService;
+use App\Models\CompanyIdentityProfile;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -246,32 +256,124 @@ class OnboardingController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function companyInformation(): Response
-    {
-        return Inertia::render(
-            'Onboarding/CompanyInformation',
-            [
-                'company' => auth()->user()?->company,
-            ]
-        );
-    }
+    public function companyInformation(
+    CanonicalCompanyProfileService $profiles
+): Response {
+
+    return Inertia::render(
+        'Onboarding/CompanyInformation',
+        [
+
+            'company' =>
+
+                $profiles->buildFromUser(
+                    auth()->user()
+                ),
+
+        ]
+    );
+}
+
     public function storeCompanyInformation(
     Request $request
-        )
-        {
+) {
+
+ 
+    $user = auth()->user();
+
+    if (!$user->company_identity_id) {
+
+        return back()->with(
+            'error',
+            'No canonical company identity is connected to this account.'
+        );
+    }
+
+    $validated = $request->validate([
+
+        'company_type' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
+
+        'phone' => [
+            'nullable',
+            'string',
+            'max:1000',
+        ],
+
+        'website' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
+
+        'country' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
+
+        'province' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
+
+        'city' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
+
+        'postal_code' => [
+            'nullable',
+            'string',
+            'max:50',
+        ],
+
+        'address' => [
+            'nullable',
+            'string',
+        ],
+
+    ]);
 
 
-            // TODO:
-            // Simpan data Company
+    
+    CompanyIdentityProfile::updateOrCreate(
 
-            auth()->user()->update([
-                'onboarding_step' => 2,
-            ]);
+        [
+            'company_identity_id' =>
+                $user->company_identity_id,
+        ],
 
-            return redirect()->route(
-                'onboarding.business-information'
-            );
-        }
+        [
+
+            'company_type' => $validated['company_type'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'website' => $validated['website'] ?? null,
+            'country' => $validated['country'] ?? null,
+            'province' => $validated['province'] ?? null,
+            'city' => $validated['city'] ?? null,
+            'postal_code' => $validated['postal_code'] ?? null,
+            'address' => $validated['address'] ?? null,
+            
+            'last_updated_by' => $user->id,
+
+            'last_reviewed_at' => now(),
+        ]
+    );
+
+        $user->update([
+            'onboarding_step' => 2,
+        ]);
+
+        return redirect()->route(
+            'onboarding.business-information'
+        );
+    }
     
     /*
     |--------------------------------------------------------------------------
@@ -279,63 +381,307 @@ class OnboardingController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function businessInformation(): Response
-    {
-        return Inertia::render(
-            'Onboarding/BusinessInformation',
-            [
-                'company' => auth()->user()?->company,
-            ]
-        );
-    }
+   public function businessInformation(
+    CanonicalCompanyBusinessService $business
+        ): Response {
 
-    public function storeBusinessInformation(
-    Request $request
-        )
-        {
-            // TODO:
-            // Simpan Business Information
+            return Inertia::render(
+                'Onboarding/BusinessInformation',
+                [
 
-            auth()->user()->update([
-                'onboarding_step' => 3,
-            ]);
+                    'company' =>
+                        $business->buildFromUser(
+                            auth()->user()
+                        ),
 
-            return redirect()->route(
-                'onboarding.capabilities'
+                ]
             );
         }
 
+    public function storeBusinessInformation(Request $request,
+    BusinessClassificationService $classification): RedirectResponse
+{
+    $user = auth()->user();
+
     /*
     |--------------------------------------------------------------------------
-    | STEP 3
+    | Canonical Company Required
     |--------------------------------------------------------------------------
     */
-
-    public function capabilities(): Response
-    {
-        return Inertia::render(
-            'Onboarding/Capabilities',
-            [
-                'company' => auth()->user()?->company,
-            ]
+    if (!$user->company_identity_id) {
+        return back()->with(
+            'error',
+            'No canonical company identity is connected to this account.'
         );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation
+    |--------------------------------------------------------------------------
+    */
+    $validated = $request->validate([
+        // Company Overview
+        'business_description'    => ['nullable', 'string'],
+        'year_established'        => ['nullable', 'integer', 'between:1900,' . date('Y')],
+        'legal_entity'            => ['nullable', 'string', 'max:255'],
+        'employee_range'          => ['nullable', 'string', 'max:255'],
+        'factory_count'           => ['nullable', 'integer', 'min:0'],
+
+        // Business Model
+        'is_fiber_producer'       => ['boolean'],
+        'is_spinner'              => ['boolean'],
+        'is_weaving'              => ['boolean'],
+        'is_knitting'             => ['boolean'],
+        'is_dyeing_finishing'     => ['boolean'],
+        'is_printing'             => ['boolean'],
+        'is_garment'              => ['boolean'],
+        'is_trader'               => ['boolean'],
+        'is_brand'                => ['boolean'],
+        'is_buying_office'        => ['boolean'],
+
+        'is_testing_laboratory'   => ['boolean'],
+        'is_certification_body'   => ['boolean'],
+        'is_machinery_supplier'   => ['boolean'],
+        'is_accessories_supplier' => ['boolean'],
+        'is_chemical_supplier'    => ['boolean'],
+
+        // Strategy
+        'oem'                     => ['boolean'],
+        'odm'                     => ['boolean'],
+        'obm'                     => ['boolean'],
+        'private_label'           => ['boolean'],
+
+        // Market
+        'domestic_market'         => ['boolean'],
+        'export_market'           => ['boolean'],
+        'export_experience_years' => ['nullable', 'integer', 'min:0', 'max:100'],
+
+        // Sustainability
+        'esg_program'             => ['boolean'],
+        'renewable_energy'        => ['boolean'],
+        'recycled_material'       => ['boolean'],
+        'wastewater_treatment'    => ['boolean'],
+        'sustainability_notes'    => ['nullable', 'string'],
+    ]);
+
+  /*
+|--------------------------------------------------------------------------
+| Save Canonical Business Profile
+|--------------------------------------------------------------------------
+*/
+
+$business = CompanyIdentityBusiness::updateOrCreate(
+
+    [
+        'company_identity_id' => $user->company_identity_id,
+    ],
+
+    array_merge(
+
+        $validated,
+
+        [
+
+            'last_updated_by' => $user->id,
+
+            'last_reviewed_at' => now(),
+
+        ]
+
+    )
+
+);
+
+/*
+|--------------------------------------------------------------------------
+| Business Classification™
+|--------------------------------------------------------------------------
+*/
+
+$result = $classification->classify($business);
+
+
+$business->update([
+
+    'primary_business_category'
+        => $result['primary_business_category'],
+
+    'secondary_business_categories'
+        => $result['secondary_business_categories'],
+
+    'value_chain_position'
+        => $result['value_chain_position'],
+
+]);
+
+/*
+|--------------------------------------------------------------------------
+| Update Onboarding Progress
+|--------------------------------------------------------------------------
+*/
+
+$user->update([
+
+    'onboarding_step' => 3,
+
+]);
+
+/*
+|--------------------------------------------------------------------------
+| Continue to Step 3
+|--------------------------------------------------------------------------
+*/
+
+return redirect()->route(
+    'onboarding.capabilities'
+);
+
+
+}
 
     public function storeCapabilities(
     Request $request
-    )
-    {
-        // TODO:
-        // Simpan Capabilities
+): RedirectResponse
+{
 
-        auth()->user()->update([
-            'onboarding_step' => 4,
-        ]);
+ 
+    $user = auth()->user();
 
-        return redirect()->route(
-            'onboarding.manufacturing'
+    /*
+    |--------------------------------------------------------------------------
+    | Canonical Company Required
+    |--------------------------------------------------------------------------
+    */
+
+    if (!$user->company_identity_id) {
+
+        return back()->with(
+            'error',
+            'No canonical company identity is connected.'
         );
+
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation
+    |--------------------------------------------------------------------------
+    */
+
+    $request->validate([
+
+    /*
+    |--------------------------------------------------------------------------
+    | Capacity Intelligence™
+    |--------------------------------------------------------------------------
+    */
+
+    'production_capacity' => ['nullable', 'numeric', 'min:0'],
+    'production_capacity_unit' => ['nullable', 'string', 'max:30'],
+
+    'current_utilized_capacity' => ['nullable', 'numeric', 'min:0'],
+    'current_utilized_capacity_unit' => ['nullable', 'string', 'max:30'],
+
+    'monthly_capacity' => ['nullable', 'numeric', 'min:0'],
+    'annual_capacity' => ['nullable', 'numeric', 'min:0'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Commercial
+    |--------------------------------------------------------------------------
+    */
+
+    'minimum_order_quantity' => ['nullable', 'numeric', 'min:0'],
+    'minimum_order_unit' => ['nullable', 'string', 'max:30'],
+
+    'lead_time_days' => ['nullable', 'integer', 'min:0'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Manufacturing Services
+    |--------------------------------------------------------------------------
+    */
+
+    'supports_oem' => ['boolean'],
+    'supports_odm' => ['boolean'],
+    'supports_private_label' => ['boolean'],
+    'supports_full_package' => ['boolean'],
+    'supports_cmt' => ['boolean'],
+    'supports_design_support' => ['boolean'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Service Capability
+    |--------------------------------------------------------------------------
+    */
+
+    'export_ready' => ['boolean'],
+    'sampling_service' => ['boolean'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Production Flexibility
+    |--------------------------------------------------------------------------
+    */
+
+    'supports_small_batch' => ['boolean'],
+    'supports_fast_sampling' => ['boolean'],
+    'supports_quick_response' => ['boolean'],
+    'supports_custom_development' => ['boolean'],
+
+]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Save Canonical Capability Profile
+    |--------------------------------------------------------------------------
+    */
+
+   $profile = CompanyIdentityCapabilityProfile::updateOrCreate(
+
+        [
+            'company_identity_id' => $user->company_identity_id,
+        ],
+
+        array_merge(
+
+            $validated,
+
+            [
+
+                'last_updated_by' => $user->id,
+
+                'last_reviewed_at' => now(),
+
+            ]
+
+        )
+
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update Progress
+    |--------------------------------------------------------------------------
+    */
+
+    $user->update([
+
+        'onboarding_step' => 4,
+
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Continue
+    |--------------------------------------------------------------------------
+    */
+
+    return redirect()->route(
+        'onboarding.manufacturing'
+    );
+}
     
     /*
     |--------------------------------------------------------------------------
@@ -343,31 +689,81 @@ class OnboardingController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function manufacturing(): Response
-    {
-        return Inertia::render(
-            'Onboarding/Manufacturing',
-            [
-                'company' => auth()->user()?->company,
-            ]
-        );
-    }
+    public function manufacturing(
+    CanonicalCompanyFactoryService $factory
+): Response {
+
+    return Inertia::render(
+        'Onboarding/Manufacturing',
+        [
+
+            'company' =>
+
+                $factory->buildFromUser(
+                    auth()->user()
+                ),
+
+        ]
+    );
+}
 
     public function storeManufacturing(
-    Request $request
-    )
-    {
-        // TODO:
-        // Simpan Manufacturing
+    Request $request,
+    CanonicalCompanyFactoryService $factoryService
+) {
 
-        auth()->user()->update([
-            'onboarding_step' => 5,
-        ]);
+    $user = auth()->user();
 
-        return redirect()->route(
-            'onboarding.media-catalog'
-        );
+    $identity = $user->companyIdentity;
+
+    if (! $identity) {
+
+        abort(404, 'Company Identity not found.');
+
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Save Factory Passport
+    |--------------------------------------------------------------------------
+    */
+
+    $factoryService->saveFactoryPassport(
+
+        $identity,
+
+        $request->input('factory', []),
+
+        $request->input('primary_machine', [])
+
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update Onboarding Progress
+    |--------------------------------------------------------------------------
+    */
+
+    $user->update([
+
+        'onboarding_step' => 5,
+
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Next Step
+    |--------------------------------------------------------------------------
+    */
+
+
+    return redirect()->route(
+
+        'onboarding.media-catalog'
+
+    );
+
+}
     /*
     |--------------------------------------------------------------------------
     | STEP 5
@@ -431,4 +827,20 @@ class OnboardingController extends Controller
         'dashboard'
     );
 }
+public function capabilities(
+    CanonicalCompanyCapabilityService $capabilities
+): Response {
+
+    return Inertia::render(
+        'Onboarding/Capabilities',
+        [
+
+            'company' => $capabilities->buildFromUser(
+                auth()->user()
+            ),
+
+        ]
+    );
+}
+
 }

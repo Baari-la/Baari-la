@@ -17,6 +17,7 @@ use Illuminate\Notifications\Notifiable;
 
 use App\Models\Company;
 use App\Models\CompanyClaim;
+use App\Models\CompanyIdentity;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDispute;
 use App\Models\SupplierReview;
@@ -53,9 +54,18 @@ class User extends Authenticatable implements MustVerifyEmail
         |--------------------------------------------------------------------------
         | Company
         |--------------------------------------------------------------------------
+        |
+        | company_id:
+        | Legacy company relationship.
+        |
+        | company_identity_id:
+        | Canonical DIGESTEX company identity managed by this user.
+        |
         */
 
+
         'company_id',
+        'company_identity_id',
 
         'onboarding_step',
         'onboarding_completed',
@@ -168,6 +178,62 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(
             Company::class
         );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Canonical Company Identity
+    |--------------------------------------------------------------------------
+    |
+    | Canonical DIGESTEX company identity that this user is authorized
+    | to manage.
+    |
+    | This relationship exists alongside company() while legacy company
+    | compatibility is still required.
+    |
+    */
+
+    public function companyIdentity()
+    {
+        return $this->belongsTo(
+            CompanyIdentity::class,
+            'company_identity_id'
+        );
+    }
+    /*
+    |--------------------------------------------------------------------------
+    | Company Ownership Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    public function hasManagedCompany(): bool
+    {
+        return !is_null($this->company_identity_id)
+            || !is_null($this->company_id);
+    }
+
+    public function managesCanonicalCompany(): bool
+    {
+        return !is_null($this->company_identity_id);
+    }
+
+    public function managesLegacyCompany(): bool
+    {
+        return is_null($this->company_identity_id)
+            && !is_null($this->company_id);
+    }
+
+    public function managedCompanyName(): ?string
+    {
+        if ($this->managesCanonicalCompany()) {
+            return $this->companyIdentity?->canonical_name;
+        }
+
+        if ($this->managesLegacyCompany()) {
+            return $this->company?->nama_perusahaan;
+        }
+
+        return null;
     }
 
     /*

@@ -6,6 +6,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+use App\Models\CompanyIdentityProfile;
+use App\Models\CompanyIdentityBusiness;
+use App\Models\CompanyIdentityCapability;
+use App\Models\CompanyIdentityCapabilityProfile;
 
 class CompanyIdentity extends Model
 {
@@ -26,9 +32,12 @@ class CompanyIdentity extends Model
         'updated_at' => 'datetime',
     ];
 
-    /**
-     * Legacy records that support this canonical identity.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Legacy Sources
+    |--------------------------------------------------------------------------
+    */
+
     public function sources(): HasMany
     {
         return $this->hasMany(
@@ -37,11 +46,12 @@ class CompanyIdentity extends Model
         );
     }
 
-    /**
-     * Convenience helper.
-     *
-     * Returns the legacy company IDs behind this identity.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Legacy Company IDs
+    |--------------------------------------------------------------------------
+    */
+
     public function sourceCompanyIds(): array
     {
         return $this->sources()
@@ -50,12 +60,16 @@ class CompanyIdentity extends Model
             ->all();
     }
 
-    /**
-     * Union of capabilities from all legacy company records.
-     *
-     * This is calculated from existing company_capabilities.
-     * Nothing is copied or modified.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Legacy Capability Union
+    |--------------------------------------------------------------------------
+    |
+    | Union of all capabilities from legacy directory records.
+    | Used before owner-managed capability tags become available.
+    |
+    */
+
     public function capabilityUnion(): array
     {
         $companyIds = $this->sourceCompanyIds();
@@ -74,9 +88,12 @@ class CompanyIdentity extends Model
             ->all();
     }
 
-    /**
-     * Only identities ready to participate in canonical lookup.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Query Scope
+    |--------------------------------------------------------------------------
+    */
+
     public function scopeReady($query)
     {
         return $query->where(
@@ -85,11 +102,77 @@ class CompanyIdentity extends Model
         );
     }
 
-    public function capabilities()
+    /*
+    |--------------------------------------------------------------------------
+    | Company Profile
+    |--------------------------------------------------------------------------
+    */
+
+    public function profile(): HasOne
+    {
+        return $this->hasOne(
+            CompanyIdentityProfile::class,
+            'company_identity_id'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Business Profile
+    |--------------------------------------------------------------------------
+    */
+
+    public function business(): HasOne
+    {
+        return $this->hasOne(
+            CompanyIdentityBusiness::class,
+            'company_identity_id'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Capability Profile
+    |--------------------------------------------------------------------------
+    */
+
+    public function capabilityProfile(): HasOne
+    {
+        return $this->hasOne(
+            CompanyIdentityCapabilityProfile::class,
+            'company_identity_id'
+        );
+    }
+
+/*
+|--------------------------------------------------------------------------
+| Factories
+|--------------------------------------------------------------------------
+|
+| One canonical company may own multiple factories.
+|
+*/
+
+public function factories()
 {
     return $this->hasMany(
-        CompanyIdentityCapability::class,
-        'company_identity_id'
+        CompanyFactory::class,
+        'company_identity_id',
+        'id'
     );
-}
+}   
+
+    /*
+    |--------------------------------------------------------------------------
+    | Capability Tags
+    |--------------------------------------------------------------------------
+    */
+
+    public function capabilities(): HasMany
+    {
+        return $this->hasMany(
+            CompanyIdentityCapability::class,
+            'company_identity_id'
+        );
+    }
 }

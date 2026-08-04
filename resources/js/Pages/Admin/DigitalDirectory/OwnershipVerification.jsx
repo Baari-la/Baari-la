@@ -5,6 +5,26 @@ import { Link } from "@inertiajs/react";
 import { Building2, ShieldCheck, CheckCircle2, XCircle } from "lucide-react";
 
 export default function OwnershipVerification({ claims = [], stats = {} }) {
+    const getCompanyName = (claim) => {
+        return (
+            claim.companyIdentity?.canonical_name ??
+            claim.company?.nama_perusahaan ??
+            claim.claimed_company_name ??
+            "-"
+        );
+    };
+
+    const getClaimType = (claim) => {
+        if (claim.company_identity_id) {
+            return "canonical";
+        }
+
+        if (claim.company_id) {
+            return "legacy";
+        }
+
+        return "manual";
+    };
     return (
         <AdminLayout>
             <div className="space-y-8">
@@ -101,10 +121,16 @@ export default function OwnershipVerification({ claims = [], stats = {} }) {
                                     {claims.map((claim) => (
                                         <tr key={claim.id} className="border-t">
                                             <TD>
-                                                <div className="font-bold">
-                                                    {claim.company
-                                                        ?.nama_perusahaan ??
-                                                        "-"}
+                                                <div className="space-y-2">
+                                                    <div className="font-bold text-slate-900">
+                                                        {getCompanyName(claim)}
+                                                    </div>
+
+                                                    <ClaimTypeBadge
+                                                        type={getClaimType(
+                                                            claim,
+                                                        )}
+                                                    />
                                                 </div>
                                             </TD>
 
@@ -119,7 +145,10 @@ export default function OwnershipVerification({ claims = [], stats = {} }) {
                                             </TD>
 
                                             <TD>
-                                                {formatDate(claim.created_at)}
+                                                {formatDate(
+                                                    claim.submitted_at ??
+                                                        claim.created_at,
+                                                )}
                                             </TD>
                                             <TD>
                                                 {claim.status === "pending" ? (
@@ -213,6 +242,29 @@ export default function OwnershipVerification({ claims = [], stats = {} }) {
 | Components
 |--------------------------------------------------------------------------
 */
+function ClaimTypeBadge({ type }) {
+    if (type === "canonical") {
+        return (
+            <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-emerald-700">
+                Canonical Identity
+            </span>
+        );
+    }
+
+    if (type === "legacy") {
+        return (
+            <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-slate-600">
+                Legacy Company
+            </span>
+        );
+    }
+
+    return (
+        <span className="inline-flex rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-amber-700">
+            Manual / Unmatched
+        </span>
+    );
+}
 
 function StatCard({ title, value, icon: Icon }) {
     return (

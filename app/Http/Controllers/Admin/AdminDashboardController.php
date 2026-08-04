@@ -329,10 +329,6 @@ $company->update($companyFields);
     $newData
 );
 
-logger('RELATIONAL SYNC EXECUTED', [
-    'company_id' => $company->id,
-    'machines_count' => count($newData['machines'] ?? []),
-]);
 
         $update->update([
 
@@ -367,39 +363,298 @@ public function __construct(
 
 public function approveClaim(
     CompanyClaim $claim
-)
-{
+) {
     /*
     |--------------------------------------------------------------------------
-    | Claim Must Be Linked To Company
+    | Claim Must Be Pending
     |--------------------------------------------------------------------------
     */
 
-    if (!$claim->company_id) {
-
+    if ($claim->status !== 'pending') {
         return back()->with(
             'error',
-            'This claim must be linked to a company before approval.'
+            'This ownership claim is no longer pending.'
         );
     }
 
-/*
-|--------------------------------------------------------------------------
-| Claim Must Be Pending
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | Load Claim Relationships
+    |--------------------------------------------------------------------------
+    */
 
-if ($claim->status !== 'pending') {
-    return back()->with(
-        'error',
-        'This ownership claim is no longer pending.'
-    );
-}
-    
-    $company = $claim->company;
+    $claim->loadMissing([
+        'user',
+        'company',
+        'companyIdentity',
+    ]);
+
+    if (!$claim->user) {
+        return back()->with(
+            'error',
+            'The user associated with this ownership claim could not be found.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Determine Claim Target
+    |--------------------------------------------------------------------------
+    */
+
+    $hasCanonicalIdentity =
+        !empty($claim->company_identity_id);
+
+    $hasLegacyCompany =
+        !empty($claim->company_id);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Invalid Claim Target
+    |--------------------------------------------------------------------------
+    |
+    | A claim must never target canonical identity and legacy company
+    | simultaneously.
+    |
+    */
+
+    if (
+        $hasCanonicalIdentity &&
+        $hasLegacyCompany
+    ) {
+        return back()->with(
+            'error',
+            'This ownership claim has an invalid company target.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Manual / Unresolved Claim
+    |--------------------------------------------------------------------------
+    |
+    | Claims without either company_identity_id or company_id must first
+    | be resolved by an administrator before ownership can be approved.
+    |
+    */
+
+    if (
+        !$hasCanonicalIdentity &&
+        !$hasLegacyCompany
+    ) {
+        return back()->with(
+            'error',
+            'This ownership claim must be linked to a canonical company identity or legacy company before approval.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Canonical Company Identity Claim
+    |--------------------------------------------------------------------------
+    */
+
+    if ($hasCanonicalIdentity) {
+
+        $companyIdentity =
+            $claim->companyIdentity;
+
+        if (!$companyIdentity) {
+            return back()->with(
+                'error',
+                'The linked canonical company identity could not be found.'
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Only READY Identity Can Be Approved
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $companyIdentity->identity_status
+            !== 'READY'
+        ) {
+            return back()->with(
+                'error',
+                'This canonical company identity is not currently available for ownership approval.'
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Identity Already Managed By Another User
+        |--------------------------------------------------------------------------
+        */
+
+        $identityAlreadyManaged =
+            \App\Models\User::query()
+                ->where(
+                    'company_identity_id',
+                    $companyIdentity->id
+                )
+                ->where(
+                    'id',
+                    '!=',
+                    $claim->user_id
+                )
+                ->exists();
+
+        if ($identityAlreadyManaged) {
+            return back()->with(
+                'error',
+                'This canonical company identity is already managed by another user.'
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | User Already Manages Another Company
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $claim->user->company_identity_id &&
+            (int) $claim->user->company_identity_id
+                !== (int) $companyIdentity->id
+        ) {
+            return back()->with(
+                'error',
+                'This user already manages another canonical company identity.'
+            );
+        }
+
+        if ($claim->user->company_id) {
+            return back()->with(
+                'error',
+                'This user already manages a legacy company.'
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Approve Canonical Claim
+        |--------------------------------------------------------------------------
+        */
+
+        DB::transaction(function () use (
+            $claim,
+            $companyIdentity
+        ) {
+            /*
+            |--------------------------------------------------------------------------
+            | Connect User To Canonical Identity
+            |--------------------------------------------------------------------------
+            */
+
+            $claim->user->update([
+                'company_identity_id' =>
+                    $companyIdentity->id,
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Mark Canonical Identity Verified
+            |--------------------------------------------------------------------------
+            */
+
+            $companyIdentity->update([
+                'verification_status' =>
+                    'verified',
+
+                'verified_at' =>
+                    now(),
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Approve Current Claim
+            |--------------------------------------------------------------------------
+            */
+
+            $claim->update([
+                'status' =>
+                    'approved',
+
+                'reviewed_at' =>
+                    now(),
+
+                'reviewed_by' =>
+                    auth()->id(),
+
+                'rejection_reason' =>
+                    null,
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Reject Other Pending Claims For Same Canonical Identity
+            |--------------------------------------------------------------------------
+            */
+
+            CompanyClaim::query()
+                ->where(
+                    'company_identity_id',
+                    $companyIdentity->id
+                )
+                ->where(
+                    'id',
+                    '!=',
+                    $claim->id
+                )
+                ->where(
+                    'status',
+                    'pending'
+                )
+                ->update([
+                    'status' =>
+                        'rejected',
+
+                    'reviewed_at' =>
+                        now(),
+
+                    'reviewed_by' =>
+                        auth()->id(),
+
+                    'rejection_reason' =>
+                        'Another ownership claim for this canonical company identity was approved.',
+                ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | NOTE
+            |--------------------------------------------------------------------------
+            |
+            | Legacy companies are intentionally NOT modified here.
+            |
+            | company_id remains NULL on the user.
+            |
+            | DigitalDirectoryParticipant and AuditLog canonical integration
+            | will be migrated separately after canonical ownership is stable.
+            |
+            */
+        });
+
+        return back()->with(
+            'message',
+            'Canonical company ownership claim approved.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Legacy Company Claim
+    |--------------------------------------------------------------------------
+    |
+    | Existing behavior is preserved for compatibility.
+    |
+    */
+
+    $company =
+        $claim->company;
 
     if (!$company) {
-
         return back()->with(
             'error',
             'The linked company could not be found.'
@@ -407,10 +662,33 @@ if ($claim->status !== 'pending') {
     }
 
     if ($company->claimed_by_user_id) {
-
         return back()->with(
             'error',
             'Company already claimed.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Already Manages Another Company
+    |--------------------------------------------------------------------------
+    */
+
+    if ($claim->user->company_identity_id) {
+        return back()->with(
+            'error',
+            'This user already manages a canonical company identity.'
+        );
+    }
+
+    if (
+        $claim->user->company_id &&
+        (int) $claim->user->company_id
+            !== (int) $company->id
+    ) {
+        return back()->with(
+            'error',
+            'This user already manages another company.'
         );
     }
 
@@ -418,9 +696,13 @@ if ($claim->status !== 'pending') {
         $claim,
         $company
     ) {
+        /*
+        |--------------------------------------------------------------------------
+        | Update Legacy Company
+        |--------------------------------------------------------------------------
+        */
 
         $company->update([
-
             'claimed_by_user_id' =>
                 $claim->user_id,
 
@@ -437,77 +719,109 @@ if ($claim->status !== 'pending') {
                 now(),
         ]);
 
-       $claim->user->update([
+        /*
+        |--------------------------------------------------------------------------
+        | Connect User To Legacy Company
+        |--------------------------------------------------------------------------
+        */
 
-    'company_id' =>
-        $company->id,
-]);
-
-/*
-|--------------------------------------------------------------------------
-| LINK DIGITAL DIRECTORY PARTICIPANT
-|--------------------------------------------------------------------------
-*/
-
-        DigitalDirectoryParticipant::where(
-            'user_id',
-            $claim->user_id
-        )
-        ->whereNull('company_id')
-        ->update([
-            'company_id' => $company->id,
+        $claim->user->update([
+            'company_id' =>
+                $company->id,
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Link Digital Directory Participant
+        |--------------------------------------------------------------------------
+        */
 
-       $claim->update([
+        DigitalDirectoryParticipant::query()
+            ->where(
+                'user_id',
+                $claim->user_id
+            )
+            ->whereNull(
+                'company_id'
+            )
+            ->update([
+                'company_id' =>
+                    $company->id,
+            ]);
 
-    'status' =>
-        'approved',
+        /*
+        |--------------------------------------------------------------------------
+        | Approve Current Claim
+        |--------------------------------------------------------------------------
+        */
 
-    'reviewed_at' =>
-        now(),
+        $claim->update([
+            'status' =>
+                'approved',
 
-    'reviewed_by' =>
-        auth()->id(),
+            'reviewed_at' =>
+                now(),
 
-    'rejection_reason' =>
-        null,
-]);
+            'reviewed_by' =>
+                auth()->id(),
 
-        CompanyClaim::where(
-            'company_id',
-            $company->id
-        )
-        ->where(
-            'id',
-            '!=',
-            $claim->id
-        )
-        ->where(
-            'status',
-            'pending'
-        )
-        ->update([
+            'rejection_reason' =>
+                null,
+        ]);
 
-    'status' =>
-        'rejected',
+        /*
+        |--------------------------------------------------------------------------
+        | Reject Other Pending Claims For Same Legacy Company
+        |--------------------------------------------------------------------------
+        */
 
-    'reviewed_at' =>
-        now(),
+        CompanyClaim::query()
+            ->where(
+                'company_id',
+                $company->id
+            )
+            ->where(
+                'id',
+                '!=',
+                $claim->id
+            )
+            ->where(
+                'status',
+                'pending'
+            )
+            ->update([
+                'status' =>
+                    'rejected',
 
-    'reviewed_by' =>
-        auth()->id(),
+                'reviewed_at' =>
+                    now(),
 
-    'rejection_reason' =>
-        'Another ownership claim for this company was approved.',
-]);
+                'reviewed_by' =>
+                    auth()->id(),
+
+                'rejection_reason' =>
+                    'Another ownership claim for this company was approved.',
+            ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Legacy Audit Log
+        |--------------------------------------------------------------------------
+        */
 
         AuditLog::create([
-    'user_id' => auth()->id(),
-    'company_id' => $company->id,
-    'action' => 'approved',
-    'details' => 'Company claim approved.'
-]);
+            'user_id' =>
+                auth()->id(),
+
+            'company_id' =>
+                $company->id,
+
+            'action' =>
+                'approved',
+
+            'details' =>
+                'Company claim approved.',
+        ]);
     });
 
     return back()->with(

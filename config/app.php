@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'debug_log' => env('APP_DEBUG_LOG', false),
+
 ];

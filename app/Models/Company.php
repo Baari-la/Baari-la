@@ -6,6 +6,7 @@ use App\Models\SupplierReview;
 use App\Models\User;
 use App\Models\CompanyUpdate;
 use App\Models\MstCountry;
+use App\Models\CompanyIdentity;
 
 class Company extends Model
 {
@@ -22,7 +23,7 @@ protected $fillable = [
     'telepon', 'email_web', 'pimpinan', 'pimpinan_2', 'tenaga_kerja', 
     'pasar_ekspor', 'produk', 'category', 'membership_type', 
     'nomor_anggota', 'photo_url', 'photo_pimpinan', 'photo_pimpinan_2', 'catalog_url','last_verified_at', 'status_verifikasi', 'stock_ready_caption',
-    'stock_qty','company_role','data_source', 'claimed_by_user_id', 'last_updated_at',
+    'stock_qty','company_role','data_source', 'company_identity_id', 'claimed_by_user_id', 'last_updated_at',
     'stock_unit', 'price'
 ];
  // GABUNGKAN SEMUA CASTS DI SINI (Hanya boleh ada satu blok ini)
@@ -204,11 +205,29 @@ public function locations()
     }
 
     public function identitySource()
-        {
-            return $this->hasOne(
-                CompanyIdentitySource::class,
-                'company_id'
-            );
+{
+    return $this->hasOne(
+        CompanyIdentitySource::class,
+        'company_id'
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
+| Canonical Company Identity
+|--------------------------------------------------------------------------
+|
+| Links this legacy company record to its canonical identity.
+|
+*/
+
+public function companyIdentity()
+{
+    return $this->belongsTo(
+        CompanyIdentity::class,
+        'company_identity_id',
+        'id'
+    );
 }
   
 /*
@@ -418,4 +437,6 @@ public function scopeClaimed($query)
     {
         return $this->load(self::PASSPORT_RELATIONS);
     }
+
+    
 }

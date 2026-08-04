@@ -1,39 +1,144 @@
+import { Head, useForm, usePage } from "@inertiajs/react";
+
 import OnboardingLayout from "@/Layouts/OnboardingLayout";
 import OnboardingNavbar from "@/Components/Onboarding/OnboardingNavbar";
 
-import { Head, useForm, usePage } from "@inertiajs/react";
-
-import {
-    Briefcase,
-    Calendar,
-    Users,
-    Globe,
-    Package,
-    ArrowRight,
-} from "lucide-react";
+import BusinessInformationCard from "@/Components/Onboarding/Business/BusinessInformationCard";
 
 export default function BusinessInformation() {
-    const { locale } = usePage().props;
+    /*
+    |--------------------------------------------------------------------------
+    | Page Props
+    |--------------------------------------------------------------------------
+    */
 
-    const isEn = locale === "en";
+    const { locale, company } = usePage().props;
 
-    const { data, setData, post, processing } = useForm({
-        company_description: "",
-        established_year: "",
-        employees: "",
-        business_type: "",
-        main_products: "",
-        export_markets: "",
-        hs_codes: "",
-        certifications: "",
-        linkedin: "",
+    /*
+    |--------------------------------------------------------------------------
+    | Business Information Form
+    |--------------------------------------------------------------------------
+    */
+
+    const { data, setData, post, processing, errors } = useForm({
+        /*
+        |--------------------------------------------------------------------------
+        | Company Description
+        |--------------------------------------------------------------------------
+        */
+
+        business_description: company?.business_description ?? "",
+
+        /*
+        |--------------------------------------------------------------------------
+        | Company Profile
+        |--------------------------------------------------------------------------
+        */
+
+        year_established: company?.year_established ?? "",
+
+        legal_entity: company?.legal_entity ?? "",
+
+        employee_range: company?.employee_range ?? "",
+
+        factory_count: company?.factory_count ?? "",
+
+        /*
+        |--------------------------------------------------------------------------
+        | Business Activities
+        |--------------------------------------------------------------------------
+        */
+
+        is_fiber_producer: company?.is_fiber_producer ?? false,
+
+        is_spinner: company?.is_spinner ?? false,
+
+        is_weaving: company?.is_weaving ?? false,
+
+        is_knitting: company?.is_knitting ?? false,
+
+        is_dyeing_finishing: company?.is_dyeing_finishing ?? false,
+
+        is_printing: company?.is_printing ?? false,
+
+        is_garment: company?.is_garment ?? false,
+
+        is_trader: company?.is_trader ?? false,
+
+        is_brand: company?.is_brand ?? false,
+
+        is_buying_office: company?.is_buying_office ?? false,
+
+        is_testing_laboratory: company?.is_testing_laboratory ?? false,
+
+        is_certification_body: company?.is_certification_body ?? false,
+
+        is_machinery_supplier: company?.is_machinery_supplier ?? false,
+
+        is_accessories_supplier: company?.is_accessories_supplier ?? false,
+
+        is_chemical_supplier: company?.is_chemical_supplier ?? false,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Business Strategy
+        |--------------------------------------------------------------------------
+        */
+
+        oem: company?.oem ?? false,
+
+        odm: company?.odm ?? false,
+
+        obm: company?.obm ?? false,
+
+        private_label: company?.private_label ?? false,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Market Coverage
+        |--------------------------------------------------------------------------
+        */
+
+        domestic_market: company?.domestic_market ?? true,
+
+        export_market: company?.export_market ?? false,
+
+        export_experience_years: company?.export_experience_years ?? "",
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sustainability
+        |--------------------------------------------------------------------------
+        */
+
+        esg_program: company?.esg_program ?? false,
+
+        renewable_energy: company?.renewable_energy ?? false,
+
+        recycled_material: company?.recycled_material ?? false,
+
+        wastewater_treatment: company?.wastewater_treatment ?? false,
+
+        sustainability_notes: company?.sustainability_notes ?? "",
     });
 
-    const submit = (e) => {
-        e.preventDefault();
+    /*
+    |--------------------------------------------------------------------------
+    | Submit
+    |--------------------------------------------------------------------------
+    */
+
+    const submit = (event) => {
+        event.preventDefault();
 
         post(route("onboarding.business-information.store"));
     };
+
+    /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
 
     return (
         <OnboardingLayout>
@@ -42,188 +147,18 @@ export default function BusinessInformation() {
             <div className="min-h-screen bg-slate-50">
                 <OnboardingNavbar currentStep={2} />
 
-                <div className="mx-auto max-w-6xl px-6 py-12">
-                    <div className="rounded-3xl bg-white p-10 shadow-sm">
-                        <div className="text-center">
-                            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-600">
-                                STEP 2
-                            </p>
-
-                            <h1 className="mt-4 text-5xl font-black">
-                                {isEn
-                                    ? "Business Information"
-                                    : "Informasi Bisnis"}
-                            </h1>
-
-                            <p className="mt-4 text-slate-500">
-                                {isEn
-                                    ? "Tell us about your business."
-                                    : "Beritahu kami tentang bisnis Anda."}
-                            </p>
-                        </div>
-
-                        <form onSubmit={submit} className="mt-10 space-y-6">
-                            {/* Description */}
-
-                            <div>
-                                <label className="font-bold">
-                                    Company Description
-                                </label>
-
-                                <textarea
-                                    rows={5}
-                                    value={data.company_description}
-                                    onChange={(e) =>
-                                        setData(
-                                            "company_description",
-                                            e.target.value,
-                                        )
-                                    }
-                                    className="
-                                        mt-2
-                                        w-full
-                                        rounded-2xl
-                                        border
-                                        border-slate-300
-                                        p-4
-                                    "
-                                />
-                            </div>
-
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <Input
-                                    icon={Calendar}
-                                    label="Established Year"
-                                    value={data.established_year}
-                                    onChange={(e) =>
-                                        setData(
-                                            "established_year",
-                                            e.target.value,
-                                        )
-                                    }
-                                />
-
-                                <Input
-                                    icon={Users}
-                                    label="Number of Employees"
-                                    value={data.employees}
-                                    onChange={(e) =>
-                                        setData("employees", e.target.value)
-                                    }
-                                />
-
-                                <Input
-                                    icon={Briefcase}
-                                    label="Business Type"
-                                    value={data.business_type}
-                                    onChange={(e) =>
-                                        setData("business_type", e.target.value)
-                                    }
-                                />
-
-                                <Input
-                                    icon={Package}
-                                    label="Main Products"
-                                    value={data.main_products}
-                                    onChange={(e) =>
-                                        setData("main_products", e.target.value)
-                                    }
-                                />
-
-                                <Input
-                                    icon={Globe}
-                                    label="Export Markets"
-                                    value={data.export_markets}
-                                    onChange={(e) =>
-                                        setData(
-                                            "export_markets",
-                                            e.target.value,
-                                        )
-                                    }
-                                />
-
-                                <Input
-                                    icon={Package}
-                                    label="HS Codes"
-                                    value={data.hs_codes}
-                                    onChange={(e) =>
-                                        setData("hs_codes", e.target.value)
-                                    }
-                                />
-
-                                <Input
-                                    icon={Briefcase}
-                                    label="Certifications"
-                                    value={data.certifications}
-                                    onChange={(e) =>
-                                        setData(
-                                            "certifications",
-                                            e.target.value,
-                                        )
-                                    }
-                                />
-
-                                <Input
-                                    icon={Globe}
-                                    label="LinkedIn"
-                                    value={data.linkedin}
-                                    onChange={(e) =>
-                                        setData("linkedin", e.target.value)
-                                    }
-                                />
-                            </div>
-
-                            <div className="flex justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="
-                                        inline-flex
-                                        items-center
-                                        gap-2
-                                        rounded-2xl
-                                        bg-emerald-600
-                                        px-8
-                                        py-4
-                                        font-black
-                                        text-white
-                                    "
-                                >
-                                    {isEn ? "CONTINUE" : "LANJUTKAN"}
-
-                                    <ArrowRight className="h-5 w-5" />
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                <div className="mx-auto max-w-7xl px-6 py-12">
+                    <BusinessInformationCard
+                        locale={locale}
+                        company={company}
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        processing={processing}
+                        submit={submit}
+                    />
                 </div>
             </div>
         </OnboardingLayout>
-    );
-}
-
-function Input({ icon: Icon, label, value, onChange }) {
-    return (
-        <div>
-            <label className="font-semibold">{label}</label>
-
-            <div className="relative mt-2">
-                <Icon className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-
-                <input
-                    value={value}
-                    onChange={onChange}
-                    className="
-                        w-full
-                        rounded-xl
-                        border
-                        border-slate-300
-                        py-3
-                        pl-11
-                        pr-4
-                    "
-                />
-            </div>
-        </div>
     );
 }

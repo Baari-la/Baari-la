@@ -775,53 +775,94 @@ public function packageAnalytics()
 
 public function ownershipVerification(): Response
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Ownership Verification Claims
+    |--------------------------------------------------------------------------
+    |
+    | Supports:
+    |
+    | 1. Canonical Company Identity
+    | 2. Legacy Company
+    | 3. Manual / Unmatched Company
+    |
+    */
+
     $claims = CompanyClaim::query()
+
+        /*
+        |--------------------------------------------------------------------------
+        | Load Claim Relationships
+        |--------------------------------------------------------------------------
+        */
 
         ->with([
             'company',
+            'companyIdentity',
             'user',
+            'reviewer',
         ])
 
-        ->whereIn(
-            'user_id',
-            DigitalDirectoryParticipant::query()
-                ->whereNotNull('user_id')
-                ->select('user_id')
-        )
+        /*
+        |--------------------------------------------------------------------------
+        | Latest Claims First
+        |--------------------------------------------------------------------------
+        */
 
-        ->latest()
+        ->latest('submitted_at')
 
         ->get();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Statistics
+    |--------------------------------------------------------------------------
+    */
+
+    $stats = [
+        'total' =>
+            $claims->count(),
+
+        'pending' =>
+            $claims
+                ->where(
+                    'status',
+                    'pending'
+                )
+                ->count(),
+
+        'approved' =>
+            $claims
+                ->where(
+                    'status',
+                    'approved'
+                )
+                ->count(),
+
+        'rejected' =>
+            $claims
+                ->where(
+                    'status',
+                    'rejected'
+                )
+                ->count(),
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Render Ownership Verification Queue
+    |--------------------------------------------------------------------------
+    */
 
     return Inertia::render(
         'Admin/DigitalDirectory/OwnershipVerification',
         [
-            'claims' => $claims,
+            'claims' =>
+                $claims,
 
-            'stats' => [
-                'total' =>
-                    $claims->count(),
-
-                'pending' =>
-                    $claims->where(
-                        'status',
-                        'pending'
-                    )->count(),
-
-                'approved' =>
-                    $claims->where(
-                        'status',
-                        'approved'
-                    )->count(),
-
-                'rejected' =>
-                    $claims->where(
-                        'status',
-                        'rejected'
-                    )->count(),
-            ],
+            'stats' =>
+                $stats,
         ]
     );
 }
-
 }

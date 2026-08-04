@@ -1,312 +1,320 @@
-import OnboardingLayout from "@/Layouts/OnboardingLayout";
-import OnboardingNavbar from "@/Components/Onboarding/OnboardingNavbar";
-import StickyWhatsAppButton from "@/Components/Program/StickyWhatsAppButton";
-
 import { Head, useForm, usePage } from "@inertiajs/react";
 
-import {
-    Building2,
-    User,
-    Mail,
-    Phone,
-    Globe,
-    MapPin,
-    ArrowRight,
-} from "lucide-react";
+import BaseOnboardingPage from "@/Components/Onboarding/BaseOnboardingPage";
+
+import CompanyInformationCard from "@/Components/Onboarding/CompanyInformationCard";
+import CompanySummaryCard from "@/Components/Onboarding/CompanySummaryCard";
+import StepNavigation from "@/Components/Onboarding/StepNavigation";
 
 export default function CompanyInformation() {
-    const { locale, auth, company } = usePage().props;
-
+    const { auth, locale, company } = usePage().props;
+    const companyFound = company?.profile_exists === true;
     const isEn = locale === "en";
 
-    const { data, setData, post, processing, errors } = useForm({
+    /*
+    |--------------------------------------------------------------------------
+    | Form
+    |--------------------------------------------------------------------------
+    */
+
+    const { data, setData, post, processing } = useForm({
         company_name: company?.nama_perusahaan ?? "",
 
-        pic_name: auth?.user?.name ?? "",
+        pic_name: company?.pic_name ?? auth.user.name ?? "",
 
-        position: "",
+        position: company?.position ?? "",
 
-        email: auth?.user?.email ?? "",
+        email: company?.email ?? auth.user.email ?? "",
 
-        phone: company?.telepon ?? "",
+        phone: company?.phone ?? "",
 
-        website: company?.email_web ?? "",
+        website: company?.website ?? "",
 
-        company_type: company?.category ?? "",
+        company_type: company?.company_type ?? "",
 
         country: company?.country ?? "Indonesia",
 
         city: company?.city ?? "",
-
-        address: company?.alamat_lengkap ?? "",
-
-        province: company?.province ?? "",
-
-        postal_code: company?.postal_code ?? "",
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Submit
+    |--------------------------------------------------------------------------
+    */
 
     const submit = (e) => {
         e.preventDefault();
 
-        post(route("onboarding.company-information.store"));
+        console.log("===== SUBMIT CLICKED =====");
+
+        post(route("onboarding.company-information.store"), {
+            preserveScroll: true,
+
+            onStart: () => console.log("POST START"),
+
+            onSuccess: () => console.log("POST SUCCESS"),
+
+            onError: (errors) => console.log("POST ERROR", errors),
+
+            onFinish: () => console.log("POST FINISH"),
+        });
     };
 
+    /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
+
     return (
-        <OnboardingLayout>
-            <Head title="Company Information" />
+        <BaseOnboardingPage
+            step={1}
+            /*
+            |--------------------------------------------------------------------------
+            | Header
+            |--------------------------------------------------------------------------
+            */
 
-            <div className="min-h-screen bg-slate-50">
-                <OnboardingNavbar currentStep={1} />
+            header={{
+                title: isEn ? "Company Identity" : "Identitas Perusahaan",
 
-                <main className="mx-auto max-w-7xl p-6">
-                    <div className="mx-auto max-w-5xl space-y-8">
-                        {/* Header */}
+                description: isEn
+                    ? "Build the foundation of your Digital Company Passport™. Complete your company identity to power Executive Dashboard™, Company Intelligence™, and Smart Business Matching™."
+                    : "Bangun fondasi Digital Company Passport™ Anda. Lengkapi identitas perusahaan sebagai dasar Executive Dashboard™, Company Intelligence™, dan Smart Business Matching™.",
+            }}
+            /*
+            |--------------------------------------------------------------------------
+            | Intelligence Box
+            |--------------------------------------------------------------------------
+            */
 
-                        <div className="text-center">
-                            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-600">
-                                STEP 1
-                            </p>
+            intelligence={{
+                title: isEn ? "Company Intelligence™" : "Company Intelligence™",
 
-                            <h1 className="mt-4 text-5xl font-black">
-                                {isEn
-                                    ? "Company Information"
-                                    : "Informasi Perusahaan"}
-                            </h1>
+                description: isEn
+                    ? "The information you provide will become the foundation for multiple DIGESTEX intelligence services."
+                    : "Informasi yang Anda lengkapi akan menjadi fondasi berbagai layanan intelijen DIGESTEX.",
 
-                            <p className="mt-4 text-lg text-slate-500">
-                                {isEn
-                                    ? "Tell us about your company."
-                                    : "Beritahu kami tentang perusahaan Anda."}
-                            </p>
-                        </div>
+                items: [
+                    "Digital Company Passport™",
 
-                        {/* Welcome */}
+                    "Executive Dashboard™",
 
-                        <div className="rounded-3xl bg-emerald-50 p-8">
-                            <h3 className="text-2xl font-black text-emerald-700">
-                                {isEn
-                                    ? `Welcome, ${auth?.user?.name}`
-                                    : `Selamat Datang, ${auth?.user?.name}`}
-                            </h3>
+                    "Company Intelligence™",
 
-                            <p className="mt-3 text-slate-600">
-                                {isEn
-                                    ? "Let's begin building your Digital Company Passport™."
-                                    : "Mari mulai membangun Digital Company Passport™ Anda."}
-                            </p>
-                        </div>
+                    "Smart Business Matching™",
 
-                        {/* Tambahan */}
-                        {company && (
-                            <div
-                                className="
+                    "Buyer Readiness™",
+
+                    isEn ? "Public Company Directory" : "Direktori Perusahaan",
+                ],
+            }}
+            /*
+            |--------------------------------------------------------------------------
+            | Summary
+            |--------------------------------------------------------------------------
+            */
+
+            sidebar={<CompanySummaryCard data={data} />}
+            /*
+            |--------------------------------------------------------------------------
+            | Navigation
+            |--------------------------------------------------------------------------
+            */
+        >
+            <form onSubmit={submit} className="space-y-8">
+                {/* ======================================================
+     | Welcome Card
+     ====================================================== */}
+
+                <div
+                    className="
             rounded-3xl
             border
-            border-emerald-200
-            bg-emerald-50
+            border-indigo-100
+            bg-gradient-to-r
+            from-indigo-50
+            via-white
+            to-emerald-50
             p-8
         "
-                            >
-                                <div className="flex items-start gap-4">
-                                    <div className="rounded-2xl bg-emerald-500 p-3">
-                                        <Building2 className="h-6 w-6 text-white" />
-                                    </div>
-
-                                    <div>
-                                        <div className="font-black text-emerald-700">
-                                            COMPANY FOUND
-                                        </div>
-
-                                        <div className="mt-2 text-xl font-black">
-                                            {company.nama_perusahaan}
-                                        </div>
-
-                                        <p className="mt-3 text-slate-600">
-                                            DIGESTEX has found your company in
-                                            our directory. Some information has
-                                            been pre-filled for your review.
-                                        </p>
-                                    </div>
-                                </div>
+                >
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <div className="text-sm font-black uppercase tracking-wider text-indigo-600">
+                                {isEn
+                                    ? "Welcome Back"
+                                    : "Selamat Datang Kembali"}
                             </div>
-                        )}
-                        {/* Form */}
 
-                        <form
-                            onSubmit={submit}
-                            className="rounded-3xl bg-white p-10 shadow-sm"
+                            <h2 className="mt-2 text-3xl font-black text-slate-900">
+                                {auth?.user?.name}
+                            </h2>
+
+                            <p className="mt-4 max-w-3xl leading-7 text-slate-600">
+                                {isEn
+                                    ? "Your Digital Company Passport™ starts here. The information below becomes the foundation for Executive Dashboard™, Company Intelligence™, Smart Business Matching™, and future DIGESTEX services."
+                                    : "Digital Company Passport™ Anda dimulai dari sini. Informasi berikut akan menjadi fondasi Executive Dashboard™, Company Intelligence™, Smart Business Matching™, serta layanan DIGESTEX berikutnya."}
+                            </p>
+                        </div>
+
+                        <div
+                            className="
+                    hidden
+                    rounded-2xl
+                    bg-white
+                    px-5
+                    py-4
+                    text-center
+                    shadow-sm
+                    lg:block
+                "
                         >
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <Input
-                                    icon={Building2}
-                                    label={
-                                        isEn
-                                            ? "Company Name *"
-                                            : "Nama Perusahaan *"
-                                    }
-                                    value={data.company_name}
-                                    error={errors.company_name}
-                                    onChange={(e) =>
-                                        setData("company_name", e.target.value)
-                                    }
-                                />
+                            <div className="text-xs font-semibold uppercase text-slate-500">
+                                {isEn ? "Status" : "Status"}
+                            </div>
 
-                                <Input
-                                    icon={User}
-                                    label="PIC Name"
-                                    value={data.pic_name}
-                                    onChange={(e) =>
-                                        setData("pic_name", e.target.value)
-                                    }
-                                />
+                            <div className="mt-2 inline-flex rounded-full bg-amber-100 px-3 py-1 text-sm font-bold text-amber-700">
+                                Draft
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                <Input
-                                    icon={User}
-                                    label={isEn ? "Position" : "Jabatan"}
-                                    value={data.position}
-                                    onChange={(e) =>
-                                        setData("position", e.target.value)
-                                    }
-                                />
+                {/* ======================================================
+     | Verified Company Identity
+     ====================================================== */}
 
-                                <Input
-                                    icon={Mail}
-                                    label="Email"
-                                    value={data.email}
-                                    onChange={(e) =>
-                                        setData("email", e.target.value)
-                                    }
-                                />
+                {companyFound && (
+                    <div
+                        className="
+                rounded-3xl
+                border
+                border-emerald-200
+                bg-emerald-50
+                p-8
+            "
+                    >
+                        <div className="flex items-start gap-4">
+                            <div
+                                className="
+                        flex
+                        h-12
+                        w-12
+                        items-center
+                        justify-center
+                        rounded-full
+                        bg-emerald-600
+                        text-xl
+                        font-black
+                        text-white
+                    "
+                            >
+                                ✓
+                            </div>
 
-                                <Input
-                                    icon={Phone}
-                                    label={
-                                        isEn ? "Phone Number" : "Nomor Telepon"
-                                    }
-                                    value={data.phone}
-                                    onChange={(e) =>
-                                        setData("phone", e.target.value)
-                                    }
-                                />
-
-                                <Input
-                                    icon={Globe}
-                                    label="Website"
-                                    value={data.website}
-                                    onChange={(e) =>
-                                        setData("website", e.target.value)
-                                    }
-                                />
-
-                                <div>
-                                    <label className="font-semibold">
-                                        {isEn
-                                            ? "Company Type"
-                                            : "Jenis Perusahaan"}
-                                    </label>
-
-                                    <select
-                                        value={data.company_type}
-                                        onChange={(e) =>
-                                            setData(
-                                                "company_type",
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="mt-2 w-full rounded-xl border border-slate-300 p-3"
-                                    >
-                                        <option value="">--</option>
-                                        <option>Fiber Producer</option>
-                                        <option>Yarn Manufacturer</option>
-                                        <option>Fabric Manufacturer</option>
-                                        <option>Garment Manufacturer</option>
-                                        <option>Textile Machinery</option>
-                                        <option>Chemical Supplier</option>
-                                        <option>Brand / Retailer</option>
-                                        <option>Technology Provider</option>
-                                    </select>
+                            <div className="flex-1">
+                                <div
+                                    className="
+                            text-sm
+                            font-black
+                            uppercase
+                            tracking-wider
+                            text-emerald-700
+                        "
+                                >
+                                    {isEn
+                                        ? "Verified Company Identity"
+                                        : "Identitas Perusahaan Terverifikasi"}
                                 </div>
 
-                                <Input
-                                    icon={Globe}
-                                    label="Country"
-                                    value={data.country}
-                                    onChange={(e) =>
-                                        setData("country", e.target.value)
-                                    }
-                                />
+                                <h2 className="mt-2 text-2xl font-black text-slate-900">
+                                    {company?.nama_perusahaan}
+                                </h2>
 
-                                <Input
-                                    icon={MapPin}
-                                    label="City"
-                                    value={data.city}
-                                    onChange={(e) =>
-                                        setData("city", e.target.value)
-                                    }
-                                />
+                                <p className="mt-4 max-w-3xl leading-7 text-slate-600">
+                                    {isEn
+                                        ? "Your company has been successfully matched with the DIGESTEX Canonical Company Identity. Some information has already been pre-filled for your review."
+                                        : "Perusahaan Anda berhasil dicocokkan dengan DIGESTEX Canonical Company Identity. Beberapa informasi telah diisi otomatis untuk ditinjau."}
+                                </p>
+
+                                <div className="mt-6 grid gap-3 md:grid-cols-3">
+                                    <Badge>
+                                        {isEn
+                                            ? "Verified Identity"
+                                            : "Identitas Terverifikasi"}
+                                    </Badge>
+
+                                    <Badge>
+                                        {isEn
+                                            ? "Existing Company Record"
+                                            : "Data Perusahaan Ditemukan"}
+                                    </Badge>
+
+                                    <Badge>
+                                        {isEn
+                                            ? "Ready for Digital Passport"
+                                            : "Siap untuk Digital Passport"}
+                                    </Badge>
+                                </div>
                             </div>
-
-                            {/* Footer */}
-
-                            <div className="mt-10 flex justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="
-                                        inline-flex
-                                        items-center
-                                        gap-2
-                                        rounded-2xl
-                                        bg-slate-900
-                                        px-8
-                                        py-4
-                                        font-bold
-                                        text-white
-                                    "
-                                >
-                                    {isEn ? "CONTINUE" : "LANJUTKAN"}
-
-                                    <ArrowRight className="h-5 w-5" />
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
+                )}
 
-                    <StickyWhatsAppButton
-                        position="right"
-                        message="DIGESTEX Company Onboarding"
-                    />
-                </main>
-            </div>
-        </OnboardingLayout>
+                {/* ======================================================
+     | Company Identity
+     ====================================================== */}
+
+                <CompanyInformationCard data={data} setData={setData} />
+
+                {/* ======================================================
+     | Navigation
+     ====================================================== */}
+
+                <StepNavigation currentStep={1} processing={processing} />
+            </form>
+        </BaseOnboardingPage>
     );
 }
 
-function Input({ icon: Icon, label, value, onChange, error }) {
+function Badge({ children }) {
     return (
-        <div>
-            <label className="font-semibold">{label}</label>
-
-            <div className="relative mt-2">
-                <Icon className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-
-                <input
-                    value={value}
-                    onChange={onChange}
-                    className={`
-                        w-full
-                        rounded-xl
-                        border
-                        py-3
-                        pl-11
-                        pr-4
-
-                        ${error ? "border-red-500" : "border-slate-300"}
-                    `}
-                />
+        <div
+            className="
+                flex
+                items-center
+                gap-2
+                rounded-xl
+                border
+                border-emerald-200
+                bg-white
+                px-4
+                py-3
+                shadow-sm
+            "
+        >
+            <div
+                className="
+                    flex
+                    h-6
+                    w-6
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-emerald-600
+                    text-xs
+                    font-bold
+                    text-white
+                "
+            >
+                ✓
             </div>
 
-            {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+            <span className="text-sm font-semibold text-slate-700">
+                {children}
+            </span>
         </div>
     );
 }
