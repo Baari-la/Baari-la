@@ -15,115 +15,108 @@ class CanonicalCompanyProfileService
     /**
      * Build canonical company payload.
      */
-    public function build(
-        CompanyIdentity $identity
-    ): array {
+    public function build(CompanyIdentity $identity): array
+{
+    $identity->loadMissing([
+        'profile',
+        'business',
+        'capabilities',
+        'locations',
+        'sources.company',
+    ]);
 
-        $identity->loadMissing([
-            'profile',
-            'capabilities',
-            'sources.company',
-        ]);
+    /*
+    |--------------------------------------------------------------------------
+    | Owner Profile
+    |--------------------------------------------------------------------------
+    */
+    $profile = $identity->profile;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Best Legacy Source
+    |--------------------------------------------------------------------------
+    */
+    $legacyCompany = $this->bestLegacyCompany($identity);
+
+    return [
+        /*
+        |--------------------------------------------------------------------------
+        | Identity
+        |--------------------------------------------------------------------------
+        */
+        'record_type'         => 'company_identity',
+        'company_identity_id' => $identity->id,
+        'nama_perusahaan'     => $identity->canonical_name,
 
         /*
         |--------------------------------------------------------------------------
-        | Owner Profile
+        | Profile
         |--------------------------------------------------------------------------
         */
-
-        $profile = $identity->profile;
+        'company_type' => $profile?->company_type,
+        'phone'        => $profile?->phone ?? $legacyCompany?->telepon,
+        'website'      => $profile?->website ?? $legacyCompany?->email_web,
 
         /*
         |--------------------------------------------------------------------------
-        | Best Legacy Source
+        | Location
         |--------------------------------------------------------------------------
         */
+        'country'     => $profile?->country ?? $identity->country_name,
+        'province'    => $profile?->province ?? $legacyCompany?->province,
+        'city'        => $profile?->city ?? $legacyCompany?->city,
+        'postal_code' => $profile?->postal_code ?? $legacyCompany?->postal_code,
+        'address'     => $profile?->address ?? $legacyCompany?->alamat_lengkap,
 
-        $legacyCompany = $this->bestLegacyCompany(
-            $identity
-        );
+        /*
+        |--------------------------------------------------------------------------
+        | Business Locations™
+        |--------------------------------------------------------------------------
+        */
+        'locations' => $identity->locations
+            ->sortBy(fn ($location) => $location->display_order)
+            ->values()
+            ->transform(function ($location) {
+                return [
+                    'id'              => $location->id,
+                    'location_type'   => $location->location_type,
+                    'location_name'   => $location->location_name,
+                    'location_label'  => $location->location_label,
+                    'location_code'   => $location->location_code,
+                    'address'         => $location->address,
+                    'country'         => $location->country,
+                    'province'        => $location->province,
+                    'city'            => $location->city,
+                    'district'        => $location->district,
+                    'subdistrict'     => $location->subdistrict,
+                    'postal_code'     => $location->postal_code,
+                    'contact_person'  => $location->contact_person,
+                    'phone'           => $location->phone,
+                    'email'           => $location->email,
+                    'website'         => $location->website,
+                    'google_maps_url' => $location->google_maps_url,
+                    'display_order'   => $location->display_order,
+                    'is_primary'      => (bool) $location->is_primary,
+                    'is_active'       => (bool) $location->is_active,
+                ];
+            })
+            ->all(),
 
-        return [
-
-            /*
-            |--------------------------------------------------------------------------
-            | Identity
-            |--------------------------------------------------------------------------
-            */
-
-            'record_type' =>
-                'company_identity',
-
-            'company_identity_id' =>
-                $identity->id,
-
-            'nama_perusahaan' =>
-                $identity->canonical_name,
-
-            /*
-            |--------------------------------------------------------------------------
-            | Profile
-            |--------------------------------------------------------------------------
-            */
-
-            'company_type' =>
-                $profile?->company_type,
-
-            'phone' =>
-                $profile?->phone
-                ?? $legacyCompany?->telepon,
-
-            'website' =>
-                $profile?->website
-                ?? $legacyCompany?->email_web,
-
-            /*
-            |--------------------------------------------------------------------------
-            | Location
-            |--------------------------------------------------------------------------
-            */
-
-            'country' =>
-                $profile?->country
-                ?? $identity->country_name,
-
-            'province' =>
-                $profile?->province
-                ?? $legacyCompany?->province,
-
-            'city' =>
-                $profile?->city
-                ?? $legacyCompany?->city,
-
-            'postal_code' =>
-                $profile?->postal_code
-                ?? $legacyCompany?->postal_code,
-
-            'address' =>
-                $profile?->address
-                ?? $legacyCompany?->alamat_lengkap,
-
-            /*
-            |--------------------------------------------------------------------------
-            | Intelligence
-            |--------------------------------------------------------------------------
-            */
-
-            'profile_exists' =>
-                $profile !== null,
-
-            'source_count' =>
-                $identity->sources->count(),
-
-            'capabilities' =>
-                $identity
-                    ->capabilities
-                    ->pluck('capability')
-                    ->sort()
-                    ->values()
-                    ->all(),
-        ];
-    }
+        /*
+        |--------------------------------------------------------------------------
+        | Intelligence
+        |--------------------------------------------------------------------------
+        */
+        'profile_exists' => $profile !== null,
+        'source_count'   => $identity->sources->count(),
+        'capabilities'   => $identity->capabilities
+            ->pluck('capability')
+            ->sort()
+            ->values()
+            ->all(),
+    ];
+}
 
    /**
  * Build profile from user.
