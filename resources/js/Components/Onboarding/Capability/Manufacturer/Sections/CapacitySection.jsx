@@ -9,11 +9,22 @@
 |
 |--------------------------------------------------------------------------
 */
-
+import { usePage } from "@inertiajs/react";
 import { Gauge, Package, CalendarClock, Boxes } from "lucide-react";
 
 export default function CapacitySection({ framework, data, setData }) {
+    const { locale } = usePage().props;
+    const isEn = locale === "en";
+
     const profile = framework?.capability_profile ?? "manufacturer";
+    const installed = Number(data.installed_monthly_capacity) || 0;
+
+    const used = Number(data.used_monthly_capacity) || 0;
+
+    const utilization =
+        installed > 0 ? ((used / installed) * 100).toFixed(1) : 0;
+
+    const available = Math.max(installed - used, 0);
 
     return (
         <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -28,12 +39,15 @@ export default function CapacitySection({ framework, data, setData }) {
 
                 <div>
                     <h2 className="text-2xl font-black">
-                        Production Capacity™
+                        {isEn
+                            ? "Capacity Intelligence™"
+                            : "Capacity Intelligence™"}
                     </h2>
 
                     <p className="mt-2 text-sm leading-6 text-slate-500">
-                        Describe your production capability to help buyers
-                        understand your manufacturing scale.
+                        {isEn
+                            ? "Provide your installed production capacity and current capacity utilization. DIGESTEX automatically calculates utilized capacity, available capacity, production status, and buyer readiness."
+                            : "Informasikan kapasitas terpasang dan utilisasi kapasitas perusahaan Anda. DIGESTEX akan menghitung secara otomatis kapasitas terpakai, kapasitas tersedia, status produksi, serta kesiapan perusahaan menerima order baru."}
                     </p>
                 </div>
             </div>
@@ -59,15 +73,39 @@ export default function CapacitySection({ framework, data, setData }) {
             <div className="mt-8 grid gap-6 md:grid-cols-2">
                 <InputField
                     icon={Package}
-                    label="Monthly Capacity"
-                    value={data.monthly_capacity ?? ""}
-                    placeholder="250 Tons"
-                    onChange={(value) => setData("monthly_capacity", value)}
+                    label={
+                        isEn
+                            ? "Installed Monthly Capacity"
+                            : "Kapasitas Terpasang per Bulan"
+                    }
+                    value={data.installed_monthly_capacity ?? ""}
+                    placeholder="1000"
+                    onChange={(value) =>
+                        setData("installed_monthly_capacity", value)
+                    }
+                />
+
+                <InputField
+                    icon={Gauge}
+                    label={
+                        isEn
+                            ? "Current Used Monthly Capacity"
+                            : "Kapasitas Terpakai per Bulan"
+                    }
+                    value={data.used_monthly_capacity ?? ""}
+                    placeholder="820"
+                    onChange={(value) =>
+                        setData("used_monthly_capacity", value)
+                    }
                 />
 
                 <InputField
                     icon={Boxes}
-                    label="Minimum Order Quantity (MOQ)"
+                    label={
+                        isEn
+                            ? "Minimum Order Quantity (MOQ)"
+                            : "Minimum Order Quantity (MOQ)"
+                    }
                     value={data.moq ?? ""}
                     placeholder="500 kg"
                     onChange={(value) => setData("moq", value)}
@@ -75,18 +113,10 @@ export default function CapacitySection({ framework, data, setData }) {
 
                 <InputField
                     icon={CalendarClock}
-                    label="Lead Time"
+                    label={isEn ? "Lead Time" : "Lead Time"}
                     value={data.lead_time ?? ""}
                     placeholder="30 Days"
                     onChange={(value) => setData("lead_time", value)}
-                />
-
-                <InputField
-                    icon={Gauge}
-                    label="Current Utilization (%)"
-                    value={data.capacity_utilization ?? ""}
-                    placeholder="85%"
-                    onChange={(value) => setData("capacity_utilization", value)}
                 />
             </div>
 
@@ -104,7 +134,11 @@ export default function CapacitySection({ framework, data, setData }) {
                     />
 
                     <SummaryRow
-                        label="Monthly Capacity"
+                        label={
+                            isEn
+                                ? "Installed Monthly Capacity"
+                                : "Kapasitas Terpasang per Bulan"
+                        }
                         value={data.monthly_capacity || "-"}
                     />
 
@@ -116,8 +150,11 @@ export default function CapacitySection({ framework, data, setData }) {
                     />
 
                     <SummaryRow
-                        label="Utilization"
-                        value={data.capacity_utilization || "-"}
+                        label={
+                            isEn
+                                ? "Capacity Utilization"
+                                : "Utilisasi Kapasitas"
+                        }
                     />
                 </div>
             </div>
@@ -132,9 +169,9 @@ export default function CapacitySection({ framework, data, setData }) {
                 </div>
 
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Capacity information improves Buyer Matching™, Production
-                    Planning™, Smart Sourcing™, and Manufacturing Intelligence™
-                    across the DIGESTEX ecosystem.
+                    {isEn
+                        ? "Installed capacity information enables DIGESTEX to calculate utilized capacity, available production capacity, production status, and buyer readiness."
+                        : "Informasi kapasitas terpasang memungkinkan DIGESTEX menghitung kapasitas terpakai, kapasitas tersedia, status produksi, dan kesiapan perusahaan menerima order baru."}
                 </p>
             </div>
         </section>

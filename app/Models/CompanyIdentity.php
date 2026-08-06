@@ -153,14 +153,13 @@ class CompanyIdentity extends Model
 |
 */
 
-public function factories()
+public function factories(): HasMany
 {
     return $this->hasMany(
         CompanyFactory::class,
-        'company_identity_id',
-        'id'
+        'company_identity_id'
     );
-}   
+} 
 
     /*
     |--------------------------------------------------------------------------
@@ -175,4 +174,17 @@ public function factories()
             'company_identity_id'
         );
     }
+    /*
+|--------------------------------------------------------------------------
+| Business Locations™
+|--------------------------------------------------------------------------
+*/
+
+public function locations(): HasMany
+{
+    return $this->hasMany(
+        CompanyIdentityLocation::class,
+        'company_identity_id'
+    )->orderBy('display_order');
+}
 }

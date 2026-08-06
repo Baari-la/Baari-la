@@ -10,12 +10,16 @@ use App\Services\Company\Identity\CanonicalCompanyCapabilityService;
 use App\Services\Company\Identity\CanonicalCompanyFactoryService;
 use App\Services\Business\BusinessClassificationService;
 use App\Models\CompanyIdentityCapabilityProfile;
+use App\Models\CompanyIdentity;
+use App\Models\CompanyIdentityLocation;
+use App\Models\CompanyIdentityProfile;
 use App\Models\CompanyIdentityBusiness;
 use App\Services\Company\Identity\CanonicalCompanyBusinessService;
-use App\Models\CompanyIdentityProfile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use RuntimeException;
 
 class OnboardingController extends Controller
 {
@@ -274,15 +278,11 @@ class OnboardingController extends Controller
     );
 }
 
-    public function storeCompanyInformation(
-    Request $request
-) {
-
- 
+    public function storeCompanyInformation(Request $request)
+{
     $user = auth()->user();
 
     if (!$user->company_identity_id) {
-
         return back()->with(
             'error',
             'No canonical company identity is connected to this account.'
@@ -290,91 +290,110 @@ class OnboardingController extends Controller
     }
 
     $validated = $request->validate([
+        'company_type' => ['nullable', 'string', 'max:255'],
+        'phone'        => ['nullable', 'string', 'max:1000'],
+        'website'      => ['nullable', 'url', 'max:255'],
+        'country'      => ['nullable', 'string', 'max:255'],
+        'province'     => ['nullable', 'string', 'max:255'],
+        'city'         => ['nullable', 'string', 'max:255'],
+        'postal_code'  => ['nullable', 'string', 'max:50'],
+        'address'      => ['nullable', 'string'],
 
-        'company_type' => [
-            'nullable',
-            'string',
-            'max:255',
-        ],
-
-        'phone' => [
-            'nullable',
-            'string',
-            'max:1000',
-        ],
-
-        'website' => [
-            'nullable',
-            'string',
-            'max:255',
-        ],
-
-        'country' => [
-            'nullable',
-            'string',
-            'max:255',
-        ],
-
-        'province' => [
-            'nullable',
-            'string',
-            'max:255',
-        ],
-
-        'city' => [
-            'nullable',
-            'string',
-            'max:255',
-        ],
-
-        'postal_code' => [
-            'nullable',
-            'string',
-            'max:50',
-        ],
-
-        'address' => [
-            'nullable',
-            'string',
-        ],
-
+        /*
+        |--------------------------------------------------------------------------
+        | Business Locations™
+        |--------------------------------------------------------------------------
+        */
+        'locations'                       => ['nullable', 'array'],
+        'locations.*.location_type'       => ['required', 'string', 'max:50'],
+        'locations.*.location_name'       => ['nullable', 'string', 'max:255'],
+        'locations.*.location_label'      => ['nullable', 'string', 'max:255'],
+        'locations.*.location_code'       => ['nullable', 'string', 'max:50'],
+        'locations.*.address'             => ['nullable', 'string'],
+        'locations.*.country'             => ['nullable', 'string', 'max:100'],
+        'locations.*.province'            => ['nullable', 'string', 'max:100'],
+        'locations.*.city'                => ['nullable', 'string', 'max:100'],
+        'locations.*.district'            => ['nullable', 'string', 'max:100'],
+        'locations.*.subdistrict'         => ['nullable', 'string', 'max:100'],
+        'locations.*.postal_code'         => ['nullable', 'string', 'max:20'],
+        'locations.*.phone'               => ['nullable', 'string', 'max:100'],
+        'locations.*.email'               => ['nullable', 'email', 'max:255'],
+        'locations.*.website'             => ['nullable', 'url', 'max:255'],
+        'locations.*.contact_person'      => ['nullable', 'string', 'max:255'],
+        'locations.*.google_maps_url'     => ['nullable', 'url'],
+        'locations.*.display_order'       => ['nullable', 'integer'],
+        'locations.*.is_primary'          => ['nullable', 'boolean'],
+        'locations.*.is_active'           => ['nullable', 'boolean'],
     ]);
 
 
-    
-    CompanyIdentityProfile::updateOrCreate(
+    DB::transaction(function () use ($user, $validated) {
+        
+        // 1. Cari CompanyIdentity secara eksplisit
+        $company = CompanyIdentity::find($user->company_identity_id);
 
-        [
-            'company_identity_id' =>
-                $user->company_identity_id,
-        ],
+        if (!$company) {
+            throw new RuntimeException('Canonical company identity not found.');
+        }
 
-        [
+        // 2. Update / Create Profile via Relasi Aggregate Root
+        $company->profile()->updateOrCreate(
+            [], // Kondisi 'company_identity_id' otomatis di-handle oleh relasi Eloquent
+            [
+                'company_type'     => $validated['company_type'] ?? null,
+                'phone'            => $validated['phone'] ?? null,
+                'website'          => $validated['website'] ?? null,
+                'country'          => $validated['country'] ?? null,
+                'province'         => $validated['province'] ?? null,
+                'city'             => $validated['city'] ?? null,
+                'postal_code'      => $validated['postal_code'] ?? null,
+                'address'          => $validated['address'] ?? null,
+                'last_updated_by'  => $user->id,
+                'last_reviewed_at' => now(),
+            ]
+        );
 
-            'company_type' => $validated['company_type'] ?? null,
-            'phone' => $validated['phone'] ?? null,
-            'website' => $validated['website'] ?? null,
-            'country' => $validated['country'] ?? null,
-            'province' => $validated['province'] ?? null,
-            'city' => $validated['city'] ?? null,
-            'postal_code' => $validated['postal_code'] ?? null,
-            'address' => $validated['address'] ?? null,
-            
-            'last_updated_by' => $user->id,
+        // 3. Refresh & Re-create Business Locations
+        if ($company->locations()->exists()) {
+            $company->locations()->delete();
+          }
 
-            'last_reviewed_at' => now(),
-        ]
-    );
+        foreach ($validated['locations'] ?? [] as $location) {
+            if (empty($location['location_name']) && empty($location['address'])) {
+                continue;
+            }
 
+            $company->locations()->create([
+                'location_type'   => $location['location_type'],
+                'location_name'   => $location['location_name'] ?? null,
+                'location_label'  => $location['location_label'] ?? null,
+                'location_code'   => $location['location_code'] ?? null,
+                'address'         => $location['address'] ?? null,
+                'country'         => $location['country'] ?? null,
+                'province'        => $location['province'] ?? null,
+                'city'            => $location['city'] ?? null,
+                'district'        => $location['district'] ?? null,
+                'subdistrict'     => $location['subdistrict'] ?? null,
+                'postal_code'     => $location['postal_code'] ?? null,
+                'phone'           => $location['phone'] ?? null,
+                'email'           => $location['email'] ?? null,
+                'website'         => $location['website'] ?? null,
+                'contact_person'  => $location['contact_person'] ?? null,
+                'google_maps_url' => $location['google_maps_url'] ?? null,
+                'display_order'   => $location['display_order'] ?? 1,
+                'is_primary'      => filter_var($location['is_primary'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                'is_active'       => filter_var($location['is_active'] ?? true, FILTER_VALIDATE_BOOLEAN),
+            ]);
+        }
+
+        // 4. Update Status Onboarding User
         $user->update([
             'onboarding_step' => 2,
         ]);
+    });
 
-        return redirect()->route(
-            'onboarding.business-information'
-        );
-    }
-    
+    return redirect()->route('onboarding.business-information');
+}
     /*
     |--------------------------------------------------------------------------
     | STEP 2
@@ -569,7 +588,7 @@ return redirect()->route(
     |--------------------------------------------------------------------------
     */
 
-    $request->validate([
+    $validated = $request->validate([
 
     /*
     |--------------------------------------------------------------------------

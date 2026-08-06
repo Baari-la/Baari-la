@@ -17,14 +17,14 @@ export default function DigitalDirectoryVisibilityBanner({
 
     const isEn = locale === "en";
     const features = [
-        "Digital Company Passport™",
-        "Executive Intelligence™",
-        "Smart Business Matching™",
-        "Build My Supply Chain™",
-        "Visibility Score™",
-        "Executive Dashboard™",
-        "Verified Digital Company Intelligence™",
-        "Business Growth Journey™",
+        "Make Your Manufacturing Capabilities Visible™",
+        "Increase Global Buyer Visibility™",
+        "Showcase Technology & Innovation™",
+        "Demonstrate Manufacturing Readiness™",
+        "Highlight Product Development Capability™",
+        "Build Buyer Trust & Credibility™",
+        "Enable Smart Business Matching™",
+        "Create Long-term Partnership Opportunities™",
     ];
 
     return (
@@ -86,13 +86,13 @@ export default function DigitalDirectoryVisibilityBanner({
                         {isEn ? (
                             <>
                                 <span className="font-semibold">
-                                    A Small Step Today,
+                                    Transforming Industry Capabilities
                                 </span>
 
                                 <br />
 
                                 <span className="text-slate-300">
-                                    A Great Opportunity Tomorrow.
+                                    into Global Business Opportunities
                                 </span>
                             </>
                         ) : (
@@ -118,7 +118,7 @@ export default function DigitalDirectoryVisibilityBanner({
                             leading-tight
                         "
                     >
-                        DIGESTEX Digital Directory
+                        DIGESTEX Strategic Industry
                         <br />& Visibility Program
                     </h1>
                     <p
@@ -131,7 +131,7 @@ export default function DigitalDirectoryVisibilityBanner({
         text-cyan-300
     "
                     >
-                        Global Textile Intelligence Ecosystem
+                        Making Industry Capabilities Visible.
                     </p>
                     <p
                         className="
@@ -142,8 +142,8 @@ export default function DigitalDirectoryVisibilityBanner({
                         "
                     >
                         {isEn
-                            ? "Complete Your Profile. Increase Your Visibility. Unlock New Opportunities."
-                            : "Lengkapi Profil Perusahaan Anda. Tingkatkan Visibilitas. Buka Peluang Baru."}
+                            ? "Showcase Your Industry Capabilities. Increase Your Strategic Visibility. Unlock New Business Opportunities."
+                            : "Tunjukkan Kemampuan Perusahaan Anda. Tingkatkan Visibilitas. Buka Peluang Bisnis Baru."}
                     </p>
                     <p
                         className="

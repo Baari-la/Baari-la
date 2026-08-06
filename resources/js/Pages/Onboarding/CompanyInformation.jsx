@@ -3,13 +3,37 @@ import { Head, useForm, usePage } from "@inertiajs/react";
 import BaseOnboardingPage from "@/Components/Onboarding/BaseOnboardingPage";
 
 import CompanyInformationCard from "@/Components/Onboarding/CompanyInformationCard";
-import CompanySummaryCard from "@/Components/Onboarding/CompanySummaryCard";
+
 import StepNavigation from "@/Components/Onboarding/StepNavigation";
+
+import { useState } from "react";
+
+import CompanyBlueprintFactory from "@/Components/Onboarding/Company/CompanyBlueprintFactory";
+
+import BusinessLocationsSection from "@/Components/Onboarding/Company/BusinessLocationsSection";
+
+import CompanySummaryCard from "@/Components/Onboarding/Company/CompanySummaryCard";
 
 export default function CompanyInformation() {
     const { auth, locale, company } = usePage().props;
     const companyFound = company?.profile_exists === true;
     const isEn = locale === "en";
+
+    /*
+|--------------------------------------------------------------------------
+| Company Blueprint™
+|--------------------------------------------------------------------------
+*/
+
+    const blueprint = CompanyBlueprintFactory(company);
+
+    /*
+|--------------------------------------------------------------------------
+| Business Locations™
+|--------------------------------------------------------------------------
+*/
+
+    // const [locations, setLocations] = useState([]);
 
     /*
     |--------------------------------------------------------------------------
@@ -35,6 +59,14 @@ export default function CompanyInformation() {
         country: company?.country ?? "Indonesia",
 
         city: company?.city ?? "",
+
+        /*
+    |--------------------------------------------------------------------------
+    | Business Locations™
+    |--------------------------------------------------------------------------
+    */
+
+        locations: company?.locations ?? [],
     });
 
     /*
@@ -116,7 +148,13 @@ export default function CompanyInformation() {
             |--------------------------------------------------------------------------
             */
 
-            sidebar={<CompanySummaryCard data={data} />}
+            sidebar={
+                <CompanySummaryCard
+                    blueprint={blueprint}
+                    company={data}
+                    locations={data.locations}
+                />
+            }
             /*
             |--------------------------------------------------------------------------
             | Navigation
@@ -268,6 +306,14 @@ export default function CompanyInformation() {
      ====================================================== */}
 
                 <CompanyInformationCard data={data} setData={setData} />
+
+                <BusinessLocationsSection
+                    blueprint={blueprint}
+                    locations={data.locations}
+                    setLocations={(locations) =>
+                        setData("locations", locations)
+                    }
+                />
 
                 {/* ======================================================
      | Navigation
