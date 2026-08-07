@@ -39,8 +39,8 @@ export default function OnboardingNavbar({ currentStep = 1 }) {
         {
             id: 4,
             route: "onboarding.manufacturing",
-            titleEn: "Manufacturing",
-            titleId: "Manufaktur",
+            titleEn: "Trade Profile",
+            titleId: "Profil Perdagangan",
             icon: Cog,
         },
         {

@@ -4,9 +4,11 @@ import OnboardingNavbar from "@/Components/Onboarding/OnboardingNavbar";
 import { Head } from "@inertiajs/react";
 
 export default function BaseOnboardingPage({
-    step,
+    currentStep,
 
-    header = {},
+    title,
+
+    description,
 
     intelligence = {},
 
@@ -18,12 +20,6 @@ export default function BaseOnboardingPage({
 
     children,
 }) {
-    const {
-        title,
-
-        description,
-    } = header;
-
     const {
         title: intelligenceTitle,
 
@@ -37,7 +33,7 @@ export default function BaseOnboardingPage({
             <Head title={title} />
 
             <div className="min-h-screen bg-slate-50">
-                <OnboardingNavbar currentStep={step} />
+                <OnboardingNavbar currentStep={currentStep} />
 
                 <div className="mx-auto max-w-7xl px-6 py-12">
                     <div className="rounded-3xl bg-white p-10 shadow-sm">
@@ -47,7 +43,7 @@ export default function BaseOnboardingPage({
 
                         <div className="text-center">
                             <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-600">
-                                STEP {step}
+                                STEP {currentStep}
                             </p>
 
                             <h1 className="mt-4 text-5xl font-black text-slate-900">

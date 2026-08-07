@@ -713,7 +713,7 @@ return redirect()->route(
 ): Response {
 
     return Inertia::render(
-        'Onboarding/Manufacturing',
+        'Onboarding/TradeProfile',
         [
 
             'company' =>
