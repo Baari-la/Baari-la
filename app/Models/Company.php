@@ -295,6 +295,24 @@ public function capabilities()
     {
         return $this->hasMany(CompanyImage::class);
     }
+/*
+|--------------------------------------------------------------------------
+| Canonical Identity Media
+|--------------------------------------------------------------------------
+|
+| Media baru dikelola melalui CompanyIdentity.
+| Relationship ini digunakan oleh Sprint 5A.
+|
+*/
+
+public function identity()
+{
+    return $this->belongsTo(
+        CompanyIdentity::class,
+        'company_identity_id'
+    );
+}
+
     public function capacities()
 {
     return $this->hasMany(CompanyCapacity::class);
@@ -438,5 +456,5 @@ public function scopeClaimed($query)
         return $this->load(self::PASSPORT_RELATIONS);
     }
 
-    
+      
 }

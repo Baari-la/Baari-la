@@ -357,7 +357,7 @@ class User extends Authenticatable implements MustVerifyEmail
         ),
 
         4 => route(
-            'onboarding.manufacturing'
+            'onboarding.trade-profile'
         ),
 
         5 => route(

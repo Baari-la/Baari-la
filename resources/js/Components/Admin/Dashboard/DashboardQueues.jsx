@@ -8,6 +8,7 @@ import {
     Sparkles,
     RefreshCw,
     ArrowRight,
+    Images,
 } from "lucide-react";
 
 export default function DashboardQueues({
@@ -18,6 +19,7 @@ export default function DashboardQueues({
     pendingClaims = 0,
     premiumRequests = 0,
     supplyChainRequests = 0,
+    pendingMediaModeration = 0,
 }) {
     const queues = [
         {
@@ -68,7 +70,17 @@ export default function DashboardQueues({
 
             href: route("admin.pending-updates"),
         },
+        {
+            title: "Media Moderation",
 
+            value: pendingMediaModeration,
+
+            icon: Images,
+
+            color: "bg-pink-100 text-pink-700",
+
+            href: route("admin.digital-directory.media-moderation.index"),
+        },
         {
             title: "Company Claims",
 

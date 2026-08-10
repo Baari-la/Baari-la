@@ -13,7 +13,12 @@ class CompanyIdentitySource extends Model
         'company_identity_id',
         'company_id',
         'source_type',
+         'is_primary',
     ];
+
+     protected $casts = [
+    'is_primary' => 'boolean',
+];
 
     /**
      * Canonical identity represented by this source record.
@@ -26,7 +31,8 @@ class CompanyIdentitySource extends Model
         );
     }
 
-    /**
+
+       /**
      * Original legacy company record.
      *
      * There is intentionally no database FK from

@@ -16,10 +16,10 @@ const routes = {
     },
     4: {
         back: "onboarding.capabilities",
-        next: "onboarding.manufacturing",
+        next: "onboarding.trade-profile",
     },
     5: {
-        back: "onboarding.manufacturing",
+        back: "onboarding.trade-profile",
         next: "onboarding.media-catalog",
     },
     6: {

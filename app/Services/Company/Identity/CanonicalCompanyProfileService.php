@@ -22,6 +22,7 @@ class CanonicalCompanyProfileService
         'business',
         'capabilities',
         'locations',
+        'tradeProfile', 
         'sources.company',
     ]);
 
@@ -31,6 +32,14 @@ class CanonicalCompanyProfileService
     |--------------------------------------------------------------------------
     */
     $profile = $identity->profile;
+
+        /*
+    |--------------------------------------------------------------------------
+    | Trade Profile™
+    |--------------------------------------------------------------------------
+    */
+
+    $trade = $identity->tradeProfile;
 
     /*
     |--------------------------------------------------------------------------
@@ -68,6 +77,48 @@ class CanonicalCompanyProfileService
         'city'        => $profile?->city ?? $legacyCompany?->city,
         'postal_code' => $profile?->postal_code ?? $legacyCompany?->postal_code,
         'address'     => $profile?->address ?? $legacyCompany?->alamat_lengkap,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Trade Profile™
+            |--------------------------------------------------------------------------
+            */
+
+            'trade_roles' =>
+                $trade?->trade_roles ?? [],
+
+            'export_experience' =>
+                $trade?->export_experience,
+
+            'export_since' =>
+                $trade?->export_since,
+
+            'export_countries' =>
+                $trade?->export_countries ?? [],
+
+            'import_countries' =>
+                $trade?->import_countries ?? [],
+
+            'main_industries' =>
+                $trade?->main_industries ?? [],
+
+            'domestic_markets' =>
+                $trade?->domestic_markets ?? [],
+
+            'export_products' =>
+                $trade?->export_products ?? [],
+
+            'import_products' =>
+                $trade?->import_products ?? [],
+
+            'trade_notes' =>
+                $trade?->trade_notes,
+
+            'trade_profile_score' =>
+                $trade?->trade_profile_score ?? 0,
+
+            'verification_status' =>
+                $trade?->verification_status ?? 'draft',
 
         /*
         |--------------------------------------------------------------------------

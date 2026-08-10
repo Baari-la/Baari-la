@@ -120,6 +120,17 @@ export default function ProgramPortalNavbar({
 
             enabled: true,
         },
+        {
+            key: "program",
+
+            label: isEn ? "Strategic Program" : "Program Strategis",
+
+            icon: Globe2,
+
+            routeName: "program.digital-directory-visibility",
+
+            enabled: true,
+        },
 
         {
             key: "company",

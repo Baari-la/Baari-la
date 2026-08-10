@@ -13,6 +13,7 @@ use App\Models\CompanyClaim;
 use App\Models\TradeAnalyticsVertical;
 use Maatwebsite\Excel\Facades\Excel; // Sesuaikan dengan library excel yang Anda gunakan (misal: Maatwebsite/Laravel-Excel)
 use App\Services\Trade\Analytics\TradeAnalyticsService;
+use App\Models\CompanyIdentityMediaAsset;
 
 
 class AdminDashboardController extends Controller
@@ -89,6 +90,13 @@ class AdminDashboardController extends Controller
         ->orderBy('total_qty', 'desc')
         ->get();
 
+$pendingMediaModeration = CompanyIdentityMediaAsset::query()
+    ->where(
+        'verification_status',
+        'draft'
+    )
+    ->count();
+    
         
         // 4. Render ke Inertia
    return Inertia::render('Admin/Dashboard', [
@@ -228,6 +236,8 @@ class AdminDashboardController extends Controller
     |--------------------------------------------------------------------------
     */
 
+    'pendingMediaModeration' => $pendingMediaModeration,
+    
     'recentCompanies' =>
         Company::latest()
             ->take(10)
@@ -946,5 +956,80 @@ public function importDataKemendag(Request $request)
     }
 
    return Inertia::render('Admin/ImportKemendag');
+}
+
+public function mediaModeration()
+{
+    $media = CompanyIdentityMediaAsset::query()
+        ->where(
+            'company_identity_media_assets.verification_status',
+            'draft'
+        )
+        ->with('companyIdentity')
+        ->latest('company_identity_media_assets.id')
+        ->get()
+        ->map(function ($asset) {
+
+            $company = Company::query()
+                ->where(
+                    'company_identity_id',
+                    $asset->company_identity_id
+                )
+                ->orderBy('id')
+                ->first();
+
+            return [
+                'id' => $asset->id,
+
+                'company_id' =>
+                    $company?->id,
+
+                'nama_perusahaan' =>
+                    $company?->nama_perusahaan,
+
+                'canonical_name' =>
+                    $asset->companyIdentity?->canonical_name,
+
+                'media_type' =>
+                    $asset->media_type,
+
+                'image_url' =>
+                    $asset->file_path
+                        ? url(
+                            '/storage/' .
+                            ltrim(
+                                $asset->file_path,
+                                '/'
+                            )
+                        )
+                        : $asset->file_url,
+
+                'image_path' =>
+                    $asset->file_path,
+
+                'title' =>
+                    $asset->title,
+
+                'caption' =>
+                    $asset->caption,
+
+                'is_featured' =>
+                    (bool) $asset->is_featured,
+
+                'sort_order' =>
+                    $asset->sort_order,
+
+                'verification_status' =>
+                    $asset->verification_status,
+            ];
+        })
+        ->values();
+
+    return Inertia::render(
+        'Admin/MediaModeration',
+        [
+            'media' => $media,
+        ]
+    );
 }
 }

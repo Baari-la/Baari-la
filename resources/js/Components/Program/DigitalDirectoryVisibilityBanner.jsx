@@ -98,13 +98,13 @@ export default function DigitalDirectoryVisibilityBanner({
                         ) : (
                             <>
                                 <span className="font-semibold">
-                                    Sebuah Langkah Kecil Hari Ini,
+                                    Mentransformasi Kemampuan Industri,
                                 </span>
 
                                 <br />
 
                                 <span className="text-slate-300">
-                                    Sebuah Peluang Besar di Masa Depan.
+                                    Menjadi Peluang Bisnis Global.
                                 </span>
                             </>
                         )}

@@ -3,7 +3,7 @@ import { useState } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 
 import DashboardHeader from "@/Components/Admin/Dashboard/DashboardHeader";
-
+import DashboardMediaModeration from "@/Components/Admin/Dashboard/DashboardMediaModeration";
 import DashboardQuickActions from "@/Components/Admin/Dashboard/DashboardQuickActions";
 
 import DashboardStats from "@/Components/Admin/Dashboard/DashboardStats";
@@ -32,7 +32,8 @@ export default function Dashboard({
     pendingClaimsCount = 0,
 
     supplyChainRequests = 0,
-
+    pendingMediaModeration = 0,
+    mediaModeration = [],
     pendingUpdates = [],
     pendingClaims = [],
 
@@ -69,8 +70,9 @@ export default function Dashboard({
                     pendingClaims={pendingClaimsCount}
                     premiumRequests={stats.premium_requests}
                     supplyChainRequests={supplyChainRequests}
+                    pendingMediaModeration={pendingMediaModeration}
                 />
-
+                <DashboardMediaModeration media={mediaModeration} />
                 {/* Recent Companies */}
 
                 <DashboardRecentCompanies companies={recentCompanies} />

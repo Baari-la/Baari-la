@@ -4,18 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 
+use App\Http\Requests\Onboarding\StoreTradeProfileRequest;
 use App\Services\Company\Identity\CompanyIdentityLookupService;
 use App\Services\Company\Identity\CanonicalCompanyProfileService;
 use App\Services\Company\Identity\CanonicalCompanyCapabilityService;
 use App\Services\Company\Identity\CanonicalCompanyFactoryService;
 use App\Services\Business\BusinessClassificationService;
 use App\Models\CompanyIdentityCapabilityProfile;
+use App\Models\CompanyIdentityTradeProfile;
 use App\Models\CompanyIdentity;
 use App\Models\CompanyIdentityLocation;
 use App\Models\CompanyIdentityProfile;
 use App\Models\CompanyIdentityBusiness;
 use App\Services\Company\Identity\CanonicalCompanyBusinessService;
 use Illuminate\Support\Facades\DB;
+use App\Models\MstCountry;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -698,33 +701,106 @@ return redirect()->route(
     */
 
     return redirect()->route(
-        'onboarding.manufacturing'
-    );
+    'onboarding.trade-profile'
+);
 }
     
+/*
+|--------------------------------------------------------------------------
+| Step 4
+| Trade Profile™
+|--------------------------------------------------------------------------
+*/
+
+public function storeTradeProfile(
+    StoreTradeProfileRequest $request
+): RedirectResponse
+{
+    $validated = $request->validated();
+
+    $user = $request->user();
+
+    DB::transaction(function () use ($validated, $user) {
+
+        CompanyIdentityTradeProfile::updateOrCreate(
+
+            [
+                'company_identity_id' => $user->company_identity_id,
+            ],
+
+            [
+
+                ...$validated,
+
+                'updated_by' => $user->id,
+
+                'created_by' => $user->id,
+
+            ]
+
+        );
+
+    });
+
+    return redirect()->route(
+        'onboarding.media-catalog'
+    );
+}
     /*
     |--------------------------------------------------------------------------
     | STEP 4
     |--------------------------------------------------------------------------
     */
 
-    public function manufacturing(
-    CanonicalCompanyFactoryService $factory
-): Response {
-
-    return Inertia::render(
-        'Onboarding/TradeProfile',
-        [
-
-            'company' =>
-
-                $factory->buildFromUser(
-                    auth()->user()
-                ),
-
-        ]
+protected function countries(): array
+{
+    $path = base_path(
+        'app/database/master-data/countries.json'
     );
+
+    if (!file_exists($path)) {
+        return [];
+    }
+
+    $json = file_get_contents($path);
+
+    $data = json_decode($json, true);
+
+    return $data['data'] ?? [];
 }
+
+   public function tradeProfile(
+    CanonicalCompanyProfileService $profiles
+): Response {
+    $user = auth()->user();
+
+    $company = $profiles->buildFromUser($user);
+
+    $countries = MstCountry::query()
+        ->where('is_active', true)
+        ->orderBy('country_name_en')
+        ->get([
+            'id',
+            'country_code',
+            'iso3',
+            'country_name_en',
+            'country_name_id',
+            'official_name',
+            'region_code',
+            'region_en',
+            'region_id',
+            'sub_region_en',
+            'sub_region_id',
+            'flag_emoji',
+            'is_active',
+        ]);
+
+    return Inertia::render('Onboarding/TradeProfile', [
+        'company'   => $company,
+        'countries' => $countries,
+    ]);
+}
+
 
     public function storeManufacturing(
     Request $request,

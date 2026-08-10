@@ -71,6 +71,12 @@ export default function AdminSidebar() {
                         "admin.digital-directory.ownership-verification",
                     ),
                 },
+                {
+                    title: "Media Moderation",
+                    href: route(
+                        "admin.digital-directory.media-moderation.index",
+                    ),
+                },
 
                 {
                     title: "Verified Participants",

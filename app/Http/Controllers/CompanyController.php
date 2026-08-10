@@ -13,6 +13,7 @@ use App\Models\CompanyLink;
 use App\Models\CompanyImage;
 use App\Models\CompanyMachine;
 use App\Models\MstCountry;
+use App\Models\CompanyIdentityMediaAsset;
 
 use Illuminate\Support\Facades\Storage;
 use App\Services\CompanyRelationalSyncService;
@@ -24,6 +25,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\CompanyProfileVisibilityService;
 use App\Services\CompanyMachineService;
 use App\Services\MasterData\CountryService;
+use App\Services\Company\Identity\CompanyIdentityMediaAssetService;
+
 
 class CompanyController extends Controller
 {
@@ -876,6 +879,8 @@ public function updateImages(
 
     return back();
 }
+
+
 public function destroyImage(
     Company $company,
     CompanyImage $image
@@ -1122,6 +1127,7 @@ $companyTypeLabels = [
         'reviews',
         'reviews.buyer',
         'reviews.purchaseOrder',
+        
     ]);
 
     $reviewCount = $company->reviews->count();
@@ -1520,7 +1526,6 @@ public function edit(
             403,
             'Akses Ditolak: Anda bukan pemilik resmi entitas industri ini.'
         );
-
     }
 
     /*
@@ -1530,7 +1535,7 @@ public function edit(
     */
 
     $company->load([
-         'products',
+        'products',
         'markets',
         'certifications',
         'contacts',
@@ -1540,10 +1545,18 @@ public function edit(
         'machines',
         'moqs',
         'locations',
-        'leadTimes'
+        'leadTimes',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Canonical Company Identity
+        |--------------------------------------------------------------------------
+        */
+
+        'identity.mediaAssets',
     ]);
 
-/*
+    /*
     |--------------------------------------------------------------------------
     | Master Data
     |--------------------------------------------------------------------------
@@ -1553,18 +1566,78 @@ public function edit(
 
     /*
     |--------------------------------------------------------------------------
+    | Canonical Media Assets
+    |--------------------------------------------------------------------------
+    */
+
+    $canonicalMediaAssets = collect();
+
+    if ($company->identity) {
+
+        $canonicalMediaAssets =
+    $company->identity->mediaAssets
+        ->map(function ($asset) {
+
+            $imageUrl = null;
+
+            if ($asset->file_path) {
+                $imageUrl = Storage::disk(
+                    $asset->disk ?: 'public'
+                )->url(
+                    $asset->file_path
+                );
+            } elseif ($asset->file_url) {
+                $imageUrl = $asset->file_url;
+            }
+
+            return [
+                'id' => $asset->id,
+
+                'image_type' =>
+                    $asset->media_type,
+
+                'image_url' =>
+                    $imageUrl,
+
+                'image_path' =>
+                    $asset->file_path,
+
+                'title' =>
+                    $asset->title,
+
+                'caption' =>
+                    $asset->caption,
+
+                'is_featured' =>
+                    (bool) $asset->is_featured,
+
+                'sort_order' =>
+                    $asset->sort_order,
+
+                'verification_status' =>
+                    $asset->verification_status,
+            ];
+        })
+        ->values();
+        
+    }
+
+    
+    /*
+    |--------------------------------------------------------------------------
     | Render
     |--------------------------------------------------------------------------
     */
 
-    return Inertia::render('Company/Edit', [
+   return Inertia::render('Company/Edit', [
 
-        'company' => $company,
+    'company' => $company,
 
-        'countries' => $countries,
+    'countries' => $countries,
 
-    ]);
+    'identity_media_assets' => $canonicalMediaAssets,
 
+]);
 }
 
 public function update(Request $request, Company $company)
@@ -1733,12 +1806,34 @@ public function update(Request $request, Company $company)
         |--------------------------------------------------------------------------
         */
         'images' => 'nullable|array',
-        'images.*.id' => 'nullable|integer',
-        'images.*.image_type' => 'nullable|string',
-        'images.*.image_url' => 'nullable|string',
-        'images.*.caption' => 'nullable|string',
-        'images.*.image_file' =>
-        'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+
+'images.*.id' =>
+    'nullable|integer',
+
+'images.*.image_type' =>
+    'nullable|string|max:100',
+
+'images.*.image_url' =>
+    'nullable|string|max:2048',
+
+'images.*.image_path' =>
+    'nullable|string|max:255',
+
+'images.*.title' =>
+    'nullable|string|max:255',
+
+'images.*.caption' =>
+    'nullable|string',
+
+'images.*.is_featured' =>
+    'nullable|boolean',
+
+'images.*.image_file' => [
+    'nullable',
+    'image',
+    'mimes:jpg,jpeg,png,webp',
+    'max:4096',
+],
 
         /*
         |--------------------------------------------------------------------------
@@ -1927,70 +2022,342 @@ public function update(Request $request, Company $company)
 
     if ($isAdmin) {
 
-        // UPDATE MAIN TABLE
-        $company->update($mainData);
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE MAIN COMPANY DATA
+    |--------------------------------------------------------------------------
+    */
 
-        // SYNC ALL RELATIONAL TABLES
-        CompanyRelationalSyncService::sync($company, $validated);
+    $company->update($mainData);
 
+    /*
+    |--------------------------------------------------------------------------
+    | CANONICAL MEDIA
+    |--------------------------------------------------------------------------
+    |
+    | Company Identity is now the canonical owner of company media.
+    |
+    */
 
-        return redirect()
-            ->route('companies.index')
-            ->with(
-                'success',
-                'Data berhasil diperbarui secara instan oleh Admin.'
-            );
+    if (!empty($validated['images'])) {
+
+        app(
+            CompanyIdentityMediaAssetService::class
+        )->sync(
+            $company,
+            $validated['images']
+        );
     }
 
     /*
     |--------------------------------------------------------------------------
-    | MEMBER → AUDIT QUEUE
+    | LEGACY RELATIONAL DATA
+    |--------------------------------------------------------------------------
+    |
+    | Images are intentionally excluded because they are now handled
+    | by CompanyIdentityMediaAssetService.
+    |
+    */
+
+    $relationalData = $validated;
+
+    unset(
+        $relationalData['images']
+    );
+
+    CompanyRelationalSyncService::sync(
+        $company,
+        $relationalData
+    );
+
+    return redirect()
+        ->route('companies.index')
+        ->with(
+            'success',
+            'Data berhasil diperbarui secara instan oleh Admin.'
+        );
+}
+
+  /*
+|--------------------------------------------------------------------------
+| MEMBER → AUDIT QUEUE
+|--------------------------------------------------------------------------
+*/
+
+$images = $validated['images'] ?? [];
+
+$canonicalImages = [];
+
+foreach ($images as $index => $image) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Existing canonical asset
     |--------------------------------------------------------------------------
     */
 
+    $asset = null;
 
-    \App\Models\CompanyUpdate::create([
-        'company_id' => $company->id,
+    if (!empty($image['id'])) {
 
-        'user_id' => auth()->id(),
+        $asset = CompanyIdentityMediaAsset::query()
+            ->where('company_identity_id', $company->company_identity_id)
+            ->where('id', $image['id'])
+            ->first();
+    }
 
-        'proposed_data' => [
-            ...$mainData,
+    /*
+    |--------------------------------------------------------------------------
+    | Uploaded file
+    |--------------------------------------------------------------------------
+    */
 
-            'products' =>
-                $validated['products'] ?? [],
-            'images' =>
-                $validated['images'] ?? [],
+    if (
+        !empty($image['image_file']) &&
+        $image['image_file'] instanceof \Illuminate\Http\UploadedFile
+    ) {
 
-            'markets' =>
-                $validated['markets'] ?? [],
+        /*
+        |--------------------------------------------------------------------------
+        | Store file
+        |--------------------------------------------------------------------------
+        */
 
-            'certifications' =>
-                $validated['certifications'] ?? [],
+        $uploadedFile = $image['image_file'];
 
-            'contacts' =>
-                $validated['contacts'] ?? [],
+        $filePath = $uploadedFile->store(
+            'company-identity-media',
+            'public'
+        );
 
-            'links' =>
-                $validated['links'] ?? [],
+        $fileUrl = \Illuminate\Support\Facades\Storage::disk('public')
+            ->url($filePath);
 
-            'capacities' =>
-                $validated['capacities'] ?? [],
-            'machines' =>
-                $validated['machines'] ?? [],
+        /*
+        |--------------------------------------------------------------------------
+        | Existing draft asset
+        |--------------------------------------------------------------------------
+        */
 
-            'moqs' =>
-                $validated['moqs'] ?? [],
-                
-                'locations' => 
-                $validated['locations'] ?? [],
+        if ($asset) {
 
-            'lead_times' =>
-                $validated['lead_times'] ?? [],  
-                    ],
+            $asset->update([
+                'media_type' => $image['image_type'] ?? $asset->media_type,
+                'file_path' => $filePath,
+                'disk' => 'public',
+                'file_url' => $fileUrl,
+                'mime_type' => $uploadedFile->getMimeType(),
+                'file_size' => $uploadedFile->getSize(),
 
-        'status' => 'pending',
-    ]);
+                'title' =>
+                    $image['title']
+                    ?? $image['caption']
+                    ?? $asset->title,
+
+                'caption' =>
+                    $image['caption']
+                    ?? $asset->caption,
+
+                'sort_order' => $index,
+
+                'is_featured' =>
+                    $image['is_featured']
+                    ?? $asset->is_featured,
+
+                'verification_status' => 'draft',
+
+                'updated_by' => auth()->id(),
+            ]);
+
+        } else {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Create new canonical draft asset
+            |--------------------------------------------------------------------------
+            */
+
+            $asset = CompanyIdentityMediaAsset::create([
+
+                'company_identity_id' =>
+                    $company->company_identity_id,
+
+                'media_type' =>
+                    $image['image_type'] ?? 'factory',
+
+                'file_path' => $filePath,
+
+                'disk' => 'public',
+
+                'file_url' => $fileUrl,
+
+                'mime_type' =>
+                    $uploadedFile->getMimeType(),
+
+                'file_size' =>
+                    $uploadedFile->getSize(),
+
+                'title' =>
+                    $image['title']
+                    ?? $image['caption']
+                    ?? null,
+
+                'caption' =>
+                    $image['caption']
+                    ?? null,
+
+                'sort_order' => $index,
+
+                'is_featured' =>
+                    $image['is_featured'] ?? false,
+
+                'verification_status' => 'draft',
+
+                'created_by' => auth()->id(),
+
+                'updated_by' => auth()->id(),
+            ]);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | URL-only image
+    |--------------------------------------------------------------------------
+    */
+
+    elseif (
+        !$asset &&
+        !empty($image['image_url'])
+    ) {
+
+        $asset = CompanyIdentityMediaAsset::create([
+
+            'company_identity_id' =>
+                $company->company_identity_id,
+
+            'media_type' =>
+                $image['image_type'] ?? 'factory',
+
+            'file_path' => null,
+
+            'disk' => 'public',
+
+            'file_url' =>
+                $image['image_url'],
+
+            'mime_type' => null,
+
+            'file_size' => null,
+
+            'title' =>
+                $image['title']
+                ?? $image['caption']
+                ?? null,
+
+            'caption' =>
+                $image['caption']
+                ?? null,
+
+            'sort_order' => $index,
+
+            'is_featured' =>
+                $image['is_featured'] ?? false,
+
+            'verification_status' => 'draft',
+
+            'created_by' => auth()->id(),
+
+            'updated_by' => auth()->id(),
+        ]);
+    }
+
+   /*
+|--------------------------------------------------------------------------
+| Build Canonical Image Metadata
+|--------------------------------------------------------------------------
+*/
+
+    if ($asset) {
+
+    $canonicalImages[] = [
+
+        'id' => $asset->id,
+
+        'image_type' =>
+            $asset->media_type,
+
+        'image_url' => $asset->file_path
+            ? url('/storage/' . ltrim($asset->file_path, '/'))
+            : null,
+
+        'image_path' =>
+            $asset->file_path,
+
+        'title' =>
+            $asset->title,
+
+        'caption' =>
+            $asset->caption,
+
+        'is_featured' =>
+            (bool) $asset->is_featured,
+
+        'sort_order' =>
+            $asset->sort_order,
+
+        'verification_status' =>
+            $asset->verification_status,
+    ];
+}
+}
+
+
+ \App\Models\CompanyUpdate::create([
+    'company_id' => $company->id,
+
+    'user_id' => auth()->id(),
+
+    'proposed_data' => [
+
+        ...$mainData,
+
+        'products' =>
+            $validated['products'] ?? [],
+
+        'images' =>
+            $canonicalImages,
+
+        'markets' =>
+            $validated['markets'] ?? [],
+
+        'certifications' =>
+            $validated['certifications'] ?? [],
+
+        'contacts' =>
+            $validated['contacts'] ?? [],
+
+        'links' =>
+            $validated['links'] ?? [],
+
+        'capacities' =>
+            $validated['capacities'] ?? [],
+
+        'machines' =>
+            $validated['machines'] ?? [],
+
+        'moqs' =>
+            $validated['moqs'] ?? [],
+
+        'locations' =>
+            $validated['locations'] ?? [],
+
+        'lead_times' =>
+            $validated['lead_times'] ?? [],
+    ],
+
+    'status' => 'pending',
+]);
 
 
 
@@ -2161,6 +2528,74 @@ $existingCompany = \App\Models\Company::where('nama_perusahaan', 'LIKE', '%' . $
     return redirect()->route('login')->with('success', 'Registrasi berhasil! Data Anda sedang diaudit oleh Admin.');
 }
 
+public function destroyIdentityMedia(
+    Company $company,
+    CompanyIdentityMediaAsset $asset
+) {
+    $user = auth()->user();
 
+    /*
+    |--------------------------------------------------------------------------
+    | AUTHORIZATION
+    |--------------------------------------------------------------------------
+    | Admin boleh mengelola canonical media.
+    | Company owner juga boleh mengelola media milik company-nya.
+    */
+
+    $isOwner = (int) $user->company_id === (int) $company->id;
+    $isAdmin = $user->role === 'admin';
+
+    if (!$isAdmin && !$isOwner) {
+        abort(
+            403,
+            'Akses Ditolak: Anda bukan pemilik resmi entitas industri ini.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | VERIFY CANONICAL IDENTITY
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        !$company->company_identity_id ||
+        (int) $asset->company_identity_id !==
+            (int) $company->company_identity_id
+    ) {
+        abort(
+            403,
+            'Media tidak terkait dengan Company Identity ini.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE PHYSICAL FILE
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        $asset->file_path &&
+        Storage::disk($asset->disk ?: 'public')
+            ->exists($asset->file_path)
+    ) {
+        Storage::disk($asset->disk ?: 'public')
+            ->delete($asset->file_path);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE CANONICAL RECORD
+    |--------------------------------------------------------------------------
+    */
+
+    $asset->delete();
+
+    return back()->with(
+        'success',
+        'Canonical media deleted successfully.'
+    );
+}
 
 }

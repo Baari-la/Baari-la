@@ -13,10 +13,16 @@ import ContactsSection from "@/Components/Company/ContactsSection";
 import MarketsSection from "@/Components/Company/MarketsSection";
 import LeadTimesSection from "@/Components/Company/LeadTimesSection";
 
-export default function Edit({ auth, countries, company }) {
+export default function Edit({
+    auth,
+    countries,
+    company,
+    identity_media_assets = [],
+}) {
     const { locale } = usePage().props;
 
     const isEn = locale === "en";
+
     const { data, setData, post, processing, errors } = useForm({
         _method: "post",
         /*
@@ -70,7 +76,29 @@ export default function Edit({ auth, countries, company }) {
 
         contacts: company.contacts || [],
         links: company.links || [],
-        images: company.images || [],
+        images: (identity_media_assets || []).map((image) => ({
+            id: image.id ?? null,
+
+            image_type: image.image_type || "factory",
+
+            image_url: image.image_path
+                ? `/storage/${image.image_path.replace(/^\/+/, "")}`
+                : "",
+
+            image_path: image.image_path || "",
+
+            title: image.title || "",
+
+            caption: image.caption || "",
+
+            is_featured: Boolean(image.is_featured),
+
+            sort_order: image.sort_order ?? 0,
+
+            verification_status: image.verification_status || "draft",
+
+            image_file: null,
+        })),
         /*
 
         |--------------------------------------------------------------------------

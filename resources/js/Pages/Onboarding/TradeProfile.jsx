@@ -36,7 +36,7 @@ import BuyerDecisionDashboard from "@/Components/Onboarding/Trade/BuyerDecisionD
 import StepNavigation from "@/Components/Onboarding/StepNavigation";
 
 export default function TradeProfile() {
-    const { locale, company } = usePage().props;
+    const { locale, company, countries } = usePage().props;
 
     const isEn = locale === "en";
 
@@ -58,6 +58,28 @@ export default function TradeProfile() {
         import_products: company?.import_products ?? [],
         trade_notes: company?.trade_notes ?? "",
     });
+
+    const countryList = Array.isArray(countries)
+        ? countries
+        : Array.isArray(countries?.data)
+          ? countries.data
+          : [];
+
+    const activeCountries = countryList
+        .filter((country) => {
+            return (
+                country?.is_active === true ||
+                country?.is_active === 1 ||
+                country?.is_active === "1"
+            );
+        })
+        .sort((a, b) => {
+            const nameA = isEn ? a.country_name_en : a.country_name_id;
+
+            const nameB = isEn ? b.country_name_en : b.country_name_id;
+
+            return (nameA ?? "").localeCompare(nameB ?? "");
+        });
 
     const submit = (e) => {
         e.preventDefault();
@@ -86,10 +108,7 @@ export default function TradeProfile() {
     };
 
     if (import.meta.env.DEV) {
-        console.group("Trade Profile Debugger");
-        console.log("Form Data:", data);
-        console.log("Form Errors:", errors);
-        console.groupEnd();
+        console.log("DIGESTEX Countries:", countries);
     }
 
     return (
@@ -161,6 +180,7 @@ export default function TradeProfile() {
                         data={data}
                         setData={setData}
                         errors={errors}
+                        countries={countries}
                     />
                     <SupplyChainCard
                         data={data}

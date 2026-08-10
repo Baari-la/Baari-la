@@ -12,8 +12,8 @@ export function getDirectoryProgramContent(isEn) {
                 : "PENDAFTARAN PERUSAHAAN DIBUKA",
 
             headline: isEn
-                ? "A Small Step Today,\nA Great Opportunity Tomorrow."
-                : "Sebuah Langkah Kecil Hari Ini,\nSebuah Peluang Besar di Masa Depan.",
+                ? "Transforming Industry Capabilities,\ninto Global Business Opportunities"
+                : "Transformasi Kemampuan Industri,\nMenjadi Peluang Bisnis Global",
 
             title: "DIGESTEX Digital Directory\n& Visibility Program",
 

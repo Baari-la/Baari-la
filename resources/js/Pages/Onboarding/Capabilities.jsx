@@ -100,7 +100,7 @@ export default function Capabilities({ company, business }) {
 
             <form onSubmit={submit}>
                 <BaseOnboardingPage
-                    step={3}
+                    currentStep={3}
                     header={<IndustryHeader blueprint={blueprint} />}
                     sidebar={
                         <>

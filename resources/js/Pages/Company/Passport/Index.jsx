@@ -16,6 +16,13 @@ export default function Index({ passport }) {
     const { locale } = usePage().props;
 
     const isEn = locale === "en";
+    console.log("=================================");
+    console.log("COMPANY PASSPORT");
+    console.log("Company:", passport?.company);
+    console.log("Company ID:", passport?.company_id);
+    console.log("Company Name:", passport?.company_name);
+    console.log("MATCHING:", passport?.matching);
+    console.log("=================================");
 
     return (
         <AppLayout>

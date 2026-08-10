@@ -17,15 +17,11 @@ export default function PublicNavbar() {
     | States
     |--------------------------------------------------------------------------
     */
-
     const [isOpen, setIsOpen] = useState(false);
-
     const [isIntelOpen, setIsIntelOpen] = useState(false);
-
     const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
-
     const [isEcosystemOpen, setIsEcosystemOpen] = useState(false);
-
+    const [isProgramOpen, setIsProgramOpen] = useState(false);
     /*
     |--------------------------------------------------------------------------
     | Language Switch
@@ -177,13 +173,13 @@ export default function PublicNavbar() {
             id: "Paspor Digital Perusahaan",
         },
 
-        {
-            routeName: "program.digital-directory-visibility",
+        // {
+        //     routeName: "program.digital-directory-visibility",
 
-            en: "Visibility Program 2026",
+        //     en: "Visibility Program 2026",
 
-            id: "Program Visibility 2026",
-        },
+        //     id: "Program Visibility 2026",
+        // },
 
         {
             routeName: "ranking.index",
@@ -201,7 +197,25 @@ export default function PublicNavbar() {
             id: "Keanggotaan",
         },
     ];
+    /*
+|--------------------------------------------------------------------------
+| Program
+|--------------------------------------------------------------------------
+*/
 
+    const programLinks = [
+        {
+            section: "DIGESTEX PROGRAM",
+        },
+
+        {
+            routeName: "program.digital-directory-visibility",
+
+            en: "Strategic Industry & Visibility Program",
+
+            id: "Program Strategic Industry & Visibility",
+        },
+    ];
     /*
     |--------------------------------------------------------------------------
     | Ecosystem
@@ -274,6 +288,7 @@ export default function PublicNavbar() {
                         isEn={isEn}
                         intelligenceLinks={intelligenceLinks}
                         visibilityLinks={visibilityLinks}
+                        programLinks={programLinks}
                         ecosystemLinks={ecosystemLinks}
                         isIntelOpen={isIntelOpen}
                         setIsIntelOpen={setIsIntelOpen}
@@ -310,6 +325,7 @@ export default function PublicNavbar() {
                         toggleLanguage={toggleLanguage}
                         intelligenceLinks={intelligenceLinks}
                         visibilityLinks={visibilityLinks}
+                        programLinks={programLinks}
                         ecosystemLinks={ecosystemLinks}
                     />
                 </div>

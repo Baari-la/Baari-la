@@ -195,7 +195,50 @@ export default function PublicNavbar() {
             id: "Intelijen Berita",
         },
     ];
+    const sourcingLinks = [
+        {
+            section: "DISCOVER",
+        },
+        {
+            routeName: "company-passport.index",
+            en: "Find Suppliers",
+            id: "Cari Supplier",
+        },
 
+        {
+            section: "SOURCING",
+        },
+        {
+            routeName: "rfqs.index",
+            en: "RFQ Marketplace",
+            id: "RFQ Marketplace",
+        },
+        {
+            routeName: "rfqs.create",
+            en: "Post an RFQ",
+            id: "Buat RFQ",
+            featured: true,
+        },
+        {
+            routeName: "collective-sourcing.index",
+            en: "Collective Sourcing",
+            id: "Collective Sourcing",
+        },
+
+        {
+            section: "COMING SOON",
+        },
+        {
+            en: "MOQ Matching",
+            id: "MOQ Matching",
+            comingSoon: true,
+        },
+        {
+            en: "Build My Supply Chain™",
+            id: "Build My Supply Chain™",
+            comingSoon: true,
+        },
+    ];
     const visibilityLinks = [
         {
             section: "VISIBILITY",
@@ -209,15 +252,8 @@ export default function PublicNavbar() {
 
         {
             routeName: "passport.demo",
-            en: "Digital Company Passport",
-            id: "Paspor Digital Perusahaan",
-        },
-
-        {
-            routeName: "program.digital-directory-visibility",
-
-            en: "Visibility Program 2026",
-            id: "Program Visibility 2026",
+            en: "Company Passport",
+            id: "Company Passport",
         },
 
         {
@@ -260,18 +296,24 @@ export default function PublicNavbar() {
 
             id: "Buyer Discovery™",
         },
+    ];
+    const programLinks = [
+        {
+            section: "DIGESTEX PROGRAM",
+        },
 
         {
-            routeName: "sourcing-hub",
+            routeName: "program.digital-directory",
 
-            en: "Sourcing Hub",
+            en: "Strategic Industry & Visibility Program",
 
-            id: "Sourcing Hub",
+            id: "Program Strategic Industry & Visibility",
         },
     ];
     const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
-
+    const [isProgramOpen, setIsProgramOpen] = useState(false);
     const [isEcosystemOpen, setIsEcosystemOpen] = useState(false);
+    const [isSourcingOpen, setIsSourcingOpen] = useState(false);
 
     return (
         <nav className="bg-white/95 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50 shadow-sm">
@@ -309,11 +351,10 @@ export default function PublicNavbar() {
                         </Link>
 
                         <Link
-                            href={route("companies.index")}
+                            href={route("company-passport.index")}
                             className={navLinkStyle}
                         >
-                            {isEn ? "Industry Directory" : "Direktori Industri"}
-
+                            {isEn ? "Company Passport" : "Company Passport"}
                             <span className={underlineStyle} />
                         </Link>
                         <div
@@ -417,33 +458,246 @@ export default function PublicNavbar() {
                                 })}
                             </div>
                         </div>
+                        {/* PROGRAM */}
 
-                        <Link
-                            href={route("sourcing-hub")}
-                            className={navLinkStyle}
+                        <div
+                            className="relative pb-2"
+                            onMouseEnter={() => setIsProgramOpen(true)}
+                            onMouseLeave={() => setIsProgramOpen(false)}
                         >
-                            {isEn ? "Sourcing Hub" : "Sourcing Hub"}
+                            <button className={navLinkStyle}>
+                                {isEn ? "PROGRAM" : "PROGRAM"}
 
-                            <span className="ml-2 text-[7px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">
-                                {isEn ? "COMING SOON" : "SEGERA HADIR"}
-                            </span>
+                                <ChevronDown
+                                    className="
+                inline
+                ml-1
+                w-3
+                h-3
+            "
+                                />
 
-                            <span className={underlineStyle} />
-                        </Link>
+                                <span className={underlineStyle} />
+                            </button>
+
+                            <div
+                                className={`
+            absolute
+            left-0
+            top-full
+
+            w-[340px]
+
+            bg-white
+            border
+            border-slate-200
+
+            rounded-2xl
+            shadow-2xl
+
+            overflow-hidden
+            origin-top-left
+
+            py-2
+            z-50
+
+            transition-all
+            duration-200
+
+            ${
+                isProgramOpen
+                    ? "opacity-100 scale-100"
+                    : "opacity-0 scale-95 pointer-events-none"
+            }
+        `}
+                            >
+                                {programLinks.map((item, index) => {
+                                    if (item.section) {
+                                        return (
+                                            <Fragment
+                                                key={`program-section-${item.section}-${index}`}
+                                            >
+                                                <div
+                                                    className="
+                                px-4
+                                pt-2
+                                pb-1
+                                text-[10px]
+                                font-black
+                                tracking-[0.2em]
+                                text-slate-400
+                            "
+                                                >
+                                                    {item.section}
+                                                </div>
+                                            </Fragment>
+                                        );
+                                    }
+
+                                    return (
+                                        <Link
+                                            key={`program-link-${item.routeName}-${index}`}
+                                            href={route(item.routeName)}
+                                            onClick={() =>
+                                                setIsProgramOpen(false)
+                                            }
+                                            className={dropdownItemStyle}
+                                        >
+                                            {isEn ? item.en : item.id}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <div
+                            className="relative pb-2"
+                            onMouseEnter={() => setIsSourcingOpen(true)}
+                            onMouseLeave={() => setIsSourcingOpen(false)}
+                        >
+                            <button className={navLinkStyle}>
+                                {isEn ? "SOURCING HUB" : "SOURCING HUB"}
+
+                                <ChevronDown className="inline ml-1 w-3 h-3" />
+
+                                <span className={underlineStyle} />
+                            </button>
+
+                            <div
+                                className={`
+            absolute
+            left-0
+            top-full
+            w-[320px]
+            bg-white
+            border
+            border-slate-200
+            rounded-2xl
+            shadow-2xl
+            overflow-hidden
+            origin-top-left
+            py-2
+            z-50
+            transition-all
+            duration-200
+            ${
+                isSourcingOpen
+                    ? "opacity-100 scale-100"
+                    : "opacity-0 scale-95 pointer-events-none"
+            }
+        `}
+                            >
+                                {sourcingLinks.map((item, index) => {
+                                    if (item.section) {
+                                        return (
+                                            <div
+                                                key={`sourcing-section-${index}`}
+                                                className="
+                            px-4
+                            pt-3
+                            pb-1
+                            text-[9px]
+                            font-black
+                            tracking-[0.2em]
+                            text-slate-400
+                        "
+                                            >
+                                                {item.section}
+                                            </div>
+                                        );
+                                    }
+
+                                    if (item.comingSoon) {
+                                        return (
+                                            <div
+                                                key={`sourcing-coming-${index}`}
+                                                className="
+                            flex
+                            items-center
+                            justify-between
+                            px-4
+                            py-3
+                            text-[11px]
+                            font-semibold
+                            uppercase
+                            tracking-wider
+                            text-slate-400
+                        "
+                                            >
+                                                <span>
+                                                    {isEn ? item.en : item.id}
+                                                </span>
+
+                                                <span
+                                                    className="
+                                rounded-full
+                                bg-slate-100
+                                px-2
+                                py-1
+                                text-[8px]
+                                font-black
+                                tracking-wide
+                                text-slate-400
+                            "
+                                                >
+                                                    COMING SOON
+                                                </span>
+                                            </div>
+                                        );
+                                    }
+
+                                    return (
+                                        <Link
+                                            key={`sourcing-link-${index}`}
+                                            href={route(item.routeName)}
+                                            onClick={() =>
+                                                setIsSourcingOpen(false)
+                                            }
+                                            className={
+                                                item.featured
+                                                    ? `
+                                mx-2
+                                my-2
+                                flex
+                                items-center
+                                justify-between
+                                rounded-xl
+                                bg-gradient-to-r
+                                from-amber-500
+                                to-yellow-500
+                                px-4
+                                py-3
+                                text-[11px]
+                                font-black
+                                uppercase
+                                tracking-wider
+                                text-slate-900
+                                shadow-md
+                                transition
+                                hover:scale-[1.02]
+                            `
+                                                    : dropdownItemStyle
+                                            }
+                                        >
+                                            <span>
+                                                {isEn ? item.en : item.id}
+                                            </span>
+
+                                            {item.featured && (
+                                                <span className="text-[9px] font-black">
+                                                    →
+                                                </span>
+                                            )}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
 
                         <Link
                             href={route("tools.calculator")}
                             className={navLinkStyle}
                         >
                             {isEn ? "Tools" : "Alat"}
-                            <span className={underlineStyle} />
-                        </Link>
-
-                        <Link
-                            href={route("pricing.index")}
-                            className={navLinkStyle}
-                        >
-                            {isEn ? "Membership" : "Keanggotaan"}
                             <span className={underlineStyle} />
                         </Link>
 
@@ -615,7 +869,20 @@ export default function PublicNavbar() {
                         <Link href={route("companies.index")}>
                             {isEn ? "Industry Directory" : "Direktori Industri"}
                         </Link>
-
+                        <Link
+                            href={route("program.digital-directory")}
+                            onClick={() => setIsOpen(false)}
+                            className="
+        font-semibold
+        text-slate-700
+        hover:text-amber-500
+        transition
+    "
+                        >
+                            {isEn
+                                ? "Strategic Industry & Visibility Program"
+                                : "Program Strategic Industry & Visibility"}
+                        </Link>
                         <Link href={route("sourcing-hub")}>
                             {isEn ? "Sourcing Hub" : "Sourcing Hub"}
                         </Link>

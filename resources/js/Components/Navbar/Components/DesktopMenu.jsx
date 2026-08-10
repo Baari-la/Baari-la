@@ -3,6 +3,7 @@ import { Link } from "@inertiajs/react";
 import IntelligenceMenu from "./IntelligenceMenu";
 import VisibilityMenu from "./VisibilityMenu";
 import EcosystemMenu from "./EcosystemMenu";
+import ProgramMenu from "./ProgramMenu";
 
 export default function DesktopMenu({
     isEn,
@@ -12,6 +13,7 @@ export default function DesktopMenu({
     visibilityLinks,
 
     ecosystemLinks,
+    programLinks,
 
     isIntelOpen,
     setIsIntelOpen,
@@ -76,6 +78,14 @@ export default function DesktopMenu({
                 links={visibilityLinks}
                 isOpen={isVisibilityOpen}
                 setIsOpen={setIsVisibilityOpen}
+            />
+
+            {/* PROGRAM */}
+            <ProgramMenu
+                isEn={isEn}
+                links={programLinks}
+                isOpen={isProgramOpen}
+                setIsOpen={setIsProgramOpen}
             />
 
             {/* ECOSYSTEM */}

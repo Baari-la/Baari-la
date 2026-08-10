@@ -12,14 +12,7 @@
 import { useMemo } from "react";
 import { usePage } from "@inertiajs/react";
 
-import {
-    Building2,
-    ShieldCheck,
-    Globe,
-    Eye,
-    CheckCircle2,
-    Clock3,
-} from "lucide-react";
+import { ShieldCheck, Globe, Eye, CheckCircle2, Clock3 } from "lucide-react";
 
 export default function BuyerDecisionDashboard({ company, data }) {
     const { locale } = usePage().props;
@@ -30,22 +23,62 @@ export default function BuyerDecisionDashboard({ company, data }) {
 
     /*
     |--------------------------------------------------------------------------
+    | Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    const hasValues = (value) => {
+        if (!Array.isArray(value)) {
+            return false;
+        }
+
+        return value.some(
+            (item) =>
+                item !== null &&
+                item !== undefined &&
+                String(item).trim() !== "",
+        );
+    };
+
+    const hasText = (value) => {
+        return (
+            value !== null && value !== undefined && String(value).trim() !== ""
+        );
+    };
+
+    /*
+    |--------------------------------------------------------------------------
     | Buyer Trust Score™
+    |--------------------------------------------------------------------------
+    | Launch Ready scoring.
+    |
+    | This is intentionally simple.
+    | Future versions can replace this with backend Trade Profile Score™.
     |--------------------------------------------------------------------------
     */
 
     const buyerTrust = useMemo(() => {
         let score = 50;
 
-        if ((data.trade_roles ?? []).length > 0) score += 8;
+        if (hasValues(data.trade_roles)) {
+            score += 8;
+        }
 
-        if (data.export_experience) score += 8;
+        if (hasText(data.export_experience)) {
+            score += 8;
+        }
 
-        if ((data.export_countries ?? []).length > 0) score += 10;
+        if (hasValues(data.export_countries)) {
+            score += 10;
+        }
 
-        if ((data.import_countries ?? []).length > 0) score += 6;
+        if (hasValues(data.import_countries)) {
+            score += 6;
+        }
 
-        if ((data.main_industries ?? []).length > 0) score += 8;
+        if (hasValues(data.main_industries)) {
+            score += 8;
+        }
 
         return Math.min(score, 100);
     }, [data]);
@@ -62,21 +95,34 @@ export default function BuyerDecisionDashboard({ company, data }) {
 
     /*
     |--------------------------------------------------------------------------
-    | Rating
+    | Buyer Trust Rating
     |--------------------------------------------------------------------------
     */
 
     const stars = useMemo(() => {
         if (buyerTrust >= 90) return "★★★★★";
-
         if (buyerTrust >= 80) return "★★★★☆";
-
         if (buyerTrust >= 70) return "★★★☆☆";
-
         if (buyerTrust >= 60) return "★★☆☆☆";
 
         return "★☆☆☆☆";
     }, [buyerTrust]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Buyer Readiness
+    |--------------------------------------------------------------------------
+    */
+
+    const readiness = {
+        tradeRole: hasValues(data.trade_roles),
+
+        exportExperience: hasText(data.export_experience),
+
+        exportCountries: hasValues(data.export_countries),
+
+        supplyChain: hasValues(data.main_industries),
+    };
 
     /*
     |--------------------------------------------------------------------------
@@ -85,11 +131,16 @@ export default function BuyerDecisionDashboard({ company, data }) {
     */
 
     const companyName =
-        company?.company_name ?? company?.nama_perusahaan ?? "-";
+        company?.company_name ??
+        company?.nama_perusahaan ??
+        company?.canonical_name ??
+        "-";
 
     return (
         <div className="space-y-6">
-            {/* ====================================================== */}
+            {/* ==========================================================
+                BUYER DECISION DASHBOARD
+            ========================================================== */}
 
             <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
                 <div className="flex items-center gap-3">
@@ -101,10 +152,12 @@ export default function BuyerDecisionDashboard({ company, data }) {
                         </div>
 
                         <div className="text-sm text-slate-500">
-                            Launch Ready
+                            {t("Launch Ready", "Siap Launch")}
                         </div>
                     </div>
                 </div>
+
+                {/* Company */}
 
                 <div className="mt-8">
                     <div className="text-xs font-bold uppercase tracking-widest text-slate-500">
@@ -151,37 +204,45 @@ export default function BuyerDecisionDashboard({ company, data }) {
                 </div>
             </div>
 
-            {/* ====================================================== */}
+            {/* ==========================================================
+                BUYER READINESS
+            ========================================================== */}
 
-            <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="rounded-3xl border border-slate-200 bg-white p-8">
                 <div className="text-lg font-black">
                     {t("Buyer Readiness", "Kesiapan Buyer")}
                 </div>
 
                 <div className="mt-6 space-y-4">
                     <Status
-                        done={(data.trade_roles ?? []).length > 0}
+                        done={readiness.tradeRole}
                         title={t("Trade Role", "Peran Perdagangan")}
+                        isEn={isEn}
                     />
 
                     <Status
-                        done={!!data.export_experience}
+                        done={readiness.exportExperience}
                         title={t("Export Experience", "Pengalaman Ekspor")}
+                        isEn={isEn}
                     />
 
                     <Status
-                        done={(data.export_countries ?? []).length > 0}
+                        done={readiness.exportCountries}
                         title={t("Export Countries", "Negara Ekspor")}
+                        isEn={isEn}
                     />
 
                     <Status
-                        done={(data.main_industries ?? []).length > 0}
+                        done={readiness.supplyChain}
                         title={t("Supply Chain", "Supply Chain")}
+                        isEn={isEn}
                     />
                 </div>
             </div>
 
-            {/* ====================================================== */}
+            {/* ==========================================================
+                SOURCING HUB
+            ========================================================== */}
 
             <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8">
                 <div className="flex items-center gap-3">
@@ -222,22 +283,26 @@ export default function BuyerDecisionDashboard({ company, data }) {
 |--------------------------------------------------------------------------
 */
 
-function Status({ done, title }) {
+function Status({ done, title, isEn }) {
     return (
         <div className="flex items-center justify-between">
-            <div className="font-medium text-slate-700">{title}</div>
+            <div className="text-slate-700">{title}</div>
 
             {done ? (
                 <div className="flex items-center gap-2 text-emerald-600">
                     <CheckCircle2 className="h-5 w-5" />
 
-                    <span className="text-sm font-bold">Complete</span>
+                    <span className="text-sm font-bold">
+                        {isEn ? "Complete" : "Lengkap"}
+                    </span>
                 </div>
             ) : (
                 <div className="flex items-center gap-2 text-amber-600">
                     <Clock3 className="h-5 w-5" />
 
-                    <span className="text-sm font-bold">Pending</span>
+                    <span className="text-sm font-bold">
+                        {isEn ? "Pending" : "Belum Lengkap"}
+                    </span>
                 </div>
             )}
         </div>

@@ -50,10 +50,9 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\DirectoryVisibilityProgramController;
 use App\Http\Controllers\ProgramPortalController;
-
-
-
-
+use App\Http\Controllers\CompanyPassportDirectoryController;
+use App\Http\Controllers\StrategicPartnershipController;
+use App\Http\Controllers\Admin\StrategicPartnershipController as AdminStrategicPartnershipController;
 
 /*
 
@@ -622,7 +621,12 @@ Route::get(
 
 
 
-// Existing company
+// Passport Directory
+Route::get(
+    '/company-passport',
+    [CompanyPassportDirectoryController::class, 'index']
+)->name('company-passport.index');
+
 // Letakkan PALING BAWAH
 Route::get(
     '/onboarding/ownership-verification/{company}',
@@ -649,6 +653,22 @@ Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
     ->middleware(['auth', 'signed', 'throttle:6,1'])
     ->name('verification.verify');
 
+    // Strategic Partner
+Route::get(
+    '/partnership',
+    [StrategicPartnershipController::class, 'create']
+)->name('strategic-partnership.create');
+
+Route::post(
+    '/partnership',
+    [StrategicPartnershipController::class, 'store']
+)->name('strategic-partnership.store');
+
+Route::get(
+    '/partnership/thank-you',
+    [StrategicPartnershipController::class, 'thankYou']
+)->name('strategic-partnership.thank-you');
+
 
 
 Route::get('/industry-solutions',[IndustrySolutionController::class, 'index'])->name('industry-solutions.index');
@@ -667,6 +687,9 @@ Route::get(
     '/partner-insights/{partner}',
     [PartnerInsightController::class, 'show']
 )->name('partner-insights.show');
+
+
+
 
 // Menu
 Route::get('/sourcing-hub', function () {
@@ -830,6 +853,11 @@ Route::middleware([
     'verified',
 ])->group(function () {
 
+Route::delete(
+    '/companies/{company}/identity-media/{asset}',
+    [CompanyController::class, 'destroyIdentityMedia']
+)->name('companies.identity-media.destroy');
+
     Route::get(
     '/onboarding/company-information',
     [OnboardingController::class, 'companyInformation']
@@ -881,14 +909,6 @@ Route::post(
 );
 
 Route::post(
-    '/onboarding/manufacturing',
-    [OnboardingController::class,
-    'storeManufacturing']
-)->name(
-    'onboarding.manufacturing.store'
-);
-
-Route::post(
     '/onboarding/media-catalog',
     [OnboardingController::class,
     'storeMediaCatalog']
@@ -914,10 +934,19 @@ Route::post(
         [OnboardingController::class, 'capabilities']
     )->name('onboarding.capabilities');
 
+    Route::prefix('onboarding')->group(function () {
+
     Route::get(
-        '/onboarding/manufacturing',
-        [OnboardingController::class, 'manufacturing']
-    )->name('onboarding.manufacturing');
+        '/trade-profile',
+        [OnboardingController::class, 'tradeProfile']
+    )->name('onboarding.trade-profile');
+
+    Route::post(
+        '/trade-profile',
+        [OnboardingController::class, 'storeTradeProfile']
+    )->name('onboarding.trade-profile.store');
+
+});
 
     Route::get(
         '/onboarding/media-catalog',
@@ -1030,6 +1059,18 @@ Route::prefix('program/digital-directory/register')->group(function () {
 
 });
 
+/*
+|--------------------------------------------------------------------------
+| PUBLIC INDUSTRY SOLUTION PARTNER
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/industry-partners/{partner:slug}',
+    [IndustrySolutionController::class, 'showPartner']
+)->name(
+    'industry-partners.show'
+);
 
 // Route::post(
 //     '/payment/confirm',
@@ -1059,6 +1100,69 @@ Route::middleware(['auth', 'verified', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+
+/*
+|--------------------------------------------------------------------------
+| STRATEGIC PARTNERSHIP
+|--------------------------------------------------------------------------
+*/
+Route::get(
+    '/strategic-partnerships',
+    [AdminStrategicPartnershipController::class, 'index']
+)->name(
+    'strategic-partnerships.index'
+);
+
+Route::get(
+    '/strategic-partnerships/{inquiry}',
+    [AdminStrategicPartnershipController::class, 'show']
+)->name(
+    'strategic-partnerships.show'
+);
+
+Route::patch(
+    '/strategic-partnerships/{inquiry}/status',
+    [AdminStrategicPartnershipController::class, 'updateStatus']
+)->name(
+    'strategic-partnerships.status'
+);
+
+Route::post(
+    '/strategic-partnerships/{inquiry}/approve',
+    [AdminStrategicPartnershipController::class, 'approve']
+)->name(
+    'strategic-partnerships.approve'
+);        
+
+/*
+|--------------------------------------------------------------------------
+| INDUSTRY PARTNER PROFILE
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/industry-partners/{partner}/edit',
+    [AdminStrategicPartnershipController::class, 'edit']
+)->name(
+    'industry-partners.edit'
+);
+
+Route::patch(
+    '/industry-partners/{partner}',
+    [AdminStrategicPartnershipController::class, 'update']
+)->name(
+    'industry-partners.update'
+);
+
+Route::post(
+    '/industry-partners/{partner}/publish',
+    [AdminStrategicPartnershipController::class, 'publish']
+)->name(
+    'industry-partners.publish'
+);
+
+
+
 
         // --- Dashboard & Pending Actions ---
         Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -1108,7 +1212,9 @@ Route::middleware(['auth', 'verified', 'admin'])
             
             // Route wildcard '{company}' diletakkan paling bawah dalam grup ini
             Route::get('/{company}', [AdminCompanyController::class, 'show'])->name('show');
-        });
+     
+        
+ });
 
         // --- Digital Directory ---
         Route::prefix('digital-directory')->name('digital-directory.')->group(function () {
@@ -1117,7 +1223,14 @@ Route::middleware(['auth', 'verified', 'admin'])
             Route::get('/verified', [DigitalDirectoryParticipantController::class, 'verified'])->name('verified');
             Route::get('/revenue', [DigitalDirectoryParticipantController::class, 'revenue'])->name('revenue');
             Route::get('/package-analytics', [DigitalDirectoryParticipantController::class, 'packageAnalytics'])->name('package-analytics');
-/*
+
+// Image Perusahaan
+Route::get(
+    '/media-moderation',
+    [AdminDashboardController::class, 'mediaModeration']
+)->name('media-moderation.index');
+
+            /*
 |--------------------------------------------------------------------------
 | Ownership Verification
 |--------------------------------------------------------------------------

@@ -7,7 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-
+use App\Models\Company;
 use App\Models\CompanyIdentityProfile;
 use App\Models\CompanyIdentityBusiness;
 use App\Models\CompanyIdentityCapability;
@@ -45,6 +45,34 @@ class CompanyIdentity extends Model
             'company_identity_id'
         );
     }
+
+    /*
+|--------------------------------------------------------------------------
+| Primary Company Source
+|--------------------------------------------------------------------------
+|
+| The primary legacy company record selected as the operational
+| company record for this canonical identity.
+|
+*/
+
+public function primarySource(): HasOne
+{
+    return $this->hasOne(
+        CompanyIdentitySource::class,
+        'company_identity_id'
+    )->where('is_primary', true);
+}
+/*
+|--------------------------------------------------------------------------
+| Primary Company
+|--------------------------------------------------------------------------
+*/
+
+public function primaryCompany(): ?Company
+{
+    return $this->primarySource?->company;
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -186,5 +214,34 @@ public function locations(): HasMany
         CompanyIdentityLocation::class,
         'company_identity_id'
     )->orderBy('display_order');
+}
+/**
+ * --------------------------------------------------------------------------
+ * Trade Profile™
+ * --------------------------------------------------------------------------
+ */
+
+public function tradeProfile(): HasOne
+{
+    return $this->hasOne(
+        CompanyIdentityTradeProfile::class,
+        'company_identity_id'
+    );
+}
+/*
+|--------------------------------------------------------------------------
+| Identity Media Assets
+|--------------------------------------------------------------------------
+|
+| Canonical media assets owned by this company identity.
+|
+*/
+
+public function mediaAssets(): HasMany
+{
+    return $this->hasMany(
+        CompanyIdentityMediaAsset::class,
+        'company_identity_id'
+    )->orderBy('sort_order');
 }
 }

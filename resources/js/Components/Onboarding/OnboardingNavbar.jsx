@@ -38,7 +38,7 @@ export default function OnboardingNavbar({ currentStep = 1 }) {
         },
         {
             id: 4,
-            route: "onboarding.manufacturing",
+            route: "onboarding.trade-profile",
             titleEn: "Trade Profile",
             titleId: "Profil Perdagangan",
             icon: Cog,

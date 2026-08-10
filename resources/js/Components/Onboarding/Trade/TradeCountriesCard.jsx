@@ -7,6 +7,10 @@
 | Trade Profile™
 |
 | Launch Ready Version
+|
+| Country source:
+| app/database/master-data/countries.json
+|
 |--------------------------------------------------------------------------
 */
 
@@ -14,9 +18,12 @@ import { usePage } from "@inertiajs/react";
 
 import { Globe, Ship, PlusCircle, Trash2 } from "lucide-react";
 
-import TextField from "@/Components/Common/Forms/TextField";
-
-export default function TradeCountriesCard({ data, setData }) {
+export default function TradeCountriesCard({
+    data,
+    setData,
+    errors = {},
+    countries = [],
+}) {
     const { locale } = usePage().props;
 
     const isEn = locale === "en";
@@ -27,9 +34,33 @@ export default function TradeCountriesCard({ data, setData }) {
 
     const isImporter = data.trade_roles?.includes("import");
 
-    if (!isExporter && !isImporter) {
-        return null;
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | DIGESTEX Country Master
+    |--------------------------------------------------------------------------
+    */
+
+    const activeCountries = countries
+        .filter((country) => country.is_active)
+        .sort((a, b) => {
+            const nameA = isEn ? a.country_name_en : a.country_name_id;
+
+            const nameB = isEn ? b.country_name_en : b.country_name_id;
+
+            return nameA.localeCompare(nameB);
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Country Label
+    |--------------------------------------------------------------------------
+    */
+
+    const countryLabel = (country) => {
+        const name = isEn ? country.country_name_en : country.country_name_id;
+
+        return `${country.flag_emoji ?? ""} ${name}`;
+    };
 
     /*
     |--------------------------------------------------------------------------
@@ -85,8 +116,22 @@ export default function TradeCountriesCard({ data, setData }) {
         );
     };
 
+    /*
+    |--------------------------------------------------------------------------
+    | Do not display card if company has no trade role
+    |--------------------------------------------------------------------------
+    */
+
+    if (!isExporter && !isImporter) {
+        return null;
+    }
+
     return (
         <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+            {/* ===========================================================
+                Header
+            =========================================================== */}
+
             <h2 className="text-2xl font-black text-slate-900">
                 {t("Trade Countries™", "Negara Perdagangan™")}
             </h2>
@@ -116,25 +161,62 @@ export default function TradeCountriesCard({ data, setData }) {
                     </div>
 
                     <div className="space-y-4">
-                        {exportCountries.map((country, index) => (
-                            <div key={index} className="flex gap-3">
-                                <div className="flex-1">
-                                    <TextField
-                                        value={country}
-                                        placeholder={t(
-                                            "Example: Japan",
-                                            "Contoh: Jepang",
-                                        )}
+                        {exportCountries.map((countryCode, index) => (
+                            <div key={`export-${index}`} className="flex gap-3">
+                                <div className="min-w-0 flex-1">
+                                    <select
+                                        value={countryCode}
                                         onChange={(e) =>
                                             updateExport(index, e.target.value)
                                         }
-                                    />
+                                        className="
+                                            w-full
+                                            rounded-xl
+                                            border
+                                            border-slate-300
+                                            bg-white
+                                            px-4
+                                            py-3
+                                            text-slate-700
+                                            outline-none
+                                            transition
+                                            focus:border-emerald-500
+                                            focus:ring-2
+                                            focus:ring-emerald-100
+                                        "
+                                    >
+                                        <option value="">
+                                            {t(
+                                                "Select export destination country",
+                                                "Pilih negara tujuan ekspor",
+                                            )}
+                                        </option>
+
+                                        {activeCountries.map((country) => (
+                                            <option
+                                                key={country.country_code}
+                                                value={country.country_code}
+                                            >
+                                                {countryLabel(country)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 <button
                                     type="button"
                                     onClick={() => removeExport(index)}
-                                    className="rounded-xl border border-red-200 px-4 text-red-600 hover:bg-red-50"
+                                    className="
+                                        shrink-0
+                                        rounded-xl
+                                        border
+                                        border-red-200
+                                        px-4
+                                        text-red-600
+                                        transition
+                                        hover:bg-red-50
+                                    "
+                                    title={t("Remove country", "Hapus negara")}
                                 >
                                     <Trash2 className="h-5 w-5" />
                                 </button>
@@ -144,12 +226,32 @@ export default function TradeCountriesCard({ data, setData }) {
                         <button
                             type="button"
                             onClick={addExport}
-                            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-emerald-400 px-5 py-3 font-semibold text-emerald-700 hover:bg-emerald-50"
+                            className="
+                                inline-flex
+                                items-center
+                                gap-2
+                                rounded-xl
+                                border
+                                border-dashed
+                                border-emerald-400
+                                px-5
+                                py-3
+                                font-semibold
+                                text-emerald-700
+                                transition
+                                hover:bg-emerald-50
+                            "
                         >
                             <PlusCircle className="h-5 w-5" />
 
                             {t("Add Export Country", "Tambah Negara Ekspor")}
                         </button>
+
+                        {errors["export_countries"] && (
+                            <p className="text-sm font-medium text-red-600">
+                                {errors["export_countries"]}
+                            </p>
+                        )}
                     </div>
                 </div>
             )}
@@ -169,25 +271,62 @@ export default function TradeCountriesCard({ data, setData }) {
                     </div>
 
                     <div className="space-y-4">
-                        {importCountries.map((country, index) => (
-                            <div key={index} className="flex gap-3">
-                                <div className="flex-1">
-                                    <TextField
-                                        value={country}
-                                        placeholder={t(
-                                            "Example: China",
-                                            "Contoh: China",
-                                        )}
+                        {importCountries.map((countryCode, index) => (
+                            <div key={`import-${index}`} className="flex gap-3">
+                                <div className="min-w-0 flex-1">
+                                    <select
+                                        value={countryCode}
                                         onChange={(e) =>
                                             updateImport(index, e.target.value)
                                         }
-                                    />
+                                        className="
+                                            w-full
+                                            rounded-xl
+                                            border
+                                            border-slate-300
+                                            bg-white
+                                            px-4
+                                            py-3
+                                            text-slate-700
+                                            outline-none
+                                            transition
+                                            focus:border-indigo-500
+                                            focus:ring-2
+                                            focus:ring-indigo-100
+                                        "
+                                    >
+                                        <option value="">
+                                            {t(
+                                                "Select import origin country",
+                                                "Pilih negara asal impor",
+                                            )}
+                                        </option>
+
+                                        {activeCountries.map((country) => (
+                                            <option
+                                                key={country.country_code}
+                                                value={country.country_code}
+                                            >
+                                                {countryLabel(country)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 <button
                                     type="button"
                                     onClick={() => removeImport(index)}
-                                    className="rounded-xl border border-red-200 px-4 text-red-600 hover:bg-red-50"
+                                    className="
+                                        shrink-0
+                                        rounded-xl
+                                        border
+                                        border-red-200
+                                        px-4
+                                        text-red-600
+                                        transition
+                                        hover:bg-red-50
+                                    "
+                                    title={t("Remove country", "Hapus negara")}
                                 >
                                     <Trash2 className="h-5 w-5" />
                                 </button>
@@ -197,7 +336,21 @@ export default function TradeCountriesCard({ data, setData }) {
                         <button
                             type="button"
                             onClick={addImport}
-                            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-indigo-400 px-5 py-3 font-semibold text-indigo-700 hover:bg-indigo-50"
+                            className="
+                                inline-flex
+                                items-center
+                                gap-2
+                                rounded-xl
+                                border
+                                border-dashed
+                                border-indigo-400
+                                px-5
+                                py-3
+                                font-semibold
+                                text-indigo-700
+                                transition
+                                hover:bg-indigo-50
+                            "
                         >
                             <PlusCircle className="h-5 w-5" />
 
@@ -206,6 +359,12 @@ export default function TradeCountriesCard({ data, setData }) {
                                 "Tambah Negara Asal Impor",
                             )}
                         </button>
+
+                        {errors["import_countries"] && (
+                            <p className="text-sm font-medium text-red-600">
+                                {errors["import_countries"]}
+                            </p>
+                        )}
                     </div>
                 </div>
             )}
