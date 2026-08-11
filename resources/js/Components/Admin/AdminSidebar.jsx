@@ -11,6 +11,7 @@ import {
     Settings,
     BarChart3,
     ChevronDown,
+    Handshake,
 } from "lucide-react";
 
 export default function AdminSidebar() {
@@ -86,6 +87,22 @@ export default function AdminSidebar() {
                 {
                     title: "Revenue Dashboard",
                     href: route("admin.digital-directory.revenue"),
+                },
+            ],
+        },
+        {
+            title: "Strategic Partnership",
+            icon: Handshake,
+
+            children: [
+                {
+                    title: "Partner Inquiries",
+                    href: route("admin.strategic-partnerships.index"),
+                },
+
+                {
+                    title: "Industry Partners",
+                    href: route("admin.industry-partners.index"),
                 },
             ],
         },

@@ -53,6 +53,10 @@ use App\Http\Controllers\ProgramPortalController;
 use App\Http\Controllers\CompanyPassportDirectoryController;
 use App\Http\Controllers\StrategicPartnershipController;
 use App\Http\Controllers\Admin\StrategicPartnershipController as AdminStrategicPartnershipController;
+use App\Http\Controllers\Admin\IndustryPartnerSolutionController;
+use App\Http\Controllers\Admin\IndustryPartnerSolutionSpecificationController;
+
+
 
 /*
 
@@ -676,6 +680,16 @@ Route::get('/industry-solutions/{category}',[IndustrySolutionController::class, 
 )->name('industry-solutions.show');
 Route::get('/ecosystem-partner',[EcosystemPartnerController::class, 'index']
 )->name('ecosystem-partner.index');
+Route::get(
+    '/ecosystem-partner/inquiry',
+    [EcosystemPartnerController::class, 'inquiry']
+)->name('ecosystem-partner.inquiry');
+
+Route::post(
+    '/ecosystem-partner/inquiry',
+    [EcosystemPartnerController::class, 'submitInquiry']
+)->name('ecosystem-partner.inquiry.submit');
+
 
 // Partners
 Route::get(
@@ -1072,6 +1086,7 @@ Route::get(
     'industry-partners.show'
 );
 
+
 // Route::post(
 //     '/payment/confirm',
 //     [
@@ -1100,6 +1115,130 @@ Route::middleware(['auth', 'verified', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+
+Route::prefix(
+            'industry-partners/{partner}/solutions'
+        )
+            ->name('industry-partner-solutions.')
+            ->group(function () {
+
+                Route::get(
+                    '/',
+                    [IndustryPartnerSolutionController::class, 'index']
+                )->name('index');
+
+                Route::get(
+                    '/create',
+                    [IndustryPartnerSolutionController::class, 'create']
+                )->name('create');
+
+                Route::post(
+                    '/',
+                    [IndustryPartnerSolutionController::class, 'store']
+                )->name('store');
+
+                Route::get(
+                    '/{solution}/edit',
+                    [IndustryPartnerSolutionController::class, 'edit']
+                )->name('edit');
+
+                Route::patch(
+                    '/{solution}',
+                    [IndustryPartnerSolutionController::class, 'update']
+                )->name('update');
+
+                Route::post(
+                    '/{solution}/publish',
+                    [IndustryPartnerSolutionController::class, 'publish']
+                )->name('publish');
+
+                Route::post(
+                    '/{solution}/unpublish',
+                    [IndustryPartnerSolutionController::class, 'unpublish']
+                )->name('unpublish');
+            });
+
+/*
+|--------------------------------------------------------------------------
+| INDUSTRY PARTNER SOLUTION SPECIFICATIONS
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/industry-partners/{partner}/solutions/{solution}/specifications',
+    [
+        IndustryPartnerSolutionSpecificationController::class,
+        'index',
+    ]
+)->name(
+    'industry-partner-solution-specifications.index'
+);
+
+
+Route::get(
+    '/industry-partners/{partner}/solutions/{solution}/specifications/create',
+    [
+        IndustryPartnerSolutionSpecificationController::class,
+        'create',
+    ]
+)->name(
+    'industry-partner-solution-specifications.create'
+);
+
+
+Route::post(
+    '/industry-partners/{partner}/solutions/{solution}/specifications',
+    [
+        IndustryPartnerSolutionSpecificationController::class,
+        'store',
+    ]
+)->name(
+    'industry-partner-solution-specifications.store'
+);
+
+
+Route::get(
+    '/industry-partners/{partner}/solutions/{solution}/specifications/{specification}/edit',
+    [
+        IndustryPartnerSolutionSpecificationController::class,
+        'edit',
+    ]
+)->name(
+    'industry-partner-solution-specifications.edit'
+);
+
+
+Route::patch(
+    '/industry-partners/{partner}/solutions/{solution}/specifications/{specification}',
+    [
+        IndustryPartnerSolutionSpecificationController::class,
+        'update',
+    ]
+)->name(
+    'industry-partner-solution-specifications.update'
+);
+
+
+Route::delete(
+    '/industry-partners/{partner}/solutions/{solution}/specifications/{specification}',
+    [
+        IndustryPartnerSolutionSpecificationController::class,
+        'destroy',
+    ]
+)->name(
+    'industry-partner-solution-specifications.destroy'
+);
+
+
+Route::patch(
+    '/industry-partners/{partner}/solutions/{solution}/specifications/{specification}/status',
+    [
+        IndustryPartnerSolutionSpecificationController::class,
+        'toggleStatus',
+    ]
+)->name(
+    'industry-partner-solution-specifications.status'
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -1139,6 +1278,10 @@ Route::post(
 | INDUSTRY PARTNER PROFILE
 |--------------------------------------------------------------------------
 */
+Route::get(
+    '/industry-partners',
+    [AdminStrategicPartnershipController::class, 'partnersIndex']
+)->name('industry-partners.index');
 
 Route::get(
     '/industry-partners/{partner}/edit',

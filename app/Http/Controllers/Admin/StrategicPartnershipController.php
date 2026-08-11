@@ -131,7 +131,120 @@ class StrategicPartnershipController extends Controller
         );
     }
 
+/*
+|--------------------------------------------------------------------------
+| INDUSTRY PARTNERS INDEX
+|--------------------------------------------------------------------------
+*/
 
+public function partnersIndex(Request $request)
+{
+    $query = IndustryPartner::query()
+        ->withCount('solutions')
+        ->latest();
+
+    /*
+    |--------------------------------------------------------------------------
+    | SEARCH
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where(
+                'company_name',
+                'like',
+                "%{$search}%"
+            )
+            ->orWhere(
+                'partner_category',
+                'like',
+                "%{$search}%"
+            );
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STATUS
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('status')) {
+        if ($request->status === 'active') {
+            $query->where('is_active', true);
+        }
+
+        if ($request->status === 'inactive') {
+            $query->where('is_active', false);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CATEGORY
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('category')) {
+        $query->where(
+            'partner_category',
+            $request->category
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STATS
+    |--------------------------------------------------------------------------
+    */
+
+    $stats = [
+        'total' => IndustryPartner::count(),
+
+        'active' => IndustryPartner::where(
+            'is_active',
+            true
+        )->count(),
+
+        'inactive' => IndustryPartner::where(
+            'is_active',
+            false
+        )->count(),
+
+        'featured' => IndustryPartner::where(
+            'is_featured',
+            true
+        )->count(),
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | PARTNERS
+    |--------------------------------------------------------------------------
+    */
+
+    $partners = $query
+        ->paginate(15)
+        ->withQueryString();
+
+    return Inertia::render(
+        'Admin/StrategicPartnership/IndustryPartners/Index',
+        [
+            'partners' => $partners,
+
+            'stats' => $stats,
+
+            'filters' => [
+                'search' => $request->search,
+                'status' => $request->status,
+                'category' => $request->category,
+            ],
+        ]
+    );
+}
     /*
     |--------------------------------------------------------------------------
     | SHOW

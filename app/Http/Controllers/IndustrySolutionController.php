@@ -15,12 +15,13 @@ class IndustrySolutionController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function index()
+     public function index()
     {
         $partners = IndustryPartner::query()
             ->where('is_active', true)
             ->orderBy('partner_category')
             ->orderByDesc('is_featured')
+            ->orderByDesc('partner_level')
             ->orderBy('company_name')
             ->get();
 
@@ -43,6 +44,12 @@ class IndustrySolutionController extends Controller
     {
         $categories = [
 
+            /*
+            |--------------------------------------------------------------------------
+            | TESTING & CERTIFICATION
+            |--------------------------------------------------------------------------
+            */
+
             'testing-certification' => [
                 'db' => 'testing_certification',
                 'title' => 'Testing & Certification',
@@ -52,6 +59,13 @@ class IndustrySolutionController extends Controller
                 'cta_title' =>
                     'Become A Testing & Certification Partner',
             ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | INDUSTRIAL MACHINERY
+            |--------------------------------------------------------------------------
+            */
 
             'industrial-machinery' => [
                 'db' => 'machinery',
@@ -63,6 +77,13 @@ class IndustrySolutionController extends Controller
                     'Become An Industrial Machinery Partner',
             ],
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | TECHNOLOGY SOLUTIONS
+            |--------------------------------------------------------------------------
+            */
+
             'technology-solutions' => [
                 'db' => 'technology',
                 'title' => 'Technology Solutions',
@@ -72,6 +93,47 @@ class IndustrySolutionController extends Controller
                 'cta_title' =>
                     'Become A Technology Partner',
             ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | DIGITAL TEXTILE PRINTING
+            |--------------------------------------------------------------------------
+            */
+
+            'digital-printing' => [
+                'db' => 'digital_printing',
+                'title' => 'Digital Textile Printing',
+                'icon' => 'fa-print',
+                'description' =>
+                    'Digital textile printing technologies, printing systems, equipment, software, and production solutions.',
+                'cta_title' =>
+                    'Become A Digital Textile Printing Partner',
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | AI & DIGITAL TRANSFORMATION
+            |--------------------------------------------------------------------------
+            */
+
+            'ai-digital-transformation' => [
+                'db' => 'ai_digital',
+                'title' => 'AI & Digital Transformation',
+                'icon' => 'fa-brain',
+                'description' =>
+                    'Artificial intelligence, automation, Industry 4.0, data intelligence, and digital transformation solutions for the textile industry.',
+                'cta_title' =>
+                    'Become An AI & Digital Transformation Partner',
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | RAW MATERIALS
+            |--------------------------------------------------------------------------
+            */
 
             'raw-materials' => [
                 'db' => 'raw_material',
@@ -83,35 +145,63 @@ class IndustrySolutionController extends Controller
                     'Become A Raw Materials Partner',
             ],
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | LOGISTICS & SUPPLY CHAIN
+            |--------------------------------------------------------------------------
+            */
+
             'logistics-supply-chain' => [
                 'db' => 'logistics',
                 'title' => 'Logistics & Supply Chain',
                 'icon' => 'fa-truck',
                 'description' =>
-                    'Domestic and international logistics, warehousing, and trade support.',
+                    'Domestic and international logistics, warehousing, freight forwarding, and trade support.',
                 'cta_title' =>
                     'Become A Logistics & Supply Chain Partner',
             ],
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | TRADE FINANCE
+            |--------------------------------------------------------------------------
+            */
+
             'trade-finance' => [
                 'db' => 'finance',
                 'title' => 'Trade Finance',
-                'icon' => 'fa-building-columns',
+                'icon' => 'fa-money-bill-wave',
                 'description' =>
-                    'Financing solutions supporting industrial growth and export activities.',
+                    'Financing, insurance, payment, and financial solutions supporting industrial growth and export activities.',
                 'cta_title' =>
                     'Become A Trade Finance Partner',
             ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | EXHIBITIONS & EVENTS
+            |--------------------------------------------------------------------------
+            */
 
             'exhibitions-events' => [
                 'db' => 'association',
                 'title' => 'Exhibitions & Events',
                 'icon' => 'fa-calendar-days',
                 'description' =>
-                    'Trade fairs, business matching, networking, and industry events.',
+                    'Trade fairs, business matching, networking, exhibitions, and industry events.',
                 'cta_title' =>
                     'Become An Exhibitions & Events Partner',
             ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | RESEARCH & EDUCATION
+            |--------------------------------------------------------------------------
+            */
 
             'research-education' => [
                 'db' => 'institution',
@@ -122,6 +212,7 @@ class IndustrySolutionController extends Controller
                 'cta_title' =>
                     'Become A Research & Education Partner',
             ],
+
         ];
 
 
@@ -134,13 +225,31 @@ class IndustrySolutionController extends Controller
         $config = $categories[$category];
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | ONLY PUBLISHED PARTNERS
+        |--------------------------------------------------------------------------
+        */
+
         $partners = IndustryPartner::query()
             ->where(
                 'partner_category',
                 $config['db']
             )
-            ->where('is_active', true)
+            ->where(
+                'is_active',
+                true
+            )
             ->orderByDesc('is_featured')
+            ->orderByRaw("
+                CASE partner_level
+                    WHEN 'platinum' THEN 4
+                    WHEN 'gold' THEN 3
+                    WHEN 'silver' THEN 2
+                    WHEN 'bronze' THEN 1
+                    ELSE 0
+                END DESC
+            ")
             ->orderBy('company_name')
             ->get();
 
@@ -154,27 +263,47 @@ class IndustrySolutionController extends Controller
         );
     }
 
-    /*
-|--------------------------------------------------------------------------
-| PUBLIC PARTNER PROFILE
-|--------------------------------------------------------------------------
-*/
 
-public function showPartner(
-    \App\Models\IndustryPartner $partner
-) {
-    abort_unless(
-        $partner->is_active,
-        404
-    );
+    /*
+    |--------------------------------------------------------------------------
+    | PUBLIC PARTNER PROFILE
+    |--------------------------------------------------------------------------
+    */
+
+  public function showPartner($partner)
+{
+    $partner = IndustryPartner::query()
+        ->where('id', $partner)
+        ->where('is_active', true)
+        ->firstOrFail();
+
+    $partner->load([
+        'solutions' => function ($query) {
+            $query
+                ->where('is_active', true)
+                ->orderByDesc('is_featured')
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->with([
+                    'specifications' => function ($specQuery) {
+                        $specQuery
+                            ->where('is_active', true)
+                            ->orderBy('sort_order')
+                            ->orderBy('id');
+                    },
+                ]);
+        },
+    ]);
 
     return Inertia::render(
         'IndustrySolutions/PartnerShow',
         [
             'partner' => $partner,
+            'solutions' => $partner->solutions,
         ]
     );
 }
+
 
     /*
     |--------------------------------------------------------------------------

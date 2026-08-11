@@ -272,19 +272,21 @@ export default function Index() {
 
                                 <h1 className="mt-8 text-5xl font-black uppercase leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl">
                                     {isEn
-                                        ? "Powering The Future Of The Textile Industry Ecosystem"
-                                        : "Membangun Masa Depan Ekosistem Industri Tekstil"}
+                                        ? "PUT YOUR SOLUTION IN FRONT OF THE TEXTILE INDUSTRY"
+                                        : "HADIRKAN SOLUSI ANDA DI DEPAN INDUSTRI TEKSTIL"}
                                 </h1>
 
                                 <p className="mt-8 max-w-3xl text-lg leading-8 text-slate-300 lg:text-xl">
                                     {isEn
-                                        ? "Position your company, technology, expertise and solutions within a connected textile industry ecosystem designed to create visibility, collaboration and business opportunities."
-                                        : "Posisikan perusahaan, teknologi, expertise dan solusi Anda dalam ekosistem industri tekstil yang terhubung untuk menciptakan visibilitas, kolaborasi dan peluang bisnis."}
+                                        ? "Become a DIGESTEX Solution Partner and position your technology, expertise and solutions within a connected, one-stop textile industry ecosystem — from upstream to downstream."
+                                        : "Jadilah Mitra soluasi dan posisikan teknologi, expertise dan solusi perusahaan Anda di dalam ekosistem industri tekstil yang terhubung dan menjadi one-stop ecosystem — dari hulu sampai hilir."}
                                 </p>
 
                                 <div className="mt-10 flex flex-wrap gap-4">
-                                    <a
-                                        href="mailto:info@digestexmedia.com?subject=Strategic Solution Partner"
+                                    <Link
+                                        href={route(
+                                            "strategic-partnership.create",
+                                        )}
                                         className="inline-flex items-center gap-3 rounded-2xl bg-amber-400 px-7 py-4 text-sm font-black uppercase tracking-wide text-slate-950 transition hover:bg-amber-300"
                                     >
                                         {isEn
@@ -292,18 +294,7 @@ export default function Index() {
                                             : "JADI STRATEGIC SOLUTION PARTNER"}
 
                                         <ArrowRight className="h-5 w-5" />
-                                    </a>
-
-                                    <a
-                                        href="#partner-benefits"
-                                        className="inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-7 py-4 text-sm font-bold text-white backdrop-blur transition hover:bg-white/10"
-                                    >
-                                        {isEn
-                                            ? "EXPLORE THE PROGRAM"
-                                            : "PELAJARI PROGRAM"}
-
-                                        <ChevronRight className="h-5 w-5" />
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -333,8 +324,8 @@ export default function Index() {
                                 <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
                                     <p className="text-lg leading-8 text-slate-300">
                                         {isEn
-                                            ? "DIGESTEX Strategic Solution Partners are not simply listed as advertisers. They become part of the industry solution ecosystem — helping manufacturers, buyers and decision makers discover relevant technologies, services and expertise."
-                                            : "DIGESTEX Strategic Solution Partner bukan sekadar tampil sebagai advertiser. Mereka menjadi bagian dari ekosistem solusi industri — membantu manufacturer, buyer dan decision maker menemukan teknologi, layanan dan expertise yang relevan."}
+                                            ? "DIGESTEX Strategic Solution Partners are not simply listed as advertisers. Their solutions become part of the industry ecosystem — positioned within relevant industry needs, explained through solution intelligence and made discoverable to professionals and decision makers across the textile value chain"
+                                            : "DIGESTEX Strategic Solution Partner bukan sekadar tampil sebagai advertiser. Solusi mereka menjadi bagian dari ekosistem industri — ditempatkan berdasarkan kebutuhan industri yang relevan, dijelaskan melalui solution intelligence dan dapat ditemukan oleh professionals serta decision makers di sepanjang rantai nilai industri tekstil"}
                                     </p>
                                 </div>
                             </div>
@@ -499,14 +490,14 @@ export default function Index() {
 
                                     <h2 className="mt-4 text-4xl font-black uppercase tracking-tight sm:text-5xl">
                                         {isEn
-                                            ? "Show More Than Your Company"
+                                            ? "YOUR SOLUTION. FULLY EXPLAINED"
                                             : "Tampilkan Lebih Dari Sekadar Perusahaan"}
                                     </h2>
 
                                     <p className="mt-6 leading-8 text-slate-400">
                                         {isEn
-                                            ? "A Strategic Solution Partner profile can explain the industry challenge, your solution, technology, business value, target users and relevant applications."
-                                            : "Profil Strategic Solution Partner dapat menjelaskan industry challenge, solusi, teknologi, business value, target user dan aplikasi yang relevan."}
+                                            ? "A DIGESTEX Solution Partner profile goes beyond company information. Your solution can explain the industry challenge, technology, applications, technical specifications, key benefits and business value — helping decision makers understand your solution before making contact"
+                                            : "Profil DIGESTEX Solution Partner tidak berhenti pada informasi perusahaan. Solusi Anda dapat menjelaskan industry challenge, technology, applications, technical specifications, key benefits dan business value — membantu decision makers memahami solusi Anda sebelum melakukan kontak"}
                                     </p>
                                 </div>
 
@@ -815,26 +806,26 @@ export default function Index() {
 
                             <h2 className="mt-5 text-4xl font-black uppercase tracking-tight sm:text-5xl lg:text-6xl">
                                 {isEn
-                                    ? "Bring Your Solution To The Textile Industry"
-                                    : "Bawa Solusi Anda Ke Industri Tekstil"}
+                                    ? "YOUR SOLUTION BELONGS IN THE ECOSYSTEM"
+                                    : "SOLUSI ANDA ADALAH BAGIAN DARI EKOSISTEM"}
                             </h2>
 
                             <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-slate-400">
                                 {isEn
-                                    ? "Become part of the DIGESTEX Strategic Solution Partner ecosystem and build a stronger position within the textile industry value chain."
-                                    : "Menjadi bagian dari ekosistem DIGESTEX Strategic Solution Partner dan membangun posisi yang lebih kuat dalam rantai nilai industri tekstil."}
+                                    ? "Join DIGESTEX as a Strategic Solution Partner and position your technology, expertise and solutions within a connected textile industry ecosystem"
+                                    : "Bergabunglah sebagai Strategic Solution Partner DIGESTEX dan posisikan teknologi, expertise dan solusi perusahaan Anda di dalam ekosistem industri tekstil yang terhubung"}
                             </p>
 
-                            <a
-                                href="mailto:partnership@digtex.id?subject=Strategic Solution Partner"
-                                className="mt-10 inline-flex items-center gap-3 rounded-full bg-amber-400 px-10 py-5 text-xs font-black uppercase tracking-[0.18em] text-slate-950 transition hover:bg-amber-300"
+                            <Link
+                                href={route("strategic-partnership.create")}
+                                className="inline-flex items-center gap-3 rounded-2xl bg-amber-400 px-7 py-4 text-sm font-black uppercase tracking-wide text-slate-950 transition hover:bg-amber-300"
                             >
                                 {isEn
                                     ? "BECOME A STRATEGIC SOLUTION PARTNER"
                                     : "JADI STRATEGIC SOLUTION PARTNER"}
 
                                 <ArrowRight className="h-5 w-5" />
-                            </a>
+                            </Link>
                         </div>
                     </section>
                 </div>

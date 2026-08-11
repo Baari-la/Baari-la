@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\IndustryPartnerSolution;
 
 class IndustryPartner extends Model
 {
@@ -58,6 +59,20 @@ class IndustryPartner extends Model
         'partnership_start_date' => 'date',
         'partnership_end_date' => 'date',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | SOLUTIONS
+    |--------------------------------------------------------------------------
+    */
+
+    public function solutions()
+    {
+        return $this->hasMany(
+            IndustryPartnerSolution::class,
+            'industry_partner_id'
+        );
+    }
 
     /*
     |--------------------------------------------------------------------------
