@@ -23,19 +23,21 @@ class ExecutiveController extends Controller
         );
 
         $dashboard = app(
-            ExecutiveDashboardService::class
-        )->build([
+    ExecutiveDashboardService::class
+)->build([
 
-            'sector' => $sector,
+    'sector' => $sector,
 
-            'hs_prefix' =>
-                $sectorConfig['hs'],
+    'hs_prefix' =>
+        $sectorConfig['hs'],
 
-            'year' => now()->year,
+    'year' => now()->year,
 
-            'months' => [1, 2, 3, 4],
+    'months' => [1, 2, 3, 4, 5, 6],
 
-        ]);
+    'data_period' => 'January-June 2026',
+
+]);
 
         return Inertia::render(
             'Trade/ExecutiveDashboard',

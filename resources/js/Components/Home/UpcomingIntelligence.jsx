@@ -1,7 +1,7 @@
-import { usePage } from "@inertiajs/react";
-import { ArrowLeft } from "lucide-react";
-import { Link } from "@inertiajs/react";
+import { usePage, Link } from "@inertiajs/react";
+
 import {
+    ArrowLeft,
     Cpu,
     Globe2,
     Brain,
@@ -18,46 +18,46 @@ export default function UpcomingIntelligence() {
     const isEn = locale === "en";
     const modules = [
         {
-            titleEn: "DIGESTEX Digital Directory & Visibility Program",
+            titleEn: "DIGESTEX Strategic Industry & Visibility Program",
 
-            titleId: "Program DIGESTEX Digital Directory & Visibility",
+            titleId: "Program Strategic Industry & Visibility DIGESTEX",
 
             descriptionEn:
-                "The foundation of the Global Textile Intelligence Ecosystem with Digital Company Passport™, Verified Company Badge, and Visibility Score™.",
+                "The strategic entry point to the DIGESTEX Global Textile Intelligence Ecosystem — connecting companies, industry intelligence, technologies, solutions, suppliers, buyers, and business opportunities across the textile value chain.",
 
             descriptionId:
-                "Fondasi Global Textile Intelligence Ecosystem dengan Digital Company Passport™, Verified Company Badge, dan Visibility Score™.",
+                "Pintu masuk strategis ke DIGESTEX Global Textile Intelligence Ecosystem — menghubungkan perusahaan, industry intelligence, teknologi, solusi, supplier, buyer, dan peluang bisnis di seluruh rantai nilai industri tekstil.",
 
             status: "NOW LIVE",
 
             icon: Globe2,
         },
-
         {
             titleEn: "Sourcing Hub™",
 
             titleId: "Sourcing Hub™",
 
             descriptionEn:
-                "RFQ Marketplace, MOQ Matching, and Collective Sourcing for the global textile industry.",
+                "A connected sourcing ecosystem for buyers and suppliers — combining RFQ Marketplace, Smart Supplier Matching, MOQ Matching, and Collective Sourcing across the global textile value chain.",
 
             descriptionId:
-                "RFQ Marketplace, MOQ Matching, dan Collective Sourcing untuk industri tekstil global.",
+                "Ekosistem sourcing terhubung untuk buyer dan supplier — menggabungkan RFQ Marketplace, Smart Supplier Matching, MOQ Matching, dan Collective Sourcing di seluruh rantai nilai industri tekstil global.",
 
             status: "UPCOMING",
 
             icon: Shirt,
         },
+
         {
             titleEn: "Cotton Intelligence™",
 
             titleId: "Cotton Intelligence™",
 
             descriptionEn:
-                "Indonesia Cotton Dashboard including volume, value, market share, supplier ranking, and spinner consumption.",
+                "A comprehensive cotton market intelligence platform covering trade flows, volume, value, market share, supplier dynamics, price movements, and spinning industry demand.",
 
             descriptionId:
-                "Dashboard kapas Indonesia yang mencakup volume, nilai, pangsa pasar, peringkat pemasok, dan konsumsi industri spinning.",
+                "Platform intelijen pasar kapas yang mencakup arus perdagangan, volume, nilai, pangsa pasar, dinamika pemasok, pergerakan harga, dan kebutuhan industri spinning.",
 
             status: "UPCOMING",
 
@@ -69,10 +69,10 @@ export default function UpcomingIntelligence() {
             titleId: "Manufacturing Intelligence™",
 
             descriptionEn:
-                "Machinery, production capacity, utilization, and factory intelligence.",
+                "Industrial manufacturing intelligence connecting factories, machinery, production capacity, utilization, capabilities, and manufacturing activity across the textile value chain.",
 
             descriptionId:
-                "Intelijen mesin, kapasitas produksi, utilisasi, dan manufaktur.",
+                "Intelijen manufaktur industri yang menghubungkan pabrik, mesin, kapasitas produksi, utilisasi, kapabilitas, dan aktivitas manufaktur di seluruh rantai nilai tekstil.",
 
             status: "UPCOMING",
 
@@ -84,58 +84,55 @@ export default function UpcomingIntelligence() {
             titleId: "Raw Material Intelligence™",
 
             descriptionEn:
-                "Intelligence for cotton, polyester, viscose, nylon, and recycled fibers.",
+                "Integrated intelligence for key textile raw materials — including cotton, polyester, viscose, nylon, and recycled fibers — connecting supply, trade, market movements, and industry demand.",
 
             descriptionId:
-                "Intelijen untuk kapas, polyester, viscose, nylon, dan serat daur ulang.",
+                "Intelijen terintegrasi untuk bahan baku utama tekstil — termasuk kapas, polyester, viscose, nylon, dan serat daur ulang — yang menghubungkan pasokan, perdagangan, pergerakan pasar, dan kebutuhan industri.",
 
             status: "UPCOMING",
 
             icon: Factory,
         },
-
         {
             titleEn: "Global Trade Radar™",
 
             titleId: "Global Trade Radar™",
 
             descriptionEn:
-                "Monitor global textile trade movements and market opportunities.",
+                "A global textile trade intelligence system monitoring trade flows, destination and sourcing markets, emerging movements, and market opportunities across countries and HS codes.",
 
             descriptionId:
-                "Memantau pergerakan perdagangan tekstil global dan peluang pasar.",
+                "Sistem intelijen perdagangan tekstil global yang memantau arus perdagangan, pasar tujuan dan sumber, pergerakan yang muncul, serta peluang pasar berdasarkan negara dan kode HS.",
 
             status: "UPCOMING",
 
             icon: Radar,
         },
-
         {
             titleEn: "Executive AI Insight™",
 
             titleId: "Executive AI Insight™",
 
             descriptionEn:
-                "Executive-level AI intelligence and strategic recommendations.",
+                "Executive-level intelligence that transforms complex industry data into strategic insights, market signals, risk alerts, and decision-support recommendations.",
 
             descriptionId:
-                "Intelijen AI tingkat eksekutif dan rekomendasi strategis.",
+                "Intelijen tingkat eksekutif yang mengubah data industri yang kompleks menjadi strategic insights, market signals, risk alerts, dan rekomendasi untuk mendukung pengambilan keputusan.",
 
             status: "UPCOMING",
 
             icon: Brain,
         },
-
         {
             titleEn: "Global Textile Operating System™",
 
             titleId: "Global Textile Operating System™",
 
             descriptionEn:
-                "Connecting Government, Industry, and Business by 2030.",
+                "The long-term vision of DIGESTEX — a connected global operating layer linking Government, Industry, and Business across the textile and apparel value chain.",
 
             descriptionId:
-                "Menghubungkan Pemerintah, Industri, dan Bisnis pada tahun 2030.",
+                "Visi jangka panjang DIGESTEX — lapisan operating system global yang menghubungkan Pemerintah, Industri, dan Bisnis di seluruh rantai nilai tekstil dan apparel.",
 
             status: "VISION",
 
@@ -171,8 +168,8 @@ export default function UpcomingIntelligence() {
 
                     <p className="mt-6 text-lg leading-8 text-slate-600">
                         {isEn
-                            ? "Building the Global Textile Intelligence Ecosystem through data, intelligence, and industrial connectivity."
-                            : "Membangun Global Textile Intelligence Ecosystem melalui data, intelijen, dan konektivitas industri."}
+                            ? "Building a connected Global Textile Intelligence Ecosystem that brings together industry intelligence, companies, technologies, solutions, suppliers, buyers, and business opportunities across the textile value chain."
+                            : "Membangun Global Textile Intelligence Ecosystem yang terhubung untuk mempertemukan industry intelligence, perusahaan, teknologi, solusi, supplier, buyer, dan peluang bisnis di seluruh rantai nilai industri tekstil."}
                     </p>
                 </div>
 

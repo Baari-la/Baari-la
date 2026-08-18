@@ -18,6 +18,9 @@ export default function DesktopMenu({
     isIntelOpen,
     setIsIntelOpen,
 
+    isProgramOpen,
+    setIsProgramOpen,
+
     isVisibilityOpen,
     setIsVisibilityOpen,
 

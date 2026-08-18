@@ -1,32 +1,20 @@
 import { useState } from "react";
-import { router, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
+import { Menu, X, Globe2 } from "lucide-react";
 
 import LogoSection from "./Components/LogoSection";
 import DesktopMenu from "./Components/DesktopMenu";
-import LanguageSwitcher from "./Components/LanguageSwitcher";
-import LoginButton from "./Components/LoginButton";
-import MobileMenu from "./Components/MobileMenu";
 
 export default function PublicNavbar() {
     const { props } = usePage();
 
     const isEn = props.locale === "en";
 
-    /*
-    |--------------------------------------------------------------------------
-    | States
-    |--------------------------------------------------------------------------
-    */
     const [isOpen, setIsOpen] = useState(false);
     const [isIntelOpen, setIsIntelOpen] = useState(false);
     const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
     const [isEcosystemOpen, setIsEcosystemOpen] = useState(false);
     const [isProgramOpen, setIsProgramOpen] = useState(false);
-    /*
-    |--------------------------------------------------------------------------
-    | Language Switch
-    |--------------------------------------------------------------------------
-    */
 
     const toggleLanguage = (lang) => {
         router.post(
@@ -36,7 +24,6 @@ export default function PublicNavbar() {
             {},
             {
                 preserveScroll: true,
-
                 onSuccess: () => setIsOpen(false),
             },
         );
@@ -50,100 +37,83 @@ export default function PublicNavbar() {
 
     const intelligenceLinks = [
         {
-            section: "PLATFORM",
-        },
-
-        {
-            routeName: "intelligence.executive.index",
-
-            en: "Executive Dashboard",
-
-            id: "Dashboard Eksekutif",
-        },
-
-        {
-            routeName: "intelligence.company.index",
-
-            en: "Company Intelligence",
-
-            id: "Intelijen Perusahaan",
-        },
-
-        {
-            routeName: "intelligence.knowledge-graph.index",
-
-            en: "Knowledge Graph",
-
-            id: "Knowledge Graph",
-        },
-
-        {
-            routeName: "intelligence.master-data.index",
-
-            en: "Master Data Explorer",
-
-            id: "Master Data",
-        },
-
-        {
-            routeName: "intelligence.visualization.index",
-
-            en: "Visualization Lab",
-
-            id: "Visualization Lab",
-        },
-
-        {
             section: "INSIGHTS",
         },
 
         {
-            routeName: "intelligence.weekly",
-
-            en: "Weekly Intelligence Report",
-
-            id: "Laporan Mingguan",
-        },
-
-        {
-            routeName: "intelligence.news",
-
-            en: "News Intelligence",
-
-            id: "Intelijen Berita",
-        },
-
-        {
-            routeName: "intelligence.market",
-
-            en: "Market Intelligence",
-
-            id: "Intelijen Pasar",
-        },
-
-        {
             routeName: "intelligence.trade",
-
             en: "Trade Intelligence",
-
             id: "Intelijen Perdagangan",
         },
 
-        {
-            routeName: "intelligence.policy",
+        /*
+    |--------------------------------------------------------------------------
+    | FUTURE INTELLIGENCE MODULES
+    | ---------------------------------------------------------------
+    | Disabled from Public Navbar until UI + functionality are ready
+    | for public / Coats demonstration.
+    |--------------------------------------------------------------------------
+    */
 
-            en: "Policy Intelligence",
+        // {
+        //     routeName: "intelligence.executive.index",
+        //     en: "Executive Dashboard",
+        //     id: "Dashboard Eksekutif",
+        // },
 
-            id: "Intelijen Kebijakan",
-        },
+        // {
+        //     routeName: "intelligence.company.index",
+        //     en: "Company Intelligence",
+        //     id: "Intelijen Perusahaan",
+        // },
 
-        {
-            routeName: "intelligence.country",
+        // {
+        //     routeName: "intelligence.knowledge-graph.index",
+        //     en: "Knowledge Graph",
+        //     id: "Knowledge Graph",
+        // },
 
-            en: "Country Intelligence",
+        // {
+        //     routeName: "intelligence.master-data.index",
+        //     en: "Master Data Explorer",
+        //     id: "Master Data",
+        // },
 
-            id: "Intelijen Negara",
-        },
+        // {
+        //     routeName: "intelligence.visualization.index",
+        //     en: "Visualization Lab",
+        //     id: "Visualization Lab",
+        // },
+
+        // {
+        //     routeName: "intelligence.weekly",
+        //     en: "Weekly Intelligence Report",
+        //     id: "Laporan Mingguan",
+        // },
+
+        // {
+        //     routeName: "intelligence.news",
+        //     en: "News Intelligence",
+        //     id: "Intelijen Berita",
+        // },
+
+        // {
+        //     routeName: "intelligence.market",
+        //     en: "Market Intelligence",
+        //     id: "Intelijen Pasar",
+        // },
+
+        // {
+        //     routeName: "intelligence.policy",
+        //     en: "Policy Intelligence",
+        //     id: "Intelijen Kebijakan",
+        // },
+
+        // {
+        //     routeName: "intelligence.country",
+        //     en: "Country Intelligence",
+        //     id: "Intelijen Negara",
+        // },
     ];
 
     /*
@@ -159,63 +129,29 @@ export default function PublicNavbar() {
 
         {
             routeName: "companies.index",
-
-            en: "Industry Directoriy",
-
+            en: "Industry Directory",
             id: "Direktori Industri",
         },
 
         {
-            routeName: "passport.demo",
-
-            en: "Digital Company Passport",
-
-            id: "Paspor Digital Perusahaan",
-        },
-
-        // {
-        //     routeName: "program.digital-directory-visibility",
-
-        //     en: "Visibility Program 2026",
-
-        //     id: "Program Visibility 2026",
-        // },
-
-        {
-            routeName: "ranking.index",
-
-            en: "Executive Rankings",
-
-            id: "Peringkat Eksekutif",
-        },
-
-        {
             routeName: "pricing.index",
-
             en: "Membership",
-
             id: "Keanggotaan",
         },
     ];
+
     /*
-|--------------------------------------------------------------------------
-| Program
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | Program
+    |--------------------------------------------------------------------------
+    */
 
     const programLinks = [
         {
             section: "DIGESTEX PROGRAM",
         },
-
-        {
-            routeName: "program.digital-directory-visibility",
-
-            en: "Strategic Industry & Visibility Program",
-
-            id: "Program Strategic Industry & Visibility",
-        },
     ];
+
     /*
     |--------------------------------------------------------------------------
     | Ecosystem
@@ -228,35 +164,42 @@ export default function PublicNavbar() {
         },
 
         {
-            routeName: "smart-business-matching",
-
-            en: "Smart Business Matching™",
-
-            id: "Smart Business Matching™",
-        },
-
-        {
-            routeName: "build-my-supply-chain",
-
-            en: "Build My Supply Chain™",
-
-            id: "Build My Supply Chain™",
-        },
-
-        {
-            routeName: "buyer-discovery",
-
-            en: "Buyer Discovery™",
-
-            id: "Buyer Discovery™",
-        },
-
-        {
             routeName: "sourcing-hub",
-
             en: "Sourcing Hub",
-
             id: "Sourcing Hub",
+        },
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mobile Menu Item Renderer
+    |--------------------------------------------------------------------------
+    */
+
+    const mobileItems = [
+        {
+            title: isEn ? "Trade Intelligence" : "Intelijen Perdagangan",
+            href: route("intelligence.trade"),
+        },
+
+        {
+            title: isEn ? "Country Intelligence" : "Intelijen Negara",
+            href: route("intelligence.country"),
+        },
+
+        {
+            title: isEn ? "Market Intelligence" : "Intelijen Pasar",
+            href: route("intelligence.market"),
+        },
+
+        {
+            title: isEn ? "Industry Directory" : "Direktori Industri",
+            href: route("companies.index"),
+        },
+
+        {
+            title: isEn ? "Sourcing Hub" : "Sourcing Hub",
+            href: route("sourcing-hub"),
         },
     ];
 
@@ -266,23 +209,20 @@ export default function PublicNavbar() {
                 sticky
                 top-0
                 z-50
-
                 border-b
                 border-slate-200
-
                 bg-white/95
                 backdrop-blur-xl
-
                 shadow-sm
             "
         >
-            <div className="mx-auto max-w-7xl px-6">
-                <div className="flex h-20 items-center justify-between">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="flex h-20 items-center justify-between gap-4">
                     {/* LOGO */}
 
                     <LogoSection />
 
-                    {/* DESKTOP MENU */}
+                    {/* DESKTOP */}
 
                     <DesktopMenu
                         isEn={isEn}
@@ -296,39 +236,170 @@ export default function PublicNavbar() {
                         setIsVisibilityOpen={setIsVisibilityOpen}
                         isEcosystemOpen={isEcosystemOpen}
                         setIsEcosystemOpen={setIsEcosystemOpen}
+                        isProgramOpen={isProgramOpen}
+                        setIsProgramOpen={setIsProgramOpen}
                     />
 
-                    {/* RIGHT SIDE */}
+                    {/* DESKTOP RIGHT */}
 
-                    <div
-                        className="
-                            hidden
-                            lg:flex
-                            items-center
-                            gap-5
-                        "
-                    >
-                        <LanguageSwitcher
-                            isEn={isEn}
-                            toggleLanguage={toggleLanguage}
-                        />
+                    <div className="hidden items-center gap-4 lg:flex">
+                        <button
+                            type="button"
+                            onClick={() => toggleLanguage(isEn ? "id" : "en")}
+                            className="
+                                inline-flex
+                                items-center
+                                gap-2
+                                rounded-xl
+                                px-3
+                                py-2
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-widest
+                                text-slate-700
+                                transition
+                                hover:bg-slate-100
+                            "
+                        >
+                            <Globe2 size={15} />
 
-                        <LoginButton isEn={isEn} />
+                            {isEn ? "ID" : "EN"}
+                        </button>
+
+                        <Link
+                            href={route("login")}
+                            className="
+                                inline-flex
+                                items-center
+                                rounded-xl
+                                bg-[#0a192f]
+                                px-4
+                                py-2.5
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-widest
+                                text-white
+                                transition
+                                hover:bg-[#11294c]
+                            "
+                        >
+                            {isEn ? "Login" : "Masuk"}
+                        </Link>
                     </div>
 
-                    {/* MOBILE */}
+                    {/* MOBILE BUTTON */}
 
-                    <MobileMenu
-                        isOpen={isOpen}
-                        setIsOpen={setIsOpen}
-                        isEn={isEn}
-                        toggleLanguage={toggleLanguage}
-                        intelligenceLinks={intelligenceLinks}
-                        visibilityLinks={visibilityLinks}
-                        programLinks={programLinks}
-                        ecosystemLinks={ecosystemLinks}
-                    />
+                    <button
+                        type="button"
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="
+                            inline-flex
+                            items-center
+                            justify-center
+                            rounded-xl
+                            p-2.5
+                            text-[#0a192f]
+                            transition
+                            hover:bg-slate-100
+                            lg:hidden
+                        "
+                        aria-label={isOpen ? "Close menu" : "Open menu"}
+                    >
+                        {isOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
                 </div>
+
+                {/* MOBILE MENU */}
+
+                {isOpen && (
+                    <div className="border-t border-slate-200 py-4 lg:hidden">
+                        <div className="space-y-1">
+                            {mobileItems.map((item) => (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    onClick={() => setIsOpen(false)}
+                                    className="
+                                            block
+                                            rounded-xl
+                                            px-4
+                                            py-3
+                                            text-sm
+                                            font-bold
+                                            text-[#0a192f]
+                                            transition
+                                            hover:bg-slate-100
+                                        "
+                                >
+                                    {item.title}
+                                </Link>
+                            ))}
+
+                            <div className="mt-3 border-t border-slate-200 pt-3">
+                                <div className="flex items-center gap-2 px-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            toggleLanguage("id");
+                                            setIsOpen(false);
+                                        }}
+                                        className="
+                                            rounded-lg
+                                            border
+                                            border-slate-200
+                                            px-3
+                                            py-2
+                                            text-xs
+                                            font-black
+                                        "
+                                    >
+                                        ID
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            toggleLanguage("en");
+                                            setIsOpen(false);
+                                        }}
+                                        className="
+                                            rounded-lg
+                                            border
+                                            border-slate-200
+                                            px-3
+                                            py-2
+                                            text-xs
+                                            font-black
+                                        "
+                                    >
+                                        EN
+                                    </button>
+
+                                    <Link
+                                        href={route("login")}
+                                        onClick={() => setIsOpen(false)}
+                                        className="
+                                            ml-auto
+                                            rounded-lg
+                                            bg-[#0a192f]
+                                            px-4
+                                            py-2
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-widest
+                                            text-white
+                                        "
+                                    >
+                                        {isEn ? "Login" : "Masuk"}
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </nav>
     );

@@ -41,15 +41,15 @@ export default function ExecutiveIntelligenceTabs({
         fiber: {
             title: isEn
                 ? "Top Export Destination Countries for Fiber"
-                : "Negara Tujuan Ekspor Utama Untuk Serat",
+                : "Negara Tujuan Ekspor Utama untuk Serat",
 
             subtitle: isEn
-                ? "January–April 2026 compared with January–April 2025"
-                : "Januari–April 2026 dibanding Januari–April 2025",
+                ? "January–June 2026 compared with January–June 2025"
+                : "Januari–Juni 2026 dibandingkan dengan Januari–Juni 2025",
 
             footerText: isEn
-                ? "View Full Fiber Intelligence"
-                : "Lihat Intelligence Serat",
+                ? "Explore Full Fiber Intelligence in Tier A"
+                : "Lihat Full Fiber Intelligence di Tier A",
 
             countries: fiberCountries,
         },
@@ -57,15 +57,15 @@ export default function ExecutiveIntelligenceTabs({
         yarn: {
             title: isEn
                 ? "Top Export Destination Countries for Yarn"
-                : "Negara Tujuan Ekspor Utama Untuk Benang",
+                : "Negara Tujuan Ekspor Utama untuk Benang",
 
             subtitle: isEn
-                ? "January–April 2026 compared with January–April 2025"
-                : "Januari–April 2026 dibanding Januari–April 2025",
+                ? "January–June 2026 compared with January–June 2025"
+                : "Januari–Juni 2026 dibandingkan dengan Januari–Juni 2025",
 
             footerText: isEn
-                ? "View Full Yarn Intelligence"
-                : "Lihat Intelligence Benang",
+                ? "Explore Full Yarn Intelligence in Tier A"
+                : "Lihat Full Yarn Intelligence di Tier A",
 
             countries: yarnCountries,
         },
@@ -73,15 +73,15 @@ export default function ExecutiveIntelligenceTabs({
         fabric: {
             title: isEn
                 ? "Top Export Destination Countries for Fabric"
-                : "Negara Tujuan Ekspor Utama Untuk Kain",
+                : "Negara Tujuan Ekspor Utama untuk Kain",
 
             subtitle: isEn
-                ? "January–April 2026 compared with January–April 2025"
-                : "Januari–April 2026 dibanding Januari–April 2025",
+                ? "January–June 2026 compared with January–June 2025"
+                : "Januari–Juni 2026 dibandingkan dengan Januari–Juni 2025",
 
             footerText: isEn
-                ? "View Full Fabric Intelligence"
-                : "Lihat Intelligence Kain",
+                ? "Explore Full Fabric Intelligence in Tier A"
+                : "Lihat Full Fabric Intelligence di Tier A",
 
             countries: fabricCountries,
         },
@@ -89,49 +89,59 @@ export default function ExecutiveIntelligenceTabs({
         apparel: {
             title: isEn
                 ? "Top Export Destination Countries for Apparel"
-                : "Negara Tujuan Ekspor Utama Untuk Apparel",
+                : "Negara Tujuan Ekspor Utama untuk Apparel",
 
             subtitle: isEn
-                ? "January–April 2026 compared with January–April 2025"
-                : "Januari–April 2026 dibanding Januari–April 2025",
+                ? "January–June 2026 compared with January–June 2025"
+                : "Januari–Juni 2026 dibandingkan dengan Januari–Juni 2025",
 
             footerText: isEn
-                ? "View Full Apparel Intelligence"
-                : "Lihat Intelligence Apparel",
+                ? "Explore Full Apparel Intelligence with PCS Analysis in Tier A"
+                : "Lihat Full Apparel Intelligence dengan Analisis PCS di Tier A",
 
             countries: apparelCountries,
         },
     };
 
+    const activeSector = sectorData[activeTab];
+
     return (
         <section className="py-16">
             <div className="max-w-7xl mx-auto px-6">
-                {/* Header */}
-
+                {/* HEADER */}
                 <div className="mb-10">
                     <div className="text-xs font-black tracking-[0.4em] text-yellow-500">
-                        DIGESTEX EXECUTIVE INTELLIGENCE
+                        {isEn
+                            ? "DIGESTEX EXECUTIVE INTELLIGENCE"
+                            : "DIGESTEX EXECUTIVE INTELLIGENCE"}
                     </div>
 
-                    <h2 className="mt-4 text-4xl font-black">
+                    <h2 className="mt-4 text-4xl font-black text-white">
                         {isEn
                             ? "Global Textile Executive Intelligence"
                             : "Global Textile Executive Intelligence"}
                     </h2>
 
-                    <p className="mt-4 max-w-3xl text-gray-400">
+                    <p className="mt-4 max-w-3xl text-gray-400 leading-relaxed">
                         {isEn
-                            ? "Explore export intelligence across the global textile value chain."
-                            : "Eksplorasi intelligence ekspor di seluruh rantai nilai industri tekstil global."}
+                            ? "Explore a public preview of textile export and import intelligence across the global value chain, with deeper trade analysis available through Tier A."
+                            : "Jelajahi preview publik export dan import intelligence di seluruh rantai nilai industri tekstil, dengan analisis perdagangan yang lebih mendalam tersedia melalui Tier A."}
                     </p>
+
+                    {/* DATA PERIOD */}
+                    <div className="mt-5 inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-400">
+                        {isEn
+                            ? "Data through June 2026"
+                            : "Data sampai Juni 2026"}
+                    </div>
                 </div>
 
-                {/* Tabs */}
-
+                {/* TABS */}
                 <div className="mb-8 flex flex-wrap gap-3">
                     {sectors.map((sector) => (
                         <button
                             key={sector.key}
+                            type="button"
                             onClick={() => setActiveTab(sector.key)}
                             className={`
                                 rounded-2xl
@@ -151,14 +161,42 @@ export default function ExecutiveIntelligenceTabs({
                     ))}
                 </div>
 
-                {/* Grid */}
-
+                {/* ACTIVE INTELLIGENCE */}
                 <TopDestinationGrid
-                    title={sectorData[activeTab].title}
-                    subtitle={sectorData[activeTab].subtitle}
-                    footerText={sectorData[activeTab].footerText}
-                    countries={sectorData[activeTab].countries}
+                    title={activeSector.title}
+                    subtitle={activeSector.subtitle}
+                    footerText={activeSector.footerText}
+                    countries={activeSector.countries}
                 />
+
+                {/* TIER A TEASER */}
+                <div className="mt-8 rounded-3xl border border-yellow-500/20 bg-gradient-to-r from-yellow-500/10 to-transparent p-6">
+                    <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                        <div className="max-w-4xl">
+                            <div className="text-xs font-black uppercase tracking-[0.25em] text-yellow-500">
+                                {isEn
+                                    ? "TIER A TRADE INTELLIGENCE"
+                                    : "TIER A TRADE INTELLIGENCE"}
+                            </div>
+
+                            <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                                {isEn
+                                    ? activeTab === "apparel"
+                                        ? "Tier A provides deeper Apparel Intelligence including HS 8-digit analysis, export value, KG, PCS, destination markets, growth, and detailed market signals."
+                                        : "Tier A provides deeper trade intelligence including HS 8-digit analysis, export value, KG, destination markets, growth, and detailed market signals."
+                                    : activeTab === "apparel"
+                                      ? "Tier A menyediakan Apparel Intelligence yang lebih mendalam mencakup analisis HS 8 digit, nilai ekspor, KG, PCS, negara tujuan, pertumbuhan, dan market signals."
+                                      : "Tier A menyediakan trade intelligence yang lebih mendalam mencakup analisis HS 8 digit, nilai ekspor, KG, negara tujuan, pertumbuhan, dan market signals."}
+                            </p>
+                        </div>
+
+                        <div className="shrink-0">
+                            <span className="inline-flex rounded-xl bg-yellow-500 px-5 py-3 text-xs font-black uppercase tracking-wider text-black">
+                                {isEn ? "TIER A" : "TIER A"}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     );

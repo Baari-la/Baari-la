@@ -279,14 +279,11 @@ class User extends Authenticatable implements MustVerifyEmail
     */
 
     public function hasPremiumAccess(): bool
-    {
-        return in_array(
-            $this->access_level,
-            [
-                'premium',
-            ]
-        );
-    }
+{
+    return $this->isAdmin()
+        || $this->isSuperAdmin()
+        || $this->access_level === 'premium';
+}
 
     public function hasApiAccess(): bool
     {

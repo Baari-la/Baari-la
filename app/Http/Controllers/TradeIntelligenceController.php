@@ -5,82 +5,52 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Services\Trade\LaunchTradeIntelligenceService;
+use App\Services\Trade\SectorTradeIntelligenceService;
 
 class TradeIntelligenceController extends Controller
 {
-  public function index(Request $request)
-{
-//   Marchmaking 
-$category = $request->input('category');
-    $region = $request->input('region');
+  public function index(
+    Request $request,
+    LaunchTradeIntelligenceService $launchService,
+    SectorTradeIntelligenceService $sectorService
+) {
+    $launchIntelligence = $launchService->getData();
 
-    $query = \DB::table('partnerships');
+    $garmentIntelligence = $sectorService->getGarmentData();
 
-    // Filter Kategori Multi-Sektor
-    if ($category) {
-        $query->where('category', $category);
-    }
+    return Inertia::render('Trade/Radar', [
+        'launchIntelligence' => $launchIntelligence,
 
-    // Filter Geografis Wilayah
-    if ($region) {
-        $query->where('region', $region);
-    }
+        'sectorIntelligence' => [
+            'garment' => $garmentIntelligence,
+        ],
 
-    $partners = $query->orderBy('match_percentage', 'desc')->get();
+        // Backward compatibility
+        'topTrade' =>
+            $launchIntelligence['topTrade'] ?? [],
 
+        'topCountries' =>
+            $launchIntelligence['topExportDestinations'] ?? [],
 
-        // 1. Ambil Data Jenis Produk dari tabel trade_master_annual_hscode
-        // Kita petakan sesuai sektor: Serat, Benang, Kain, Garmen, Home Textile
-        $topTrade = DB::table('trade_master_annual_hscode')
-            ->selectRaw('
-                CASE 
-                    WHEN hscode LIKE "52%" THEN "Serat Kapas"
-                    WHEN hscode LIKE "54%" OR hscode LIKE "55%" THEN "Serat Sintetis"
-                    WHEN hscode BETWEEN "5204" AND "5207" OR hscode BETWEEN "5401" AND "5406" THEN "Benang"
-                    WHEN hscode LIKE "5208%" OR hscode LIKE "5212%" OR hscode LIKE "5407%" THEN "Kain"
-                    WHEN hscode LIKE "61%" OR hscode LIKE "62%" THEN "Garmen"
-                    WHEN hscode LIKE "63%" THEN "Home Textile"
-                    ELSE "Produk Tekstil Lainnya"
-                END as name,
-                SUM(nilai_ekspor_2025) as value
-            ')
-            ->groupBy('name')
-            ->orderBy('value', 'desc')
-            ->get()
-            ->map(function($item) {
-                // Standar Industri: Garmen pakai Pcs, lainnya Kg
-                $item->unit = ($item->name === 'Garmen') ? 'Pcs' : 'Kg';
-                return $item;
-            });
+        'yearlyTrends' =>
+            $launchIntelligence['yearlyTrends'] ?? [],
 
-        // 2. Ambil Data Negara Tujuan dari tabel trade_master_annual_country
-        $topCountries = DB::table('trade_master_annual_country')
-            ->selectRaw('negara_tujuan as name, SUM(nilai_ekspor_2025) as value')
-            ->groupBy('negara_tujuan')
-            ->orderBy('value', 'desc')
-            ->take(5)
-            ->get();
+        'hscodes' =>
+            array_slice(
+                $launchIntelligence['topExportProducts'] ?? [],
+                0,
+                10
+            ),
 
-        // 3. Ambil Tren Tahunan (2021-2025) untuk grafik utama
-        $yearlyTrends = DB::table('trade_master_annual_hscode')
-            ->selectRaw('
-                SUM(nilai_ekspor_2021) as "2021", 
-                SUM(nilai_ekspor_2022) as "2022", 
-                SUM(nilai_ekspor_2023) as "2023", 
-                SUM(nilai_ekspor_2024) as "2024", 
-                SUM(nilai_ekspor_2025) as "2025"
-            ')->first();
+        'partners' => [],
 
-        return Inertia::render('Trade/Radar', [
-            'topTrade' => $topTrade,
-            'topCountries' => $topCountries,
-            'yearlyTrends' => $yearlyTrends,
-            'hscodes' => \App\Models\HsCode::take(10)->get(),
-            'partners' => $partners,
-        'filters' => $request->only(['category', 'region'])
-        ]);
-    }
-
+        'filters' => $request->only([
+            'category',
+            'region',
+        ]),
+    ]);
+}
     /* PERBAIKAN 1: Menyelaraskan kueri index bursa bahan agar mendukung filter pencarian */
     public function indexInventory(Request $request)
     {

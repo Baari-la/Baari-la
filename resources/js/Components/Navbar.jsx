@@ -89,111 +89,83 @@ export default function PublicNavbar() {
     // List sub-menu Intelligence Center agar DRY (Don't Repeat Yourself)
     const intelligenceLinks = [
         {
-            section: "PLATFORM",
-        },
-
-        {
-            routeName: "intelligence.executive.index",
-
-            en: "Executive Dashboard",
-
-            id: "Dashboard Eksekutif",
-        },
-
-        {
-            routeName: "intelligence.company.index",
-
-            en: "Company Intelligence",
-
-            id: "Intelijen Perusahaan",
-        },
-
-        {
-            routeName: "intelligence.knowledge-graph.index",
-
-            en: "Knowledge Graph",
-
-            id: "Knowledge Graph",
-        },
-
-        {
-            routeName: "intelligence.master-data.index",
-
-            en: "Master Data",
-
-            id: "Master Data",
-        },
-
-        {
-            routeName: "intelligence.visualization.index",
-
-            en: "Visualization Lab",
-
-            id: "Visualization Lab",
-        },
-
-        {
             section: "INSIGHTS",
-        },
-
-        {
-            routeName: "intelligence.news",
-
-            en: "News Intelligence",
-
-            id: "Intelijen Berita",
-        },
-
-        {
-            routeName: "intelligence.market",
-
-            en: "Market Intelligence",
-
-            id: "Intelijen Pasar",
         },
 
         {
             routeName: "intelligence.trade",
-
             en: "Trade Intelligence",
-
             id: "Intelijen Perdagangan",
         },
 
-        {
-            routeName: "intelligence.policy",
+        /*
+    |--------------------------------------------------------------------------
+    | FUTURE INTELLIGENCE MODULES
+    | ---------------------------------------------------------------
+    | Disabled from Public Navbar until UI + functionality are ready
+    | for public / Coats demonstration.
+    |--------------------------------------------------------------------------
+    */
 
-            en: "Policy Intelligence",
+        // {
+        //     routeName: "intelligence.executive.index",
+        //     en: "Executive Dashboard",
+        //     id: "Dashboard Eksekutif",
+        // },
 
-            id: "Intelijen Kebijakan",
-        },
+        // {
+        //     routeName: "intelligence.company.index",
+        //     en: "Company Intelligence",
+        //     id: "Intelijen Perusahaan",
+        // },
 
-        {
-            routeName: "intelligence.country",
+        // {
+        //     routeName: "intelligence.knowledge-graph.index",
+        //     en: "Knowledge Graph",
+        //     id: "Knowledge Graph",
+        // },
 
-            en: "Country Intelligence",
+        // {
+        //     routeName: "intelligence.master-data.index",
+        //     en: "Master Data Explorer",
+        //     id: "Master Data",
+        // },
 
-            id: "Intelijen Negara",
-        },
-        {
-            section: "INSIGHTS",
-        },
+        // {
+        //     routeName: "intelligence.visualization.index",
+        //     en: "Visualization Lab",
+        //     id: "Visualization Lab",
+        // },
 
-        {
-            routeName: "intelligence.weekly",
+        // {
+        //     routeName: "intelligence.weekly",
+        //     en: "Weekly Intelligence Report",
+        //     id: "Laporan Mingguan",
+        // },
 
-            en: "Weekly Intelligence Report",
+        // {
+        //     routeName: "intelligence.news",
+        //     en: "News Intelligence",
+        //     id: "Intelijen Berita",
+        // },
 
-            id: "Laporan Mingguan",
-        },
+        // {
+        //     routeName: "intelligence.market",
+        //     en: "Market Intelligence",
+        //     id: "Intelijen Pasar",
+        // },
 
-        {
-            routeName: "intelligence.news",
+        // {
+        //     routeName: "intelligence.policy",
+        //     en: "Policy Intelligence",
+        //     id: "Intelijen Kebijakan",
+        // },
 
-            en: "News Intelligence",
-
-            id: "Intelijen Berita",
-        },
+        // {
+        //     routeName: "intelligence.country",
+        //     en: "Country Intelligence",
+        //     id: "Intelijen Negara",
+        // },
     ];
     const sourcingLinks = [
         {

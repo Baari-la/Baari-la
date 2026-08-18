@@ -1,0 +1,250 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\Home;
+
+use App\Repositories\Trade\Dashboard\HomeTradeRepository;
+use App\Services\Trade\Intelligence\Core\PiecesConversionService;
+
+class HomeTradeService
+{
+    public function __construct(
+        protected HomeTradeRepository $repository,
+        protected PiecesConversionService $piecesConversionService,
+    ) {
+    }
+
+    /**
+     * --------------------------------------------------------------------------
+     * Home Dashboard Data
+     * --------------------------------------------------------------------------
+     *
+     * IMPORTANT:
+     * The Home page must stay lightweight.
+     *
+     * Full Executive Reports (fiber/yarn/fabric/apparel) belong to
+     * the dedicated Trade Intelligence page and must NOT be rebuilt
+     * during every Home request.
+     */
+    public function getData(): array
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Garment Trade
+        |--------------------------------------------------------------------------
+        */
+
+        $tradeRows = $this->repository->tradeSummary([
+            'hs_prefix' => ['61', '62'],
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Estimated Pieces
+        |--------------------------------------------------------------------------
+        */
+
+        $totalPieces = 0;
+
+        foreach ($tradeRows as $row) {
+
+            if ($row->tipe_arus !== 'ekspor') {
+                continue;
+            }
+
+            $totalPieces += $this->piecesConversionService->toPieces(
+                $row->hs_code,
+                (float) $row->vol_2025
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Hero Summary
+        |--------------------------------------------------------------------------
+        */
+
+        $heroSummary = $this->repository->heroSummary();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Top Products
+        |--------------------------------------------------------------------------
+        |
+        | Keep empty for now.
+        | Full product intelligence is handled by Trade Intelligence.
+        |--------------------------------------------------------------------------
+        */
+
+        $topProducts = [];
+
+        /*
+        |--------------------------------------------------------------------------
+        | Market Highlights
+        |--------------------------------------------------------------------------
+        */
+
+        $marketHighlights = $this->repository->marketHighlights();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Fiber Intelligence
+        |--------------------------------------------------------------------------
+        */
+
+        $fiberData = $this->getRawFiberData();
+
+        if (!auth()->check()) {
+
+            $fiberData = collect($fiberData)
+                ->map(function ($item, $index) {
+
+                    if ($index > 3) {
+
+                        $item['cotton_vol'] = 0;
+                        $item['cotton_val'] = 0;
+                        $item['syn_vol'] = 0;
+                        $item['syn_val'] = 0;
+                    }
+
+                    return $item;
+
+                })
+                ->all();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Lightweight Executive Trade Snapshot
+        |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        | Do NOT call ExecutiveReportService here.
+        |
+        | The previous implementation built four full executive reports:
+        | - fiber
+        | - yarn
+        | - fabric
+        | - apparel
+        |
+        | That caused expensive analytics work during Home cache misses.
+        |
+        | We keep the same frontend contract (`executiveTrade`) for now,
+        | but return lightweight placeholders until the dedicated
+        | HomeExecutiveSnapshotService is introduced.
+        |--------------------------------------------------------------------------
+        */
+
+        $executiveTrade = [
+            'fiber' => [],
+            'yarn' => [],
+            'fabric' => [],
+            'apparel' => [],
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | Response
+        |--------------------------------------------------------------------------
+        */
+
+        return [
+
+            'heroSummary' => $heroSummary,
+
+            'garmentTrade' => $tradeRows,
+
+            'totalGarment' => $totalPieces,
+
+            'marketHighlights' => $marketHighlights,
+
+            'topProducts' => $topProducts,
+
+            'fiberIntelligence' => $fiberData,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Temporary Backward Compatibility
+            |--------------------------------------------------------------------------
+            */
+
+            'report' => $executiveTrade['apparel'],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Executive Trade Intelligence
+            |--------------------------------------------------------------------------
+            */
+
+            'executiveTrade' => $executiveTrade,
+        ];
+    }
+
+    /**
+     * --------------------------------------------------------------------------
+     * Temporary Fiber Dataset
+     * --------------------------------------------------------------------------
+     */
+    private function getRawFiberData(): array
+    {
+        return [
+
+            [
+                'year' => '2019',
+                'cotton_vol' => 320000,
+                'cotton_val' => 540000000,
+                'syn_vol' => 450000,
+                'syn_val' => 620000000,
+            ],
+
+            [
+                'year' => '2020',
+                'cotton_vol' => 290000,
+                'cotton_val' => 480000000,
+                'syn_vol' => 410000,
+                'syn_val' => 580000000,
+            ],
+
+            [
+                'year' => '2021',
+                'cotton_vol' => 340000,
+                'cotton_val' => 610000000,
+                'syn_vol' => 480000,
+                'syn_val' => 690000000,
+            ],
+
+            [
+                'year' => '2022',
+                'cotton_vol' => 310000,
+                'cotton_val' => 590000000,
+                'syn_vol' => 460000,
+                'syn_val' => 660000000,
+            ],
+
+            [
+                'year' => '2023',
+                'cotton_vol' => 330000,
+                'cotton_val' => 620000000,
+                'syn_vol' => 490000,
+                'syn_val' => 710000000,
+            ],
+
+            [
+                'year' => '2024',
+                'cotton_vol' => 350000,
+                'cotton_val' => 650000000,
+                'syn_vol' => 520000,
+                'syn_val' => 750000000,
+            ],
+
+            [
+                'year' => '2025',
+                'cotton_vol' => 370000,
+                'cotton_val' => 690000000,
+                'syn_vol' => 550000,
+                'syn_val' => 800000000,
+            ],
+        ];
+    }
+}

@@ -55,8 +55,15 @@ use App\Http\Controllers\StrategicPartnershipController;
 use App\Http\Controllers\Admin\StrategicPartnershipController as AdminStrategicPartnershipController;
 use App\Http\Controllers\Admin\IndustryPartnerSolutionController;
 use App\Http\Controllers\Admin\IndustryPartnerSolutionSpecificationController;
-
-
+use App\Http\Controllers\TierAIntelligenceController;
+use App\Http\Controllers\Trade\ThreadIntelligenceController;
+use App\Http\Controllers\Trade\FiberIntelligenceController;
+use App\Http\Controllers\Trade\YarnIntelligenceController;
+use App\Http\Controllers\Trade\FabricIntelligenceController;
+use App\Http\Controllers\Trade\GarmentIntelligenceController;
+use App\Http\Controllers\Trade\HomeTextileIntelligenceController;
+use App\Http\Controllers\Trade\TechnicalTextileIntelligenceController;
+use App\Http\Controllers\Trade\SpecialtyTextileIntelligenceController;
 
 /*
 
@@ -348,12 +355,17 @@ Route::get('/admin/partnerships/{id}/edit', [TradeIntelligenceController::class,
     Route::post('/premium-request', [CompanyController::class, 'requestPremium'])->name('premium.request');
 });
 
+
 /*
 
 |--------------------------------------------------------------------------
 | LEVEL 3: ANGGOTA API & PREMIUM (High-Level Data)
 |--------------------------------------------------------------------------
 */
+
+
+
+
 Route::middleware(['auth'])->group(function () {
     
     // Fitur Update Data Perusahaan (Tombol Update di Dashboard)
@@ -364,7 +376,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Intelligence & Radar
     Route::get('/intelligence-center', [AnalyticsController::class, 'deepAnalysis'])->name('intelligence.center');
-    Route::get('/trade-radar', [TradeIntelligenceController::class, 'index'])->name('trade.radar');
+    // Route::get('/trade-radar', [TradeIntelligenceController::class, 'index'])->name('trade.radar');
     Route::get('/inventory/create', [TradeIntelligenceController::class, 'create'])->name('inventory.create');
     Route::post('/inventory', [TradeIntelligenceController::class, 'storeInventory'])->name('inventory.store');
     // Inventory & Tools
@@ -760,6 +772,61 @@ Route::get(
     '/executive-dashboard',
     [ExecutiveController::class, 'index']
 );
+/*
+|--------------------------------------------------------------------------
+| TIER A — EXECUTIVE TRADE INTELLIGENCE
+|--------------------------------------------------------------------------
+*/
+// Coats
+Route::get(
+    '/intelligence/thread',
+    [ThreadIntelligenceController::class, 'index']
+)->name('intelligence.thread');
+
+Route::get(
+    '/intelligence/fiber',
+    [FiberIntelligenceController::class, 'index']
+)->name('trade.fiber.intelligence');
+
+Route::get(
+    '/intelligence/yarn',
+    [YarnIntelligenceController::class, 'index']
+)->name('trade.yarn.intelligence');
+
+Route::get(
+    '/intelligence/fabric',
+    [FabricIntelligenceController::class, 'index']
+)->name('trade.fabric.intelligence');
+
+Route::get(
+    '/intelligence/garment',
+    [GarmentIntelligenceController::class, 'index']
+)->name('trade.garment.intelligence');
+Route::get(
+    '/intelligence/home-textile',
+    [HomeTextileIntelligenceController::class, 'index']
+)->name('trade.home-textile.intelligence');
+Route::get(
+    '/intelligence/technical-textile',
+    [TechnicalTextileIntelligenceController::class, 'index']
+)->name('trade.technical-textile.intelligence');
+Route::get(
+    '/intelligence/specialty-textile',
+    [SpecialtyTextileIntelligenceController::class, 'index']
+)->name('trade.specialty-textile.intelligence');
+
+// ===================
+
+
+
+Route::middleware(['auth', 'premium'])->group(function () {
+
+    Route::get(
+        '/executive-dashboard/tier-a',
+        [TierAIntelligenceController::class, 'index']
+    )->name('executive.tier-a');
+
+});
 
 Route::prefix('executive-dashboard')
     ->name('executive.')
@@ -814,11 +881,9 @@ Route::prefix('intelligence')
         )->name('market');
 
         Route::get(
-            '/trade',
-            fn () => Inertia::render(
-                'ComingSoon'
-            )
-        )->name('trade');
+    '/trade',
+    [TradeIntelligenceController::class, 'index']
+)->name('trade');
 
         Route::get(
             '/policy',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Trade\Executive;
 
+use App\Services\Trade\TradeReportingPeriodProvider;
 use App\Services\Trade\Analytics\CountryAnalyticsService;
 use App\Services\Trade\Intelligence\AIExecutiveRecommendationService;
 use App\Services\Trade\Intelligence\CountryBadgeService;
