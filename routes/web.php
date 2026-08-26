@@ -64,6 +64,7 @@ use App\Http\Controllers\Trade\GarmentIntelligenceController;
 use App\Http\Controllers\Trade\HomeTextileIntelligenceController;
 use App\Http\Controllers\Trade\TechnicalTextileIntelligenceController;
 use App\Http\Controllers\Trade\SpecialtyTextileIntelligenceController;
+use App\Http\Controllers\Trade\GarmentTradeSelectionController;
 
 /*
 
@@ -814,6 +815,11 @@ Route::get(
     '/intelligence/specialty-textile',
     [SpecialtyTextileIntelligenceController::class, 'index']
 )->name('trade.specialty-textile.intelligence');
+
+Route::get(
+    '/trade/garment/selection',
+    [GarmentTradeSelectionController::class, 'index']
+)->name('trade.garment.selection');
 
 // ===================
 

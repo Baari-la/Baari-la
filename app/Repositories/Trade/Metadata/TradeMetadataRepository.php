@@ -39,74 +39,7 @@ class TradeMetadataRepository
         ];
     }
 
-    /**
- * --------------------------------------------------------------------------
- * Trade Metadata
- * --------------------------------------------------------------------------
- *
- * Single aggregate query for dashboard metadata.
- */
-public function getMetadata(): array
-{
-    $metadata = TradeStatistic::query()
 
-        ->selectRaw("
-            MAX(year) AS latest_year,
-
-            MIN(year) AS oldest_year,
-
-            COUNT(*) AS total_records,
-
-            COUNT(DISTINCT hs_code) AS total_hs_codes,
-
-            COUNT(DISTINCT country_code) AS total_countries,
-
-            MAX(updated_at) AS last_updated,
-
-            SUM(
-                CASE
-                    WHEN trade_flow='export'
-                    THEN trade_value
-                    ELSE 0
-                END
-            ) AS export_value,
-            SUM(
-                CASE
-                    WHEN trade_flow='import'
-                    THEN trade_value
-                    ELSE 0
-                END
-            ) AS import_value
-        ")
-        ->first();
-    /*
-    |--------------------------------------------------------------------------
-    | Latest Month
-    |--------------------------------------------------------------------------
-    */
-    $latestMonth = TradeStatistic::query()
-        ->where('year', $metadata->latest_year)
-        ->max('month');
-    return [
-
-        'latest_year'      => (int) $metadata->latest_year,
-        'oldest_year'      => (int) $metadata->oldest_year,
-        'latest_month'     => (int) $latestMonth,
-        'latest_period'    => sprintf(
-            '%04d-%02d',
-            $metadata->latest_year,
-            $latestMonth
-        ),
-
-        'total_records'    => (int) $metadata->total_records,
-        'total_hs_codes'   => (int) $metadata->total_hs_codes,
-        'total_countries'  => (int) $metadata->total_countries,
-        'export_value'     => (float) $metadata->export_value,
-        'import_value'     => (float) $metadata->import_value,
-        'last_updated'     => $metadata->last_updated,
-
-    ];
-}
 /**
  * Latest Available Year
  */

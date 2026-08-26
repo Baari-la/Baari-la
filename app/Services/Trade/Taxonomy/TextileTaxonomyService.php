@@ -516,6 +516,91 @@ class TextileTaxonomyService
         return null;
     }
 
+/**
+ * --------------------------------------------------------------------------
+ * Get Canonical HS-8 Codes for a Sector
+ * --------------------------------------------------------------------------
+ *
+ * Returns only HS-8 codes that:
+ * - exist in trade_statistics
+ * - are classified by the taxonomy
+ * - belong to the requested sector
+ *
+ * IMPORTANT:
+ * - HS-8 is the authoritative filtering level.
+ * - Chapter is NOT used as the final filter.
+ * - HS4/chapter taxonomy rules are still used for classification.
+ * - No trade rows are loaded here.
+ */
+public function hsCodesForSector(
+    string $sectorKey
+): array {
+    $sectorKey = strtolower(
+        trim($sectorKey)
+    );
+
+    if ($sectorKey === '') {
+        return [];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Load distinct HS-8 codes from trade_statistics
+    |--------------------------------------------------------------------------
+    */
+
+            $hsCodes =
+            \App\Models\HsCode::query()
+                ->where('is_active', true)
+                ->where('is_textile', true)
+                ->pluck('hs_code')
+                ->map(
+                    fn ($hsCode) =>
+                        $this->normalizeHsCode($hsCode)
+                )
+                ->filter()
+                ->unique()
+                ->values();
+
+        if ($hsCodes->isEmpty()) {
+            return [];
+        }
+    /*
+    |--------------------------------------------------------------------------
+    | Classify each HS-8
+    |--------------------------------------------------------------------------
+    */
+
+    $classificationMap =
+        $this->classifyMany(
+            $hsCodes->all()
+        );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Keep ONLY requested sector
+    |--------------------------------------------------------------------------
+    */
+
+    return collect(
+        $classificationMap
+    )
+        ->filter(
+            fn ($classification) =>
+                is_array($classification)
+                &&
+                ($classification['sector'] ?? null)
+                    === $sectorKey
+        )
+        ->keys()
+        ->map(
+            fn ($hsCode) =>
+                (string) $hsCode
+        )
+        ->values()
+        ->all();
+}
+
     /**
      * --------------------------------------------------------------------------
      * Classify Many HS Codes

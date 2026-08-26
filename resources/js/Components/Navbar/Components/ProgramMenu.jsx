@@ -57,20 +57,14 @@ export default function ProgramMenu({ isEn, links = [], isOpen, setIsOpen }) {
             {isOpen && (
                 <div
                     className="
-                        absolute
-                        left-1/2
-                        top-full
-                        z-50
-                        mt-3
-                        w-80
-                        -translate-x-1/2
-                        overflow-hidden
-                        rounded-2xl
-                        border
-                        border-slate-200
-                        bg-white
-                        shadow-2xl
-                    "
+        absolute
+        left-1/2
+        top-full
+        z-50
+        w-80
+        -translate-x-1/2
+        pt-3
+    "
                 >
                     {links.map((item, index) => {
                         if (item.section) {

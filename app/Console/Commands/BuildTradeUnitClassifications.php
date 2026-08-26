@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Models\HsCode;
 use App\Models\TradeStatistic;
 use App\Models\TradeUnitClassification;
 use App\Services\Trade\Taxonomy\TextileTaxonomyService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class BuildTradeUnitClassifications extends Command
@@ -19,7 +19,7 @@ class BuildTradeUnitClassifications extends Command
                             {--batch=500 : Number of HS-8 records per batch}';
 
     protected $description =
-        'Build DIGESTEX HS-8 Trade Unit Classification master from trade_statistics and TextileTaxonomyService.';
+        'Build DIGESTEX HS-8 Trade Unit Classification master from Canonical HS-8 Master and trade_statistics.';
 
     public function handle(
         TextileTaxonomyService $taxonomy
@@ -39,14 +39,12 @@ class BuildTradeUnitClassifications extends Command
             |--------------------------------------------------------------------------
             */
 
-            $sectorFilter =
-                $this->option('sector');
+            $sectorFilter = $this->option('sector');
 
-            $batchSize =
-                max(
-                    50,
-                    (int) $this->option('batch')
-                );
+            $batchSize = max(
+                50,
+                (int) $this->option('batch')
+            );
 
             /*
             |--------------------------------------------------------------------------
@@ -68,8 +66,7 @@ class BuildTradeUnitClassifications extends Command
                     return self::SUCCESS;
                 }
 
-                TradeUnitClassification::query()
-                    ->delete();
+                TradeUnitClassification::query()->delete();
 
                 $this->info(
                     'Existing classifications deleted.'
@@ -78,24 +75,69 @@ class BuildTradeUnitClassifications extends Command
 
             /*
             |--------------------------------------------------------------------------
-            | Sector Candidate Optimization
+            | CANONICAL HS-8 UNIVERSE
             |--------------------------------------------------------------------------
             |
-            | This is ONLY a database performance optimization.
+            | Canonical HS-8 Master is the authoritative universe.
             |
-            | Final sector classification still comes from
-            | TextileTaxonomyService.
+            | trade_statistics is NOT used to discover the HS-8 universe.
             |
             */
 
-            $chapterPrefixes = [];
+            $canonicalQuery = HsCode::query()
+                ->where('is_active', true)
+                ->where('is_textile', true);
 
-            if ($sectorFilter === 'garment') {
+            /*
+            |--------------------------------------------------------------------------
+            | Sector Filter
+            |--------------------------------------------------------------------------
+            |
+            | Use TextileTaxonomyService as the authoritative classifier.
+            | This keeps sector selection consistent with the rest of DIGESTEX.
+            |
+            */
 
-                $chapterPrefixes = [
-                    '61',
-                    '62',
-                ];
+            if ($sectorFilter) {
+
+                $sectorHsCodes = $taxonomy->hsCodesForSector(
+                    (string) $sectorFilter
+                );
+
+                if (empty($sectorHsCodes)) {
+
+                    $this->warn(
+                        "No canonical HS-8 found for sector: {$sectorFilter}"
+                    );
+
+                    return self::SUCCESS;
+                }
+
+                $canonicalQuery->whereIn(
+                    'hs_code',
+                    $sectorHsCodes
+                );
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Canonical HS-8 Count
+            |--------------------------------------------------------------------------
+            */
+
+            $total = (clone $canonicalQuery)->count();
+
+            $this->info(
+                "Canonical HS-8 candidates: {$total}"
+            );
+
+            if ($total === 0) {
+
+                $this->warn(
+                    'No canonical HS-8 records available.'
+                );
+
+                return self::SUCCESS;
             }
 
             /*
@@ -111,335 +153,285 @@ class BuildTradeUnitClassifications extends Command
 
             $sectorCounts = [];
 
-            $lastHsCode = '';
-
             /*
             |--------------------------------------------------------------------------
-            | Batch Loop
+            | Process Canonical HS-8 Master
             |--------------------------------------------------------------------------
             */
 
-            while (true) {
-
-                /*
-                |--------------------------------------------------------------------------
-                | Build Query
-                |--------------------------------------------------------------------------
-                */
-
-                $query = TradeStatistic::query()
-
-                    ->whereNotNull('hs_code')
-
-                    ->whereRaw(
-                        "CHAR_LENGTH(REPLACE(hs_code, '.', '')) = 8"
-                    )
-
-                    ->where(
-                        'hs_code',
-                        '>',
-                        $lastHsCode
-                    );
-
-                /*
-                |--------------------------------------------------------------------------
-                | Candidate Chapter Filter
-                |--------------------------------------------------------------------------
-                */
-
-                if (! empty($chapterPrefixes)) {
-
-                    $query->where(
-                        function ($q) use ($chapterPrefixes) {
-
-                            foreach (
-                                $chapterPrefixes as $prefix
-                            ) {
-
-                                $q->orWhere(
-                                    'hs_code',
-                                    'like',
-                                    $prefix . '%'
-                                );
-                            }
-                        }
-                    );
-                }
-
-                /*
-                |--------------------------------------------------------------------------
-                | One Record Per HS-8
-                |--------------------------------------------------------------------------
-                |
-                | We only need one representative description here.
-                |
-                */
-
-                $rows = $query
-
-                    ->selectRaw(
-                        'hs_code, MAX(hs_description) AS hs_description'
-                    )
-
-                    ->groupBy(
-                        'hs_code'
-                    )
-
-                    ->orderBy(
-                        'hs_code'
-                    )
-
-                    ->limit(
-                        $batchSize
-                    )
-
-                    ->get();
-
-                /*
-                |--------------------------------------------------------------------------
-                | End
-                |--------------------------------------------------------------------------
-                */
-
-                if ($rows->isEmpty()) {
-                    break;
-                }
-
-                /*
-                |--------------------------------------------------------------------------
-                | Process Batch
-                |--------------------------------------------------------------------------
-                */
-
-                foreach ($rows as $row) {
-
-                    $lastHsCode =
-                        $row->hs_code;
-
-                    $processed++;
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Taxonomy Classification
-                    |--------------------------------------------------------------------------
-                    */
-
-                    $classification =
-                        $taxonomy->classify(
-                            $row->hs_code
-                        );
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | No Classification
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (
-                        ! is_array($classification)
-                        || empty(
-                            $classification['sector']
-                        )
+            $canonicalQuery
+                ->orderBy('id_hs')
+                ->chunkById(
+                    $batchSize,
+                    function ($rows) use (
+                        $taxonomy,
+                        $sectorFilter,
+                        &$processed,
+                        &$classified,
+                        &$unclassified,
+                        &$skipped,
+                        &$sectorCounts
                     ) {
 
-                        $unclassified++;
+                        foreach ($rows as $row) {
 
-                        continue;
-                    }
+                            $processed++;
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Sector Validation
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (
-                        $sectorFilter
-                        && $classification['sector']
-                            !== $sectorFilter
-                    ) {
-
-                        $skipped++;
-
-                        continue;
-                    }
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Official Unit
-                    |--------------------------------------------------------------------------
-                    |
-                    | We determine the most frequently used
-                    | volume unit for this HS-8.
-                    |
-                    */
-
-                    $officialUnit =
-                        TradeStatistic::query()
-
-                            ->where(
-                                'hs_code',
-                                $row->hs_code
-                            )
-
-                            ->whereNotNull(
-                                'volume_unit'
-                            )
-
-                            ->select(
-                                'volume_unit'
-                            )
-
-                            ->selectRaw(
-                                'COUNT(*) AS unit_count'
-                            )
-
-                            ->groupBy(
-                                'volume_unit'
-                            )
-
-                            ->orderByDesc(
-                                'unit_count'
-                            )
-
-                            ->value(
-                                'volume_unit'
+                            $hsCode = trim(
+                                (string) $row->hs_code
                             );
 
-                    $officialUnit =
-                        $officialUnit
-                            ? strtoupper(
-                                trim(
-                                    (string) $officialUnit
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Canonical HS-8 Safety
+                            |--------------------------------------------------------------------------
+                            */
+
+                            if (
+                                ! preg_match(
+                                    '/^\d{8}$/',
+                                    $hsCode
                                 )
-                            )
-                            : null;
+                            ) {
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Current Intelligence Unit
-                    |--------------------------------------------------------------------------
-                    |
-                    | No conversion yet.
-                    |
-                    */
+                                $skipped++;
 
-                    $intelligenceUnit =
-                        $officialUnit;
+                                continue;
+                            }
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Product Classification
-                    |--------------------------------------------------------------------------
-                    */
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Taxonomy Classification
+                            |--------------------------------------------------------------------------
+                            */
 
-                    $productType =
-                        $classification['subsector']
-                        ?? null;
+                            $classification =
+                                $taxonomy->classify(
+                                    $hsCode
+                                );
 
-                    $productGroup =
-                        $classification['label_en']
-                        ?? $classification['label_id']
-                        ?? null;
+                            /*
+                            |--------------------------------------------------------------------------
+                            | No Classification
+                            |--------------------------------------------------------------------------
+                            */
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Persist
-                    |--------------------------------------------------------------------------
-                    */
+                            if (
+                                ! is_array($classification)
+                                || empty(
+                                    $classification['sector']
+                                )
+                            ) {
 
-                    TradeUnitClassification::updateOrCreate(
+                                $unclassified++;
 
-                        [
-                            'hs_code' =>
-                                $row->hs_code,
-                        ],
+                                continue;
+                            }
 
-                        [
-                            'hs_description' =>
-                                $row->hs_description,
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Sector Validation
+                            |--------------------------------------------------------------------------
+                            */
 
-                            'sector' =>
-                                $classification['sector'],
+                            if (
+                                $sectorFilter
+                                && $classification['sector']
+                                    !== strtolower(
+                                        trim(
+                                            (string) $sectorFilter
+                                        )
+                                    )
+                            ) {
 
-                            'product_type' =>
-                                $productType,
+                                $skipped++;
 
-                            'product_group' =>
-                                $productGroup,
+                                continue;
+                            }
 
-                            'official_unit' =>
-                                $officialUnit,
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Representative Trade Description
+                            |--------------------------------------------------------------------------
+                            |
+                            | Canonical HS-8 remains authoritative.
+                            | Description may be taken from trade_statistics
+                            | as the actual trade-data representation.
+                            |
+                            */
 
-                            'intelligence_unit' =>
-                                $intelligenceUnit,
+                            $tradeDescription =
+                                TradeStatistic::query()
+                                    ->where(
+                                        'hs_code',
+                                        $hsCode
+                                    )
+                                    ->whereNotNull(
+                                        'hs_description'
+                                    )
+                                    ->where(
+                                        'hs_description',
+                                        '!=',
+                                        ''
+                                    )
+                                    ->orderByDesc(
+                                        'year'
+                                    )
+                                    ->orderByDesc(
+                                        'month'
+                                    )
+                                    ->value(
+                                        'hs_description'
+                                    );
 
-                            'conversion_enabled' =>
-                                false,
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Official Unit
+                            |--------------------------------------------------------------------------
+                            |
+                            | Determine the most frequently used trade
+                            | volume unit for this HS-8.
+                            |
+                            */
 
-                            'status' =>
-                                'active',
+                            $officialUnit =
+                                TradeStatistic::query()
+                                    ->where(
+                                        'hs_code',
+                                        $hsCode
+                                    )
+                                    ->whereNotNull(
+                                        'volume_unit'
+                                    )
+                                    ->select(
+                                        'volume_unit'
+                                    )
+                                    ->selectRaw(
+                                        'COUNT(*) AS unit_count'
+                                    )
+                                    ->groupBy(
+                                        'volume_unit'
+                                    )
+                                    ->orderByDesc(
+                                        'unit_count'
+                                    )
+                                    ->value(
+                                        'volume_unit'
+                                    );
 
-                            'classification_source' =>
-                                'TextileTaxonomyService',
+                            $officialUnit =
+                                $officialUnit
+                                    ? strtoupper(
+                                        trim(
+                                            (string) $officialUnit
+                                        )
+                                    )
+                                    : null;
 
-                            'notes' =>
-                                'Generated from canonical trade_statistics HS-8 data. Conversion will be applied only after HS-8 conversion factor validation.',
-                        ]
-                    );
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Current Intelligence Unit
+                            |--------------------------------------------------------------------------
+                            |
+                            | Conversion remains disabled until a validated
+                            | HS-8 conversion factor exists.
+                            |
+                            */
 
-                    $classified++;
+                            $intelligenceUnit =
+                                $officialUnit;
 
-                    $sector =
-                        $classification['sector'];
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Product Classification
+                            |--------------------------------------------------------------------------
+                            */
 
-                    $sectorCounts[$sector] =
-                        ($sectorCounts[$sector] ?? 0) + 1;
-                }
+                            $productType =
+                                $classification['subsector']
+                                ?? null;
 
-                /*
-                |--------------------------------------------------------------------------
-                | Progress
-                |--------------------------------------------------------------------------
-                */
+                            $productGroup =
+                                $classification['label_en']
+                                ?? $classification['label_id']
+                                ?? null;
 
-                if (
-                    $processed % 1000 === 0
-                    || $rows->count() < $batchSize
-                ) {
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Persist
+                            |--------------------------------------------------------------------------
+                            */
 
-                    $this->line(
-                        'Processed: ' .
-                        $processed .
-                        ' | Classified: ' .
-                        $classified .
-                        ' | Last HS-8: ' .
-                        $lastHsCode
-                    );
-                }
+                            TradeUnitClassification::updateOrCreate(
 
-                /*
-                |--------------------------------------------------------------------------
-                | Release Memory
-                |--------------------------------------------------------------------------
-                */
+                                [
+                                    'hs_code' =>
+                                        $hsCode,
+                                ],
 
-                unset($rows);
+                                [
 
-                gc_collect_cycles();
-            }
+                                    'hs_description' =>
+                                        $tradeDescription
+                                        ?? $row->uraian_hs_en
+                                        ?? $row->uraian_hs_id
+                                        ?? null,
 
-            /*
-            |--------------------------------------------------------------------------
-            | Execution Time
-            |--------------------------------------------------------------------------
-            */
+                                    'sector' =>
+                                        $classification['sector'],
 
-            $executionTime =
-                round(
-                    microtime(true) - $startedAt,
-                    3
+                                    'product_type' =>
+                                        $productType,
+
+                                    'product_group' =>
+                                        $productGroup,
+
+                                    'official_unit' =>
+                                        $officialUnit,
+
+                                    'intelligence_unit' =>
+                                        $intelligenceUnit,
+
+                                    'conversion_enabled' =>
+                                        false,
+
+                                    'status' =>
+                                        'active',
+
+                                    'classification_source' =>
+                                        'Canonical HS-8 Master + TextileTaxonomyService',
+
+                                    'notes' =>
+                                        'Generated from the Canonical HS-8 Master. Trade statistics are used only for representative description and official volume unit. Conversion is enabled only after validated HS-8 conversion factor resolution.',
+                                ]
+                            );
+
+                            $classified++;
+
+                            $sector =
+                                $classification['sector'];
+
+                            $sectorCounts[$sector] =
+                                ($sectorCounts[$sector] ?? 0) + 1;
+                        }
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Progress
+                        |--------------------------------------------------------------------------
+                        */
+
+                        $this->output->write(
+                            "\rProcessed: {$processed}"
+                            . " | Classified: {$classified}"
+                            . " | Skipped: {$skipped}"
+                            . " | Unclassified: {$unclassified}"
+                        );
+                    },
+                    'id_hs'
                 );
+
+            $this->newLine(2);
 
             /*
             |--------------------------------------------------------------------------
@@ -447,41 +439,52 @@ class BuildTradeUnitClassifications extends Command
             |--------------------------------------------------------------------------
             */
 
-            $this->newLine();
+            $elapsed =
+                round(
+                    microtime(true) - $startedAt,
+                    2
+                );
 
             $this->info(
-                'HS-8 classification master generated successfully.'
+                'Trade Unit Classification build completed.'
             );
 
-            $this->line(
-                'Execution time: ' .
-                $executionTime .
-                ' seconds'
-            );
-
-            $this->line(
-                'Processed: ' .
-                $processed
-            );
-
-            $this->line(
-                'Classified: ' .
-                $classified
-            );
-
-            $this->line(
-                'Unclassified: ' .
-                $unclassified
-            );
-
-            $this->line(
-                'Skipped by sector filter: ' .
-                $skipped
+            $this->table(
+                [
+                    'Metric',
+                    'Count',
+                ],
+                [
+                    [
+                        'Canonical HS-8 candidates',
+                        $total,
+                    ],
+                    [
+                        'Processed',
+                        $processed,
+                    ],
+                    [
+                        'Classified',
+                        $classified,
+                    ],
+                    [
+                        'Unclassified',
+                        $unclassified,
+                    ],
+                    [
+                        'Skipped',
+                        $skipped,
+                    ],
+                    [
+                        'Elapsed seconds',
+                        $elapsed,
+                    ],
+                ]
             );
 
             /*
             |--------------------------------------------------------------------------
-            | Sector Breakdown
+            | Sector Summary
             |--------------------------------------------------------------------------
             */
 
@@ -490,7 +493,7 @@ class BuildTradeUnitClassifications extends Command
                 $this->newLine();
 
                 $this->info(
-                    'Sector classification:'
+                    'Classification by sector:'
                 );
 
                 foreach (
@@ -498,44 +501,17 @@ class BuildTradeUnitClassifications extends Command
                 ) {
 
                     $this->line(
-                        '  ' .
-                        $sector .
-                        ': ' .
-                        $count
+                        "  {$sector}: {$count}"
                     );
                 }
             }
-
-            /*
-            |--------------------------------------------------------------------------
-            | Conversion Status
-            |--------------------------------------------------------------------------
-            */
-
-            $this->newLine();
-
-            $this->info(
-                'Conversion status:'
-            );
-
-            $this->line(
-                '  Conversion enabled: 0'
-            );
-
-            $this->line(
-                '  Intelligence unit: official trade unit'
-            );
-
-            $this->line(
-                '  HS-8 conversion factors: NOT YET APPLIED'
-            );
 
             return self::SUCCESS;
 
         } catch (Throwable $e) {
 
             $this->error(
-                'Failed to build Trade Unit Classification master.'
+                'Trade Unit Classification build failed.'
             );
 
             $this->error(

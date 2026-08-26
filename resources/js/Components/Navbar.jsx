@@ -89,15 +89,56 @@ export default function PublicNavbar() {
     // List sub-menu Intelligence Center agar DRY (Don't Repeat Yourself)
     const intelligenceLinks = [
         {
-            section: "INSIGHTS",
+            section: "TRADE INTELLIGENCE",
         },
 
         {
-            routeName: "intelligence.trade",
-            en: "Trade Intelligence",
-            id: "Intelijen Perdagangan",
+            routeName: "trade.fiber.intelligence",
+            en: "Fiber Intelligence",
+            id: "Intelijen Fiber",
         },
 
+        {
+            routeName: "trade.yarn.intelligence",
+            en: "Yarn Intelligence",
+            id: "Intelijen Benang",
+        },
+
+        {
+            routeName: "intelligence.thread",
+            en: "Thread Intelligence",
+            id: "Intelijen Sewing Thread",
+        },
+
+        {
+            routeName: "trade.fabric.intelligence",
+            en: "Fabric Intelligence",
+            id: "Intelijen Kain",
+        },
+
+        {
+            routeName: "trade.garment.intelligence",
+            en: "Garment Intelligence",
+            id: "Intelijen Garmen",
+        },
+
+        {
+            routeName: "trade.home-textile.intelligence",
+            en: "Home Textile Intelligence",
+            id: "Intelijen Home Textile",
+        },
+
+        {
+            routeName: "trade.technical-textile.intelligence",
+            en: "Technical Textile Intelligence",
+            id: "Intelijen Technical Textile",
+        },
+
+        {
+            routeName: "trade.specialty-textile.intelligence",
+            en: "Specialty Textile Intelligence",
+            id: "Intelijen Specialty Textile",
+        },
         /*
     |--------------------------------------------------------------------------
     | FUTURE INTELLIGENCE MODULES

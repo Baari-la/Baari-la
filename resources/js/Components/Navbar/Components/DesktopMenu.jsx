@@ -1,31 +1,20 @@
 import { Link } from "@inertiajs/react";
 
 import IntelligenceMenu from "./IntelligenceMenu";
-import VisibilityMenu from "./VisibilityMenu";
-import EcosystemMenu from "./EcosystemMenu";
 import ProgramMenu from "./ProgramMenu";
 
 export default function DesktopMenu({
     isEn,
 
     intelligenceLinks,
-
-    visibilityLinks,
-
-    ecosystemLinks,
     programLinks,
+    upcomingLinks,
 
     isIntelOpen,
     setIsIntelOpen,
 
     isProgramOpen,
     setIsProgramOpen,
-
-    isVisibilityOpen,
-    setIsVisibilityOpen,
-
-    isEcosystemOpen,
-    setIsEcosystemOpen,
 }) {
     const navLinkStyle = `
         relative
@@ -39,6 +28,24 @@ export default function DesktopMenu({
         duration-300
         group
         py-2
+    `;
+
+    const upcomingStyle = `
+        relative
+        inline-flex
+        items-center
+        gap-2
+        text-[11px]
+        font-bold
+        uppercase
+        tracking-widest
+        text-slate-700
+        hover:text-amber-500
+        transition-all
+        duration-300
+        group
+        py-2
+        cursor-default
     `;
 
     const underlineStyle = `
@@ -74,16 +81,8 @@ export default function DesktopMenu({
                 setIsOpen={setIsIntelOpen}
             />
 
-            {/* VISIBILITY */}
-
-            <VisibilityMenu
-                isEn={isEn}
-                links={visibilityLinks}
-                isOpen={isVisibilityOpen}
-                setIsOpen={setIsVisibilityOpen}
-            />
-
             {/* PROGRAM */}
+
             <ProgramMenu
                 isEn={isEn}
                 links={programLinks}
@@ -91,21 +90,67 @@ export default function DesktopMenu({
                 setIsOpen={setIsProgramOpen}
             />
 
-            {/* ECOSYSTEM */}
+            {/* SOURCING HUB — UPCOMING */}
 
-            <EcosystemMenu
-                isEn={isEn}
-                links={ecosystemLinks}
-                isOpen={isEcosystemOpen}
-                setIsOpen={setIsEcosystemOpen}
-            />
+            <div className="relative">
+                <button
+                    type="button"
+                    className={upcomingStyle}
+                    aria-label={
+                        isEn
+                            ? "Sourcing Hub — Upcoming"
+                            : "Sourcing Hub — Segera Hadir"
+                    }
+                >
+                    {isEn ? "Sourcing Hub" : "Sourcing Hub"}
 
-            {/* TOOLS */}
+                    <span
+                        className="
+                            rounded-full
+                            bg-slate-100
+                            px-2
+                            py-0.5
+                            text-[8px]
+                            font-black
+                            tracking-wider
+                            text-slate-500
+                        "
+                    >
+                        UPCOMING
+                    </span>
 
-            <Link href={route("tools.calculator")} className={navLinkStyle}>
-                TOOLS
-                <span className={underlineStyle} />
-            </Link>
+                    <span className={underlineStyle} />
+                </button>
+            </div>
+
+            {/* RADAR — UPCOMING */}
+
+            <div className="relative">
+                <button
+                    type="button"
+                    className={upcomingStyle}
+                    aria-label={
+                        isEn ? "Radar — Upcoming" : "Radar — Segera Hadir"
+                    }
+                >
+                    RADAR
+                    <span
+                        className="
+                            rounded-full
+                            bg-indigo-50
+                            px-2
+                            py-0.5
+                            text-[8px]
+                            font-black
+                            tracking-wider
+                            text-indigo-600
+                        "
+                    >
+                        UPCOMING
+                    </span>
+                    <span className={underlineStyle} />
+                </button>
+            </div>
 
             {/* ABOUT */}
 

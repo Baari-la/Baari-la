@@ -30,7 +30,7 @@ class TradeReportingPeriodProvider
 
     protected const PUBLIC_THROUGH_YEAR = 2026;
 
-    protected const PUBLIC_THROUGH_MONTH = 5;
+    protected const PUBLIC_THROUGH_MONTH = 6;
 
     protected const BUFFER_YEAR = 2026;
 

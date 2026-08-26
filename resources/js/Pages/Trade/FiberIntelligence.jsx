@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Head, usePage } from "@inertiajs/react";
+import PublicNavbar from "@/Components/Navbar/PublicNavbar";
 import {
     ArrowDownRight,
     ArrowUpRight,
@@ -342,7 +343,7 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
     return (
         <>
             <Head title={labels.title} />
-
+            <PublicNavbar />
             <div className="min-h-screen bg-slate-50">
                 {/* =========================================================
                     HERO
@@ -741,13 +742,17 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                         const marketShare =
                                             importMarketShare?.find(
                                                 (share) =>
-                                                    share.country ===
-                                                    item.country,
+                                                    share.country_code ===
+                                                    item.country_code,
                                             )?.market_share_percent ?? 0;
+
+                                        const countryName = isEn
+                                            ? item.country_name_en
+                                            : item.country_name_id;
 
                                         return (
                                             <div
-                                                key={`${item.country}-${index}`}
+                                                key={`${item.country_code}-${index}`}
                                             >
                                                 <div className="flex items-center justify-between gap-3">
                                                     <div className="flex min-w-0 items-center gap-3">
@@ -755,8 +760,15 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                                             {index + 1}
                                                         </span>
 
+                                                        <span className="shrink-0 text-base leading-none">
+                                                            {item.flag_emoji?.trim() ||
+                                                                "🌐"}
+                                                        </span>
+
                                                         <span className="truncate text-sm font-bold text-slate-700">
-                                                            {item.country}
+                                                            {countryName ??
+                                                                item.country ??
+                                                                "—"}
                                                         </span>
                                                     </div>
 
@@ -789,7 +801,18 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                 <div className="mt-5 border-t border-slate-100 pt-4 text-xs text-slate-500">
                                     {labels.leadingOrigin}:{" "}
                                     <span className="font-black text-slate-700">
-                                        {importMarketShare?.[0]?.country}
+                                        {(() => {
+                                            const leading =
+                                                importMarketShare?.[0];
+
+                                            return isEn
+                                                ? (leading?.country_name_en ??
+                                                      leading?.country ??
+                                                      "—")
+                                                : (leading?.country_name_id ??
+                                                      leading?.country ??
+                                                      "—");
+                                        })()}
                                     </span>{" "}
                                     ({formatDecimal(highestImportShare)}
                                     %)
@@ -822,13 +845,17 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                         const marketShare =
                                             exportMarketShare?.find(
                                                 (share) =>
-                                                    share.country ===
-                                                    item.country,
+                                                    share.country_code ===
+                                                    item.country_code,
                                             )?.market_share_percent ?? 0;
+
+                                        const countryName = isEn
+                                            ? item.country_name_en
+                                            : item.country_name_id;
 
                                         return (
                                             <div
-                                                key={`${item.country}-${index}`}
+                                                key={`${item.country_code}-${index}`}
                                             >
                                                 <div className="flex items-center justify-between gap-3">
                                                     <div className="flex min-w-0 items-center gap-3">
@@ -836,8 +863,15 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                                             {index + 1}
                                                         </span>
 
+                                                        <span className="shrink-0 text-base leading-none">
+                                                            {item.flag_emoji?.trim() ||
+                                                                "🌐"}
+                                                        </span>
+
                                                         <span className="truncate text-sm font-bold text-slate-700">
-                                                            {item.country}
+                                                            {countryName ??
+                                                                item.country ??
+                                                                "—"}
                                                         </span>
                                                     </div>
 
@@ -870,7 +904,18 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                 <div className="mt-5 border-t border-slate-100 pt-4 text-xs text-slate-500">
                                     {labels.leadingDestination}:{" "}
                                     <span className="font-black text-slate-700">
-                                        {exportMarketShare?.[0]?.country}
+                                        {(() => {
+                                            const leading =
+                                                exportMarketShare?.[0];
+
+                                            return isEn
+                                                ? (leading?.country_name_en ??
+                                                      leading?.country ??
+                                                      "—")
+                                                : (leading?.country_name_id ??
+                                                      leading?.country ??
+                                                      "—");
+                                        })()}
                                     </span>{" "}
                                     ({formatDecimal(highestExportShare)}
                                     %)
@@ -929,13 +974,17 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                             const share =
                                                 cottonOrigin?.import_market_share?.find(
                                                     (row) =>
-                                                        row.country ===
-                                                        item.country,
+                                                        row.country_code ===
+                                                        item.country_code,
                                                 )?.market_share_percent ?? 0;
+
+                                            const countryName = isEn
+                                                ? item.country_name_en
+                                                : item.country_name_id;
 
                                             return (
                                                 <div
-                                                    key={`${item.country}-${index}`}
+                                                    key={`${item.country_code}-${index}`}
                                                 >
                                                     <div className="flex items-center justify-between gap-3">
                                                         <div className="flex min-w-0 items-center gap-3">
@@ -943,8 +992,15 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                                                 {index + 1}
                                                             </span>
 
+                                                            <span className="shrink-0 text-base leading-none">
+                                                                {item.flag_emoji?.trim() ||
+                                                                    "🌐"}
+                                                            </span>
+
                                                             <span className="truncate text-sm font-bold text-slate-700">
-                                                                {item.country}
+                                                                {countryName ??
+                                                                    item.country ??
+                                                                    "—"}
                                                             </span>
                                                         </div>
 
@@ -957,10 +1013,10 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
 
                                                     <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
                                                         <div
-                                                            className="h-full rounded-full bg-amber-500"
+                                                            className="h-full rounded-full bg-orange-500"
                                                             style={{
                                                                 width: `${Math.max(
-                                                                    3,
+                                                                    4,
                                                                     Number(
                                                                         share,
                                                                     ),
@@ -1012,13 +1068,17 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                             const share =
                                                 cottonOrigin?.export_market_share?.find(
                                                     (row) =>
-                                                        row.country ===
-                                                        item.country,
+                                                        row.country_code ===
+                                                        item.country_code,
                                                 )?.market_share_percent ?? 0;
+
+                                            const countryName = isEn
+                                                ? item.country_name_en
+                                                : item.country_name_id;
 
                                             return (
                                                 <div
-                                                    key={`${item.country}-${index}`}
+                                                    key={`${item.country_code}-${index}`}
                                                 >
                                                     <div className="flex items-center justify-between gap-3">
                                                         <div className="flex min-w-0 items-center gap-3">
@@ -1026,8 +1086,15 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                                                 {index + 1}
                                                             </span>
 
+                                                            <span className="shrink-0 text-base leading-none">
+                                                                {item.flag_emoji?.trim() ||
+                                                                    "🌐"}
+                                                            </span>
+
                                                             <span className="truncate text-sm font-bold text-slate-700">
-                                                                {item.country}
+                                                                {countryName ??
+                                                                    item.country ??
+                                                                    "—"}
                                                             </span>
                                                         </div>
 
@@ -1043,7 +1110,7 @@ export default function FiberIntelligence({ fiber = {}, page = {} }) {
                                                             className="h-full rounded-full bg-emerald-500"
                                                             style={{
                                                                 width: `${Math.max(
-                                                                    3,
+                                                                    4,
                                                                     Number(
                                                                         share,
                                                                     ),

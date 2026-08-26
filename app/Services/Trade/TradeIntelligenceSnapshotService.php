@@ -17,37 +17,28 @@ class TradeIntelligenceSnapshotService
     ) {
     }
 
-    /**
-     * Read path:
-     *
-     * 1. Cache
-     * 2. Last validated snapshot
-     * 3. Builder only when explicitly requested
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Get Latest Valid Snapshot
+    |--------------------------------------------------------------------------
+    |
+    | General snapshot read path.
+    |
+    | IMPORTANT:
+    | Never build a heavy snapshot during a normal user request.
+    |
+    */
+
     public function get(
         string $snapshotKey,
         ?Closure $fallbackBuilder = null
     ): ?array {
-        $cached = CacheService::get(
-            $snapshotKey
-        );
-
-        if (is_array($cached)) {
-            return $cached;
-        }
-
         $snapshot =
             $this->repository->latestValid(
                 $snapshotKey
             );
 
         if (is_array($snapshot)) {
-            CacheService::put(
-                $snapshotKey,
-                $snapshot,
-                $this->cacheTtl
-            );
-
             return $snapshot;
         }
 
@@ -62,6 +53,38 @@ class TradeIntelligenceSnapshotService
         return null;
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Get Shared Period Snapshot
+    |--------------------------------------------------------------------------
+    |
+    | Historical / selected periods use their own persistent snapshot key.
+    |
+    | Example:
+    |
+    | digestex.trade.sector.garment.period.2024-12-vs-2023-12
+    |
+    | If another user requests the same period, the existing validated
+    | snapshot is reused instead of rebuilding the database intelligence.
+    |
+    */
+
+    public function getForPeriod(
+        string $snapshotKey
+    ): ?array {
+        return $this->repository->latestValid(
+            $snapshotKey
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Save Validated Snapshot
+    |--------------------------------------------------------------------------
+    */
+
     public function save(
         string $snapshotKey,
         array $payload,
@@ -73,27 +96,50 @@ class TradeIntelligenceSnapshotService
             $meta
         );
 
-        CacheService::put(
-            $snapshotKey,
-            $payload,
-            $this->cacheTtl
-        );
-
         return $payload;
     }
 
-    public function forget(
-        string $snapshotKey
-    ): void {
-        CacheService::forget(
-            $snapshotKey
-        );
-    }
 
-    public function hasValidSnapshot(
-        string $snapshotKey
-    ): bool {
-        return $this->repository
-            ->latestValid($snapshotKey) !== null;
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | Forget Cache
+    |--------------------------------------------------------------------------
+    */
+
+    public function forget(
+    string $snapshotKey
+): void {
+    CacheService::forget(
+        $snapshotKey
+    );
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Delete Persistent Snapshot
+|--------------------------------------------------------------------------
+*/
+
+public function deleteBySnapshotKey(
+    string $snapshotKey
+): int {
+    return $this->repository->deleteBySnapshotKey(
+        $snapshotKey
+    );
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Check Valid Snapshot
+|--------------------------------------------------------------------------
+*/
+
+public function hasValidSnapshot(
+    string $snapshotKey
+): bool {
+    return $this->repository
+        ->latestValid($snapshotKey) !== null;
+}
 }

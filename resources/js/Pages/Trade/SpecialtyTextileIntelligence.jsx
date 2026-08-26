@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Head, usePage } from "@inertiajs/react";
+import PublicNavbar from "@/Components/Navbar/PublicNavbar";
 import {
     ArrowDownRight,
     ArrowUpRight,
@@ -297,7 +298,7 @@ export default function SpecialtyTextileIntelligence({
     return (
         <>
             <Head title={labels.title} />
-
+            <PublicNavbar />
             <div className="min-h-screen bg-slate-50">
                 {/* =========================================================
                     HERO

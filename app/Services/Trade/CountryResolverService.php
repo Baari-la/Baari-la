@@ -63,6 +63,7 @@ class CountryResolverService
                 'iso3',
                 'country_name_en',
                 'country_name_id',
+                'flag_emoji',
             ]);
 
         foreach ($countries as $country) {
@@ -92,6 +93,9 @@ class CountryResolverService
 
                 'country_name_id' =>
                     $country->country_name_id,
+
+                'flag_emoji' =>
+                    $country->flag_emoji,
             ];
 
             /*
@@ -151,6 +155,7 @@ class CountryResolverService
                 'c.iso3',
                 'c.country_name_en',
                 'c.country_name_id',
+                'c.flag_emoji',
             ]);
 
         foreach ($aliases as $alias) {
@@ -189,6 +194,9 @@ class CountryResolverService
 
                 'country_name_id' =>
                     $alias->country_name_id,
+
+                'flag_emoji' =>
+                    $alias->flag_emoji,
             ];
         }
 
@@ -241,6 +249,10 @@ class CountryResolverService
 
         $country->country_name_id =
             $record['country_name_id'];
+
+        $country->flag_emoji =
+            $record['flag_emoji']
+            ?? null;
 
         return $country;
     }

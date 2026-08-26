@@ -11,9 +11,9 @@ export default function PublicNavbar() {
     const isEn = props.locale === "en";
 
     const [isOpen, setIsOpen] = useState(false);
+
     const [isIntelOpen, setIsIntelOpen] = useState(false);
-    const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
-    const [isEcosystemOpen, setIsEcosystemOpen] = useState(false);
+
     const [isProgramOpen, setIsProgramOpen] = useState(false);
 
     const toggleLanguage = (lang) => {
@@ -37,13 +37,55 @@ export default function PublicNavbar() {
 
     const intelligenceLinks = [
         {
-            section: "INSIGHTS",
+            section: "TRADE INTELLIGENCE",
         },
 
         {
-            routeName: "intelligence.trade",
-            en: "Trade Intelligence",
-            id: "Intelijen Perdagangan",
+            routeName: "trade.fiber.intelligence",
+            en: "Fiber Intelligence",
+            id: "Intelijen Fiber",
+        },
+
+        {
+            routeName: "trade.yarn.intelligence",
+            en: "Yarn Intelligence",
+            id: "Intelijen Benang",
+        },
+
+        {
+            routeName: "intelligence.thread",
+            en: "Thread Intelligence",
+            id: "Intelijen Sewing Thread",
+        },
+
+        {
+            routeName: "trade.fabric.intelligence",
+            en: "Fabric Intelligence",
+            id: "Intelijen Kain",
+        },
+
+        {
+            routeName: "trade.garment.intelligence",
+            en: "Garment Intelligence",
+            id: "Intelijen Garmen",
+        },
+
+        {
+            routeName: "trade.home-textile.intelligence",
+            en: "Home Textile Intelligence",
+            id: "Intelijen Home Textile",
+        },
+
+        {
+            routeName: "trade.technical-textile.intelligence",
+            en: "Technical Textile Intelligence",
+            id: "Intelijen Technical Textile",
+        },
+
+        {
+            routeName: "trade.specialty-textile.intelligence",
+            en: "Specialty Textile Intelligence",
+            id: "Intelijen Specialty Textile",
         },
 
         /*
@@ -118,30 +160,6 @@ export default function PublicNavbar() {
 
     /*
     |--------------------------------------------------------------------------
-    | Visibility
-    |--------------------------------------------------------------------------
-    */
-
-    const visibilityLinks = [
-        {
-            section: "VISIBILITY",
-        },
-
-        {
-            routeName: "companies.index",
-            en: "Industry Directory",
-            id: "Direktori Industri",
-        },
-
-        {
-            routeName: "pricing.index",
-            en: "Membership",
-            id: "Keanggotaan",
-        },
-    ];
-
-    /*
-    |--------------------------------------------------------------------------
     | Program
     |--------------------------------------------------------------------------
     */
@@ -150,23 +168,33 @@ export default function PublicNavbar() {
         {
             section: "DIGESTEX PROGRAM",
         },
+
+        {
+            routeName: "program.digital-directory",
+
+            en: "Strategic Industry & Visibility Program",
+
+            id: "Program Strategic Industry & Visibility",
+        },
     ];
 
     /*
-    |--------------------------------------------------------------------------
-    | Ecosystem
-    |--------------------------------------------------------------------------
-    */
+|--------------------------------------------------------------------------
+| Upcoming Navigation
+|--------------------------------------------------------------------------
+*/
 
-    const ecosystemLinks = [
+    const upcomingLinks = [
         {
-            section: "ECOSYSTEM",
+            key: "sourcing-hub",
+            en: "Sourcing Hub",
+            id: "Sourcing Hub",
         },
 
         {
-            routeName: "sourcing-hub",
-            en: "Sourcing Hub",
-            id: "Sourcing Hub",
+            key: "radar",
+            en: "Radar",
+            id: "Radar",
         },
     ];
 
@@ -178,28 +206,36 @@ export default function PublicNavbar() {
 
     const mobileItems = [
         {
+            type: "link",
+            title: isEn ? "Home" : "Beranda",
+            href: route("home"),
+        },
+
+        {
+            type: "link",
             title: isEn ? "Trade Intelligence" : "Intelijen Perdagangan",
             href: route("intelligence.trade"),
         },
 
         {
-            title: isEn ? "Country Intelligence" : "Intelijen Negara",
-            href: route("intelligence.country"),
+            type: "program",
+            title: isEn ? "Program" : "Program",
         },
 
         {
-            title: isEn ? "Market Intelligence" : "Intelijen Pasar",
-            href: route("intelligence.market"),
+            type: "upcoming",
+            title: "Sourcing Hub",
         },
 
         {
-            title: isEn ? "Industry Directory" : "Direktori Industri",
-            href: route("companies.index"),
+            type: "upcoming",
+            title: "Radar",
         },
 
         {
-            title: isEn ? "Sourcing Hub" : "Sourcing Hub",
-            href: route("sourcing-hub"),
+            type: "link",
+            title: isEn ? "About" : "Tentang",
+            href: route("about"),
         },
     ];
 
@@ -227,15 +263,10 @@ export default function PublicNavbar() {
                     <DesktopMenu
                         isEn={isEn}
                         intelligenceLinks={intelligenceLinks}
-                        visibilityLinks={visibilityLinks}
                         programLinks={programLinks}
-                        ecosystemLinks={ecosystemLinks}
+                        upcomingLinks={upcomingLinks}
                         isIntelOpen={isIntelOpen}
                         setIsIntelOpen={setIsIntelOpen}
-                        isVisibilityOpen={isVisibilityOpen}
-                        setIsVisibilityOpen={setIsVisibilityOpen}
-                        isEcosystemOpen={isEcosystemOpen}
-                        setIsEcosystemOpen={setIsEcosystemOpen}
                         isProgramOpen={isProgramOpen}
                         setIsProgramOpen={setIsProgramOpen}
                     />

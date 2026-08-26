@@ -1010,134 +1010,97 @@ class FabricTradeIntelligenceService
     */
 
     protected function buildTopCountries(
-        $rows,
-        string $flow,
-        int $limit = 10
-    ): array {
-        $items =
-            $rows->filter(
-                fn ($row) =>
-                    $row['flow'] === $flow
-                    && filled(
-                        $row['country']
-                    )
-            );
+    $rows,
+    string $flow,
+    int $limit = 10
+): array {
+    $items =
+        $rows->filter(
+            fn ($row) =>
+                $row['flow'] === $flow
+                && filled(
+                    $row['country']
+                )
+        );
 
-        return $items
-            ->groupBy('country')
-            ->map(
-                function (
-                    $group,
-                    $country
-                ) {
-                    return [
+    return $items
+        ->groupBy('country')
+        ->map(
+            function (
+                $group,
+                $country
+            ) {
+                $first =
+                    $group->first();
 
-                        'country' =>
-                            $country,
+                return [
 
-                        'value' =>
-                            (float) $group->sum(
-                                'value'
-                            ),
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Canonical Country Identity
+                    |--------------------------------------------------------------------------
+                    */
 
-                        'volume' =>
-                            (float) $group->sum(
-                                'volume'
-                            ),
-                    ];
-                }
-            )
-            ->sortByDesc(
-                'value'
-            )
-            ->take(
-                $limit
-            )
-            ->values()
-            ->all();
-    }
+                    'country_id' =>
+                        $first['country_id']
+                            ?? null,
 
+                    'country_code' =>
+                        $first['country_code']
+                            ?? null,
 
-    /*
-    |--------------------------------------------------------------------------
-    | Country Market Share
-    |--------------------------------------------------------------------------
-    */
+                    'iso3' =>
+                        $first['iso3']
+                            ?? null,
 
-    protected function buildCountryMarketShare(
-        $rows,
-        string $flow,
-        int $limit = 10
-    ): array {
-        $items =
-            $rows->filter(
-                fn ($row) =>
-                    $row['flow'] === $flow
-                    && filled(
-                        $row['country']
-                    )
-            );
+                    'country_name_en' =>
+                        $first['country_name_en']
+                            ?? null,
 
-        $total =
-            (float) $items->sum(
-                'value'
-            );
+                    'country_name_id' =>
+                        $first['country_name_id']
+                            ?? null,
 
-        if (
-            $total <= 0.0
-        ) {
-            return [];
-        }
+                    'flag_emoji' =>
+                        $first['flag_emoji']
+                            ?? null,
 
-        return $items
-            ->groupBy('country')
-            ->map(
-                function (
-                    $group,
-                    $country
-                ) use (
-                    $total
-                ) {
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Legacy / Source Country Name
+                    |--------------------------------------------------------------------------
+                    */
 
-                    $value =
+                    'country' =>
+                        $country,
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Trade Values
+                    |--------------------------------------------------------------------------
+                    */
+
+                    'value' =>
                         (float) $group->sum(
                             'value'
-                        );
+                        ),
 
-                    return [
-
-                        'country' =>
-                            $country,
-
-                        'value' =>
-                            $value,
-
-                        'volume' =>
-                            (float) $group->sum(
-                                'volume'
-                            ),
-
-                        'market_share_percent' =>
-                            round(
-                                (
-                                    $value
-                                    / $total
-                                ) * 100,
-                                2
-                            ),
-                    ];
-                }
-            )
-            ->sortByDesc(
-                'value'
-            )
-            ->take(
-                $limit
-            )
-            ->values()
-            ->all();
-    }
-
+                    'volume' =>
+                        (float) $group->sum(
+                            'volume'
+                        ),
+                ];
+            }
+        )
+        ->sortByDesc(
+            'value'
+        )
+        ->take(
+            $limit
+        )
+        ->values()
+        ->all();
+}
 
     /*
     |--------------------------------------------------------------------------

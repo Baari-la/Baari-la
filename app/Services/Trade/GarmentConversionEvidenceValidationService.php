@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Trade;
 
 use App\Models\GarmentConversionEvidence;
-use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
 
 class GarmentConversionEvidenceValidationService
@@ -18,6 +17,24 @@ class GarmentConversionEvidenceValidationService
      * - Does not enable conversion.
      * - Does not approve conversion.
      * - Does not modify the database.
+     *
+     * Canonical methodology:
+     *
+     * KG_PER_PCS
+     *
+     * Meaning:
+     *   1 PCS garment = X KG
+     *
+     * This factor is later used to convert
+     * official trade quantity reported in KG
+     * into estimated garment quantity in PCS.
+     *
+     * Example:
+     *
+     *   KG_PER_PCS = 0.193333
+     *
+     *   1,000 KG / 0.193333
+     *   = approximately 5,172 PCS
      *
      * The returned result is a validation decision only.
      */
@@ -75,6 +92,40 @@ class GarmentConversionEvidenceValidationService
         ) {
             return $this->blocked(
                 'Methodology does not permit automatic conversion.'
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Supported Conversion Methodologies
+        |--------------------------------------------------------------------------
+        |
+        | KG_PER_PCS is the canonical garment conversion methodology.
+        |
+        | Meaning:
+        |
+        |   KG_PER_PCS = average garment weight in KG per PCS.
+        |
+        | Other methodologies remain available for future evidence models,
+        | but must not be silently interpreted as KG_PER_PCS.
+        |
+        */
+
+        if (
+            !in_array(
+                $methodology,
+                [
+                    'KG_PER_PCS',
+                    'PAIR_TO_KG',
+                    'MULTI_PIECE',
+                    'PRODUCT_SPECIFIC',
+                ],
+                true
+            )
+        ) {
+            return $this->review(
+                'UNSUPPORTED_METHODOLOGY',
+                "Methodology {$methodology} is not supported by the current garment conversion evidence validator."
             );
         }
 
@@ -186,6 +237,12 @@ class GarmentConversionEvidenceValidationService
 
             'factor_eligible' => true,
 
+            /*
+            |--------------------------------------------------------------------------
+            | Factor Is Not Calculated Here
+            |--------------------------------------------------------------------------
+            */
+
             'conversion_factor' => null,
         ];
     }
@@ -210,17 +267,50 @@ class GarmentConversionEvidenceValidationService
         string $evidenceType
     ): bool {
         $allowed = match ($methodology) {
-            'PCS_TO_KG' => [
+            /*
+            |--------------------------------------------------------------------------
+            | Canonical Garment Conversion
+            |--------------------------------------------------------------------------
+            |
+            | AVERAGE_WEIGHT_PER_PIECE means:
+            |
+            |   average KG of one garment piece.
+            |
+            | Therefore:
+            |
+            |   KG_PER_PCS
+            |
+            */
+
+            'KG_PER_PCS' => [
                 'AVERAGE_WEIGHT_PER_PIECE',
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Pair-based conversion
+            |--------------------------------------------------------------------------
+            */
 
             'PAIR_TO_KG' => [
                 'AVERAGE_WEIGHT_PER_PAIR',
             ],
 
+            /*
+            |--------------------------------------------------------------------------
+            | Multi-piece products
+            |--------------------------------------------------------------------------
+            */
+
             'MULTI_PIECE' => [
                 'COMPONENT_WEIGHT_EVIDENCE',
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Product-specific evidence
+            |--------------------------------------------------------------------------
+            */
 
             'PRODUCT_SPECIFIC' => [
                 'PRODUCT_SPECIFIC_WEIGHT_EVIDENCE',
@@ -466,6 +556,12 @@ class GarmentConversionEvidenceValidationService
             'ESTIMATE',
         ];
 
+        /*
+        |--------------------------------------------------------------------------
+        | Strong Source
+        |--------------------------------------------------------------------------
+        */
+
         if (
             in_array(
                 $sourceType,
@@ -483,12 +579,18 @@ class GarmentConversionEvidenceValidationService
 
                 'reason' =>
                     'Source type is considered strong enough for evidence validation, subject to the recorded measurement context.',
-                
+
                 'factor_eligible' => true,
 
                 'conversion_factor' => null,
             ];
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Medium Source
+        |--------------------------------------------------------------------------
+        */
 
         if (
             in_array(
@@ -514,6 +616,12 @@ class GarmentConversionEvidenceValidationService
             ];
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Reference Source
+        |--------------------------------------------------------------------------
+        */
+
         if (
             in_array(
                 $sourceType,
@@ -526,6 +634,12 @@ class GarmentConversionEvidenceValidationService
                 'Reference or benchmark evidence is not sufficient by itself for factor approval.'
             );
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Unknown Source
+        |--------------------------------------------------------------------------
+        */
 
         return $this->review(
             'UNKNOWN_SOURCE_TYPE',
@@ -546,10 +660,15 @@ class GarmentConversionEvidenceValidationService
     ): array {
         return [
             'status' => 'VALIDATED',
+
             'validation_code' => $code,
+
             'confidence_level' => $confidence,
+
             'reason' => $reason,
+
             'factor_eligible' => true,
+
             'conversion_factor' => null,
         ];
     }
@@ -560,10 +679,15 @@ class GarmentConversionEvidenceValidationService
     ): array {
         return [
             'status' => 'REVIEW',
+
             'validation_code' => $code,
+
             'confidence_level' => null,
+
             'reason' => $reason,
+
             'factor_eligible' => false,
+
             'conversion_factor' => null,
         ];
     }
@@ -574,10 +698,15 @@ class GarmentConversionEvidenceValidationService
     ): array {
         return [
             'status' => 'REJECTED',
+
             'validation_code' => $code,
+
             'confidence_level' => null,
+
             'reason' => $reason,
+
             'factor_eligible' => false,
+
             'conversion_factor' => null,
         ];
     }
@@ -587,10 +716,16 @@ class GarmentConversionEvidenceValidationService
     ): array {
         return [
             'status' => 'BLOCKED',
-            'validation_code' => 'AUTOMATIC_CONVERSION_BLOCKED',
+
+            'validation_code' =>
+                'AUTOMATIC_CONVERSION_BLOCKED',
+
             'confidence_level' => null,
+
             'reason' => $reason,
+
             'factor_eligible' => false,
+
             'conversion_factor' => null,
         ];
     }

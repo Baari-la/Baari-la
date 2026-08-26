@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Head, usePage } from "@inertiajs/react";
+import PublicNavbar from "@/Components/Navbar/PublicNavbar";
 import {
     ArrowDownRight,
     ArrowUpRight,
@@ -298,7 +299,7 @@ export default function ThreadIntelligence({ thread = {}, page = {} }) {
     return (
         <>
             <Head title={labels.title} />
-
+            <PublicNavbar />
             <div className="min-h-screen bg-slate-50">
                 {/* =========================================================
                     HERO
@@ -586,40 +587,63 @@ export default function ThreadIntelligence({ thread = {}, page = {} }) {
                             <div className="space-y-4">
                                 {topImportOrigins
                                     .slice(0, 10)
-                                    .map((item, index) => (
-                                        <div key={`${item.country}-${index}`}>
-                                            <div className="flex items-center justify-between gap-3">
-                                                <div className="flex min-w-0 items-center gap-3">
-                                                    <span className="w-5 shrink-0 text-xs font-black text-slate-400">
-                                                        {index + 1}
-                                                    </span>
+                                    .map((item, index) => {
+                                        const marketShare =
+                                            importMarketShare?.find(
+                                                (share) =>
+                                                    share.country_code ===
+                                                    item.country_code,
+                                            )?.market_share_percent ?? 0;
 
-                                                    <span className="truncate text-sm font-bold text-slate-700">
-                                                        {item.country}
+                                        const countryName = isEn
+                                            ? item.country_name_en
+                                            : item.country_name_id;
+
+                                        return (
+                                            <div
+                                                key={`${item.country_code}-${index}`}
+                                            >
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <div className="flex min-w-0 items-center gap-3">
+                                                        <span className="w-5 shrink-0 text-xs font-black text-slate-400">
+                                                            {index + 1}
+                                                        </span>
+
+                                                        <span className="shrink-0 text-base leading-none">
+                                                            {item.flag_emoji?.trim() ||
+                                                                "🌐"}
+                                                        </span>
+
+                                                        <span className="truncate text-sm font-bold text-slate-700">
+                                                            {countryName ??
+                                                                item.country ??
+                                                                "—"}
+                                                        </span>
+                                                    </div>
+
+                                                    <span className="shrink-0 text-sm font-black text-slate-900">
+                                                        {formatCurrency(
+                                                            item.value,
+                                                        )}
                                                     </span>
                                                 </div>
 
-                                                <span className="shrink-0 text-sm font-black text-slate-900">
-                                                    {formatCurrency(item.value)}
-                                                </span>
+                                                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                                                    <div
+                                                        className="h-full rounded-full bg-indigo-500"
+                                                        style={{
+                                                            width: `${Math.max(
+                                                                4,
+                                                                Number(
+                                                                    marketShare,
+                                                                ),
+                                                            )}%`,
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
-
-                                            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                                                <div
-                                                    className="h-full rounded-full bg-indigo-500"
-                                                    style={{
-                                                        width: `${Math.max(
-                                                            4,
-                                                            Number(
-                                                                item.market_share_percent ??
-                                                                    0,
-                                                            ),
-                                                        )}%`,
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                             </div>
 
                             {importMarketShare.length > 0 && (
@@ -628,7 +652,18 @@ export default function ThreadIntelligence({ thread = {}, page = {} }) {
                                         ? "Leading origin:"
                                         : "Negara asal utama:"}{" "}
                                     <span className="font-black text-slate-700">
-                                        {importMarketShare[0]?.country}
+                                        {(() => {
+                                            const leading =
+                                                importMarketShare?.[0];
+
+                                            return isEn
+                                                ? (leading?.country_name_en ??
+                                                      leading?.country ??
+                                                      "—")
+                                                : (leading?.country_name_id ??
+                                                      leading?.country ??
+                                                      "—");
+                                        })()}
                                     </span>{" "}
                                     ({formatDecimal(highestImportShare)}
                                     %)
@@ -656,45 +691,63 @@ export default function ThreadIntelligence({ thread = {}, page = {} }) {
                             <div className="space-y-4">
                                 {topExportDestinations
                                     .slice(0, 10)
-                                    .map((item, index) => (
-                                        <div key={`${item.country}-${index}`}>
-                                            <div className="flex items-center justify-between gap-3">
-                                                <div className="flex min-w-0 items-center gap-3">
-                                                    <span className="w-5 shrink-0 text-xs font-black text-slate-400">
-                                                        {index + 1}
-                                                    </span>
+                                    .map((item, index) => {
+                                        const marketShare =
+                                            exportMarketShare?.find(
+                                                (share) =>
+                                                    share.country_code ===
+                                                    item.country_code,
+                                            )?.market_share_percent ?? 0;
 
-                                                    <span className="truncate text-sm font-bold text-slate-700">
-                                                        {item.country}
+                                        const countryName = isEn
+                                            ? item.country_name_en
+                                            : item.country_name_id;
+
+                                        return (
+                                            <div
+                                                key={`${item.country_code}-${index}`}
+                                            >
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <div className="flex min-w-0 items-center gap-3">
+                                                        <span className="w-5 shrink-0 text-xs font-black text-slate-400">
+                                                            {index + 1}
+                                                        </span>
+
+                                                        <span className="shrink-0 text-base leading-none">
+                                                            {item.flag_emoji?.trim() ||
+                                                                "🌐"}
+                                                        </span>
+
+                                                        <span className="truncate text-sm font-bold text-slate-700">
+                                                            {countryName ??
+                                                                item.country ??
+                                                                "—"}
+                                                        </span>
+                                                    </div>
+
+                                                    <span className="shrink-0 text-sm font-black text-slate-900">
+                                                        {formatCurrency(
+                                                            item.value,
+                                                        )}
                                                     </span>
                                                 </div>
 
-                                                <span className="shrink-0 text-sm font-black text-slate-900">
-                                                    {formatCurrency(item.value)}
-                                                </span>
+                                                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                                                    <div
+                                                        className="h-full rounded-full bg-emerald-500"
+                                                        style={{
+                                                            width: `${Math.max(
+                                                                4,
+                                                                Number(
+                                                                    marketShare,
+                                                                ),
+                                                            )}%`,
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
-
-                                            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                                                <div
-                                                    className="h-full rounded-full bg-emerald-500"
-                                                    style={{
-                                                        width: `${Math.max(
-                                                            4,
-                                                            Number(
-                                                                exportMarketShare?.find(
-                                                                    (share) =>
-                                                                        share.country ===
-                                                                        item.country,
-                                                                )
-                                                                    ?.market_share_percent ??
-                                                                    0,
-                                                            ),
-                                                        )}%`,
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                             </div>
 
                             {exportMarketShare.length > 0 && (
@@ -703,7 +756,18 @@ export default function ThreadIntelligence({ thread = {}, page = {} }) {
                                         ? "Leading destination:"
                                         : "Negara tujuan utama:"}{" "}
                                     <span className="font-black text-slate-700">
-                                        {exportMarketShare[0]?.country}
+                                        {(() => {
+                                            const leading =
+                                                exportMarketShare?.[0];
+
+                                            return isEn
+                                                ? (leading?.country_name_en ??
+                                                      leading?.country ??
+                                                      "—")
+                                                : (leading?.country_name_id ??
+                                                      leading?.country ??
+                                                      "—");
+                                        })()}
                                     </span>{" "}
                                     ({formatDecimal(highestExportShare)}
                                     %)

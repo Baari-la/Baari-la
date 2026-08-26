@@ -23,25 +23,26 @@ final class TradeReportingPeriod
         public readonly ?int $bufferYear = null,
         public readonly ?int $bufferMonth = null,
         public readonly string $status = 'available',
+        public readonly string $mode = 'ytd',
     ) {
         $this->validate();
     }
 
+
     /*
     |--------------------------------------------------------------------------
-    | Factory
+    | Factory: Latest Public Period
     |--------------------------------------------------------------------------
+    |
+    | Existing system behavior is preserved.
+    |
+    | Example:
+    |
+    | Public  : Jan-Jun 2026
+    | Compare : Jan-Jun 2025
+    |
     */
 
-    /**
-     * Create a reporting period for a public month.
-     *
-     * Example:
-     *
-     * Public  : May 2026
-     * Compare : May 2025
-     * Buffer  : June 2026
-     */
     public static function make(
         int $publicThroughYear,
         int $publicThroughMonth,
@@ -50,15 +51,99 @@ final class TradeReportingPeriod
         string $status = 'available',
     ): self {
         return new self(
-            publicThroughYear: $publicThroughYear,
-            publicThroughMonth: $publicThroughMonth,
-            comparisonYear: $publicThroughYear - 1,
-            comparisonThroughMonth: $publicThroughMonth,
-            bufferYear: $bufferYear,
-            bufferMonth: $bufferMonth,
-            status: $status,
+            publicThroughYear:
+                $publicThroughYear,
+
+            publicThroughMonth:
+                $publicThroughMonth,
+
+            comparisonYear:
+                $publicThroughYear - 1,
+
+            comparisonThroughMonth:
+                $publicThroughMonth,
+
+            bufferYear:
+                $bufferYear,
+
+            bufferMonth:
+                $bufferMonth,
+
+            status:
+                $status,
+
+            mode:
+                'ytd',
         );
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Factory: Custom User Selection
+    |--------------------------------------------------------------------------
+    */
+
+    public static function forSelection(
+        int $currentYear,
+        int $currentMonth,
+        int $comparisonYear,
+        int $comparisonMonth,
+        string $mode = 'ytd',
+    ): self {
+        return new self(
+            publicThroughYear:
+                $currentYear,
+
+            publicThroughMonth:
+                $currentMonth,
+
+            comparisonYear:
+                $comparisonYear,
+
+            comparisonThroughMonth:
+                $comparisonMonth,
+
+            bufferYear:
+                null,
+
+            bufferMonth:
+                null,
+
+            status:
+                'available',
+
+            mode:
+                strtolower(
+                    trim($mode)
+                ),
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mode
+    |--------------------------------------------------------------------------
+    */
+
+    public function isYtd(): bool
+    {
+        return $this->mode === 'ytd';
+    }
+
+
+    public function isMonthly(): bool
+    {
+        return $this->mode === 'monthly';
+    }
+
+
+    public function isFullYear(): bool
+    {
+        return $this->mode === 'full_year';
+    }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -68,6 +153,14 @@ final class TradeReportingPeriod
 
     public function currentStart(): Carbon
     {
+        if ($this->isMonthly()) {
+            return Carbon::create(
+                $this->publicThroughYear,
+                $this->publicThroughMonth,
+                1,
+            )->startOfDay();
+        }
+
         return Carbon::create(
             $this->publicThroughYear,
             1,
@@ -75,14 +168,24 @@ final class TradeReportingPeriod
         )->startOfDay();
     }
 
+
     public function currentEnd(): Carbon
     {
+        if ($this->isFullYear()) {
+            return Carbon::create(
+                $this->publicThroughYear,
+                12,
+                1,
+            )->endOfMonth();
+        }
+
         return Carbon::create(
             $this->publicThroughYear,
             $this->publicThroughMonth,
             1,
         )->endOfMonth();
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -92,6 +195,14 @@ final class TradeReportingPeriod
 
     public function comparisonStart(): Carbon
     {
+        if ($this->isMonthly()) {
+            return Carbon::create(
+                $this->comparisonYear,
+                $this->comparisonThroughMonth,
+                1,
+            )->startOfDay();
+        }
+
         return Carbon::create(
             $this->comparisonYear,
             1,
@@ -99,14 +210,24 @@ final class TradeReportingPeriod
         )->startOfDay();
     }
 
+
     public function comparisonEnd(): Carbon
     {
+        if ($this->isFullYear()) {
+            return Carbon::create(
+                $this->comparisonYear,
+                12,
+                1,
+            )->endOfMonth();
+        }
+
         return Carbon::create(
             $this->comparisonYear,
             $this->comparisonThroughMonth,
             1,
         )->endOfMonth();
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -123,6 +244,7 @@ final class TradeReportingPeriod
         );
     }
 
+
     public function comparisonPeriod(): string
     {
         return sprintf(
@@ -131,6 +253,7 @@ final class TradeReportingPeriod
             $this->comparisonThroughMonth,
         );
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -141,13 +264,15 @@ final class TradeReportingPeriod
     public function snapshotKey(): string
     {
         return sprintf(
-            '%04d-%02d-vs-%04d-%02d',
+            '%04d-%02d-vs-%04d-%02d-%s',
             $this->publicThroughYear,
             $this->publicThroughMonth,
             $this->comparisonYear,
             $this->comparisonThroughMonth,
+            $this->mode,
         );
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -164,8 +289,27 @@ final class TradeReportingPeriod
         );
     }
 
+
     public function displayPeriodLabelEn(): string
     {
+        if ($this->isMonthly()) {
+            return sprintf(
+                '%s %d',
+                $this->monthName(
+                    $this->publicThroughMonth,
+                    'en',
+                ),
+                $this->publicThroughYear,
+            );
+        }
+
+        if ($this->isFullYear()) {
+            return sprintf(
+                'Full Year %d',
+                $this->publicThroughYear,
+            );
+        }
+
         return sprintf(
             'Data through %s %d',
             $this->monthName(
@@ -176,8 +320,27 @@ final class TradeReportingPeriod
         );
     }
 
+
     public function displayPeriodLabelId(): string
     {
+        if ($this->isMonthly()) {
+            return sprintf(
+                '%s %d',
+                $this->monthName(
+                    $this->publicThroughMonth,
+                    'id',
+                ),
+                $this->publicThroughYear,
+            );
+        }
+
+        if ($this->isFullYear()) {
+            return sprintf(
+                'Full Year %d',
+                $this->publicThroughYear,
+            );
+        }
+
         return sprintf(
             'Data sampai %s %d',
             $this->monthName(
@@ -188,8 +351,33 @@ final class TradeReportingPeriod
         );
     }
 
+
     public function comparisonPeriodLabelEn(): string
     {
+        if ($this->isMonthly()) {
+            return sprintf(
+                '%s %d vs %s %d',
+                $this->monthName(
+                    $this->comparisonThroughMonth,
+                    'en',
+                ),
+                $this->comparisonYear,
+                $this->monthName(
+                    $this->publicThroughMonth,
+                    'en',
+                ),
+                $this->publicThroughYear,
+            );
+        }
+
+        if ($this->isFullYear()) {
+            return sprintf(
+                'Full Year %d vs Full Year %d',
+                $this->comparisonYear,
+                $this->publicThroughYear,
+            );
+        }
+
         return sprintf(
             'Jan %d–%s %d vs Jan %d–%s %d',
             $this->comparisonYear,
@@ -207,8 +395,33 @@ final class TradeReportingPeriod
         );
     }
 
+
     public function comparisonPeriodLabelId(): string
     {
+        if ($this->isMonthly()) {
+            return sprintf(
+                '%s %d vs %s %d',
+                $this->monthName(
+                    $this->comparisonThroughMonth,
+                    'id',
+                ),
+                $this->comparisonYear,
+                $this->monthName(
+                    $this->publicThroughMonth,
+                    'id',
+                ),
+                $this->publicThroughYear,
+            );
+        }
+
+        if ($this->isFullYear()) {
+            return sprintf(
+                'Full Year %d vs Full Year %d',
+                $this->comparisonYear,
+                $this->publicThroughYear,
+            );
+        }
+
         return sprintf(
             'Jan %d–%s %d vs Jan %d–%s %d',
             $this->comparisonYear,
@@ -225,6 +438,7 @@ final class TradeReportingPeriod
             $this->publicThroughYear,
         );
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -237,6 +451,7 @@ final class TradeReportingPeriod
         return $this->bufferYear !== null
             && $this->bufferMonth !== null;
     }
+
 
     public function bufferPeriod(): ?string
     {
@@ -251,6 +466,7 @@ final class TradeReportingPeriod
         );
     }
 
+
     /*
     |--------------------------------------------------------------------------
     | Status
@@ -262,10 +478,12 @@ final class TradeReportingPeriod
         return $this->status === 'available';
     }
 
+
     public function isBufferPromoted(): bool
     {
         return $this->status === 'buffer_promoted';
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -299,6 +517,9 @@ final class TradeReportingPeriod
 
             'status' =>
                 $this->status,
+
+            'mode' =>
+                $this->mode,
 
             'period' =>
                 $this->periodLabel(),
@@ -337,6 +558,7 @@ final class TradeReportingPeriod
                 $this->comparisonEnd()->toDateString(),
         ];
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -396,7 +618,24 @@ final class TradeReportingPeriod
                 'Buffer month must be between 1 and 12.'
             );
         }
+
+        if (
+            !in_array(
+                $this->mode,
+                [
+                    'ytd',
+                    'monthly',
+                    'full_year',
+                ],
+                true
+            )
+        ) {
+            throw new InvalidArgumentException(
+                'Reporting period mode must be ytd, monthly, or full_year.'
+            );
+        }
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -441,6 +680,6 @@ final class TradeReportingPeriod
         ];
 
         return $names[$locale][$month]
-            ?? (string) $month;
+            ?? $names['en'][$month];
     }
 }

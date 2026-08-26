@@ -38,38 +38,117 @@ class TradeStatisticsMetadataService
      */
     protected function build(): array
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Trade Statistics Metadata
+        |--------------------------------------------------------------------------
+        |
+        | trade_statistics remains the source for:
+        | - reporting period
+        | - trade records
+        | - countries
+        | - trade value
+        | - HS codes actually present in trade data
+        |
+        */
+
+        $tradeQuery = DB::table('trade_statistics')
+            ->where('trade_flow', 'export');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Canonical HS-8 Master
+        |--------------------------------------------------------------------------
+        |
+        | mst_hscode is the authoritative textile HS-8 universe.
+        |
+        */
+
+        $canonicalHs8Count = DB::table('mst_hscode')
+            ->where('is_active', true)
+            ->where('is_textile', true)
+            ->count();
+
         return [
 
-            'latest_year' => DB::table('trade_statistics')
-                ->where('trade_flow', 'export')
-                ->max('year'),
+            /*
+            |--------------------------------------------------------------------------
+            | Trade Period
+            |--------------------------------------------------------------------------
+            */
 
-            'oldest_year' => DB::table('trade_statistics')
-                ->where('trade_flow', 'export')
-                ->min('year'),
+            'latest_year' =>
+                (clone $tradeQuery)
+                    ->max('year'),
 
-            'last_updated' => DB::table('trade_statistics')
-                ->where('trade_flow', 'export')
-                ->max('updated_at'),
+            'oldest_year' =>
+                (clone $tradeQuery)
+                    ->min('year'),
 
-            'total_records' => DB::table('trade_statistics')
-                ->where('trade_flow', 'export')
-                ->count(),
+            /*
+            |--------------------------------------------------------------------------
+            | Data Freshness
+            |--------------------------------------------------------------------------
+            */
 
-            'total_hs_codes' => DB::table('trade_statistics')
-                ->where('trade_flow', 'export')
-                ->distinct('hs_code')
-                ->count('hs_code'),
+            'last_updated' =>
+                (clone $tradeQuery)
+                    ->max('updated_at'),
 
-            'total_countries' => DB::table('trade_statistics')
-                ->where('trade_flow', 'export')
-                ->distinct('country_code')
-                ->count('country_code'),
+            /*
+            |--------------------------------------------------------------------------
+            | Trade Dataset
+            |--------------------------------------------------------------------------
+            */
 
-            'total_export_value' => DB::table('trade_statistics')
-                ->where('trade_flow', 'export')
-                ->sum('trade_value'),
+            'total_records' =>
+                (clone $tradeQuery)
+                    ->count(),
 
+            /*
+            |--------------------------------------------------------------------------
+            | HS Codes Actually Present in Trade Data
+            |--------------------------------------------------------------------------
+            |
+            | This is intentionally NOT the Canonical HS-8 count.
+            |
+            */
+
+            'total_hs_codes' =>
+                (clone $tradeQuery)
+                    ->distinct('hs_code')
+                    ->count('hs_code'),
+
+            /*
+            |--------------------------------------------------------------------------
+            | Canonical Textile HS-8 Universe
+            |--------------------------------------------------------------------------
+            */
+
+            'canonical_hs8_count' =>
+                $canonicalHs8Count,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Countries
+            |--------------------------------------------------------------------------
+            */
+
+            'total_countries' =>
+                (clone $tradeQuery)
+                    ->whereNotNull('country_code')
+                    ->distinct('country_code')
+                    ->count('country_code'),
+
+            /*
+            |--------------------------------------------------------------------------
+            | Export Value
+            |--------------------------------------------------------------------------
+            */
+
+            'total_export_value' =>
+                (clone $tradeQuery)
+                    ->sum('trade_value'),
         ];
     }
 }
