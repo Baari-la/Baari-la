@@ -30,10 +30,10 @@ export default function Step2PackageSelection() {
     const isEn = locale === "en";
 
     /*
-    |--------------------------------------------------------------------------
-    | PROGRAM PACKAGES
-    |--------------------------------------------------------------------------
-    */
+|--------------------------------------------------------------------------
+| PROGRAM PACKAGES
+|--------------------------------------------------------------------------
+*/
 
     const packages = [
         {
@@ -46,8 +46,8 @@ export default function Step2PackageSelection() {
                 : "Bangun Kehadiran Digital Anda",
 
             description: isEn
-                ? "Start your DIGESTEX journey with a free digital company presence and begin building your visibility."
-                : "Mulai perjalanan DIGESTEX dengan kehadiran digital perusahaan secara gratis dan mulai membangun visibilitas Anda.",
+                ? "Start building your company's digital presence within the DIGESTEX ecosystem and establish the foundation for future visibility."
+                : "Mulai membangun kehadiran digital perusahaan Anda di dalam ekosistem DIGESTEX sebagai fondasi untuk meningkatkan visibilitas di masa depan.",
 
             price: "Rp 0",
 
@@ -61,7 +61,7 @@ export default function Step2PackageSelection() {
                 ? [
                       "Company Identity",
                       "Basic Company Profile",
-                      "Company Directory Listing",
+                      "DIGESTEX Company Listing",
                       "Claim Your Company",
                       "Products & Capabilities",
                       "Basic MOQ",
@@ -69,9 +69,9 @@ export default function Step2PackageSelection() {
                       "Basic Visibility Score™",
                   ]
                 : [
-                      "Company Identity",
+                      "Identitas Perusahaan",
                       "Profil Perusahaan Dasar",
-                      "Listing di Company Directory",
+                      "Listing Perusahaan di DIGESTEX",
                       "Claim Perusahaan",
                       "Produk & Kapabilitas",
                       "MOQ Dasar",
@@ -90,12 +90,12 @@ export default function Step2PackageSelection() {
             name: "VERIFIED COMPANY",
 
             subtitle: isEn
-                ? "Build Trust & Credibility"
-                : "Bangun Kepercayaan & Kredibilitas",
+                ? "Build a Trusted Digital Identity"
+                : "Bangun Identitas Digital yang Terpercaya",
 
             description: isEn
-                ? "Strengthen your company's credibility with verified business information and a trusted digital company identity."
-                : "Perkuat kredibilitas perusahaan dengan informasi bisnis terverifikasi dan identitas digital perusahaan yang terpercaya.",
+                ? "Strengthen your company's digital identity with verified business information and establish greater trust with buyers and business partners."
+                : "Perkuat identitas digital perusahaan melalui informasi bisnis yang terverifikasi serta bangun kepercayaan yang lebih tinggi dengan buyer dan mitra bisnis.",
 
             price: "Rp 2.500.000",
 
@@ -110,20 +110,20 @@ export default function Step2PackageSelection() {
                       "Everything in FREE",
                       "Verified Company Badge",
                       "Digital Company Passport™",
-                      "Product & Capability Listing",
+                      "Structured Company Profile",
+                      "Products & Capabilities",
                       "Company Contact Information",
                       "Verification Status",
-                      "Enhanced Company Profile",
                       "Export Market Profile",
                   ]
                 : [
                       "Semua fitur FREE",
                       "Verified Company Badge",
                       "Digital Company Passport™",
-                      "Listing Produk & Kapabilitas",
+                      "Profil Perusahaan Terstruktur",
+                      "Produk & Kapabilitas",
                       "Informasi Kontak Perusahaan",
                       "Status Verifikasi",
-                      "Enhanced Company Profile",
                       "Profil Pasar Ekspor",
                   ],
 
@@ -136,12 +136,12 @@ export default function Step2PackageSelection() {
             name: "PREMIUM / VISIBILITY PARTNER",
 
             subtitle: isEn
-                ? "Increase Your Visibility"
-                : "Tingkatkan Visibilitas Anda",
+                ? "Build Your Readable-AI Profile & Increase Visibility"
+                : "Bangun Readable-AI Profile & Tingkatkan Visibilitas",
 
             description: isEn
-                ? "Designed for companies seeking stronger visibility, discoverability and access to more business opportunities."
-                : "Dirancang untuk perusahaan yang ingin meningkatkan visibilitas, discoverability, dan peluang bisnis.",
+                ? "Designed for companies ready to transform their capabilities into a stronger Readable-AI Profile, improve discoverability, and gain greater digital and global business visibility."
+                : "Dirancang untuk perusahaan yang siap mengubah kapabilitasnya menjadi Readable-AI Profile yang lebih kuat, meningkatkan discoverability, serta memperluas visibilitas digital dan global.",
 
             price: "Rp 5.000.000",
 
@@ -156,28 +156,30 @@ export default function Step2PackageSelection() {
             features: isEn
                 ? [
                       "Everything in Verified",
+                      "Readable-AI Profile",
                       "Visibility Score™",
-                      "Featured Company Listing",
+                      "Featured Company Visibility",
                       "Enhanced Company Profile",
                       "Production Capacity",
-                      "Machinery Information",
-                      "Certifications",
-                      "Export Markets",
+                      "Machinery & Technology",
+                      "Certifications & Compliance",
+                      "Export Markets & Experience",
                       "Lead Time",
-                      "Business Visibility",
+                      "Global Business Visibility",
                       "RFQ Opportunity Access",
                   ]
                 : [
                       "Semua fitur Verified",
+                      "Readable-AI Profile",
                       "Visibility Score™",
-                      "Featured Company Listing",
+                      "Featured Company Visibility",
                       "Enhanced Company Profile",
                       "Kapasitas Produksi",
-                      "Informasi Mesin",
-                      "Sertifikasi",
-                      "Pasar Ekspor",
+                      "Mesin & Teknologi",
+                      "Sertifikasi & Kepatuhan",
+                      "Pasar & Pengalaman Ekspor",
                       "Lead Time",
-                      "Business Visibility",
+                      "Visibilitas Bisnis Global",
                       "Akses Peluang RFQ",
                   ],
 
@@ -194,8 +196,8 @@ export default function Step2PackageSelection() {
                 : "Ubah Intelligence Menjadi Keputusan",
 
             description: isEn
-                ? "For executives and decision makers who require deeper industry intelligence and advanced market insight."
-                : "Untuk pimpinan dan pengambil keputusan yang membutuhkan industry intelligence dan market insight yang lebih mendalam.",
+                ? "For executives and decision makers seeking deeper industry intelligence, market insight, trade intelligence, and advanced business decision support."
+                : "Untuk pimpinan dan pengambil keputusan yang membutuhkan industry intelligence, market insight, trade intelligence, serta dukungan pengambilan keputusan bisnis yang lebih mendalam.",
 
             price: "Rp 10.000.000",
 
@@ -248,16 +250,15 @@ export default function Step2PackageSelection() {
             <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
                 <div className="space-y-10">
                     {/* =====================================================
-                        HEADER
-                    ===================================================== */}
-
+    HEADER
+===================================================== */}
                     <section className="text-center">
                         <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">
                             <Sparkles className="h-4 w-4" />
 
                             {isEn
-                                ? "DIGESTEX PROGRAM LEVELS"
-                                : "LEVEL PROGRAM DIGESTEX"}
+                                ? "DIGESTEX COMPANY GROWTH JOURNEY"
+                                : "PERJALANAN PERTUMBUHAN PERUSAHAAN DIGESTEX"}
                         </div>
 
                         <p className="mt-6 text-sm font-black uppercase tracking-[0.25em] text-slate-400">
@@ -266,28 +267,28 @@ export default function Step2PackageSelection() {
 
                         <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
                             {isEn
-                                ? "Choose Your DIGESTEX Program Level"
-                                : "Pilih Level Program DIGESTEX Anda"}
+                                ? "Choose Your DIGESTEX Program"
+                                : "Pilih Program DIGESTEX Anda"}
                         </h1>
 
                         <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-slate-500 sm:text-lg">
                             {isEn
-                                ? "Start free, build your digital presence, increase your visibility and grow toward greater intelligence and strategic industry participation."
-                                : "Mulai gratis, bangun kehadiran digital, tingkatkan visibilitas dan berkembang menuju intelligence serta partisipasi strategis dalam ekosistem industri."}
+                                ? "Start with a strong digital identity, build your Readable-AI Profile, increase your visibility, and progress toward deeper intelligence and global business opportunities."
+                                : "Mulai dengan membangun identitas digital yang kuat, bangun Readable-AI Profile, tingkatkan visibilitas, dan berkembang menuju intelligence yang lebih mendalam serta peluang bisnis global."}
                         </p>
 
                         <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white">
                             <Globe2 className="h-4 w-4 text-emerald-400" />
 
                             {isEn
-                                ? "START FREE. BUILD VISIBILITY. GROW WITH DIGESTEX."
-                                : "MULAI GRATIS. BANGUN VISIBILITAS. TUMBUH BERSAMA DIGESTEX."}
+                                ? "BUILD YOUR IDENTITY. INCREASE VISIBILITY. UNLOCK OPPORTUNITIES."
+                                : "BANGUN IDENTITAS. TINGKATKAN VISIBILITAS. BUKA PELUANG."}
                         </div>
                     </section>
 
                     {/* =====================================================
-                        JOURNEY STRIP
-                    ===================================================== */}
+    JOURNEY STRIP
+===================================================== */}
 
                     <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
                         <div className="grid md:grid-cols-5">
@@ -296,37 +297,39 @@ export default function Step2PackageSelection() {
                                 title={isEn ? "Build" : "Bangun"}
                                 text={
                                     isEn
-                                        ? "Digital Presence"
-                                        : "Kehadiran Digital"
+                                        ? "Your Digital Identity"
+                                        : "Identitas Digital Perusahaan"
                                 }
                                 active
                             />
 
                             <JourneyStep
                                 number="02"
-                                title={isEn ? "Verify" : "Verifikasi"}
+                                title={isEn ? "Structure" : "Strukturkan"}
                                 text={
-                                    isEn ? "Build Trust" : "Bangun Kepercayaan"
+                                    isEn
+                                        ? "Readable-AI Profile"
+                                        : "Readable-AI Profile"
                                 }
                             />
 
                             <JourneyStep
                                 number="03"
-                                title={isEn ? "Grow" : "Tumbuh"}
+                                title={isEn ? "Verify" : "Verifikasi"}
                                 text={
                                     isEn
-                                        ? "Increase Visibility"
-                                        : "Tingkatkan Visibilitas"
+                                        ? "Build Trust & Credibility"
+                                        : "Bangun Kepercayaan & Kredibilitas"
                                 }
                             />
 
                             <JourneyStep
                                 number="04"
-                                title={isEn ? "Discover" : "Ditemukan"}
+                                title={isEn ? "Increase" : "Tingkatkan"}
                                 text={
                                     isEn
-                                        ? "Business Opportunities"
-                                        : "Peluang Bisnis"
+                                        ? "Business Visibility"
+                                        : "Visibilitas Bisnis"
                                 }
                             />
 
@@ -335,8 +338,8 @@ export default function Step2PackageSelection() {
                                 title={isEn ? "Connect" : "Terhubung"}
                                 text={
                                     isEn
-                                        ? "Global Ecosystem"
-                                        : "Ekosistem Global"
+                                        ? "Global Business Opportunities"
+                                        : "Peluang Bisnis Global"
                                 }
                             />
                         </div>
@@ -345,7 +348,6 @@ export default function Step2PackageSelection() {
                     {/* =====================================================
                         PACKAGE CARDS
                     ===================================================== */}
-
                     <section className="grid gap-6 xl:grid-cols-4">
                         {packages.map((pkg) => {
                             const Icon = pkg.icon;
@@ -360,11 +362,9 @@ export default function Step2PackageSelection() {
                             );
                         })}
                     </section>
-
                     {/* =====================================================
     STRATEGIC SOLUTION PARTNER
 ===================================================== */}
-
                     <section className="relative overflow-hidden rounded-3xl bg-slate-950 p-6 text-white shadow-2xl sm:p-8 lg:p-10">
                         {/* =================================================
         DECORATIVE BACKGROUND
@@ -391,48 +391,48 @@ export default function Step2PackageSelection() {
                                 <div className="grid grid-cols-2 gap-3">
                                     {(isEn
                                         ? [
-                                              "Industry Visibility",
-                                              "Ecosystem Positioning",
-                                              "Solution Showcase",
-                                              "Thought Leadership",
-                                              "Executive Engagement",
-                                              "Partnership Opportunities",
+                                              "Structured Digital Company Identity",
+                                              "Readable-AI Profile",
+                                              "Industry & Business Visibility",
+                                              "Improved Discoverability",
+                                              "Verified Business Information",
+                                              "Business Opportunity Readiness",
                                           ]
                                         : [
-                                              "Industry Visibility",
-                                              "Strategis dalam Ekosistem",
-                                              "Solution Showcase",
-                                              "Thought Leadership",
-                                              "Executive Engagement",
-                                              "Peluang Partnership",
+                                              "Identitas Digital Perusahaan Terstruktur",
+                                              "Readable-AI Profile",
+                                              "Visibilitas Industri & Bisnis",
+                                              "Meningkatkan Kemudahan Ditemukan",
+                                              "Informasi Bisnis Terverifikasi",
+                                              "Kesiapan Mengakses Peluang Bisnis",
                                           ]
                                     ).map((item) => (
                                         <div
                                             key={item}
                                             className="
-                            min-h-[82px]
-                            rounded-2xl
-                            border
-                            border-white/10
-                            bg-white/[0.035]
-                            p-4
-                            transition
-                            hover:border-emerald-400/30
-                            hover:bg-white/[0.06]
-                        "
+                    min-h-[82px]
+                    rounded-2xl
+                    border
+                    border-white/10
+                    bg-white/[0.035]
+                    p-4
+                    transition
+                    hover:border-emerald-400/30
+                    hover:bg-white/[0.06]
+                "
                                         >
                                             <div className="flex items-start gap-3">
                                                 <span
                                                     className="
-                                    flex
-                                    h-7
-                                    w-7
-                                    shrink-0
-                                    items-center
-                                    justify-center
-                                    rounded-full
-                                    bg-emerald-400/10
-                                "
+                            flex
+                            h-7
+                            w-7
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-emerald-400/10
+                        "
                                                 >
                                                     <Check className="h-4 w-4 text-emerald-400" />
                                                 </span>
@@ -446,14 +446,14 @@ export default function Step2PackageSelection() {
                                 </div>
 
                                 {/* =================================================
-                STRATEGIC SOLUTION CATEGORIES
-            ================================================= */}
+        STRATEGIC SOLUTION CATEGORIES
+    ================================================= */}
 
                                 <div className="mt-8">
                                     <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
                                         {isEn
-                                            ? "Strategic Solution Partners We Welcome"
-                                            : "Mitra Solusi Strategis yang Kami Sambut"}
+                                            ? "Strategic Solution Companies We Welcome"
+                                            : "Perusahaan Penyedia Solusi Strategis yang Kami Sambut"}
                                     </p>
 
                                     <div className="mt-4 flex flex-wrap gap-2">
@@ -490,20 +490,20 @@ export default function Step2PackageSelection() {
                                             <span
                                                 key={item}
                                                 className="
-                                rounded-full
-                                border
-                                border-white/10
-                                bg-white/[0.035]
-                                px-3
-                                py-2
-                                text-xs
-                                font-medium
-                                text-slate-300
-                                transition
-                                hover:border-emerald-400/30
-                                hover:bg-emerald-400/10
-                                hover:text-emerald-300
-                            "
+                        rounded-full
+                        border
+                        border-white/10
+                        bg-white/[0.035]
+                        px-3
+                        py-2
+                        text-xs
+                        font-medium
+                        text-slate-300
+                        transition
+                        hover:border-emerald-400/30
+                        hover:bg-emerald-400/10
+                        hover:text-emerald-300
+                    "
                                             >
                                                 {item}
                                             </span>
@@ -512,8 +512,8 @@ export default function Step2PackageSelection() {
 
                                     <p className="mt-5 max-w-md text-xs leading-5 text-slate-500">
                                         {isEn
-                                            ? "If your company provides a solution that can improve textile manufacturing, sourcing, trade, sustainability or digital transformation, we would like to hear from you."
-                                            : "Jika perusahaan Anda menyediakan solusi yang dapat meningkatkan manufaktur tekstil, sourcing, perdagangan, sustainability, atau transformasi digital, kami ingin berdiskusi dengan Anda."}
+                                            ? "If your company provides technologies, products, services or solutions that support textile manufacturing, sourcing, trade, sustainability or digital transformation, DIGESTEX welcomes you to become part of the ecosystem."
+                                            : "Jika perusahaan Anda menyediakan teknologi, produk, layanan, atau solusi yang mendukung manufaktur tekstil, sourcing, perdagangan, sustainability, atau transformasi digital, DIGESTEX menyambut Anda menjadi bagian dari ekosistem."}
                                     </p>
                                 </div>
                             </div>
@@ -549,14 +549,14 @@ export default function Step2PackageSelection() {
 
                                         <h2 className="mt-5 text-3xl font-black leading-tight sm:text-4xl">
                                             {isEn
-                                                ? "Powering the Textile Industry Ecosystem"
-                                                : "Kemitraan Strategis untuk Menggerakkan Industri Tekstil"}
+                                                ? "Make Your Solution Visible to the Textile Industry"
+                                                : "Jadikan Solusi Anda Lebih Terlihat oleh Industri Tekstil"}
                                         </h2>
 
                                         <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
                                             {isEn
-                                                ? "Connect your solutions, innovation and expertise with textile companies, decision makers and business opportunities across the global industry ecosystem."
-                                                : "Hubungkan solusi, inovasi, dan keahlian perusahaan Anda dengan perusahaan tekstil, pengambil keputusan, dan peluang bisnis dalam ekosistem industri global."}
+                                                ? "Position your technology, products, services and expertise within the DIGESTEX Global Textile Intelligence Ecosystem — helping the right companies discover your capabilities and connect with relevant business opportunities."
+                                                : "Posisikan teknologi, produk, layanan, dan keahlian perusahaan Anda dalam DIGESTEX Global Textile Intelligence Ecosystem — membantu perusahaan yang tepat menemukan kapabilitas Anda dan terhubung dengan peluang bisnis yang relevan."}
                                         </p>
                                     </div>
 
@@ -854,7 +854,6 @@ export default function Step2PackageSelection() {
                     {/* =====================================================
                         PROGRAM PRINCIPLE
                     ===================================================== */}
-
                     <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm lg:p-10">
                         <div className="grid gap-8 lg:grid-cols-3">
                             <Principle
@@ -898,11 +897,9 @@ export default function Step2PackageSelection() {
                             />
                         </div>
                     </section>
-
                     {/* =====================================================
                         BACK
                     ===================================================== */}
-
                     <div className="flex justify-start">
                         <Link
                             href={route("program.digital-directory")}
@@ -913,11 +910,9 @@ export default function Step2PackageSelection() {
                             {isEn ? "BACK" : "KEMBALI"}
                         </Link>
                     </div>
-
                     {/* =====================================================
                         FOOTER NOTE
                     ===================================================== */}
-
                     <div className="rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm">
                         <div className="flex flex-col items-center gap-3">
                             <LockKeyhole className="h-5 w-5 text-slate-400" />

@@ -1501,7 +1501,7 @@ class HomeTextileTradeIntelligenceService
 
     /*
     |--------------------------------------------------------------------------
-    | Snapshot Period Validation
+    buildSnapshot(
     |--------------------------------------------------------------------------
     */
 

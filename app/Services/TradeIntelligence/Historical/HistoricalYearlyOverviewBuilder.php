@@ -450,36 +450,76 @@ class HistoricalYearlyOverviewBuilder
     */
 
     protected function normalizeLeadingCountry(
-        ?array $country
-    ): ?array {
+    ?array $country
+): ?array {
 
-        if (
-            !is_array($country)
-        ) {
-            return null;
-        }
-
-        return [
-
-            'country' =>
-                $country['country']
-                ?? $country['trade_country']
-                ?? $country['name']
-                ?? null,
-
-            'trade_value' =>
-                (float) (
-                    $country['trade_value']
-                    ?? $country['value']
-                    ?? 0
-                ),
-
-            'trade_volume' =>
-                (float) (
-                    $country['trade_volume']
-                    ?? $country['volume']
-                    ?? 0
-                ),
-        ];
+    if (
+        !is_array($country)
+    ) {
+        return null;
     }
+
+    return [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Country Identity
+        |--------------------------------------------------------------------------
+        */
+
+        'country' =>
+            $country['country']
+            ?? $country['trade_country']
+            ?? $country['name']
+            ?? $country['country_name_id']
+            ?? $country['country_name_en']
+            ?? null,
+
+        'country_id' =>
+            isset($country['country_id'])
+                ? (int) $country['country_id']
+                : null,
+
+        'country_code' =>
+            $country['country_code']
+            ?? null,
+
+        'iso3' =>
+            $country['iso3']
+            ?? null,
+
+        'country_name_en' =>
+            $country['country_name_en']
+            ?? null,
+
+        'country_name_id' =>
+            $country['country_name_id']
+            ?? null,
+
+        'flag_emoji' =>
+            $country['flag_emoji']
+            ?? null,
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Official Trade Metrics
+        |--------------------------------------------------------------------------
+        */
+
+        'trade_value' =>
+            (float) (
+                $country['trade_value']
+                ?? $country['value']
+                ?? 0
+            ),
+
+        'trade_volume' =>
+            (float) (
+                $country['trade_volume']
+                ?? $country['volume']
+                ?? 0
+            ),
+    ];
+}
 }

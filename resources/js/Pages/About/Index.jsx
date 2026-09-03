@@ -10,18 +10,22 @@ export default function About() {
             year: "2002",
             title: "Industry Association Engagement",
             titleId: "Keterlibatan dalam Asosiasi Industri",
+
             descriptionEn:
-                "Beginning active involvement in Indonesia's textile industry, building first-hand understanding of manufacturers, suppliers, industry challenges, and the broader textile business environment.",
+                "Beginning active involvement in Indonesia's textile industry, developing first-hand understanding of manufacturers, suppliers, industry challenges, and the business environment across the textile value chain.",
+
             descriptionId:
-                "Memulai keterlibatan aktif dalam industri tekstil Indonesia, membangun pemahaman langsung mengenai manufacturer, supplier, tantangan industri, dan lingkungan bisnis tekstil secara luas.",
+                "Memulai keterlibatan aktif dalam industri tekstil Indonesia, membangun pemahaman langsung mengenai manufacturer, supplier, tantangan industri, dan lingkungan bisnis di seluruh rantai nilai industri tekstil.",
         },
 
         {
             year: "2004 - 2011",
             title: "International Textile Media & Global Industry Network",
             titleId: "Media Tekstil Internasional & Jaringan Industri Global",
+
             descriptionEn:
-                "Contributing to international textile publications while developing relationships with manufacturers, suppliers, buyers, technology providers, and textile industry stakeholders across international markets.",
+                "Contributing to international textile publications while building relationships with manufacturers, suppliers, buyers, technology providers, and textile industry stakeholders across international markets.",
+
             descriptionId:
                 "Berkontribusi pada publikasi tekstil internasional sekaligus membangun hubungan dengan manufacturer, supplier, buyer, technology provider, dan stakeholder industri tekstil di berbagai pasar internasional.",
         },
@@ -30,94 +34,147 @@ export default function About() {
             year: "2006 - 2011",
             title: "Government, Trade & Industry Engagement",
             titleId: "Keterlibatan Pemerintah, Perdagangan & Industri",
+
             descriptionEn:
-                "Engaging with government and industry stakeholders while gaining deeper experience in industrial policy, trade, regulatory frameworks, and the challenges affecting textile industry competitiveness.",
+                "Engaging with government and industry stakeholders while gaining deeper experience in industrial policy, international trade, regulatory frameworks, and the challenges shaping textile industry competitiveness.",
+
             descriptionId:
-                "Berinteraksi dengan stakeholder pemerintah dan industri sekaligus memperluas pengalaman dalam kebijakan industri, perdagangan, regulasi, serta berbagai tantangan yang memengaruhi daya saing industri tekstil.",
+                "Berinteraksi dengan stakeholder pemerintah dan industri sekaligus memperluas pengalaman dalam kebijakan industri, perdagangan internasional, regulasi, serta berbagai tantangan yang membentuk daya saing industri tekstil.",
         },
 
         {
             year: "2011 - Present",
             title: "Industry Knowledge & Business Connectivity",
             titleId: "Pengetahuan Industri & Konektivitas Bisnis",
+
             descriptionEn:
-                "Developing industry publications, business directories, networking initiatives, seminars, business matching activities, and market connectivity programs that connect companies and industry stakeholders.",
+                "Developing industry publications, business directories, networking initiatives, seminars, business matching activities, and market connectivity programs that connect companies, decision makers, and industry stakeholders.",
+
             descriptionId:
-                "Mengembangkan publikasi industri, direktori bisnis, networking initiatives, seminar, kegiatan business matching, dan program market connectivity yang menghubungkan perusahaan dan stakeholder industri.",
+                "Mengembangkan publikasi industri, direktori bisnis, networking initiatives, seminar, kegiatan business matching, dan program market connectivity yang menghubungkan perusahaan, pengambil keputusan, dan stakeholder industri.",
         },
 
         {
             year: "2022 - 2025",
-            title: "Digital Industry Directory Foundation",
-            titleId: "Fondasi Digital Industry Directory",
+            title: "Digital Industry Data & Visibility Foundation",
+            titleId: "Fondasi Data Digital & Visibilitas Industri",
+
             descriptionEn:
-                "Expanding industry directory experience and company data coverage, creating the foundation for a more structured digital approach to company visibility, verification, and industry connectivity.",
+                "Expanding company data, industry directory capabilities, and digital visibility initiatives while laying the foundation for structured company information, verification, discoverability, and intelligent industry connectivity.",
+
             descriptionId:
-                "Memperluas pengalaman dalam pengembangan direktori industri dan cakupan data perusahaan, yang menjadi fondasi bagi pendekatan digital yang lebih terstruktur terhadap company visibility, verification, dan konektivitas industri.",
+                "Memperluas data perusahaan, kapabilitas direktori industri, dan inisiatif visibilitas digital sekaligus membangun fondasi untuk informasi perusahaan yang terstruktur, verifikasi, discoverability, dan konektivitas industri yang lebih cerdas.",
         },
 
         {
             year: "2026",
-            title: "DIGESTEX Global Textile Intelligence Ecosystem",
-            titleId: "DIGESTEX Global Textile Intelligence Ecosystem",
+            title: "DIGESTEX Readable-AI Profile & Visibility Program",
+            titleId: "DIGESTEX Readable-AI Profile & Visibility Program",
+
             descriptionEn:
-                "Transforming more than two decades of industry experience, networks, trade knowledge, and business connectivity into an independent digital ecosystem connecting companies, intelligence, technologies, solutions, suppliers, buyers, and business opportunities across the textile value chain.",
+                "Transforming more than two decades of industry experience, knowledge, networks, company data, and business connectivity into structured Readable-AI Profiles — helping companies become easier to discover, understand, trust, and connect with relevant business opportunities within the DIGESTEX Global Textile Intelligence Ecosystem.",
+
             descriptionId:
-                "Mentransformasikan lebih dari dua dekade pengalaman industri, jaringan, pengetahuan perdagangan, dan konektivitas bisnis menjadi ekosistem digital independen yang menghubungkan perusahaan, intelligence, teknologi, solusi, supplier, buyer, dan peluang bisnis di seluruh rantai nilai industri tekstil.",
+                "Mentransformasikan lebih dari dua dekade pengalaman industri, pengetahuan, jaringan, data perusahaan, dan konektivitas bisnis menjadi Readable-AI Profile yang terstruktur — membantu perusahaan lebih mudah ditemukan, dipahami, dipercaya, dan terhubung dengan peluang bisnis yang relevan dalam DIGESTEX Global Textile Intelligence Ecosystem.",
         },
     ];
-
     const pillars = [
-        "Manufacturers",
-        "Raw Materials",
-        "Technology Solutions",
-        "Industrial Machinery",
+        "Manufacturers & Brands",
+        "Raw Materials & Chemicals",
+        "Technology & Machinery",
         "Testing & Certification",
         "Logistics & Supply Chain",
-        "Trade Finance",
+        "Trade Finance & Insurance",
         "Research & Education",
+        "Industry Solutions",
     ];
+
     const solutions = [
         {
-            titleEn: "Industry Directory & Visibility",
-            titleId: "Direktori Industri & Visibility",
-            descEn: "Verified company intelligence, digital profiles, and visibility tools that help companies become more discoverable to relevant industry decision makers and business opportunities.",
-            descId: "Informasi perusahaan terverifikasi, profil digital, dan tools visibility yang membantu perusahaan lebih mudah ditemukan oleh decision makers industri dan peluang bisnis yang relevan.",
+            titleEn: "Readable-AI Company Profiles",
+            titleId: "Readable-AI Company Profiles",
+
+            descEn: "Transforming company capabilities, products, technologies, certifications, markets, and business information into structured Readable-AI Profiles that are easier to discover, understand, and evaluate.",
+
+            descId: "Mentransformasikan kapabilitas perusahaan, produk, teknologi, sertifikasi, pasar, dan informasi bisnis menjadi Readable-AI Profile yang terstruktur sehingga lebih mudah ditemukan, dipahami, dan dievaluasi.",
+
             icon: "🏭",
         },
+
+        {
+            titleEn: "Digital Visibility & Discoverability",
+            titleId: "Visibilitas & Discoverability Digital",
+
+            descEn: "Helping companies strengthen their digital presence and become more discoverable to buyers, sourcing teams, investors, brands, and strategic business partners.",
+
+            descId: "Membantu perusahaan memperkuat kehadiran digital dan menjadi lebih mudah ditemukan oleh buyer, tim sourcing, investor, brand, dan mitra bisnis strategis.",
+
+            icon: "🔎",
+        },
+
         {
             titleEn: "Sourcing & Business Matching",
             titleId: "Sourcing & Business Matching",
-            descEn: "Connecting buyers, suppliers, and manufacturers through RFQs, Smart Supplier Matching, sourcing opportunities, and direct business connections.",
-            descId: "Menghubungkan buyer, supplier, dan manufacturer melalui RFQ, Smart Supplier Matching, peluang sourcing, dan koneksi bisnis secara langsung.",
+
+            descEn: "Connecting buyers, suppliers, and manufacturers through RFQs, supplier discovery, Smart Business Matching™, sourcing opportunities, and direct business connections.",
+
+            descId: "Menghubungkan buyer, supplier, dan manufacturer melalui RFQ, supplier discovery, Smart Business Matching™, peluang sourcing, dan koneksi bisnis secara langsung.",
+
             icon: "🤝",
         },
+
         {
             titleEn: "Collective Sourcing & MOQ Matching",
             titleId: "Collective Sourcing & MOQ Matching",
-            descEn: "Helping companies combine demand, overcome MOQ barriers, and access materials and products through collaborative sourcing opportunities.",
-            descId: "Membantu perusahaan menggabungkan kebutuhan, mengatasi kendala MOQ, serta mendapatkan material dan produk melalui peluang collaborative sourcing.",
+
+            descEn: "Helping companies combine demand, overcome MOQ barriers, and access materials and products through collaborative sourcing and intelligent demand matching.",
+
+            descId: "Membantu perusahaan menggabungkan kebutuhan, mengatasi kendala MOQ, serta memperoleh material dan produk melalui collaborative sourcing dan intelligent demand matching.",
+
             icon: "📦",
         },
+
         {
             titleEn: "Industry & Trade Intelligence",
             titleId: "Industry & Trade Intelligence",
-            descEn: "Connecting trade data, HS-level analytics, market movements, pricing signals, and industry intelligence to support better commercial and strategic decisions.",
-            descId: "Menghubungkan data perdagangan, analitik tingkat HS, pergerakan pasar, sinyal harga, dan industry intelligence untuk mendukung keputusan komersial dan strategis yang lebih baik.",
+
+            descEn: "Transforming trade data, HS-level analytics, market movements, pricing signals, and industry information into intelligence that supports better commercial and strategic decisions.",
+
+            descId: "Mentransformasikan data perdagangan, analitik tingkat HS, pergerakan pasar, sinyal harga, dan informasi industri menjadi intelligence untuk mendukung keputusan komersial dan strategis yang lebih baik.",
+
             icon: "📊",
         },
+
         {
             titleEn: "Technology & Solution Ecosystem",
             titleId: "Ekosistem Teknologi & Solusi",
-            descEn: "Connecting textile companies with technologies, machinery, digital solutions, technical expertise, and specialized industry service providers.",
-            descId: "Menghubungkan perusahaan tekstil dengan teknologi, mesin, solusi digital, keahlian teknis, dan penyedia layanan industri khusus.",
+
+            descEn: "Connecting textile companies with relevant technologies, machinery, digital solutions, testing and certification, technical expertise, and specialized industry service providers.",
+
+            descId: "Menghubungkan perusahaan tekstil dengan teknologi, mesin, solusi digital, testing dan certification, keahlian teknis, serta penyedia layanan industri yang relevan.",
+
             icon: "⚙️",
         },
+
         {
-            titleEn: "Strategic Ecosystem Partnerships",
-            titleId: "Kemitraan Strategis Ekosistem",
-            descEn: "Building long-term collaboration with leading industry companies and strategic partners to strengthen the connected textile ecosystem from upstream to downstream.",
-            descId: "Membangun kolaborasi jangka panjang dengan perusahaan industri terkemuka dan strategic partners untuk memperkuat ekosistem tekstil yang terhubung dari hulu sampai hilir.",
+            titleEn: "Executive & AI Intelligence",
+            titleId: "Executive & AI Intelligence",
+
+            descEn: "Enabling executives and decision makers to access deeper market, trade, company, and industry intelligence through evolving AI-powered intelligence services.",
+
+            descId: "Membantu eksekutif dan pengambil keputusan memperoleh market, trade, company, dan industry intelligence yang lebih mendalam melalui layanan intelligence berbasis AI yang terus berkembang.",
+
+            icon: "🧠",
+        },
+
+        {
+            titleEn: "Global Business Connectivity",
+            titleId: "Konektivitas Bisnis Global",
+
+            descEn: "Creating a connected business environment where companies, capabilities, technologies, intelligence, buyers, suppliers, and strategic partners can discover and connect with relevant opportunities.",
+
+            descId: "Membangun lingkungan bisnis yang terhubung di mana perusahaan, kapabilitas, teknologi, intelligence, buyer, supplier, dan strategic partner dapat menemukan serta terhubung dengan peluang yang relevan.",
+
             icon: "🌎",
         },
     ];
@@ -126,7 +183,9 @@ export default function About() {
         <WebsiteLayout>
             {/* HERO */}
 
-            {/* HERO */}
+            {/* ==========================================================
+    HERO — ABOUT DIGESTEX
+========================================================== */}
 
             <section className="py-24">
                 <div className="max-w-6xl mx-auto px-6 text-center">
@@ -147,15 +206,15 @@ export default function About() {
                     >
                         {isEn ? (
                             <>
-                                Global Textile
+                                The One-Stop
                                 <br />
-                                Intelligence Ecosystem
+                                Textile Industry Ecosystem
                             </>
                         ) : (
                             <>
-                                Global Textile
+                                The One-Stop
                                 <br />
-                                Intelligence Ecosystem
+                                Textile Industry Ecosystem
                             </>
                         )}
                     </h1>
@@ -173,13 +232,29 @@ export default function About() {
             "
                     >
                         {isEn
-                            ? "Built From Real Industry Experience. Designed For A Connected Global Textile Industry."
-                            : "Dibangun Dari Pengalaman Industri Nyata. Dirancang Untuk Industri Tekstil Global Yang Terhubung."}
+                            ? "Connecting the textile industry from upstream to downstream — together with the technologies, solutions, services, intelligence, and supporting industries that keep the industry moving."
+                            : "Menghubungkan industri tekstil dari hulu hingga hilir — bersama teknologi, solusi, layanan, intelligence, dan industri pendukung yang menjaga industri terus bergerak."}
                     </p>
 
                     <p
                         className="
-                mt-8
+                mt-6
+                text-yellow-400
+                text-sm
+                md:text-base
+                font-black
+                uppercase
+                tracking-[0.2em]
+            "
+                    >
+                        {isEn
+                            ? "Built in Indonesia. Connected to the Global Textile Industry."
+                            : "Dibangun di Indonesia. Terhubung dengan Industri Tekstil Global."}
+                    </p>
+
+                    <p
+                        className="
+                mt-10
                 text-slate-400
                 text-lg
                 max-w-4xl
@@ -188,8 +263,8 @@ export default function About() {
             "
                     >
                         {isEn
-                            ? "DIGESTEX is an independent digital industry platform built upon more than two decades of experience across the textile sector, including industry associations, KADIN, government stakeholders, business networks, manufacturers, suppliers, technology providers, and international textile media."
-                            : "DIGESTEX adalah platform digital industri independen yang dibangun berdasarkan lebih dari dua dekade pengalaman di sektor tekstil, termasuk melalui asosiasi industri, KADIN, stakeholder pemerintah, jaringan bisnis, manufacturer, supplier, technology provider, dan media tekstil internasional."}
+                            ? "DIGESTEX is an independent digital industry platform built from more than two decades of experience across the textile sector — including manufacturers, suppliers, buyers, technology providers, industry associations, government stakeholders, business networks, and international textile media."
+                            : "DIGESTEX adalah platform digital industri independen yang dibangun dari pengalaman lebih dari dua dekade di sektor tekstil — mencakup manufacturer, supplier, buyer, technology provider, asosiasi industri, stakeholder pemerintah, jaringan bisnis, dan media tekstil internasional."}
                     </p>
 
                     <p
@@ -203,8 +278,8 @@ export default function About() {
             "
                     >
                         {isEn
-                            ? "The platform is designed to connect industry intelligence, companies, technologies, solutions, suppliers, buyers, and business opportunities within one connected digital environment across the textile value chain."
-                            : "Platform ini dirancang untuk menghubungkan industry intelligence, perusahaan, teknologi, solusi, supplier, buyer, dan peluang bisnis dalam satu lingkungan digital yang terhubung di seluruh rantai nilai industri tekstil."}
+                            ? "DIGESTEX is being developed as a connected digital environment where companies across the textile value chain can discover relevant industry information, technologies, solutions, services, suppliers, buyers, partners, markets, and business opportunities within one ecosystem."
+                            : "DIGESTEX dikembangkan sebagai lingkungan digital yang terhubung di mana perusahaan di seluruh rantai nilai industri tekstil dapat menemukan informasi industri, teknologi, solusi, layanan, supplier, buyer, partner, pasar, dan peluang bisnis yang relevan dalam satu ekosistem."}
                     </p>
 
                     <p
@@ -218,8 +293,8 @@ export default function About() {
             "
                     >
                         {isEn
-                            ? "DIGESTEX starts from Indonesia as its initial market and is designed to progressively expand to other major textile and apparel markets around the world."
-                            : "DIGESTEX dimulai dari Indonesia sebagai pasar awal dan dirancang untuk berkembang secara bertahap ke berbagai pasar utama tekstil dan apparel di seluruh dunia."}
+                            ? "From raw materials and manufacturing to technology, machinery, testing and certification, logistics, trade finance, research, education, exhibitions, and other supporting industries, DIGESTEX brings the industry together through connected digital programs and solutions."
+                            : "Mulai dari raw materials dan manufacturing hingga teknologi, machinery, testing dan certification, logistics, trade finance, research, education, exhibitions, serta berbagai industri pendukung lainnya, DIGESTEX mempertemukan industri melalui berbagai program dan solusi digital yang saling terhubung."}
                     </p>
 
                     <p
@@ -233,8 +308,23 @@ export default function About() {
             "
                     >
                         {isEn
-                            ? "Rather than simply providing information, DIGESTEX is being developed as an environment where companies can become more visible, discover relevant intelligence and solutions, connect with potential partners, and identify new business opportunities."
-                            : "DIGESTEX tidak hanya menyediakan informasi, tetapi dikembangkan sebagai lingkungan digital tempat perusahaan dapat meningkatkan visibility, menemukan intelligence dan solusi yang relevan, terhubung dengan calon mitra, serta menemukan peluang bisnis baru."}
+                            ? "These include company intelligence, digital company profiles, Readable-AI Profiles, trade intelligence, sourcing, business matching, technology and solution discovery, and other initiatives designed to strengthen industry connectivity."
+                            : "Program-program tersebut mencakup company intelligence, digital company profiles, Readable-AI Profiles, trade intelligence, sourcing, business matching, technology dan solution discovery, serta berbagai inisiatif lainnya untuk memperkuat konektivitas industri."}
+                    </p>
+
+                    <p
+                        className="
+                mt-6
+                text-slate-400
+                text-lg
+                max-w-4xl
+                mx-auto
+                leading-relaxed
+            "
+                    >
+                        {isEn
+                            ? "Starting from Indonesia, DIGESTEX is designed to progressively connect with major textile and apparel markets around the world — creating a more visible, connected, intelligent, and accessible textile industry ecosystem."
+                            : "Dimulai dari Indonesia, DIGESTEX dirancang untuk secara bertahap terhubung dengan berbagai pasar utama tekstil dan apparel di seluruh dunia — menciptakan ekosistem industri tekstil yang lebih visible, terhubung, intelligent, dan mudah diakses."}
                     </p>
 
                     <div className="flex flex-wrap justify-center gap-3 mt-12">
@@ -246,14 +336,14 @@ export default function About() {
 
                         <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300">
                             {isEn
-                                ? "Independent Industry Platform"
-                                : "Platform Industri Independen"}
+                                ? "One-Stop Textile Industry Ecosystem"
+                                : "One-Stop Textile Industry Ecosystem"}
                         </span>
 
                         <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300">
                             {isEn
-                                ? "Global Industry Network"
-                                : "Jaringan Industri Global"}
+                                ? "Upstream to Downstream"
+                                : "Hulu hingga Hilir"}
                         </span>
 
                         <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300">
@@ -264,8 +354,8 @@ export default function About() {
 
                         <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300">
                             {isEn
-                                ? "Business Connectivity"
-                                : "Konektivitas Bisnis"}
+                                ? "Global Business Connectivity"
+                                : "Konektivitas Bisnis Global"}
                         </span>
                     </div>
                 </div>
@@ -275,12 +365,20 @@ export default function About() {
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="text-center mb-16">
                         <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
-                            OUR JOURNEY
+                            {isEn ? "OUR JOURNEY" : "PERJALANAN KAMI"}
                         </span>
 
                         <h2 className="text-4xl md:text-5xl font-black text-white mt-4 uppercase">
-                            More Than Two Decades Of Industry Experience
+                            {isEn
+                                ? "More Than Two Decades of Industry Experience"
+                                : "Lebih Dari Dua Dekade Pengalaman Industri"}
                         </h2>
+
+                        <p className="text-gray-400 text-lg max-w-3xl mx-auto mt-6 leading-relaxed">
+                            {isEn
+                                ? "DIGESTEX is built upon more than two decades of experience across the textile industry, business networks, industry institutions, and international textile markets."
+                                : "DIGESTEX dibangun berdasarkan pengalaman lebih dari dua dekade di industri tekstil, jaringan bisnis, institusi industri, dan pasar tekstil internasional."}
+                        </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-6">
@@ -292,6 +390,9 @@ export default function About() {
                         border border-white/10
                         bg-white/5
                         p-8
+                        transition
+                        hover:border-yellow-500/30
+                        hover:bg-white/[0.07]
                     "
                             >
                                 <div className="text-yellow-500 font-black text-xl">
@@ -302,84 +403,72 @@ export default function About() {
                                     {item.title}
                                 </h3>
 
-                                <p className="text-gray-400 mt-4">
+                                <p className="text-gray-400 mt-4 leading-relaxed">
                                     {item.description}
                                 </p>
                             </div>
                         ))}
                     </div>
+
+                    <div className="mt-14 max-w-4xl mx-auto text-center">
+                        <p className="text-lg md:text-xl text-slate-300 leading-relaxed">
+                            {isEn
+                                ? "These experiences provide the industry understanding, relationships, and perspective that form the foundation of DIGESTEX — transforming real-world industry knowledge into a connected digital ecosystem."
+                                : "Pengalaman tersebut menjadi fondasi pemahaman industri, hubungan, dan perspektif yang membentuk DIGESTEX — mentransformasikan pengalaman nyata industri menjadi ekosistem digital yang terhubung."}
+                        </p>
+                    </div>
                 </div>
             </section>
-            {/* OUR JOURNEY */}
-
             {/* BUILT FROM INDUSTRY EXPERIENCE */}
 
             <section className="py-24 border-t border-white/5">
                 <div className="max-w-5xl mx-auto px-6 text-center">
                     <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
-                        BUILT FROM INDUSTRY EXPERIENCE
+                        {isEn
+                            ? "BUILT FROM REAL INDUSTRY EXPERIENCE"
+                            : "DIBANGUN DARI PENGALAMAN INDUSTRI NYATA"}
                     </span>
 
                     <h2 className="text-4xl md:text-5xl font-black text-white mt-4 uppercase">
-                        Transforming Experience Into Industry Value
+                        {isEn
+                            ? "Transforming Industry Experience Into Digital Infrastructure"
+                            : "Mentransformasikan Pengalaman Industri Menjadi Infrastruktur Digital"}
                     </h2>
 
                     <p className="mt-8 text-gray-400 text-lg leading-relaxed">
-                        Digestex brings together decades of industry experience,
-                        business connectivity, market understanding, and
-                        stakeholder engagement into a practical ecosystem
-                        designed to support the textile industry.
+                        {isEn
+                            ? "DIGESTEX is built on more than two decades of direct experience across the textile industry — connecting manufacturers, suppliers, buyers, technology providers, industry institutions, trade networks, government stakeholders, and international textile media."
+                            : "DIGESTEX dibangun berdasarkan lebih dari dua dekade pengalaman langsung di industri tekstil — menghubungkan manufacturer, supplier, buyer, technology provider, institusi industri, jaringan perdagangan, stakeholder pemerintah, dan media tekstil internasional."}
                     </p>
 
                     <p className="mt-6 text-gray-400 text-lg leading-relaxed">
-                        Over the years, interactions with manufacturers,
-                        suppliers, technology providers, industry organizations,
-                        policymakers, and international buyers have provided
-                        valuable insights into the challenges and opportunities
-                        facing the textile sector.
+                        {isEn
+                            ? "This experience provides a practical understanding of how the textile value chain operates, how companies build and evaluate capabilities, how technologies and solutions are adopted, and how business relationships and opportunities develop across the industry."
+                            : "Pengalaman tersebut memberikan pemahaman praktis mengenai bagaimana rantai nilai industri tekstil berjalan, bagaimana perusahaan membangun dan mengevaluasi kapabilitas, bagaimana teknologi dan solusi diadopsi, serta bagaimana hubungan dan peluang bisnis berkembang di dalam industri."}
                     </p>
 
                     <p className="mt-6 text-gray-400 text-lg leading-relaxed">
-                        Today, these insights are being translated into
-                        practical solutions that enhance visibility, strengthen
-                        connectivity, support collaboration, improve market
-                        intelligence, and create new business opportunities
-                        across the global textile value chain.
+                        {isEn
+                            ? "DIGESTEX translates this industry knowledge into a connected digital infrastructure that brings together companies, industry intelligence, technologies, solutions, services, sourcing, markets, and business opportunities across the textile value chain."
+                            : "DIGESTEX mentransformasikan pengetahuan industri tersebut menjadi infrastruktur digital yang terhubung untuk mempertemukan perusahaan, industry intelligence, teknologi, solusi, layanan, sourcing, pasar, dan peluang bisnis di seluruh rantai nilai industri tekstil."}
                     </p>
-                </div>
-            </section>
 
-            {/* ECOSYSTEM VISION */}
+                    <p className="mt-6 text-gray-400 text-lg leading-relaxed">
+                        {isEn
+                            ? "Digital capabilities such as structured company intelligence and Readable-AI Profiles are part of this broader infrastructure — helping companies become more visible, understandable, discoverable, and connected within the evolving digital and AI-driven business environment."
+                            : "Kapabilitas digital seperti structured company intelligence dan Readable-AI Profiles merupakan bagian dari infrastruktur yang lebih luas tersebut — membantu perusahaan menjadi lebih visible, mudah dipahami, mudah ditemukan, dan lebih terhubung dalam lingkungan bisnis digital dan berbasis AI yang terus berkembang."}
+                    </p>
 
-            <section className="py-24 border-t border-white/5">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
-                            ECOSYSTEM VISION
-                        </span>
-
-                        <h2 className="text-4xl font-black text-white mt-4 uppercase">
-                            Connecting The Textile Value Chain
-                        </h2>
-                    </div>
-
-                    <div className="grid md:grid-cols-4 gap-6">
-                        {pillars.map((pillar) => (
-                            <div
-                                key={pillar}
-                                className="rounded-[24px] border border-white/10 bg-white/5 p-6 text-center"
-                            >
-                                <h3 className="text-white font-black">
-                                    {pillar}
-                                </h3>
-                            </div>
-                        ))}
-                    </div>
+                    <p className="mt-6 text-gray-400 text-lg leading-relaxed">
+                        {isEn
+                            ? "The broader objective is to create a more connected textile industry ecosystem where industry participants can discover relevant information, capabilities, technologies, solutions, partners, markets, and opportunities through one integrated platform."
+                            : "Tujuan yang lebih luas adalah menciptakan ekosistem industri tekstil yang lebih terhubung, di mana pelaku industri dapat menemukan informasi, kapabilitas, teknologi, solusi, partner, pasar, dan peluang yang relevan melalui satu platform yang terintegrasi."}
+                    </p>
                 </div>
             </section>
             <section className="py-24 border-t border-white/5">
                 <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center max-w-4xl mx-auto mb-20">
+                    <div className="text-center max-w-5xl mx-auto mb-20">
                         <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
                             {isEn
                                 ? "WHY DIGESTEX EXISTS"
@@ -389,64 +478,82 @@ export default function About() {
                         <h2 className="text-4xl md:text-6xl font-black text-white mt-6 uppercase leading-tight">
                             {isEn ? (
                                 <>
-                                    Built Around
+                                    The Textile Industry Is Connected.
                                     <br />
-                                    Real Industry Needs
+                                    Its Digital Ecosystem Should Be Too.
                                 </>
                             ) : (
                                 <>
-                                    Dibangun Berdasarkan
+                                    Industri Tekstil Saling Terhubung.
                                     <br />
-                                    Kebutuhan Industri yang Nyata
+                                    Ekosistem Digitalnya Juga Harus Terhubung.
                                 </>
                             )}
                         </h2>
 
                         <p className="mt-8 text-gray-400 text-lg leading-relaxed">
                             {isEn
-                                ? "DIGESTEX was not created from market assumptions. It has evolved from real needs observed across the textile industry — from manufacturers, buyers, suppliers, technology providers, industry organizations, and other stakeholders seeking better visibility, trusted connections, actionable intelligence, relevant solutions, and stronger business opportunities."
-                                : "DIGESTEX tidak dibangun berdasarkan asumsi pasar. DIGESTEX berkembang dari kebutuhan nyata yang terlihat di industri tekstil — dari manufacturer, buyer, supplier, technology provider, organisasi industri, dan berbagai stakeholder yang membutuhkan visibility yang lebih baik, koneksi yang terpercaya, intelligence yang dapat ditindaklanjuti, solusi yang relevan, dan peluang bisnis yang lebih kuat."}
+                                ? "The textile industry is a complex global value chain involving manufacturers, suppliers, buyers, technology providers, service companies, financial institutions, logistics providers, testing and certification companies, research institutions, exhibitions, media, and many other supporting industries. Yet much of this ecosystem remains fragmented across different platforms, networks, sources of information, and business channels."
+                                : "Industri tekstil merupakan rantai nilai global yang kompleks, melibatkan manufacturer, supplier, buyer, technology provider, perusahaan jasa, institusi keuangan, penyedia logistik, perusahaan testing dan certification, lembaga riset, pameran, media, serta berbagai supporting industry lainnya. Namun sebagian besar ekosistem tersebut masih tersebar di berbagai platform, jaringan, sumber informasi, dan kanal bisnis yang berbeda."}
+                        </p>
+
+                        <p className="mt-6 text-gray-400 text-lg leading-relaxed">
+                            {isEn
+                                ? "DIGESTEX was created to bring these elements together through one connected digital infrastructure — creating a One-Stop Textile Industry Ecosystem that connects the industry from upstream to downstream together with the technologies, solutions, services, intelligence, and supporting industries that keep the industry moving."
+                                : "DIGESTEX hadir untuk mempertemukan berbagai elemen tersebut melalui satu infrastruktur digital yang terhubung — membangun One-Stop Textile Industry Ecosystem yang menghubungkan industri dari hulu hingga hilir, bersama teknologi, solusi, layanan, intelligence, dan supporting industry yang membuat industri terus bergerak."}
+                        </p>
+
+                        <p className="mt-6 text-gray-400 text-lg leading-relaxed">
+                            {isEn
+                                ? "Within this ecosystem, DIGESTEX connects industry intelligence, companies, sourcing, solutions, markets, business opportunities, and professional networks — helping companies and industry stakeholders discover relevant information, capabilities, technologies, partners, and opportunities more efficiently."
+                                : "Di dalam ekosistem ini, DIGESTEX menghubungkan industry intelligence, perusahaan, sourcing, solusi, pasar, peluang bisnis, dan jaringan profesional — membantu perusahaan dan stakeholder industri menemukan informasi, kapabilitas, teknologi, mitra, dan peluang yang relevan secara lebih efisien."}
+                        </p>
+
+                        <p className="mt-6 text-gray-400 text-lg leading-relaxed">
+                            {isEn
+                                ? "Readable-AI Profiles are one important part of this infrastructure — helping companies structure their capabilities so they can be discovered and understood by people, search systems, and AI. But the larger objective is to create a connected digital environment for the entire textile industry ecosystem."
+                                : "Readable-AI Profile merupakan salah satu bagian penting dari infrastruktur ini — membantu perusahaan menstrukturkan kapabilitasnya agar dapat ditemukan dan dipahami oleh manusia, sistem pencarian, dan AI. Namun tujuan yang lebih besar adalah membangun lingkungan digital yang terhubung bagi seluruh ekosistem industri tekstil."}
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {/* Visibility */}
+                        {/* One-Stop Ecosystem */}
                         <div className="rounded-[32px] border border-white/10 bg-white/5 p-8 hover:bg-white/[0.07] transition-all">
-                            <div className="text-4xl mb-5">🌍</div>
+                            <div className="text-4xl mb-5">🌐</div>
 
                             <h3 className="text-white text-xl font-black">
                                 {isEn
-                                    ? "Industry Visibility"
-                                    : "Industry Visibility"}
+                                    ? "One-Stop Ecosystem"
+                                    : "One-Stop Ecosystem"}
                             </h3>
 
                             <p className="text-gray-400 mt-4 leading-relaxed">
                                 {isEn
-                                    ? "Companies need stronger visibility to relevant buyers, sourcing offices, investors, suppliers, technology providers, and decision makers across local and international markets."
-                                    : "Perusahaan membutuhkan visibility yang lebih kuat kepada buyer, sourcing office, investor, supplier, technology provider, dan decision maker yang relevan di pasar domestik maupun internasional."}
+                                    ? "Bring industry companies, technologies, solutions, services, intelligence and supporting industries together within one connected platform."
+                                    : "Mempertemukan perusahaan industri, teknologi, solusi, layanan, intelligence dan supporting industry dalam satu platform yang terhubung."}
                             </p>
                         </div>
 
-                        {/* Connectivity */}
+                        {/* Value Chain */}
                         <div className="rounded-[32px] border border-white/10 bg-white/5 p-8 hover:bg-white/[0.07] transition-all">
-                            <div className="text-4xl mb-5">🤝</div>
+                            <div className="text-4xl mb-5">🔗</div>
 
                             <h3 className="text-white text-xl font-black">
                                 {isEn
-                                    ? "Industry Connectivity"
-                                    : "Konektivitas Industri"}
+                                    ? "Upstream To Downstream"
+                                    : "Hulu Hingga Hilir"}
                             </h3>
 
                             <p className="text-gray-400 mt-4 leading-relaxed">
                                 {isEn
-                                    ? "Buyers, suppliers, manufacturers, and industry stakeholders need a more efficient way to discover trusted companies, capabilities, sourcing opportunities, and potential business partners."
-                                    : "Buyer, supplier, manufacturer, dan stakeholder industri membutuhkan cara yang lebih efisien untuk menemukan perusahaan terpercaya, kapabilitas, peluang sourcing, dan calon mitra bisnis."}
+                                    ? "Connect the textile value chain from raw materials and manufacturing to sourcing, markets, brands, buyers and supporting industries."
+                                    : "Menghubungkan rantai nilai tekstil mulai dari bahan baku dan manufaktur hingga sourcing, pasar, brand, buyer dan supporting industry."}
                             </p>
                         </div>
 
                         {/* Intelligence */}
                         <div className="rounded-[32px] border border-white/10 bg-white/5 p-8 hover:bg-white/[0.07] transition-all">
-                            <div className="text-4xl mb-5">📊</div>
+                            <div className="text-4xl mb-5">🧠</div>
 
                             <h3 className="text-white text-xl font-black">
                                 {isEn
@@ -456,25 +563,25 @@ export default function About() {
 
                             <p className="text-gray-400 mt-4 leading-relaxed">
                                 {isEn
-                                    ? "Industry decision makers need access to structured trade data, market movements, pricing signals, regulations, company intelligence, and strategic insights to make better decisions."
-                                    : "Decision maker industri membutuhkan akses terhadap data perdagangan yang terstruktur, pergerakan pasar, sinyal harga, regulasi, company intelligence, dan strategic insights untuk mengambil keputusan yang lebih baik."}
+                                    ? "Make industry, trade, company, market and executive intelligence more accessible for better business decisions."
+                                    : "Membuat intelligence industri, trade, perusahaan, pasar dan executive lebih mudah diakses untuk mendukung keputusan bisnis yang lebih baik."}
                             </p>
                         </div>
 
-                        {/* Solutions */}
+                        {/* Connectivity */}
                         <div className="rounded-[32px] border border-white/10 bg-white/5 p-8 hover:bg-white/[0.07] transition-all">
-                            <div className="text-4xl mb-5">⚙️</div>
+                            <div className="text-4xl mb-5">🤝</div>
 
                             <h3 className="text-white text-xl font-black">
                                 {isEn
-                                    ? "Solutions & Collaboration"
-                                    : "Solusi & Kolaborasi"}
+                                    ? "Business Connectivity"
+                                    : "Konektivitas Bisnis"}
                             </h3>
 
                             <p className="text-gray-400 mt-4 leading-relaxed">
                                 {isEn
-                                    ? "Technology providers, solution partners, and industry organizations need a connected environment where their expertise and solutions can reach the companies and decision makers that need them."
-                                    : "Technology provider, solution partner, dan organisasi industri membutuhkan lingkungan yang terhubung agar keahlian dan solusi mereka dapat menjangkau perusahaan serta decision maker yang membutuhkannya."}
+                                    ? "Create better pathways between companies, buyers, suppliers, technologies, solutions, partners and global business opportunities."
+                                    : "Menciptakan jalur yang lebih baik antara perusahaan, buyer, supplier, teknologi, solusi, mitra dan peluang bisnis global."}
                             </p>
                         </div>
                     </div>
@@ -482,8 +589,14 @@ export default function About() {
                     <div className="mt-16 max-w-5xl mx-auto text-center">
                         <p className="text-xl text-slate-300 leading-relaxed">
                             {isEn
-                                ? "DIGESTEX brings these needs together in one connected digital ecosystem — helping companies become more visible, enabling buyers and suppliers to connect, transforming data into intelligence, and making relevant technologies, solutions, and business opportunities easier to discover across the textile value chain."
-                                : "DIGESTEX mempertemukan kebutuhan tersebut dalam satu ekosistem digital yang terhubung — membantu perusahaan menjadi lebih visible, memungkinkan buyer dan supplier terhubung, mengubah data menjadi intelligence, serta membuat teknologi, solusi, dan peluang bisnis yang relevan lebih mudah ditemukan di seluruh rantai nilai industri tekstil."}
+                                ? "DIGESTEX is designed as the digital infrastructure connecting the textile industry ecosystem — from upstream to downstream, from intelligence to business connectivity, and from Indonesia toward the global textile industry."
+                                : "DIGESTEX dirancang sebagai infrastruktur digital yang menghubungkan ekosistem industri tekstil — dari hulu hingga hilir, dari intelligence hingga konektivitas bisnis, dan dari Indonesia menuju industri tekstil global."}
+                        </p>
+
+                        <p className="mt-8 text-2xl font-black text-white leading-relaxed">
+                            {isEn
+                                ? "The goal is simple: make the textile industry more connected, more intelligent, more discoverable, and more accessible through one ecosystem."
+                                : "Tujuannya sederhana: membuat industri tekstil semakin terhubung, semakin intelligent, semakin mudah ditemukan, dan semakin mudah diakses melalui satu ekosistem."}
                         </p>
                     </div>
                 </div>
@@ -495,20 +608,48 @@ export default function About() {
                         {isEn ? "OUR MISSION" : "MISI KAMI"}
                     </span>
 
-                    <h2 className="text-4xl md:text-5xl font-black text-white mt-4 uppercase">
-                        {isEn
-                            ? "Connecting Industry Intelligence, Companies, Solutions, Markets, and Opportunities"
-                            : "Menghubungkan Industry Intelligence, Perusahaan, Solusi, Pasar, dan Peluang"}
+                    <h2 className="text-4xl md:text-5xl font-black text-white mt-4 uppercase leading-tight">
+                        {isEn ? (
+                            <>
+                                Connecting the Global Textile Industry
+                                <br />
+                                From Upstream to Downstream
+                            </>
+                        ) : (
+                            <>
+                                Menghubungkan Industri Tekstil Global
+                                <br />
+                                Dari Hulu sampai Hilir
+                            </>
+                        )}
                     </h2>
 
                     <p className="mt-8 text-gray-400 text-lg leading-relaxed">
                         {isEn
-                            ? "DIGESTEX exists to make the textile industry more connected, more informed, and more discoverable — bringing intelligence, companies, technologies, solutions, suppliers, buyers, and business opportunities together across the global textile value chain."
-                            : "DIGESTEX hadir untuk membuat industri tekstil semakin terhubung, semakin informatif, dan semakin mudah ditemukan — mempertemukan intelligence, perusahaan, teknologi, solusi, supplier, buyer, dan peluang bisnis di seluruh rantai nilai industri tekstil global."}
+                            ? "DIGESTEX's mission is to build a connected, intelligent, and trusted digital ecosystem for the global textile industry — bringing together companies, raw materials, manufacturers, technologies, solutions, suppliers, buyers, markets, trade intelligence, and business opportunities within one integrated platform."
+                            : "Misi DIGESTEX adalah membangun ekosistem digital industri tekstil global yang terhubung, intelligent, dan terpercaya — mempertemukan perusahaan, bahan baku, manufacturer, teknologi, solusi, supplier, buyer, pasar, trade intelligence, dan peluang bisnis dalam satu platform yang terintegrasi."}
+                    </p>
+
+                    <p className="mt-6 text-gray-400 text-lg leading-relaxed">
+                        {isEn
+                            ? "From upstream materials and manufacturing to downstream products, sourcing, trade, technology, services, and supporting industries, DIGESTEX is designed to connect the different capabilities and needs of the textile value chain in one digital environment."
+                            : "Mulai dari bahan baku dan manufaktur di sisi hulu hingga produk, sourcing, perdagangan, teknologi, jasa, dan supporting industries di sisi hilir, DIGESTEX dirancang untuk menghubungkan berbagai kapabilitas dan kebutuhan dalam rantai nilai industri tekstil melalui satu lingkungan digital."}
+                    </p>
+
+                    <p className="mt-6 text-gray-400 text-lg leading-relaxed">
+                        {isEn
+                            ? "Through specialized programs and intelligence services, DIGESTEX helps companies become more visible, enables better discovery and connectivity, provides relevant market and trade intelligence, and creates pathways toward sourcing, collaboration, investment, and new business opportunities."
+                            : "Melalui berbagai program dan layanan intelligence yang terintegrasi, DIGESTEX membantu perusahaan meningkatkan visibility, memudahkan discovery dan konektivitas, menyediakan market dan trade intelligence yang relevan, serta membuka jalur menuju sourcing, kolaborasi, investasi, dan peluang bisnis baru."}
+                    </p>
+
+                    <p className="mt-8 text-2xl font-black text-white leading-relaxed">
+                        {isEn
+                            ? "One Industry. One Connected Ecosystem. One Digital Platform."
+                            : "Satu Industri. Satu Ekosistem yang Terhubung. Satu Platform Digital."}
                     </p>
                 </div>
             </section>
-            {/* DIGTEX TODAY */}
+            {/* DIGESTEX TODAY */}
 
             <section className="py-24 border-t border-white/5">
                 <div className="max-w-7xl mx-auto px-6">
@@ -517,20 +658,26 @@ export default function About() {
                             {isEn ? "DIGESTEX TODAY" : "DIGESTEX HARI INI"}
                         </span>
 
-                        <h2 className="text-4xl font-black text-white mt-4 uppercase">
+                        <h2 className="text-4xl md:text-5xl font-black text-white mt-4 uppercase">
                             {isEn
-                                ? "The Foundation of a Global Textile Industry Ecosystem"
-                                : "Fondasi Global Textile Industry Ecosystem"}
+                                ? "The One-Stop Textile Industry Ecosystem"
+                                : "One-Stop Textile Industry Ecosystem"}
                         </h2>
 
-                        <p className="max-w-4xl mx-auto text-lg text-slate-400 leading-relaxed mt-8">
+                        <p className="max-w-5xl mx-auto text-lg text-slate-400 leading-relaxed mt-8">
                             {isEn
-                                ? "DIGESTEX is transforming more than two decades of textile industry experience, relationships, trade knowledge, and business connectivity into a connected digital ecosystem — starting from Indonesia and progressively expanding to other global textile markets."
-                                : "DIGESTEX mentransformasikan lebih dari dua dekade pengalaman industri tekstil, hubungan industri, pengetahuan perdagangan, dan konektivitas bisnis menjadi ekosistem digital yang terhubung — dimulai dari Indonesia dan secara bertahap berkembang ke pasar tekstil global lainnya."}
+                                ? "DIGESTEX is building a connected digital ecosystem for the textile industry — bringing together companies, industry intelligence, sourcing, technologies, solutions, services, markets, business opportunities, and supporting industries across the textile value chain."
+                                : "DIGESTEX membangun ekosistem digital yang terhubung untuk industri tekstil — mempertemukan perusahaan, industry intelligence, sourcing, teknologi, solusi, layanan, pasar, peluang bisnis, dan supporting industry di seluruh rantai nilai industri tekstil."}
+                        </p>
+
+                        <p className="max-w-4xl mx-auto text-lg text-slate-400 leading-relaxed mt-6">
+                            {isEn
+                                ? "Built in Indonesia, DIGESTEX is designed to progressively connect the Indonesian textile industry with regional and global markets — creating a more connected, intelligent, discoverable, and accessible industry ecosystem."
+                                : "Dibangun di Indonesia, DIGESTEX dirancang untuk secara bertahap menghubungkan industri tekstil Indonesia dengan pasar regional dan global — menciptakan ekosistem industri yang lebih terhubung, lebih intelligent, lebih mudah ditemukan, dan lebih mudah diakses."}
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {solutions.map((item) => (
                             <div
                                 key={item.title}
@@ -561,6 +708,14 @@ export default function About() {
                             </div>
                         ))}
                     </div>
+
+                    <div className="mt-16 text-center">
+                        <p className="text-xl md:text-2xl font-black text-white leading-relaxed">
+                            {isEn
+                                ? "From upstream to downstream. From intelligence to opportunity. From Indonesia to the global textile industry."
+                                : "Dari hulu sampai hilir. Dari intelligence hingga peluang. Dari Indonesia menuju industri tekstil global."}
+                        </p>
+                    </div>
                 </div>
             </section>
 
@@ -570,36 +725,36 @@ export default function About() {
                 <div className="max-w-5xl mx-auto px-6 text-center">
                     <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
                         {isEn
-                            ? "FOUNDING-STAGE ECOSYSTEM PARTNERSHIP"
-                            : "KEMITRAAN EKOSISTEM TAHAP AWAL"}
+                            ? "CONNECTING THE TEXTILE INDUSTRY ECOSYSTEM"
+                            : "MENGHUBUNGKAN EKOSISTEM INDUSTRI TEKSTIL"}
                     </span>
 
                     <h2 className="text-4xl md:text-6xl font-black text-white mt-6 uppercase leading-tight">
                         {isEn ? (
                             <>
-                                Help Shape The Future Of
+                                Connect With The Future Of
                                 <br />
-                                Global Textile Industry Connectivity
+                                The Textile Industry
                             </>
                         ) : (
                             <>
-                                Bersama Membentuk Masa Depan
+                                Terhubung Dengan Masa Depan
                                 <br />
-                                Konektivitas Industri Tekstil Global
+                                Industri Tekstil
                             </>
                         )}
                     </h2>
 
                     <p className="mt-8 text-slate-400 text-lg leading-relaxed max-w-4xl mx-auto">
                         {isEn
-                            ? "DIGESTEX is inviting selected industry leaders, technology providers, manufacturers, suppliers, buyers, and strategic stakeholders to participate in the early development of a connected Global Textile Intelligence Ecosystem — starting from Indonesia and progressively expanding to other textile and apparel markets."
-                            : "DIGESTEX mengundang perusahaan industri, penyedia teknologi, manufacturer, supplier, buyer, dan strategic stakeholders terpilih untuk berpartisipasi dalam tahap awal pengembangan Global Textile Intelligence Ecosystem yang terhubung — dimulai dari Indonesia dan secara bertahap berkembang ke pasar tekstil dan apparel lainnya."}
+                            ? "DIGESTEX is creating a One-Stop Textile Industry Ecosystem that connects the textile value chain from upstream to downstream — together with the technologies, solutions, services, intelligence, and supporting industries that keep the industry moving."
+                            : "DIGESTEX membangun One-Stop Textile Industry Ecosystem yang menghubungkan rantai nilai industri tekstil dari hulu hingga hilir — bersama teknologi, solusi, layanan, intelligence, dan supporting industry yang membuat industri terus bergerak."}
                     </p>
 
                     <p className="mt-8 text-slate-300 text-lg leading-relaxed max-w-3xl mx-auto">
                         {isEn
-                            ? "The founding stage is designed for companies that want to participate not only in the ecosystem, but also in shaping how industry intelligence, solutions, sourcing, visibility, and business connectivity will develop within it."
-                            : "Tahap awal ini ditujukan bagi perusahaan yang tidak hanya ingin hadir dalam ekosistem, tetapi juga berperan dalam membentuk bagaimana industry intelligence, solusi, sourcing, visibility, dan konektivitas bisnis akan berkembang di dalamnya."}
+                            ? "Starting from Indonesia and progressively connecting to the global textile industry, DIGESTEX is opening selected opportunities for companies, technology providers, institutions, strategic partners, sponsors, and ecosystem investors to participate in the development and growth of the ecosystem."
+                            : "Dimulai dari Indonesia dan secara bertahap terhubung dengan industri tekstil global, DIGESTEX membuka peluang terpilih bagi perusahaan, technology provider, institusi, strategic partner, sponsor, dan ecosystem investor untuk berpartisipasi dalam pengembangan dan pertumbuhan ekosistem."}
                     </p>
 
                     <div className="flex flex-wrap justify-center gap-3 mt-10">
@@ -611,10 +766,17 @@ export default function About() {
                         </span>
 
                         <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">
+                            ⚙️{" "}
+                            {isEn
+                                ? "Technology & Solution Connectivity"
+                                : "Konektivitas Teknologi & Solusi"}
+                        </span>
+
+                        <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">
                             🤝{" "}
                             {isEn
-                                ? "Strategic Collaboration"
-                                : "Kolaborasi Strategis"}
+                                ? "Strategic Ecosystem Positioning"
+                                : "Posisi Strategis Dalam Ekosistem"}
                         </span>
 
                         <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">
@@ -626,50 +788,56 @@ export default function About() {
 
                         <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">
                             🚀{" "}
-                            {isEn ? "Business Opportunities" : "Peluang Bisnis"}
+                            {isEn
+                                ? "Business & Market Opportunities"
+                                : "Peluang Bisnis & Pasar"}
                         </span>
                     </div>
 
                     <div className="mt-16 grid md:grid-cols-3 gap-6 text-left">
+                        {/* Solution Partner */}
+
                         <div className="rounded-[28px] border border-white/10 bg-white/5 p-6">
                             <h3 className="text-white font-black text-lg">
-                                {isEn
-                                    ? "Industry Visibility"
-                                    : "Industry Visibility"}
+                                {isEn ? "Solution Partner" : "Solution Partner"}
                             </h3>
 
                             <p className="text-slate-400 mt-3 text-sm leading-relaxed">
                                 {isEn
-                                    ? "Strengthen your company's presence within the DIGESTEX ecosystem and become more discoverable to relevant manufacturers, buyers, suppliers, partners, and industry decision makers."
-                                    : "Memperkuat kehadiran perusahaan dalam ekosistem DIGESTEX dan meningkatkan discoverability kepada manufacturer, buyer, supplier, partner, dan decision maker industri yang relevan."}
+                                    ? "Bring your technologies, machinery, services, expertise, and solutions into a connected environment where relevant textile companies and decision makers can discover and evaluate them."
+                                    : "Membawa teknologi, mesin, layanan, keahlian, dan solusi perusahaan ke dalam lingkungan yang terhubung sehingga dapat ditemukan dan dievaluasi oleh perusahaan tekstil serta decision maker yang relevan."}
                             </p>
                         </div>
 
+                        {/* Strategic Partner */}
+
                         <div className="rounded-[28px] border border-white/10 bg-white/5 p-6">
                             <h3 className="text-white font-black text-lg">
                                 {isEn
-                                    ? "Solution & Ecosystem Participation"
-                                    : "Partisipasi Solusi & Ekosistem"}
+                                    ? "Strategic Partner"
+                                    : "Strategic Partner"}
                             </h3>
 
                             <p className="text-slate-400 mt-3 text-sm leading-relaxed">
                                 {isEn
-                                    ? "Present technologies, solutions, expertise, and capabilities within a connected industry environment designed to help decision makers discover relevant solutions."
-                                    : "Menampilkan teknologi, solusi, keahlian, dan kapabilitas dalam lingkungan industri yang terhubung untuk membantu decision maker menemukan solusi yang relevan."}
+                                    ? "Work with DIGESTEX to develop industry programs, intelligence, sourcing, connectivity, events, knowledge initiatives, and other strategic ecosystem capabilities."
+                                    : "Berkolaborasi dengan DIGESTEX dalam pengembangan program industri, intelligence, sourcing, konektivitas, event, knowledge initiatives, dan berbagai kapabilitas strategis ekosistem lainnya."}
                             </p>
                         </div>
 
+                        {/* Sponsor / Ecosystem Investor */}
+
                         <div className="rounded-[28px] border border-white/10 bg-white/5 p-6">
                             <h3 className="text-white font-black text-lg">
                                 {isEn
-                                    ? "Strategic Positioning"
-                                    : "Strategic Positioning"}
+                                    ? "Sponsor & Ecosystem Investor"
+                                    : "Sponsor & Ecosystem Investor"}
                             </h3>
 
                             <p className="text-slate-400 mt-3 text-sm leading-relaxed">
                                 {isEn
-                                    ? "Establish an early strategic position within an ecosystem designed to connect industry intelligence, technologies, solutions, sourcing, and business opportunities across the textile value chain."
-                                    : "Membangun posisi strategis sejak tahap awal dalam ekosistem yang menghubungkan industry intelligence, teknologi, solusi, sourcing, dan peluang bisnis di seluruh rantai nilai tekstil."}
+                                    ? "Support the development, expansion, and long-term growth of a connected digital infrastructure for the textile industry — from Indonesia toward the global market."
+                                    : "Mendukung pengembangan, ekspansi, dan pertumbuhan jangka panjang infrastruktur digital yang terhubung untuk industri tekstil — dari Indonesia menuju pasar global."}
                             </p>
                         </div>
                     </div>
@@ -697,14 +865,14 @@ export default function About() {
                 "
                         >
                             {isEn
-                                ? "Explore Strategic Partnership Opportunities"
-                                : "Lihat Peluang Kemitraan Strategis"}
+                                ? "Explore Ecosystem Partnership Opportunities"
+                                : "Lihat Peluang Kemitraan Ekosistem"}
                         </Link>
 
                         <p className="mt-6 text-xs uppercase tracking-[0.3em] text-slate-500">
                             {isEn
-                                ? "Founding-Stage Opportunities Available By Category"
-                                : "Peluang Tahap Awal Tersedia Berdasarkan Kategori"}
+                                ? "Selected Opportunities Available Across Ecosystem Categories"
+                                : "Peluang Terpilih Tersedia di Berbagai Kategori Ekosistem"}
                         </p>
                     </div>
                 </div>

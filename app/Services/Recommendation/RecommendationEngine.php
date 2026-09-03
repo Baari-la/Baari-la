@@ -9,7 +9,7 @@ use Carbon\Carbon;
 
 use App\Services\Recommendation\Contracts\RecommendationEngineContract;
 use App\Services\Recommendation\DTO\RecommendationResult;
-
+use App\Services\Recommendation\Eligibility\FactorEligibilityAdapter;
 use App\Services\Recommendation\Candidate\CandidateLoader;
 use App\Services\Recommendation\Candidate\CandidateEvaluator;
 
@@ -85,6 +85,7 @@ class RecommendationEngine implements RecommendationEngineContract
         protected RecommendationReasonService $reason,
         protected RecommendationExplanationService $explanation,
         protected RecommendationMetadataService $metadata,
+        protected FactorEligibilityAdapter $factorEligibility,
     ) {
     }
 

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Services\TradeIntelligence\Period;
 
 use App\Services\TradeIntelligence\Current\CurrentPeriodDatasetBuilder;
+use App\Services\TradeIntelligence\Current\CurrentOverviewBuilder;
 use App\Services\TradeIntelligence\Historical\HistoricalYearlyDatasetBuilder;
-use App\Services\TradeIntelligence\Support\TradeReportingPeriod;
+use App\Services\TradeIntelligence\Current\CurrentFlowBuilder;
+use App\Services\TradeIntelligence\Current\CurrentSubsectorBuilder;
+use App\Services\Trade\TradeReportingPeriod;
 
 class TradePeriodDatasetBuilder
 {
@@ -45,6 +48,9 @@ class TradePeriodDatasetBuilder
     public function __construct(
         protected CurrentPeriodDatasetBuilder $currentBuilder,
         protected HistoricalYearlyDatasetBuilder $historicalBuilder,
+        protected CurrentOverviewBuilder $overviewBuilder,
+        protected CurrentFlowBuilder $flowBuilder,
+        protected CurrentSubsectorBuilder $subsectorBuilder,
     ) {
     }
 
@@ -171,6 +177,163 @@ class TradePeriodDatasetBuilder
                         $existingDatasets,
                 );
         }
+        /*
+        |--------------------------------------------------------------------------
+        | Executive Overview
+        |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        |
+        | CurrentPeriodDatasetBuilder builds ONE period only.
+        | Therefore the executive overview must be assembled here,
+        | where both current and comparison datasets are available.
+        |
+        */
+
+        $startedAt = microtime(true);
+
+        $overview =
+            $this->overviewBuilder->build(
+                collect(
+                    $currentDataset['dataset'] ?? []
+                ),
+                collect(
+                    $comparisonDataset['dataset'] ?? []
+                ),
+            );
+
+        \Log::info(
+            'GARMENT PERF: PERIOD OVERVIEW',
+            [
+                'current_descriptor' =>
+                    $currentDescriptor,
+
+                'comparison_descriptor' =>
+                    $comparisonDescriptor,
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Flow Performance
+        |--------------------------------------------------------------------------
+        |
+        | Flow comparison requires both current and comparison
+        | period datasets.
+        |
+        */
+
+        $startedAt = microtime(true);
+
+        $flow =
+            $this->flowBuilder->build(
+                collect(
+                    $currentDataset['dataset'] ?? []
+                ),
+                collect(
+                    $comparisonDataset['dataset'] ?? []
+                ),
+            );
+
+
+
+        \Log::info(
+            'GARMENT PERF: PERIOD FLOW',
+            [
+                'current_descriptor' =>
+                    $currentDescriptor,
+
+                'comparison_descriptor' =>
+                    $comparisonDescriptor,
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Subsector Performance
+        |--------------------------------------------------------------------------
+        |
+        | Subsector comparison requires both current and comparison
+        | period datasets.
+        |
+        */
+
+        $startedAt = microtime(true);
+
+        $bySubsector =
+            $this->subsectorBuilder->build(
+                collect(
+                    $currentDataset['dataset'] ?? []
+                ),
+                collect(
+                    $comparisonDataset['dataset'] ?? []
+                ),
+            );
+/*
+|--------------------------------------------------------------------------
+| Time Intelligence Projection
+|--------------------------------------------------------------------------
+|
+| CurrentPeriodDatasetBuilder already calculates the trend
+| for each individual period.
+|
+| At the period level, current and comparison trends must
+| both be exposed because the frontend renders them side
+| by side.
+|
+*/
+
+$monthlyTrend = array_values(
+    array_merge(
+        $comparisonDataset['monthly_trend'] ?? [],
+        $currentDataset['monthly_trend'] ?? [],
+    )
+);
+
+
+$yearlyTrend = array_values(
+    array_merge(
+        $comparisonDataset['yearly_trend'] ?? [],
+        $currentDataset['yearly_trend'] ?? [],
+    )
+);
+
+
+$hs8Products =
+    $currentDataset['hs8_products']
+    ?? [];
+    
+            
+        \Log::info(
+            'GARMENT PERF: PERIOD SUBSECTOR',
+            [
+                'current_descriptor' =>
+                    $currentDescriptor,
+
+                'comparison_descriptor' =>
+                    $comparisonDescriptor,
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
 
 
         /*
@@ -207,6 +370,8 @@ class TradePeriodDatasetBuilder
         |
         */
 
+        $startedAt = microtime(true);
+
         $trendRows =
             $this->buildTrendRows(
                 current:
@@ -220,77 +385,213 @@ class TradePeriodDatasetBuilder
                     $comparisonDescriptor,
             );
 
+        \Log::info(
+            'GARMENT PERF: PERIOD TREND ROWS',
+            [
+                'current_descriptor' =>
+                    $currentDescriptor,
 
+                'comparison_descriptor' =>
+                    $comparisonDescriptor,
+
+                'rows' =>
+                    count($trendRows),
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+        
         /*
         |--------------------------------------------------------------------------
         | Result
         |--------------------------------------------------------------------------
         */
+        \Log::info(
+            'GARMENT PERF: PERIOD BUILDER TOTAL',
+            [
+                'current_descriptor' =>
+                    $currentDescriptor,
+
+                'comparison_descriptor' =>
+                    $comparisonDescriptor,
+
+                'current_rows' =>
+                    count(
+                        $currentDataset['dataset'] ?? []
+                    ),
+
+                'comparison_rows' =>
+                    count(
+                        $comparisonDataset['dataset'] ?? []
+                    ),
+
+                'trend_rows' =>
+                    count($trendRows),
+            ]
+        );
+        
 
         return [
 
-            /*
-            |--------------------------------------------------------------------------
-            | Canonical Period Datasets
-            |--------------------------------------------------------------------------
-            */
+    /*
+    |--------------------------------------------------------------------------
+    | Canonical Period Datasets
+    |--------------------------------------------------------------------------
+    */
 
-            'period_datasets' =>
-                $periodDatasets,
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Current
-            |--------------------------------------------------------------------------
-            */
-
-            'current' =>
-                $currentDataset,
+    'period_datasets' =>
+        $periodDatasets,
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Previous
-            |--------------------------------------------------------------------------
-            */
+    /*
+    |--------------------------------------------------------------------------
+    | Current
+    |--------------------------------------------------------------------------
+    */
 
-            'previous' =>
-                $comparisonDataset,
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Trend Rows
-            |--------------------------------------------------------------------------
-            */
-
-            'trend_rows' =>
-                $trendRows,
+    'current' =>
+        $currentDataset,
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Period Descriptors
-            |--------------------------------------------------------------------------
-            */
+    /*
+    |--------------------------------------------------------------------------
+    | Previous
+    |--------------------------------------------------------------------------
+    */
 
-            'current_descriptor' =>
-                $currentDescriptor,
-
-            'comparison_descriptor' =>
-                $comparisonDescriptor,
+    'previous' =>
+        $comparisonDataset,
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Dataset Format
-            |--------------------------------------------------------------------------
-            */
+    /*
+    |--------------------------------------------------------------------------
+    | Executive Overview
+    |--------------------------------------------------------------------------
+    */
 
-            'dataset_format' =>
-                self::DATASET_FORMAT,
-        ];
+    'overview' =>
+        $overview,
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Flow Performance
+    |--------------------------------------------------------------------------
+    */
+
+    'by_flow' =>
+        $flow,
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Subsector Performance
+    |--------------------------------------------------------------------------
+    */
+
+    'by_subsector' =>
+        $bySubsector,
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Top Products
+    |--------------------------------------------------------------------------
+    */
+
+    'top_import_products' =>
+        $currentDataset['top_import_products'] ?? [],
+
+    'top_export_products' =>
+        $currentDataset['top_export_products'] ?? [],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Top Countries
+    |--------------------------------------------------------------------------
+    */
+
+    'top_import_origins' =>
+        $currentDataset['top_import_origins'] ?? [],
+
+    'top_export_destinations' =>
+        $currentDataset['top_export_destinations'] ?? [],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Country Market Share
+    |--------------------------------------------------------------------------
+    */
+
+    'import_market_share' =>
+        $currentDataset['import_market_share'] ?? [],
+
+    'export_market_share' =>
+        $currentDataset['export_market_share'] ?? [],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trends
+    |--------------------------------------------------------------------------
+    */
+
+    'monthly_trend' =>
+        $currentDataset['monthly_trend'] ?? [],
+
+    'yearly_trend' =>
+        $currentDataset['yearly_trend'] ?? [],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | HS-8 Intelligence
+    |--------------------------------------------------------------------------
+    */
+
+    'hs8_products' =>
+        $currentDataset['hs8_products'] ?? [],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trend Rows
+    |--------------------------------------------------------------------------
+    */
+
+    'trend_rows' =>
+        $trendRows,
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Period Descriptors
+    |--------------------------------------------------------------------------
+    */
+
+    'current_descriptor' =>
+        $currentDescriptor,
+
+    'comparison_descriptor' =>
+        $comparisonDescriptor,
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dataset Format
+    |--------------------------------------------------------------------------
+    */
+
+    'dataset_format' =>
+        self::DATASET_FORMAT,
+];
     }
 
 
@@ -668,9 +969,7 @@ class TradePeriodDatasetBuilder
                 $dataset['dataset']
             )
         ) {
-            return array_values(
-                $dataset['dataset']
-            );
+            return $dataset['dataset'];
         }
 
 
@@ -685,13 +984,11 @@ class TradePeriodDatasetBuilder
         */
 
         if (
-            $this->looksLikeTradeRows(
-                $dataset
+    $this->looksLikeTradeRows(
+        $dataset
             )
         ) {
-            return array_values(
-                $dataset
-            );
+            return $dataset;
         }
 
 
@@ -797,4 +1094,6 @@ class TradePeriodDatasetBuilder
     {
         return self::DATASET_FORMAT;
     }
+
+    
 }

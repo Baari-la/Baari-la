@@ -8,6 +8,8 @@ use App\Services\Recommendation\Contracts\RecommendationEngineContract;
 use App\Services\Recommendation\RecommendationEngine;
 use App\Services\SupplyChain\Contracts\SupplyChainRecommendationContract;
 use App\Services\SupplyChain\SupplyChainRecommendationEngine;
+use App\Services\TradeIntelligence\Snapshot\SnapshotAssembler;
+use App\Services\TradeIntelligence\Snapshot\SnapshotMetadataBuilder;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,7 +27,19 @@ class AppServiceProvider extends ServiceProvider
         SupplyChainRecommendationContract::class,
         SupplyChainRecommendationEngine::class
     );
-}
+$this->app->when(
+    SnapshotAssembler::class
+)->needs(
+    SnapshotMetadataBuilder::class
+)->give(
+    fn () => new SnapshotMetadataBuilder(
+        sector: 'garment',
+        snapshotKey: 'digestex.trade.sector.garment',
+        snapshotType: 'sector',
+    )
+);
+
+    }
 
     /**
      * Bootstrap any application services.

@@ -516,22 +516,23 @@ class TextileTaxonomyService
         return null;
     }
 
-/**
- * --------------------------------------------------------------------------
- * Get Canonical HS-8 Codes for a Sector
- * --------------------------------------------------------------------------
- *
- * Returns only HS-8 codes that:
- * - exist in trade_statistics
- * - are classified by the taxonomy
- * - belong to the requested sector
- *
- * IMPORTANT:
- * - HS-8 is the authoritative filtering level.
- * - Chapter is NOT used as the final filter.
- * - HS4/chapter taxonomy rules are still used for classification.
- * - No trade rows are loaded here.
- */
+/*
+|--------------------------------------------------------------------------
+| Get Canonical HS-8 Codes for a Sector
+|--------------------------------------------------------------------------
+|
+| Returns only HS-8 codes that:
+| - exist in the active HS master
+| - are marked as textile
+| - are successfully classified by the taxonomy
+| - belong to the requested sector
+|
+| IMPORTANT:
+| - HS-8 is the authoritative filtering level.
+| - Chapter is NOT used as the final filter.
+| - HS4/chapter taxonomy rules are still used for classification.
+| - No trade rows are loaded here.
+*/
 public function hsCodesForSector(
     string $sectorKey
 ): array {

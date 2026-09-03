@@ -8,8 +8,10 @@ use App\Services\Trade\Taxonomy\TextileTaxonomyService;
 use App\Services\TradeIntelligence\Support\TradeColumnResolver;
 use App\Services\TradeIntelligence\Support\TradeFlowNormalizer;
 use App\Services\TradeIntelligence\Support\TradeMetricCalculator;
-use App\Services\TradeIntelligence\TradeReportingPeriod;
+use App\Services\Trade\TradeReportingPeriod;
+use App\Services\Trade\CountryResolverService;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class CurrentPeriodDatasetBuilder
@@ -50,7 +52,8 @@ class CurrentPeriodDatasetBuilder
         protected TradeColumnResolver $columnResolver,
         protected TradeFlowNormalizer $flowNormalizer,
         protected TradeMetricCalculator $metricCalculator,
-        protected CurrentOverviewBuilder $overviewBuilder,
+        // protected CurrentOverviewBuilder $overviewBuilder,
+        protected CountryResolverService $countryResolver,
         protected CurrentSubsectorBuilder $subsectorBuilder,
         protected CurrentFlowBuilder $flowBuilder,
         protected CurrentProductBuilder $productBuilder,
@@ -86,11 +89,25 @@ class CurrentPeriodDatasetBuilder
         TradeReportingPeriod $period,
         array $request
     ): array {
+
+        \Log::info(
+            'GARMENT PERF: ENTER CURRENT BUILDER',
+            [
+                'period' =>
+                    $period->snapshotKey(),
+
+                'request' =>
+                    $request,
+            ]
+        );
+
         /*
         |--------------------------------------------------------------------------
         | Resolve Period
         |--------------------------------------------------------------------------
         */
+
+        $startedAt = microtime(true);
 
         $year =
             (int) (
@@ -146,26 +163,44 @@ class CurrentPeriodDatasetBuilder
         |--------------------------------------------------------------------------
         | Canonical Garment HS-8
         |--------------------------------------------------------------------------
-        |
-        | IMPORTANT:
-        |
-        | The garment universe comes from the canonical taxonomy
-        | layer.
-        |
-        | We deliberately DO NOT use:
-        |
-        |     hs_code LIKE '61%'
-        |     hs_code LIKE '62%'
-        |     chapter filters
-        |
-        | The database query must be restricted to the exact
-        | canonical garment HS-8 list.
-        |
         */
 
         $sectorHsCodes =
             $this->sectorHsCodes();
 
+
+        \Log::info(
+            'GARMENT PERF: PERIOD RESOLUTION',
+            [
+                'year' =>
+                    $year,
+
+                'month_start' =>
+                    $monthStart,
+
+                'month_end' =>
+                    $monthEnd,
+
+                'mode' =>
+                    $mode,
+
+                'hs8_count' =>
+                    count($sectorHsCodes),
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Empty Canonical Universe
+        |--------------------------------------------------------------------------
+        */
 
         if (
             empty($sectorHsCodes)
@@ -181,46 +216,230 @@ class CurrentPeriodDatasetBuilder
 
         /*
         |--------------------------------------------------------------------------
-        | Acquire Current Period Rows
+        | Shared Canonical Dataset Cache
         |--------------------------------------------------------------------------
-        |
-        | ONE aggregated query.
-        |
-        | The query is restricted by:
-        |
-        |     canonical garment HS-8
-        |     selected year
-        |     selected month window
-        |
         */
 
-        $rows =
-            $this->queryRows(
-                columns: $columns,
-                sectorHsCodes: $sectorHsCodes,
-                year: $year,
-                monthStart: $monthStart,
-                monthEnd: $monthEnd,
+        $cacheKey =
+            $this->canonicalDatasetCacheKey(
+                year:
+                    $year,
+
+                monthStart:
+                    $monthStart,
+
+                monthEnd:
+                    $monthEnd,
+
+                mode:
+                    $mode,
+            );
+
+
+        $startedAt = microtime(true);
+
+        $dataset =
+            Cache::store('redis')->remember(
+                $cacheKey,
+                now()->addHours(6),
+                function () use (
+                    $columns,
+                    $sectorHsCodes,
+                    $year,
+                    $monthStart,
+                    $monthEnd
+                ): array {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Memory Before Query
+                    |--------------------------------------------------------------------------
+                    */
+
+                    \Log::info(
+                        'GARMENT PERF: MEMORY BEFORE QUERY',
+                        [
+                            'year' =>
+                                $year,
+
+                            'month_start' =>
+                                $monthStart,
+
+                            'month_end' =>
+                                $monthEnd,
+
+                            'memory_mb' =>
+                                round(
+                                    memory_get_usage(true) / 1024 / 1024,
+                                    2
+                                ),
+
+                            'peak_memory_mb' =>
+                                round(
+                                    memory_get_peak_usage(true) / 1024 / 1024,
+                                    2
+                                ),
+                        ]
+                    );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Database Acquisition
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $rows =
+                        $this->queryRows(
+                            columns:
+                                $columns,
+
+                            sectorHsCodes:
+                                $sectorHsCodes,
+
+                            year:
+                                $year,
+
+                            monthStart:
+                                $monthStart,
+
+                            monthEnd:
+                                $monthEnd,
+                        );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Memory After Query
+                    |--------------------------------------------------------------------------
+                    */
+
+                    \Log::info(
+                        'GARMENT PERF: MEMORY AFTER QUERY',
+                        [
+                            'rows' =>
+                                $rows->count(),
+
+                            'memory_mb' =>
+                                round(
+                                    memory_get_usage(true) / 1024 / 1024,
+                                    2
+                                ),
+
+                            'peak_memory_mb' =>
+                                round(
+                                    memory_get_peak_usage(true) / 1024 / 1024,
+                                    2
+                                ),
+                        ]
+                    );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Canonical Normalization
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $dataset =
+                        $this->normalizeRows(
+                            $rows
+                        );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Release Query Collection
+                    |--------------------------------------------------------------------------
+                    */
+
+                    unset($rows);
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Memory After Normalize
+                    |--------------------------------------------------------------------------
+                    */
+
+                    \Log::info(
+                        'GARMENT PERF: MEMORY AFTER NORMALIZE',
+                        [
+                            'rows' =>
+                                count($dataset),
+
+                            'memory_mb' =>
+                                round(
+                                    memory_get_usage(true) / 1024 / 1024,
+                                    2
+                                ),
+
+                            'peak_memory_mb' =>
+                                round(
+                                    memory_get_peak_usage(true) / 1024 / 1024,
+                                    2
+                                ),
+                        ]
+                    );
+
+
+                    return $dataset;
+                }
             );
 
 
         /*
         |--------------------------------------------------------------------------
-        | Normalize Trade Rows
+        | Canonical Dataset Cache
         |--------------------------------------------------------------------------
         */
 
-        $dataset =
-            $this->normalizeRows(
-                $rows
-            );
+        \Log::info(
+            'GARMENT PERF: CANONICAL DATASET CACHE',
+            [
+                'cache_key' =>
+                    $cacheKey,
+
+                'year' =>
+                    $year,
+
+                'month_start' =>
+                    $monthStart,
+
+                'month_end' =>
+                    $monthEnd,
+
+                'mode' =>
+                    $mode,
+
+                'rows' =>
+                    count($dataset),
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
 
 
         /*
         |--------------------------------------------------------------------------
         | Canonical Collection
         |--------------------------------------------------------------------------
+        |
+        | One Collection wrapper is created around the canonical
+        | dataset and shared by all Current/* builders.
+        |
+        | IMPORTANT:
+        |
+        | collect() does not duplicate every row here.
+        | The collection references the existing dataset array.
+        |
         */
+
+        $startedAt = microtime(true);
 
         $collection =
             collect(
@@ -228,14 +447,341 @@ class CurrentPeriodDatasetBuilder
             );
 
 
+        \Log::info(
+            'GARMENT PERF: COLLECTION',
+            [
+                'year' =>
+                    $year,
+
+                'rows' =>
+                    $collection->count(),
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+
         /*
         |--------------------------------------------------------------------------
         | Current Intelligence
         |--------------------------------------------------------------------------
         |
-        | Every Current/* builder works against the same canonical
-        | period collection.
+        | All builders receive the same canonical collection.
         |
+        | No business logic is changed here.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Top Import Products
+        |--------------------------------------------------------------------------
+        */
+
+        $startedAt = microtime(true);
+
+        $topImportProducts =
+            $this->productBuilder->build(
+                $collection,
+                'import'
+            );
+
+        \Log::info(
+            'GARMENT PERF: TOP IMPORT PRODUCTS',
+            [
+                'year' =>
+                    $year,
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Top Export Products
+        |--------------------------------------------------------------------------
+        */
+
+        $startedAt = microtime(true);
+
+        $topExportProducts =
+            $this->productBuilder->build(
+                $collection,
+                'export'
+            );
+
+        \Log::info(
+            'GARMENT PERF: TOP EXPORT PRODUCTS',
+            [
+                'year' =>
+                    $year,
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Top Import Origins
+        |--------------------------------------------------------------------------
+        */
+
+        $startedAt = microtime(true);
+
+        $topImportOrigins =
+            $this->countryBuilder->buildTopCountries(
+                $collection,
+                'import'
+            );
+
+        \Log::info(
+    'GARMENT DEBUG: TOP IMPORT ORIGINS OUTPUT',
+    [
+        'rows' =>
+            count($topImportOrigins),
+
+        'sample' =>
+            array_slice(
+                $topImportOrigins,
+                0,
+                3
+            ),
+    ]
+);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Top Export Destinations
+        |--------------------------------------------------------------------------
+        */
+
+        $startedAt = microtime(true);
+
+        $topExportDestinations =
+            $this->countryBuilder->buildTopCountries(
+                $collection,
+                'export'
+            );
+
+       \Log::info(
+    'GARMENT DEBUG: TOP EXPORT DESTINATIONS OUTPUT',
+    [
+        'rows' =>
+            count($topExportDestinations),
+
+        'sample' =>
+            array_slice(
+                $topExportDestinations,
+                0,
+                3
+            ),
+    ]
+);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Import Market Share
+        |--------------------------------------------------------------------------
+        */
+
+        $startedAt = microtime(true);
+
+        $importMarketShare =
+            $this->countryBuilder->buildMarketShare(
+                $collection,
+                'import'
+            );
+
+        \Log::info(
+            'GARMENT PERF: IMPORT MARKET SHARE',
+            [
+                'year' =>
+                    $year,
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Export Market Share
+        |--------------------------------------------------------------------------
+        */
+
+        $startedAt = microtime(true);
+
+        $exportMarketShare =
+            $this->countryBuilder->buildMarketShare(
+                $collection,
+                'export'
+            );
+
+        \Log::info(
+            'GARMENT PERF: EXPORT MARKET SHARE',
+            [
+                'year' =>
+                    $year,
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Monthly Trend
+        |--------------------------------------------------------------------------
+        */
+
+        $startedAt = microtime(true);
+
+        $monthlyTrend =
+            $this->trendBuilder->buildMonthly(
+                $collection
+            );
+\Log::info(
+    'GARMENT DEBUG: MONTHLY TREND SAMPLE',
+    [
+        'year' => $year,
+
+        'rows' =>
+            is_countable($monthlyTrend)
+                ? count($monthlyTrend)
+                : null,
+
+        'sample' =>
+            is_array($monthlyTrend)
+                ? array_slice(
+                    $monthlyTrend,
+                    0,
+                    2
+                )
+                : null,
+    ]
+);
+
+        \Log::info(
+            'GARMENT PERF: MONTHLY TREND',
+            [
+                'year' =>
+                    $year,
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+
+                 'rows' =>
+                is_countable($monthlyTrend)
+                    ? count($monthlyTrend)
+                    : null,
+                        ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Yearly Trend
+        |--------------------------------------------------------------------------
+        */
+
+        $startedAt = microtime(true);
+
+        $yearlyTrend =
+            $this->trendBuilder->buildYearly(
+                $collection
+            );
+
+        \Log::info(
+            'GARMENT PERF: YEARLY TREND',
+            [
+                'year' =>
+                    $year,
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | HS-8 Intelligence
+        |--------------------------------------------------------------------------
+        */
+
+        $startedAt = microtime(true);
+
+        $hs8Products =
+            $this->hs8Builder->build(
+                $collection
+            );
+
+        \Log::info(
+            'GARMENT PERF: HS8 PRODUCTS',
+            [
+                'year' =>
+                    $year,
+
+                'time_ms' =>
+                    round(
+                        (microtime(true) - $startedAt) * 1000,
+                        2
+                    ),
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Release Collection Wrapper
+        |--------------------------------------------------------------------------
+        |
+        | All Current/* builders have finished consuming the shared
+        | canonical collection.
+        |
+        | We deliberately keep $dataset because it is part of the
+        | canonical return contract.
+        |
+        */
+
+        unset($collection);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Return Dataset
+        |--------------------------------------------------------------------------
         */
 
         return [
@@ -271,57 +817,15 @@ class CurrentPeriodDatasetBuilder
 
             /*
             |--------------------------------------------------------------------------
-            | Executive Overview
-            |--------------------------------------------------------------------------
-            */
-
-            'overview' =>
-                $this->overviewBuilder->build(
-                    $collection
-                ),
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Subsector
-            |--------------------------------------------------------------------------
-            */
-
-            'by_subsector' =>
-                $this->subsectorBuilder->build(
-                    $collection
-                ),
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Flow
-            |--------------------------------------------------------------------------
-            */
-
-            'by_flow' =>
-                $this->flowBuilder->build(
-                    $collection
-                ),
-
-
-            /*
-            |--------------------------------------------------------------------------
             | Top Products
             |--------------------------------------------------------------------------
             */
 
             'top_import_products' =>
-                $this->productBuilder->build(
-                    $collection,
-                    'import'
-                ),
+                $topImportProducts,
 
             'top_export_products' =>
-                $this->productBuilder->build(
-                    $collection,
-                    'export'
-                ),
+                $topExportProducts,
 
 
             /*
@@ -331,16 +835,10 @@ class CurrentPeriodDatasetBuilder
             */
 
             'top_import_origins' =>
-                $this->countryBuilder->buildTopCountries(
-                    $collection,
-                    'import'
-                ),
+                $topImportOrigins,
 
             'top_export_destinations' =>
-                $this->countryBuilder->buildTopCountries(
-                    $collection,
-                    'export'
-                ),
+                $topExportDestinations,
 
 
             /*
@@ -350,38 +848,23 @@ class CurrentPeriodDatasetBuilder
             */
 
             'import_market_share' =>
-                $this->countryBuilder->buildMarketShare(
-                    $collection,
-                    'import'
-                ),
+                $importMarketShare,
 
             'export_market_share' =>
-                $this->countryBuilder->buildMarketShare(
-                    $collection,
-                    'export'
-                ),
+                $exportMarketShare,
 
 
             /*
             |--------------------------------------------------------------------------
-            | Trends Inside This Period
+            | Trends
             |--------------------------------------------------------------------------
-            |
-            | These are trends contained inside this single period.
-            |
-            | Comparison-period concatenation is NOT performed here.
-            |
             */
 
             'monthly_trend' =>
-                $this->trendBuilder->monthly(
-                    $collection
-                ),
+                $monthlyTrend,
 
             'yearly_trend' =>
-                $this->trendBuilder->yearly(
-                    $collection
-                ),
+                $yearlyTrend,
 
 
             /*
@@ -391,9 +874,7 @@ class CurrentPeriodDatasetBuilder
             */
 
             'hs8_products' =>
-                $this->hs8Builder->build(
-                    $collection
-                ),
+                $hs8Products,
         ];
     }
 
@@ -408,6 +889,7 @@ class CurrentPeriodDatasetBuilder
         int $throughMonth,
         string $mode
     ): array {
+
         $throughMonth =
             max(
                 1,
@@ -490,6 +972,7 @@ class CurrentPeriodDatasetBuilder
         int $monthStart,
         int $monthEnd
     ): Collection {
+
         return DB::table(
             'trade_statistics'
         )
@@ -565,129 +1048,195 @@ class CurrentPeriodDatasetBuilder
     |
     */
 
-    protected function normalizeRows(
-        Collection $rows
-    ): array {
-        return $rows
-            ->map(
-                function ($row): array {
+   protected function normalizeRows(
+    Collection $rows
+): array {
 
-                    $flow =
-                        $this->flowNormalizer->normalize(
-                            $row->flow
-                                ?? null
+    /*
+    |--------------------------------------------------------------------------
+    | Country resolution cache
+    |--------------------------------------------------------------------------
+    |
+    | Many trade rows share the same country name.
+    | Resolve each distinct source country only once.
+    |
+    */
+
+    $countryCache = [];
+
+    return $rows
+        ->map(
+            function ($row) use (&$countryCache): array {
+
+                $flow =
+                    $this->flowNormalizer->normalize(
+                        $row->flow
+                            ?? null
+                    );
+
+                $value =
+                    $this->toFloat(
+                        $row->value
+                            ?? 0
+                    );
+
+                $volume =
+                    $this->toFloat(
+                        $row->volume
+                            ?? 0
+                    );
+
+                /*
+                |--------------------------------------------------------------------------
+                | Country
+                |--------------------------------------------------------------------------
+                */
+
+                $sourceCountry =
+                    $row->country
+                        ?? null;
+
+                $countryKey =
+                    $this->countryResolver->normalize(
+                        $sourceCountry
+                    );
+
+                if (
+                    $countryKey !== ''
+                    && !array_key_exists(
+                        $countryKey,
+                        $countryCache
+                    )
+                ) {
+                    $countryCache[$countryKey] =
+                        $this->countryResolver->resolve(
+                            $sourceCountry,
+                            'KEMENDAG'
                         );
-
-
-                    $value =
-                        $this->toFloat(
-                            $row->value
-                                ?? 0
-                        );
-
-
-                    $volume =
-                        $this->toFloat(
-                            $row->volume
-                                ?? 0
-                        );
-
-
-                    return [
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Period
-                        |--------------------------------------------------------------------------
-                        */
-
-                        'year' =>
-                            (int) (
-                                $row->year
-                                ?? 0
-                            ),
-
-                        'month' =>
-                            (int) (
-                                $row->month
-                                ?? 0
-                            ),
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | HS-8
-                        |--------------------------------------------------------------------------
-                        */
-
-                        'hs_code' =>
-                            (string) (
-                                $row->hs_code
-                                ?? ''
-                            ),
-
-                        'description' =>
-                            $row->description
-                                ?? null,
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Country
-                        |--------------------------------------------------------------------------
-                        */
-
-                        'country' =>
-                            $row->country
-                                ?? null,
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Flow
-                        |--------------------------------------------------------------------------
-                        */
-
-                        'flow' =>
-                            $flow,
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Official Trade Metrics
-                        |--------------------------------------------------------------------------
-                        |
-                        | trade_volume remains authoritative.
-                        |
-                        */
-
-                        'value' =>
-                            $value,
-
-                        'trade_value' =>
-                            $value,
-
-                        'volume' =>
-                            $volume,
-
-                        'trade_volume' =>
-                            $volume,
-
-                        'volume_unit' =>
-                            'KG',
-                    ];
                 }
-            )
-            ->filter(
-                fn (array $row): bool =>
-                    $row['hs_code'] !== ''
-                    &&
-                    $row['flow'] !== null
-            )
-            ->values()
-            ->all();
-    }
 
+                $country =
+                    $countryCache[$countryKey]
+                        ?? null;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Canonical country contract
+                |--------------------------------------------------------------------------
+                */
+
+                return [
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Period
+                    |--------------------------------------------------------------------------
+                    */
+
+                    'year' =>
+                        (int) (
+                            $row->year
+                            ?? 0
+                        ),
+
+                    'month' =>
+                        (int) (
+                            $row->month
+                            ?? 0
+                        ),
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | HS-8
+                    |--------------------------------------------------------------------------
+                    */
+
+                    'hs_code' =>
+                        (string) (
+                            $row->hs_code
+                            ?? ''
+                        ),
+
+                    'description' =>
+                        $row->description
+                            ?? null,
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Country
+                    |--------------------------------------------------------------------------
+                    |
+                    | Keep the original source value for traceability,
+                    | but expose the canonical country fields required
+                    | by Trade Intelligence / frontend.
+                    |
+                    */
+
+                    'country' =>
+                        $sourceCountry,
+
+                    'country_id' =>
+                        $country?->id,
+
+                    'country_code' =>
+                        $country?->country_code,
+
+                    'iso3' =>
+                        $country?->iso3,
+
+                    'country_name_en' =>
+                        $country?->country_name_en,
+
+                    'country_name_id' =>
+                        $country?->country_name_id,
+
+                    'flag_emoji' =>
+                        $country?->flag_emoji,
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Flow
+                    |--------------------------------------------------------------------------
+                    */
+
+                    'flow' =>
+                        $flow,
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Official Trade Metrics
+                    |--------------------------------------------------------------------------
+                    |
+                    | trade_volume remains authoritative.
+                    |
+                    */
+
+                    'value' =>
+                        $value,
+
+                    'trade_value' =>
+                        $value,
+
+                    'volume' =>
+                        $volume,
+
+                    'trade_volume' =>
+                        $volume,
+
+                    'volume_unit' =>
+                        'KG',
+                ];
+            }
+        )
+        ->filter(
+            fn (array $row): bool =>
+                $row['hs_code'] !== ''
+                &&
+                $row['flow'] !== null
+        )
+        ->values()
+        ->all();
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -704,6 +1253,7 @@ class CurrentPeriodDatasetBuilder
 
     protected function sectorHsCodes(): array
     {
+
         if (
             $this->cachedSectorHsCodes !== null
         ) {
@@ -731,6 +1281,7 @@ class CurrentPeriodDatasetBuilder
             )
                 ->map(
                     static function ($code): string {
+
                         return preg_replace(
                             '/\D+/',
                             '',
@@ -740,6 +1291,7 @@ class CurrentPeriodDatasetBuilder
                 )
                 ->filter(
                     static function (string $code): bool {
+
                         return strlen($code) === 8;
                     }
                 )
@@ -768,64 +1320,37 @@ class CurrentPeriodDatasetBuilder
         int $monthEnd,
         string $mode
     ): array {
+
         $empty =
             collect();
 
 
-        return [
+return [
 
-            'dataset' => [],
+    'dataset' => [],
 
-            'year' =>
-                $year,
+    'year' => $year,
 
-            'month_start' =>
-                $monthStart,
+    'month_start' => $monthStart,
 
-            'month_end' =>
-                $monthEnd,
+    'month_end' => $monthEnd,
 
-            'mode' =>
-                $mode,
+    'mode' => $mode,
 
-            'overview' =>
-                $this->overviewBuilder->build(
-                    $empty
-                ),
+    'top_import_products' => [],
+    'top_export_products' => [],
 
-            'by_subsector' =>
-                [],
+    'top_import_origins' => [],
+    'top_export_destinations' => [],
 
-            'by_flow' =>
-                [],
+    'import_market_share' => [],
+    'export_market_share' => [],
 
-            'top_import_products' =>
-                [],
+    'monthly_trend' => [],
+    'yearly_trend' => [],
 
-            'top_export_products' =>
-                [],
-
-            'top_import_origins' =>
-                [],
-
-            'top_export_destinations' =>
-                [],
-
-            'import_market_share' =>
-                [],
-
-            'export_market_share' =>
-                [],
-
-            'monthly_trend' =>
-                [],
-
-            'yearly_trend' =>
-                [],
-
-            'hs8_products' =>
-                [],
-        ];
+    'hs8_products' => [],
+];
     }
 
 
@@ -838,6 +1363,7 @@ class CurrentPeriodDatasetBuilder
     protected function toFloat(
         mixed $value
     ): float {
+
         if (
             $value === null
         ) {
@@ -863,5 +1389,32 @@ class CurrentPeriodDatasetBuilder
         return is_numeric($value)
             ? (float) $value
             : 0.0;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Shared Canonical Dataset Cache
+    |--------------------------------------------------------------------------
+    |
+    | Cache hanya berlaku untuk Current / YTD / Monthly dataset.
+    |
+    | Historical 2019–2024 TIDAK melewati builder ini.
+    |
+    */
+
+   protected function canonicalDatasetCacheKey(
+    int $year,
+    int $monthStart,
+    int $monthEnd,
+    string $mode
+): string {
+    return sprintf(
+        'trade_intelligence:garment:canonical:%04d:%02d-%02d:%s:v2',
+        $year,
+        $monthStart,
+        $monthEnd,
+        $mode,
+    );
     }
 }

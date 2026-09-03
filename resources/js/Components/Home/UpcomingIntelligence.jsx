@@ -18,20 +18,22 @@ export default function UpcomingIntelligence() {
     const isEn = locale === "en";
     const modules = [
         {
-            titleEn: "DIGESTEX Strategic Industry & Visibility Program",
+            titleEn: "DIGESTEX Readable-AI Profile & Visibility Program",
 
-            titleId: "Program Strategic Industry & Visibility DIGESTEX",
+            titleId: "DIGESTEX Readable-AI Profile & Visibility Program",
 
             descriptionEn:
-                "The strategic entry point to the DIGESTEX Global Textile Intelligence Ecosystem — connecting companies, industry intelligence, technologies, solutions, suppliers, buyers, and business opportunities across the textile value chain.",
+                "The strategic entry point to the DIGESTEX Global Textile Intelligence Ecosystem — transforming company capabilities into a structured, trusted, and Readable-AI Profile designed to strengthen digital visibility and unlock future business opportunities.",
 
             descriptionId:
-                "Pintu masuk strategis ke DIGESTEX Global Textile Intelligence Ecosystem — menghubungkan perusahaan, industry intelligence, teknologi, solusi, supplier, buyer, dan peluang bisnis di seluruh rantai nilai industri tekstil.",
+                "Pintu masuk strategis menuju DIGESTEX Global Textile Intelligence Ecosystem — mengubah kapabilitas perusahaan menjadi Readable-AI Profile yang terstruktur dan terpercaya untuk memperkuat visibilitas digital serta membuka peluang bisnis di masa depan.",
 
-            status: "NOW LIVE",
+            // status: "NOW LIVE",
+            status: "UPCOMING",
 
             icon: Globe2,
         },
+
         {
             titleEn: "Sourcing Hub™",
 
@@ -245,72 +247,139 @@ export default function UpcomingIntelligence() {
                 >
                     <h3 className="text-center text-3xl font-black">
                         {isEn
-                            ? "DIGESTEX Roadmap 2026–2030"
-                            : "Roadmap DIGESTEX 2026–2030"}
+                            ? "DIGESTEX Development Roadmap 2026–2030"
+                            : "Roadmap Pengembangan DIGESTEX 2026–2030"}
                     </h3>
 
-                    <div className="mt-10 grid gap-6 md:grid-cols-5">
-                        <div>
-                            <div className="text-2xl font-black text-amber-400">
+                    <p className="mx-auto mt-4 max-w-3xl text-center text-sm leading-7 text-slate-400">
+                        {isEn
+                            ? "A progressive development roadmap from digital industry identity and trade intelligence toward a connected global textile industry ecosystem."
+                            : "Roadmap pengembangan bertahap dari digital industry identity dan trade intelligence menuju ekosistem industri tekstil global yang terhubung."}
+                    </p>
+
+                    <div className="mt-12 grid gap-6 md:grid-cols-5">
+                        {/* 2026 */}
+                        <div className="relative rounded-3xl border border-white/10 bg-white/5 p-6">
+                            <div className="text-3xl font-black text-amber-400">
                                 2026
                             </div>
 
-                            <div className="mt-2 text-sm text-slate-300">
-                                Digital Directory
+                            <div className="mt-2 text-xs font-black uppercase tracking-widest text-white">
+                                {isEn
+                                    ? "Digital Foundation"
+                                    : "Fondasi Digital"}
+                            </div>
+
+                            <div className="mt-5 text-sm leading-7 text-slate-300">
+                                AI-Readable Company Profiles
                                 <br />
-                                Cotton Intelligence
+                                Digital Industry Identity
                                 <br />
-                                Sourcing Hub
+                                Trade Intelligence Foundation
+                                <br />
+                                Textile Sector Intelligence
+                                <br />
+                                Early Ecosystem Partners
                             </div>
                         </div>
 
-                        <div>
-                            <div className="text-2xl font-black text-amber-400">
+                        {/* 2027 */}
+                        <div className="relative rounded-3xl border border-white/10 bg-white/5 p-6">
+                            <div className="text-3xl font-black text-amber-400">
                                 2027
                             </div>
 
-                            <div className="mt-2 text-sm text-slate-300">
-                                Raw Material
+                            <div className="mt-2 text-xs font-black uppercase tracking-widest text-white">
+                                {isEn
+                                    ? "Industry & Business Intelligence"
+                                    : "Industry & Business Intelligence"}
+                            </div>
+
+                            <div className="mt-5 text-sm leading-7 text-slate-300">
+                                Industry Intelligence
                                 <br />
-                                Manufacturing
+                                Manufacturing Intelligence
                                 <br />
-                                Intelligence
+                                Market Intelligence
+                                <br />
+                                Sourcing Intelligence
+                                <br />
+                                Business Connectivity
                             </div>
                         </div>
 
-                        <div>
-                            <div className="text-2xl font-black text-amber-400">
+                        {/* 2028 */}
+                        <div className="relative rounded-3xl border border-white/10 bg-white/5 p-6">
+                            <div className="text-3xl font-black text-amber-400">
                                 2028
                             </div>
 
-                            <div className="mt-2 text-sm text-slate-300">
-                                Global Trade
+                            <div className="mt-2 text-xs font-black uppercase tracking-widest text-white">
+                                {isEn
+                                    ? "Global Trade & Market Intelligence"
+                                    : "Global Trade & Market Intelligence"}
+                            </div>
+
+                            <div className="mt-5 text-sm leading-7 text-slate-300">
+                                Global Trade Intelligence
                                 <br />
-                                Radar
+                                Trade Radar™
+                                <br />
+                                Country & Product Intelligence
+                                <br />
+                                Global Market Intelligence
+                                <br />
+                                Trade Flow Analytics
                             </div>
                         </div>
 
-                        <div>
-                            <div className="text-2xl font-black text-amber-400">
+                        {/* 2029 */}
+                        <div className="relative rounded-3xl border border-white/10 bg-white/5 p-6">
+                            <div className="text-3xl font-black text-amber-400">
                                 2029
                             </div>
 
-                            <div className="mt-2 text-sm text-slate-300">
-                                Executive AI
+                            <div className="mt-2 text-xs font-black uppercase tracking-widest text-white">
+                                {isEn
+                                    ? "Decision Intelligence"
+                                    : "Decision Intelligence"}
+                            </div>
+
+                            <div className="mt-5 text-sm leading-7 text-slate-300">
+                                Executive AI Insight™
                                 <br />
-                                Smart Matching
+                                Smart Business Matching™
+                                <br />
+                                Predictive Market Signals
+                                <br />
+                                Decision Intelligence
+                                <br />
+                                Strategic Business Intelligence
                             </div>
                         </div>
 
-                        <div>
-                            <div className="text-2xl font-black text-amber-400">
+                        {/* 2030 */}
+                        <div className="relative rounded-3xl border border-amber-400/20 bg-amber-400/5 p-6">
+                            <div className="text-3xl font-black text-amber-400">
                                 2030
                             </div>
 
-                            <div className="mt-2 text-sm text-slate-300">
-                                Global Textile
+                            <div className="mt-2 text-xs font-black uppercase tracking-widest text-white">
+                                {isEn
+                                    ? "Connected Textile Industry"
+                                    : "Connected Textile Industry"}
+                            </div>
+
+                            <div className="mt-5 text-sm leading-7 text-slate-300">
+                                Connected Textile Intelligence Ecosystem
                                 <br />
-                                Operating System
+                                Global Textile Business Infrastructure
+                                <br />
+                                Integrated Industry Intelligence
+                                <br />
+                                AI-Enabled Industry Connectivity
+                                <br />
+                                Global Textile Ecosystem
                             </div>
                         </div>
                     </div>
@@ -318,7 +387,8 @@ export default function UpcomingIntelligence() {
                 {/* Footer */}
             </div>
             {/* TAmbahan */}
-            <div className="mt-20 flex justify-center">
+
+            {/* <div className="mt-20 flex justify-center">
                 <div
                     className="
             w-full
@@ -333,14 +403,14 @@ export default function UpcomingIntelligence() {
                 >
                     <h3 className="text-4xl font-black">
                         {isEn
-                            ? "Join the Journey"
-                            : "Bergabung dalam Perjalanan Ini"}
+                            ? "Start Your Digital Journey"
+                            : "Mulai Perjalanan Digital Perusahaan Anda"}
                     </h3>
 
                     <p className="mx-auto mt-6 max-w-3xl leading-8 text-slate-300">
                         {isEn
-                            ? "DIGESTEX Digital Directory & Visibility Program 2026 is not the destination. It is the foundation of the Global Textile Intelligence Ecosystem."
-                            : "DIGESTEX Digital Directory & Visibility Program 2026 bukanlah tujuan akhir. Program ini merupakan fondasi dari Global Textile Intelligence Ecosystem."}
+                            ? "The DIGESTEX Readable-AI Profile & Visibility Program is the starting point for transforming your company capabilities into a structured digital identity — creating the foundation for greater visibility, intelligence, connectivity, and future business opportunities."
+                            : "DIGESTEX Readable-AI Profile & Visibility Program merupakan langkah awal untuk mengubah kapabilitas perusahaan menjadi identitas digital yang terstruktur — membangun fondasi bagi visibilitas, intelligence, konektivitas, dan peluang bisnis yang lebih besar di masa depan."}
                     </p>
 
                     <Link
@@ -359,11 +429,11 @@ export default function UpcomingIntelligence() {
             "
                     >
                         {isEn
-                            ? "JOIN DIGITAL DIRECTORY"
-                            : "IKUT DIGITAL DIRECTORY"}
+                            ? "BUILD YOUR READABLE-AI PROFILE"
+                            : "BANGUN READABLE-AI PROFILE ANDA"}
                     </Link>
                 </div>
-            </div>
+            </div> */}
 
             <div className="mx-auto max-w-7xl px-6 pt-8">
                 <Link

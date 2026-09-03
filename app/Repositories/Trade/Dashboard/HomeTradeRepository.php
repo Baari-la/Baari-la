@@ -79,7 +79,7 @@ class HomeTradeRepository
      * --------------------------------------------------------------------------
      *
      * Returns raw trade volume.
-     * Estimated Pieces are calculated by PiecesConversionService.
+     * Estimated Pieces are calculated by GarmentConversionService using governed HS-8 conversion factors.
      */
     public function tradeSummary(array $filters = [])
     {

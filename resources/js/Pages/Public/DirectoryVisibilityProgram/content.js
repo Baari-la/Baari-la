@@ -12,35 +12,44 @@ export function getDirectoryProgramContent(isEn) {
                 : "PENDAFTARAN PERUSAHAAN DIBUKA",
 
             headline: isEn
-                ? "Transforming Industry Capabilities,\ninto Global Business Opportunities"
-                : "Transformasi Kemampuan Industri,\nMenjadi Peluang Bisnis Global",
+                ? "Transforming Industry Capabilities\ninto Global Business Opportunities"
+                : "Mengubah Kapabilitas Industri\nMenjadi Peluang Bisnis Global",
 
-            title: "DIGESTEX Digital Directory\n& Visibility Program",
+            title: "DIGESTEX Readable-AI Profile\n& Visibility Program",
 
             ecosystem: "Global Textile Intelligence Ecosystem",
 
             tagline: isEn
-                ? "Build Your Digital Identity."
-                : "Bangun Identitas Digital Perusahaan Anda.",
+                ? "Make Your Company Easier to Understand, Discover, and Connect."
+                : "Membuat Perusahaan Lebih Mudah Dipahami, Ditemukan, dan Terhubung.",
 
             description: isEn
-                ? "Complete your company profile. Increase your visibility. Unlock new business opportunities through the DIGESTEX Global Textile Intelligence Ecosystem."
-                : "Lengkapi profil perusahaan Anda. Tingkatkan visibilitas. Buka peluang bisnis baru melalui DIGESTEX Global Textile Intelligence Ecosystem.",
+                ? "Structure your company capabilities into a Readable-AI Profile and Digital Company Passport™ — helping buyers, search systems, and AI better understand your company while strengthening digital and global business visibility."
+                : "Strukturkan kapabilitas perusahaan Anda menjadi Readable-AI Profile dan Digital Company Passport™ — membantu buyer, sistem pencarian, dan AI memahami perusahaan Anda dengan lebih baik sekaligus memperkuat visibilitas digital dan global.",
 
             joinButton: isEn ? "JOIN THE PROGRAM" : "IKUTI PROGRAM",
 
-            learnButton: isEn ? "LEARN ABOUT THE PROGRAM" : "PELAJARI PROGRAM",
+            learnButton: isEn ? "EXPLORE THE PROGRAM" : "PELAJARI PROGRAM",
 
             journeyTitle: isEn
-                ? "Digital Transformation Journey"
-                : "Perjalanan Transformasi Digital",
+                ? "From Company Information to Global Business Visibility"
+                : "Dari Informasi Perusahaan Menuju Visibilitas Bisnis Global",
 
             journey: [
                 {
                     icon: "directory",
                     color: "slate",
 
-                    title: isEn ? "Legacy Directory" : "Direktori Konvensional",
+                    title: isEn
+                        ? "Company Information"
+                        : "Informasi Perusahaan",
+                },
+
+                {
+                    icon: "ai",
+                    color: "violet",
+
+                    title: "Readable-AI Profile",
                 },
 
                 {
@@ -55,15 +64,15 @@ export function getDirectoryProgramContent(isEn) {
                     color: "emerald",
 
                     title: isEn
-                        ? "Verified Company"
-                        : "Perusahaan Terverifikasi",
+                        ? "Verified & Visible"
+                        : "Terverifikasi & Terlihat",
                 },
 
                 {
                     icon: "matching",
                     color: "amber",
 
-                    title: "Smart Business Matching™",
+                    title: "Business Discovery & Matching",
                 },
 
                 {
@@ -77,27 +86,45 @@ export function getDirectoryProgramContent(isEn) {
             ],
         },
 
+        /*
+|--------------------------------------------------------------------------
+| HERO CTA
+|--------------------------------------------------------------------------
+*/
+
         cta: {
-            badge: isEn ? "START TODAY" : "MULAI HARI INI",
+            badge: isEn
+                ? "START YOUR DIGITAL JOURNEY"
+                : "MULAI PERJALANAN DIGITAL ANDA",
 
             title: isEn
-                ? "Build Your Digital Identity Today."
-                : "Bangun Identitas Digital Perusahaan Anda Hari Ini.",
+                ? "Turn Your Company Information Into Digital Business Visibility."
+                : "Ubah Informasi Perusahaan Menjadi Visibilitas Bisnis Digital.",
 
             description: isEn
-                ? "Join DIGESTEX and increase your company's visibility."
-                : "Bergabunglah dengan DIGESTEX dan tingkatkan visibilitas perusahaan Anda.",
+                ? "Join the DIGESTEX Readable-AI Profile & Visibility Program and build a structured digital identity that helps your company become easier to understand, discover, trust, and connect with."
+                : "Bergabunglah dengan DIGESTEX Readable-AI Profile & Visibility Program dan bangun identitas digital yang terstruktur agar perusahaan Anda lebih mudah dipahami, ditemukan, dipercaya, dan terhubung.",
 
             benefits: [
+                isEn
+                    ? "Readable-AI Company Profile"
+                    : "Readable-AI Company Profile",
+
                 isEn
                     ? "Professional Digital Company Passport™"
                     : "Digital Company Passport™ Profesional",
 
-                isEn ? "Verified Company Badge" : "Verified Company Badge",
+                isEn
+                    ? "Improved Digital Discoverability"
+                    : "Discoverability Digital yang Lebih Baik",
 
-                isEn ? "Global Business Visibility" : "Visibilitas Global",
+                isEn
+                    ? "Global Business Visibility"
+                    : "Visibilitas Bisnis Global",
 
-                isEn ? "Business Matching Ready" : "Siap Business Matching",
+                isEn
+                    ? "Business Matching™ Readiness"
+                    : "Kesiapan Business Matching™",
             ],
 
             primaryButton: isEn ? "JOIN THE PROGRAM" : "IKUTI PROGRAM",
@@ -105,15 +132,16 @@ export function getDirectoryProgramContent(isEn) {
             secondaryButton: isEn ? "LEARN MORE" : "PELAJARI PROGRAM",
 
             closing: isEn
-                ? "A Small Step Today. A Great Opportunity Tomorrow."
-                : "Sebuah Langkah Kecil Hari Ini. Sebuah Peluang Besar di Masa Depan.",
+                ? "Make Your Company Easier to Understand. Easier to Discover. Ready for Greater Opportunities."
+                : "Buat Perusahaan Anda Lebih Mudah Dipahami. Lebih Mudah Ditemukan. Lebih Siap Meraih Peluang.",
 
             commitment: isEn
-                ? "DIGESTEX continues to develop the Global Textile Intelligence Ecosystem."
-                : "DIGESTEX terus mengembangkan Global Textile Intelligence Ecosystem.",
+                ? "DIGESTEX is building a trusted Global Textile Intelligence Ecosystem where structured business information becomes the foundation for visibility, intelligence, and global business opportunities."
+                : "DIGESTEX membangun Global Textile Intelligence Ecosystem yang terpercaya, di mana informasi bisnis yang terstruktur menjadi fondasi bagi visibilitas, intelligence, dan peluang bisnis global.",
 
             signature: "Global Textile Intelligence Ecosystem",
         },
+
         /*
 |--------------------------------------------------------------------------
 | PROGRAM OVERVIEW
@@ -198,6 +226,7 @@ export function getDirectoryProgramContent(isEn) {
             ],
         },
         /*
+/*
 |--------------------------------------------------------------------------
 | SUMMARY
 |--------------------------------------------------------------------------
@@ -205,65 +234,65 @@ export function getDirectoryProgramContent(isEn) {
 
         summary: {
             badge: isEn
-                ? "WHY THIS PROGRAM MATTERS"
-                : "MENGAPA PROGRAM INI PENTING",
+                ? "WHY READABLE-AI VISIBILITY MATTERS"
+                : "MENGAPA READABLE-AI VISIBILITY PENTING",
 
             title: isEn
-                ? "Why This Program Matters"
-                : "Mengapa Program Ini Penting",
+                ? "Prepare Your Company for the Next Generation of Business"
+                : "Persiapkan Perusahaan Anda untuk Generasi Bisnis Berikutnya",
 
             description: isEn
-                ? "Digital visibility has become one of the most important factors influencing how buyers, sourcing teams, investors, and strategic partners discover and evaluate companies."
-                : "Visibilitas digital telah menjadi salah satu faktor terpenting yang mempengaruhi bagaimana buyer, tim sourcing, investor, dan mitra strategis menemukan serta mengevaluasi perusahaan.",
+                ? "The textile industry is becoming increasingly digital, searchable, connected, and AI-readable. Companies need to prepare their digital identity and capabilities accordingly."
+                : "Industri tekstil semakin digital, semakin mudah dicari, semakin terhubung, dan semakin membutuhkan informasi yang dapat dibaca serta dipahami oleh AI. Perusahaan perlu mempersiapkan identitas digital dan kapabilitasnya untuk menghadapi perubahan tersebut.",
 
-            subtitle: "DIGESTEX Digital Directory & Visibility Program",
+            subtitle: "DIGESTEX Readable-AI Profile & Visibility Program",
 
             short: isEn
-                ? "Today, buyers rarely begin with a phone call or factory visit. They begin with digital research. Companies that provide complete, trusted, and professional digital information create stronger first impressions, build credibility faster, and significantly improve their opportunities to participate in future business."
-                : "Saat ini buyer jarang memulai dengan telepon atau kunjungan pabrik. Mereka memulai dengan pencarian digital. Perusahaan yang memiliki informasi digital yang lengkap, terpercaya, dan profesional akan memberikan kesan pertama yang lebih baik, membangun kredibilitas lebih cepat, serta meningkatkan peluang memperoleh bisnis baru.",
+                ? "The textile industry is becoming increasingly digital, searchable, connected, and AI-readable. Companies need to prepare their digital identity and capabilities accordingly."
+                : "Industri tekstil semakin digital, semakin mudah dicari, semakin terhubung, dan semakin membutuhkan informasi yang dapat dibaca serta dipahami oleh AI. Perusahaan perlu mempersiapkan identitas digital dan kapabilitasnya untuk menghadapi perubahan tersebut.",
 
             button: isEn ? "READ MORE" : "BACA SELENGKAPNYA",
 
             buttonClose: isEn ? "SHOW LESS" : "TUTUP",
 
             detailTitle: isEn
-                ? "Why Digital Visibility Creates Business Opportunities"
-                : "Mengapa Visibilitas Digital Membuka Peluang Bisnis",
+                ? "Why Companies Need to Become Readable-AI"
+                : "Mengapa Perusahaan Perlu Menjadi Readable-AI",
 
             detail: [
                 isEn
-                    ? "Buyers increasingly search online before arranging meetings, exhibitions, or factory visits."
-                    : "Buyer kini lebih sering mencari informasi perusahaan secara online sebelum melakukan pertemuan, pameran, maupun kunjungan pabrik.",
+                    ? "The textile industry is becoming increasingly digital, searchable, connected, and AI-readable. Companies need to prepare their digital identity and capabilities accordingly."
+                    : "Industri tekstil semakin digital, semakin mudah dicari, semakin terhubung, dan semakin membutuhkan informasi yang dapat dibaca serta dipahami oleh AI. Perusahaan perlu mempersiapkan identitas digital dan kapabilitasnya untuk menghadapi perubahan tersebut.",
 
                 isEn
-                    ? "A complete Digital Company Passport™ strengthens credibility and creates stronger first impressions."
-                    : "Digital Company Passport™ yang lengkap meningkatkan kredibilitas sekaligus memberikan kesan pertama yang lebih profesional.",
+                    ? "DIGESTEX provides the infrastructure to help companies transform their industry capabilities into structured Readable-AI Profiles."
+                    : "DIGESTEX menyediakan infrastrukturnya untuk membantu perusahaan mentransformasikan kapabilitas industrinya menjadi Readable-AI Profile yang terstruktur.",
 
                 isEn
-                    ? "Verified company information builds trust among buyers, suppliers, investors, and strategic partners."
-                    : "Informasi perusahaan yang terverifikasi membangun kepercayaan antara buyer, supplier, investor, dan mitra strategis.",
+                    ? "A structured Readable-AI Profile makes company capabilities easier to discover, understand, and evaluate across digital channels."
+                    : "Readable-AI Profile yang terstruktur membuat kapabilitas perusahaan lebih mudah ditemukan, dipahami, dan dievaluasi melalui berbagai kanal digital.",
 
                 isEn
-                    ? "Greater visibility increases discoverability and creates more business opportunities."
-                    : "Semakin tinggi visibilitas perusahaan, semakin besar peluang perusahaan ditemukan dan memperoleh peluang bisnis baru.",
+                    ? "Structured and trusted information creates a stronger digital foundation for connecting companies with relevant buyers, sourcing opportunities, strategic partners, and global business networks."
+                    : "Informasi yang terstruktur dan terpercaya menciptakan fondasi digital yang lebih kuat untuk menghubungkan perusahaan dengan buyer yang relevan, peluang sourcing, mitra strategis, dan jaringan bisnis global.",
 
                 isEn
-                    ? "A strong digital identity prepares companies for Business Matching™, Executive Intelligence™, and future global collaboration."
-                    : "Identitas digital yang kuat mempersiapkan perusahaan mengikuti Business Matching™, Executive Intelligence™, dan kolaborasi global di masa depan.",
+                    ? "Your Readable-AI Profile becomes part of the DIGESTEX Global Textile Intelligence Ecosystem — an infrastructure designed to connect industry capabilities, intelligence, technology, and business opportunities."
+                    : "Readable-AI Profile perusahaan Anda menjadi bagian dari DIGESTEX Global Textile Intelligence Ecosystem — sebuah infrastruktur yang dirancang untuk menghubungkan kapabilitas industri, intelligence, teknologi, dan peluang bisnis.",
 
                 isEn
-                    ? "DIGESTEX is building a connected Global Textile Intelligence Ecosystem where trusted information becomes the foundation for long-term business relationships."
-                    : "DIGESTEX membangun Global Textile Intelligence Ecosystem dimana informasi perusahaan yang terpercaya menjadi fondasi hubungan bisnis jangka panjang.",
+                    ? "The question is no longer whether companies should become digitally visible, but whether they are ready to be discovered in the next generation of business."
+                    : "Pertanyaannya bukan lagi apakah perusahaan perlu memiliki visibilitas digital, tetapi apakah perusahaan siap ditemukan dalam generasi bisnis berikutnya.",
             ],
 
             closing: {
                 title: isEn
-                    ? "Start Building Your Digital Identity Today"
-                    : "Mulailah Membangun Identitas Digital Perusahaan Anda Hari Ini",
+                    ? "Is Your Company Ready to Be Discovered?"
+                    : "Apakah Perusahaan Anda Siap untuk Ditemukan?",
 
                 description: isEn
-                    ? "Every successful business journey begins with one simple step: presenting your company professionally. Build your Digital Company Passport™ today and become part of a trusted Global Textile Intelligence Ecosystem."
-                    : "Setiap perjalanan bisnis yang sukses dimulai dari satu langkah sederhana: menghadirkan perusahaan Anda secara profesional. Bangun Digital Company Passport™ hari ini dan jadilah bagian dari Global Textile Intelligence Ecosystem yang terpercaya.",
+                    ? "Your capabilities already exist. DIGESTEX helps transform them into a structured Readable-AI Profile — making your company easier to discover, understand, trust, and connect with relevant business opportunities."
+                    : "Kapabilitas perusahaan Anda sudah ada. DIGESTEX membantu mentransformasikannya menjadi Readable-AI Profile yang terstruktur — sehingga perusahaan lebih mudah ditemukan, dipahami, dipercaya, dan terhubung dengan peluang bisnis yang relevan.",
 
                 button: isEn ? "JOIN THE PROGRAM" : "IKUTI PROGRAM",
             },
@@ -280,12 +309,12 @@ export function getDirectoryProgramContent(isEn) {
                 : "DIGITAL COMPANY PASSPORT™",
 
             title: isEn
-                ? "Build a Trusted Digital Identity for Your Company"
-                : "Bangun Identitas Digital Perusahaan yang Terpercaya",
+                ? "Turn Your Company Capabilities into a Digital Business Identity"
+                : "Ubah Kapabilitas Perusahaan Menjadi Identitas Bisnis Digital",
 
             description: isEn
-                ? "Transform your company profile into a trusted Digital Company Passport™ that represents your business identity, capabilities, products, certifications, and market readiness."
-                : "Transformasikan profil perusahaan Anda menjadi Digital Company Passport™ yang terpercaya untuk menampilkan identitas bisnis, kapabilitas, produk, sertifikasi, dan kesiapan pasar perusahaan.",
+                ? "Your Readable-AI Profile becomes the foundation of a Digital Company Passport™ — a structured digital business identity that brings together your company capabilities, products, technologies, certifications, production information, and market readiness."
+                : "Readable-AI Profile menjadi fondasi Digital Company Passport™ — identitas bisnis digital yang terstruktur dan menyatukan kapabilitas perusahaan, produk, teknologi, sertifikasi, informasi produksi, serta kesiapan pasar perusahaan.",
 
             introduction: {
                 title: isEn
@@ -293,8 +322,8 @@ export function getDirectoryProgramContent(isEn) {
                     : "Apa itu Digital Company Passport™?",
 
                 description: isEn
-                    ? "It combines company identity, manufacturing capability, certifications, production information, products, export experience, and business intelligence into one trusted digital profile."
-                    : "Digital Company Passport™ menggabungkan identitas perusahaan, kemampuan manufaktur, sertifikasi, kapasitas produksi, produk, pengalaman ekspor, serta business intelligence ke dalam satu profil digital yang terpercaya.",
+                    ? "A Digital Company Passport™ transforms structured company information into a comprehensive digital business identity — helping buyers, sourcing teams, search systems, and AI understand what your company does, what you offer, where you operate, and where your capabilities fit."
+                    : "Digital Company Passport™ mengubah informasi perusahaan yang terstruktur menjadi identitas bisnis digital yang komprehensif — membantu buyer, tim sourcing, sistem pencarian, dan AI memahami apa yang perusahaan Anda lakukan, apa yang Anda tawarkan, di mana Anda beroperasi, dan di mana kapabilitas Anda sesuai.",
             },
 
             features: [
@@ -302,8 +331,8 @@ export function getDirectoryProgramContent(isEn) {
                     title: isEn ? "Company Identity" : "Identitas Perusahaan",
 
                     description: isEn
-                        ? "Present essential company information, business profile, location, contacts, and corporate identity in one structured digital profile."
-                        : "Tampilkan informasi utama perusahaan, profil bisnis, lokasi, kontak, dan identitas perusahaan dalam satu profil digital yang terstruktur.",
+                        ? "Present your company identity, business profile, location, contacts, ownership, and essential corporate information in a structured digital format."
+                        : "Tampilkan identitas perusahaan, profil bisnis, lokasi, kontak, kepemilikan, dan informasi utama perusahaan dalam format digital yang terstruktur.",
                 },
 
                 {
@@ -312,16 +341,18 @@ export function getDirectoryProgramContent(isEn) {
                         : "Produk & Kapabilitas",
 
                     description: isEn
-                        ? "Showcase your products, manufacturing capabilities, production processes, and areas of specialization."
-                        : "Tampilkan produk, kemampuan manufaktur, proses produksi, dan bidang spesialisasi perusahaan.",
+                        ? "Clearly communicate what your company produces, supplies, manufactures, or provides, together with its areas of specialization."
+                        : "Komunikasikan secara jelas produk yang diproduksi, dipasok, atau layanan yang diberikan perusahaan beserta bidang spesialisasinya.",
                 },
 
                 {
-                    title: isEn ? "Production Capacity" : "Kapasitas Produksi",
+                    title: isEn
+                        ? "Production & Capacity"
+                        : "Produksi & Kapasitas",
 
                     description: isEn
-                        ? "Provide buyers and business partners with a clearer understanding of your production scale and manufacturing capacity."
-                        : "Berikan gambaran yang lebih jelas kepada buyer dan mitra bisnis mengenai skala produksi dan kapasitas manufaktur perusahaan.",
+                        ? "Provide a clearer view of production capabilities, capacity, facilities, and manufacturing scale relevant to potential business requirements."
+                        : "Berikan gambaran yang lebih jelas mengenai kemampuan produksi, kapasitas, fasilitas, dan skala manufaktur yang relevan dengan kebutuhan bisnis.",
                 },
 
                 {
@@ -330,8 +361,8 @@ export function getDirectoryProgramContent(isEn) {
                         : "Mesin & Teknologi",
 
                     description: isEn
-                        ? "Present key machinery, production technology, and manufacturing infrastructure that support your capabilities."
-                        : "Tampilkan mesin utama, teknologi produksi, dan infrastruktur manufaktur yang mendukung kapabilitas perusahaan.",
+                        ? "Present key machinery, production technologies, processes, and manufacturing infrastructure that support your capabilities."
+                        : "Tampilkan mesin utama, teknologi produksi, proses, dan infrastruktur manufaktur yang mendukung kapabilitas perusahaan.",
                 },
 
                 {
@@ -340,34 +371,33 @@ export function getDirectoryProgramContent(isEn) {
                         : "Sertifikasi & Kepatuhan",
 
                     description: isEn
-                        ? "Highlight certifications, standards, and compliance information that strengthen business credibility."
-                        : "Tampilkan sertifikasi, standar, dan informasi kepatuhan yang memperkuat kredibilitas perusahaan.",
+                        ? "Highlight relevant certifications, standards, testing, compliance, and verification information that strengthen business credibility."
+                        : "Tampilkan sertifikasi, standar, pengujian, kepatuhan, dan informasi verifikasi yang relevan untuk memperkuat kredibilitas bisnis.",
                 },
 
                 {
                     title: isEn
-                        ? "Export Markets & Experience"
+                        ? "Markets & Export Experience"
                         : "Pasar & Pengalaman Ekspor",
 
                     description: isEn
-                        ? "Show your export experience, international market coverage, and readiness to connect with global business opportunities."
-                        : "Tampilkan pengalaman ekspor, cakupan pasar internasional, dan kesiapan perusahaan untuk terhubung dengan peluang bisnis global.",
+                        ? "Show your market coverage, export experience, target markets, and readiness to engage with international buyers and business partners."
+                        : "Tampilkan cakupan pasar, pengalaman ekspor, target pasar, dan kesiapan perusahaan untuk berinteraksi dengan buyer serta mitra bisnis internasional.",
                 },
             ],
 
-            // closing: { ... }
             closing: {
                 badge: isEn
-                    ? "BUILD YOUR DIGITAL IDENTITY"
-                    : "BANGUN IDENTITAS DIGITAL ANDA",
+                    ? "YOUR DIGITAL BUSINESS IDENTITY"
+                    : "IDENTITAS BISNIS DIGITAL ANDA",
 
                 title: isEn
-                    ? "Turn Your Company Profile Into a Trusted Digital Business Identity"
-                    : "Ubah Profil Perusahaan Anda Menjadi Identitas Bisnis Digital yang Terpercaya",
+                    ? "Make Your Capabilities Visible, Understandable, and Discoverable"
+                    : "Jadikan Kapabilitas Anda Terlihat, Dipahami, dan Mudah Ditemukan",
 
                 description: isEn
-                    ? "Your Digital Company Passport™ brings together your company identity, products, manufacturing capabilities, certifications, production capacity, export experience, and business information into one structured digital profile — helping your company become more visible, credible, and ready for new business opportunities."
-                    : "Digital Company Passport™ menyatukan identitas perusahaan, produk, kemampuan manufaktur, sertifikasi, kapasitas produksi, pengalaman ekspor, dan informasi bisnis ke dalam satu profil digital yang terstruktur — membantu perusahaan Anda menjadi lebih terlihat, lebih terpercaya, dan lebih siap membuka peluang bisnis baru.",
+                    ? "Your Digital Company Passport™ brings together the structured information behind your company identity, products, capabilities, technologies, certifications, production capacity, and market experience — creating a stronger digital presence for discovery, credibility, and global business opportunities."
+                    : "Digital Company Passport™ menyatukan informasi terstruktur mengenai identitas perusahaan, produk, kapabilitas, teknologi, sertifikasi, kapasitas produksi, dan pengalaman pasar — menciptakan kehadiran digital yang lebih kuat untuk discovery, kredibilitas, dan peluang bisnis global.",
 
                 primaryButton: isEn
                     ? "BUILD YOUR COMPANY PASSPORT"
@@ -378,12 +408,12 @@ export function getDirectoryProgramContent(isEn) {
                     : "PELAJARI PROGRAM",
 
                 quote: isEn
-                    ? "Your company profile is no longer just information. It becomes your digital business identity."
-                    : "Profil perusahaan bukan lagi sekadar informasi. Profil tersebut menjadi identitas bisnis digital perusahaan Anda.",
+                    ? "Your company profile is no longer just information. It becomes a structured digital business identity that can be discovered, understood, and connected."
+                    : "Profil perusahaan Anda bukan lagi sekadar informasi. Profil tersebut menjadi identitas bisnis digital yang terstruktur, dapat ditemukan, dipahami, dan dihubungkan.",
 
                 commitment: isEn
-                    ? "DIGESTEX is building a trusted Global Textile Intelligence Ecosystem where companies can be discovered, understood, and connected through structured and reliable business information."
-                    : "DIGESTEX membangun Global Textile Intelligence Ecosystem yang terpercaya, tempat perusahaan dapat ditemukan, dipahami, dan terhubung melalui informasi bisnis yang terstruktur dan dapat dipercaya.",
+                    ? "DIGESTEX is building a Global Textile Intelligence Ecosystem where structured, reliable, and meaningful company information helps businesses become more discoverable and creates stronger connections to global business opportunities."
+                    : "DIGESTEX membangun Global Textile Intelligence Ecosystem di mana informasi perusahaan yang terstruktur, terpercaya, dan bermakna membantu perusahaan menjadi lebih mudah ditemukan serta menciptakan koneksi yang lebih kuat dengan peluang bisnis global.",
             },
         },
         /*
@@ -396,93 +426,95 @@ export function getDirectoryProgramContent(isEn) {
             badge: isEn ? "BUSINESS BENEFITS" : "MANFAAT BISNIS",
 
             title: isEn
-                ? "Why Companies Join the DIGESTEX Ecosystem"
-                : "Mengapa Perusahaan Bergabung dengan Ekosistem DIGESTEX",
+                ? "Turn Digital Visibility into Business Opportunity"
+                : "Ubah Visibilitas Digital Menjadi Peluang Bisnis",
 
             description: isEn
-                ? "More than simply listing your company in a directory, the DIGESTEX Digital Directory & Visibility Program helps strengthen credibility, improve discoverability, and create long-term business opportunities."
-                : "Lebih dari sekadar menampilkan perusahaan dalam sebuah direktori, DIGESTEX Digital Directory & Visibility Program membantu memperkuat kredibilitas, meningkatkan visibilitas, dan membuka peluang bisnis jangka panjang.",
+                ? "The DIGESTEX Readable-AI Profile & Visibility Program goes beyond listing your company. It structures your capabilities into a meaningful digital business identity designed to improve discoverability, strengthen credibility, and position your company for relevant business opportunities."
+                : "DIGESTEX Readable-AI Profile & Visibility Program lebih dari sekadar menampilkan perusahaan. Program ini menstrukturkan kapabilitas perusahaan menjadi identitas bisnis digital yang bermakna untuk meningkatkan discoverability, memperkuat kredibilitas, dan memposisikan perusahaan pada peluang bisnis yang relevan.",
 
             items: [
                 {
                     icon: "visibility",
 
                     title: isEn
-                        ? "Increase Business Visibility"
-                        : "Meningkatkan Visibilitas Bisnis",
+                        ? "Strengthen Global Visibility"
+                        : "Memperkuat Visibilitas Global",
 
                     description: isEn
-                        ? "Make your company easier to discover by buyers, sourcing teams, investors, brands, and strategic partners."
-                        : "Membantu perusahaan lebih mudah ditemukan oleh buyer, tim sourcing, investor, brand, dan mitra strategis.",
+                        ? "Present your company capabilities in a structured digital format that makes your business easier to discover across the DIGESTEX ecosystem."
+                        : "Tampilkan kapabilitas perusahaan dalam format digital yang terstruktur agar bisnis Anda lebih mudah ditemukan di dalam ekosistem DIGESTEX.",
                 },
 
                 {
                     icon: "discover",
 
                     title: isEn
-                        ? "Improve Discoverability"
-                        : "Meningkatkan Discoverability",
+                        ? "Become More Discoverable"
+                        : "Lebih Mudah Ditemukan",
 
                     description: isEn
-                        ? "A structured digital profile significantly improves searchability inside the DIGESTEX ecosystem."
-                        : "Profil digital yang terstruktur meningkatkan peluang perusahaan ditemukan di dalam ekosistem DIGESTEX.",
+                        ? "Structure your products, capabilities, markets, technologies, and certifications so buyers, search systems, and AI can better understand where your company fits."
+                        : "Strukturkan produk, kapabilitas, pasar, teknologi, dan sertifikasi agar buyer, sistem pencarian, dan AI dapat lebih memahami posisi serta relevansi perusahaan Anda.",
                 },
 
                 {
                     icon: "credibility",
 
                     title: isEn
-                        ? "Build Greater Credibility"
-                        : "Meningkatkan Kredibilitas",
+                        ? "Strengthen Digital Credibility"
+                        : "Memperkuat Kredibilitas Digital",
 
                     description: isEn
-                        ? "Verified company information creates trust and confidence before the first meeting ever happens."
-                        : "Informasi perusahaan yang terverifikasi membangun kepercayaan bahkan sebelum pertemuan bisnis pertama terjadi.",
+                        ? "Structured and verified company information provides a stronger foundation for trust before a business conversation begins."
+                        : "Informasi perusahaan yang terstruktur dan terverifikasi memberikan fondasi yang lebih kuat untuk membangun kepercayaan sebelum komunikasi bisnis dimulai.",
                 },
 
                 {
                     icon: "matching",
 
-                    title: "Smart Business Matching™",
+                    title: isEn
+                        ? "Prepare for Smart Business Matching™"
+                        : "Mempersiapkan Smart Business Matching™",
 
                     description: isEn
-                        ? "Prepare your company to participate in future AI-assisted Business Matching programs."
-                        : "Mempersiapkan perusahaan mengikuti Business Matching berbasis AI di masa depan.",
+                        ? "Build the structured company information needed to support future AI-assisted Business Matching and more relevant business connections."
+                        : "Bangun informasi perusahaan yang terstruktur sebagai fondasi untuk mendukung AI-assisted Business Matching dan koneksi bisnis yang lebih relevan di masa depan.",
                 },
 
                 {
                     icon: "ecosystem",
 
                     title: isEn
-                        ? "Join a Connected Ecosystem"
-                        : "Masuk ke Ekosistem Terhubung",
+                        ? "Become Part of a Connected Ecosystem"
+                        : "Menjadi Bagian dari Ekosistem Terhubung",
 
                     description: isEn
-                        ? "Become part of the DIGESTEX Global Textile Intelligence Ecosystem connecting industries, technology, sourcing, and investment."
-                        : "Menjadi bagian dari DIGESTEX Global Textile Intelligence Ecosystem yang menghubungkan industri, teknologi, sourcing, dan investasi.",
+                        ? "Connect your company identity and capabilities to the DIGESTEX Global Textile Intelligence Ecosystem across industry, sourcing, technology, services, and investment."
+                        : "Hubungkan identitas dan kapabilitas perusahaan dengan DIGESTEX Global Textile Intelligence Ecosystem yang mencakup industri, sourcing, teknologi, layanan, dan investasi.",
                 },
 
                 {
                     icon: "growth",
 
                     title: isEn
-                        ? "Accelerate Business Growth"
-                        : "Mendorong Pertumbuhan Bisnis",
+                        ? "Position for New Opportunities"
+                        : "Membuka Posisi untuk Peluang Baru",
 
                     description: isEn
-                        ? "Better visibility and trusted information create stronger opportunities for future business expansion."
-                        : "Visibilitas yang lebih tinggi dan informasi yang terpercaya membuka peluang ekspansi bisnis yang lebih besar.",
+                        ? "Greater visibility, clearer capability communication, and stronger digital credibility can create more opportunities for business development and international collaboration."
+                        : "Visibilitas yang lebih tinggi, komunikasi kapabilitas yang lebih jelas, dan kredibilitas digital yang lebih kuat dapat membuka lebih banyak peluang pengembangan bisnis dan kolaborasi internasional.",
                 },
             ],
 
             closing: {
                 title: isEn
-                    ? "Visibility Creates Opportunity"
-                    : "Visibilitas Menciptakan Peluang",
+                    ? "Make Your Capabilities Visible. Make Your Business Discoverable."
+                    : "Jadikan Kapabilitas Anda Terlihat. Jadikan Bisnis Anda Mudah Ditemukan.",
 
                 description: isEn
-                    ? "Companies that are easier to discover are more likely to be shortlisted, contacted, and selected. Build your Digital Company Passport™ and become part of a trusted business ecosystem."
-                    : "Perusahaan yang lebih mudah ditemukan memiliki peluang lebih besar untuk masuk dalam shortlist buyer, dihubungi, dan dipilih sebagai mitra bisnis. Bangun Digital Company Passport™ Anda dan jadilah bagian dari ekosistem bisnis yang terpercaya.",
+                    ? "Your Digital Company Passport™ gives your company a structured digital identity within the DIGESTEX ecosystem — helping buyers and business networks understand your capabilities and discover where your company fits."
+                    : "Digital Company Passport™ memberikan identitas digital yang terstruktur bagi perusahaan Anda di dalam ekosistem DIGESTEX — membantu buyer dan jaringan bisnis memahami kapabilitas perusahaan serta menemukan posisi yang relevan bagi bisnis Anda.",
 
                 button: isEn ? "JOIN THE PROGRAM" : "IKUTI PROGRAM",
             },
@@ -500,89 +532,103 @@ export function getDirectoryProgramContent(isEn) {
                 : "PERJALANAN TRANSFORMASI DIGITAL",
 
             title: isEn
-                ? "From Company Profile to Business Intelligence"
-                : "Dari Company Profile Menuju Business Intelligence",
+                ? "From Company Information to Global Business Visibility"
+                : "Dari Informasi Perusahaan Menuju Visibilitas Bisnis Global",
 
             description: isEn
-                ? "Every successful company begins with a profile. The companies that continue to grow are those that transform their profile into a trusted digital business identity."
-                : "Setiap perusahaan sukses berawal dari sebuah profil. Perusahaan yang terus berkembang adalah perusahaan yang mengubah profil tersebut menjadi identitas digital yang terpercaya.",
+                ? "Your digital journey begins with complete company information and evolves into a structured, trusted, and Readable-AI Profile — helping buyers, search systems, and AI better understand your company, capabilities, and business potential."
+                : "Perjalanan digital perusahaan dimulai dari informasi perusahaan yang lengkap dan berkembang menjadi Readable-AI Profile yang terstruktur dan terpercaya — membantu buyer, sistem pencarian, dan AI memahami perusahaan, kapabilitas, serta potensi bisnis Anda dengan lebih baik.",
 
             steps: [
                 {
                     number: "01",
 
                     title: isEn
-                        ? "Complete Company Profile"
-                        : "Lengkapi Profil Perusahaan",
+                        ? "Complete Your Company Information"
+                        : "Lengkapi Informasi Perusahaan",
 
                     description: isEn
-                        ? "Create a complete company profile including products, manufacturing capability, certifications, production capacity, export markets, and contact information."
-                        : "Lengkapi profil perusahaan yang mencakup produk, kapasitas produksi, sertifikasi, kemampuan manufaktur, pasar ekspor, dan informasi kontak.",
+                        ? "Provide complete and accurate information about your company, products, manufacturing capabilities, certifications, production capacity, markets, and business contacts."
+                        : "Lengkapi informasi perusahaan secara akurat, termasuk produk, kemampuan manufaktur, sertifikasi, kapasitas produksi, pasar, dan kontak bisnis.",
                 },
 
                 {
                     number: "02",
 
-                    title: "Digital Company Passport™",
+                    title: "Readable-AI Profile",
 
                     description: isEn
-                        ? "Your company information is transformed into a professional Digital Company Passport™ inside the DIGESTEX ecosystem."
-                        : "Informasi perusahaan diubah menjadi Digital Company Passport™ yang profesional di dalam ekosistem DIGESTEX.",
+                        ? "Your company information is structured into a Readable-AI Profile so that people, buyers, search systems, and AI can better understand what your company does, what you offer, and where you operate."
+                        : "Informasi perusahaan Anda disusun menjadi Readable-AI Profile agar manusia, buyer, sistem pencarian, dan AI dapat lebih mudah memahami apa yang perusahaan Anda lakukan, apa yang ditawarkan, dan di mana perusahaan beroperasi.",
                 },
 
                 {
                     number: "03",
 
-                    title: isEn
-                        ? "Verification & Trust"
-                        : "Verifikasi & Kredibilitas",
+                    title: "Digital Company Passport™",
 
                     description: isEn
-                        ? "Verified information increases confidence for buyers, investors, sourcing teams, and strategic partners."
-                        : "Informasi yang terverifikasi meningkatkan kepercayaan buyer, investor, sourcing team, dan mitra strategis.",
+                        ? "Your structured company information becomes a professional Digital Company Passport™ — a trusted digital business identity representing your company, capabilities, products, certifications, and market readiness."
+                        : "Informasi perusahaan yang telah terstruktur menjadi Digital Company Passport™ — identitas bisnis digital profesional yang merepresentasikan perusahaan, kapabilitas, produk, sertifikasi, dan kesiapan pasar.",
                 },
 
                 {
                     number: "04",
 
-                    title: "Visibility Score™",
+                    title: isEn
+                        ? "Verification & Trust"
+                        : "Verifikasi & Kepercayaan",
 
                     description: isEn
-                        ? "Your company receives a visibility score based on profile completeness, credibility, and business readiness."
-                        : "Perusahaan memperoleh Visibility Score™ berdasarkan kelengkapan profil, kredibilitas, dan kesiapan bisnis.",
+                        ? "Relevant company information can be verified to strengthen credibility and provide greater confidence to buyers, sourcing teams, investors, and strategic partners."
+                        : "Informasi perusahaan yang relevan dapat diverifikasi untuk memperkuat kredibilitas dan memberikan keyakinan lebih besar kepada buyer, sourcing team, investor, dan mitra strategis.",
                 },
 
                 {
                     number: "05",
 
-                    title: "Smart Business Matching™",
+                    title: "Visibility Score™",
 
                     description: isEn
-                        ? "A stronger digital profile improves opportunities for future Business Matching™, sourcing, and collaboration."
-                        : "Profil digital yang kuat meningkatkan peluang mengikuti Business Matching™, sourcing, dan kolaborasi bisnis di masa depan.",
+                        ? "Your digital presence is evaluated through profile completeness, information quality, credibility, and business readiness — helping identify opportunities to improve your company's digital visibility."
+                        : "Kehadiran digital perusahaan dievaluasi berdasarkan kelengkapan profil, kualitas informasi, kredibilitas, dan kesiapan bisnis — membantu mengidentifikasi peluang untuk meningkatkan visibilitas digital perusahaan.",
                 },
 
                 {
                     number: "06",
 
+                    title: isEn
+                        ? "Business Discovery & Opportunities"
+                        : "Business Discovery & Peluang Bisnis",
+
+                    description: isEn
+                        ? "A stronger and more understandable digital identity improves the opportunity for your company to be discovered, shortlisted, contacted, and considered for sourcing, Business Matching™, and global collaboration."
+                        : "Identitas digital yang lebih kuat dan mudah dipahami meningkatkan peluang perusahaan ditemukan, masuk shortlist, dihubungi, dan dipertimbangkan untuk sourcing, Business Matching™, dan kolaborasi global.",
+                },
+
+                {
+                    number: "07",
+
                     title: "Executive Intelligence™",
 
                     description: isEn
-                        ? "The journey continues with Executive Dashboard™, AI Insight™, and future business intelligence services."
-                        : "Perjalanan berlanjut menuju Executive Dashboard™, AI Insight™, serta berbagai layanan Business Intelligence di masa depan.",
+                        ? "The journey continues as your structured company information becomes a foundation for future Executive Dashboard™, AI Insight™, market intelligence, and other DIGESTEX intelligence services."
+                        : "Perjalanan berlanjut ketika informasi perusahaan yang telah terstruktur menjadi fondasi bagi Executive Dashboard™, AI Insight™, market intelligence, dan berbagai layanan intelligence DIGESTEX di masa depan.",
                 },
             ],
 
             closing: {
                 title: isEn
-                    ? "Your Digital Journey Never Stops"
-                    : "Perjalanan Digital Perusahaan Tidak Berhenti",
+                    ? "Your Digital Journey Becomes Your Business Advantage"
+                    : "Perjalanan Digital Menjadi Keunggulan Bisnis Anda",
 
                 description: isEn
-                    ? "DIGESTEX is continuously developing new intelligence services to help textile companies become more visible, more connected, and more competitive in the global market."
-                    : "DIGESTEX terus mengembangkan layanan intelligence untuk membantu perusahaan tekstil menjadi lebih terlihat, lebih terhubung, dan lebih kompetitif di pasar global.",
+                    ? "DIGESTEX helps transform company information into a structured digital identity that can be understood, discovered, trusted, and connected — creating a stronger foundation for global business opportunities."
+                    : "DIGESTEX membantu mengubah informasi perusahaan menjadi identitas digital yang terstruktur, dapat dipahami, ditemukan, dipercaya, dan terhubung — menciptakan fondasi yang lebih kuat untuk peluang bisnis global.",
 
-                button: isEn ? "START YOUR JOURNEY" : "MULAI PERJALANAN ANDA",
+                button: isEn
+                    ? "START YOUR DIGITAL JOURNEY"
+                    : "MULAI PERJALANAN DIGITAL ANDA",
             },
         },
 
@@ -593,46 +639,46 @@ export function getDirectoryProgramContent(isEn) {
 */
 
         membership: {
-            badge: isEn ? "MEMBERSHIP JOURNEY" : "PERJALANAN KEANGGOTAAN",
+            badge: isEn ? "DIGESTEX JOURNEY" : "PERJALANAN DIGESTEX",
 
             title: isEn
-                ? "Grow Your Business with DIGESTEX"
-                : "Kembangkan Bisnis Anda Bersama DIGESTEX",
+                ? "From Digital Identity to Global Business Opportunities"
+                : "Dari Identitas Digital Menuju Peluang Bisnis Global",
 
             description: isEn
-                ? "Start by building your digital identity and continue your journey through a structured membership ecosystem designed to increase visibility, credibility, connectivity, and access to future business opportunities."
-                : "Mulai dengan membangun identitas digital perusahaan dan lanjutkan perjalanan melalui ekosistem keanggotaan yang dirancang untuk meningkatkan visibilitas, kredibilitas, konektivitas, serta akses terhadap peluang bisnis di masa depan.",
+                ? "Your DIGESTEX journey begins by structuring your company information into a Readable-AI Profile and building a trusted Digital Company Passport™. As your digital presence grows, your company can progress toward greater visibility, intelligence, connectivity, and business opportunities."
+                : "Perjalanan DIGESTEX dimulai dengan menyusun informasi perusahaan menjadi Readable-AI Profile dan membangun Digital Company Passport™ yang terpercaya. Seiring berkembangnya kehadiran digital perusahaan, Anda dapat melangkah menuju visibilitas, intelligence, konektivitas, dan peluang bisnis yang lebih besar.",
 
             levels: [
                 {
                     level: "01",
 
-                    title: isEn ? "Digital Presence" : "Kehadiran Digital",
+                    title: isEn ? "Readable-AI Profile" : "Readable-AI Profile",
 
                     subtitle: isEn
-                        ? "Build Your Digital Identity"
-                        : "Bangun Identitas Digital Perusahaan",
+                        ? "Make Your Company Understandable"
+                        : "Membuat Perusahaan Lebih Mudah Dipahami",
 
                     description: isEn
-                        ? "Establish your company presence within the DIGESTEX ecosystem through a structured and professional digital company profile."
-                        : "Bangun kehadiran perusahaan di dalam ekosistem DIGESTEX melalui profil digital perusahaan yang terstruktur dan profesional.",
+                        ? "Structure your company information so that buyers, search systems, and AI can clearly understand your identity, products, capabilities, markets, and business focus."
+                        : "Susun informasi perusahaan agar buyer, sistem pencarian, dan AI dapat memahami dengan jelas identitas, produk, kapabilitas, pasar, dan fokus bisnis perusahaan.",
 
                     features: [
                         isEn
-                            ? "Digital Company Profile"
-                            : "Profil Digital Perusahaan",
+                            ? "Structured Company Information"
+                            : "Informasi Perusahaan yang Terstruktur",
 
                         isEn
-                            ? "Company & Product Information"
-                            : "Informasi Perusahaan & Produk",
+                            ? "Products & Capabilities"
+                            : "Produk & Kapabilitas",
 
                         isEn
-                            ? "Business Contact Visibility"
-                            : "Visibilitas Kontak Bisnis",
+                            ? "Business & Market Information"
+                            : "Informasi Bisnis & Pasar",
 
                         isEn
-                            ? "Industry Directory Presence"
-                            : "Kehadiran dalam Direktori Industri",
+                            ? "AI-Readable Company Profile"
+                            : "Profil Perusahaan yang AI-Readable",
                     ],
 
                     highlight: false,
@@ -641,51 +687,83 @@ export function getDirectoryProgramContent(isEn) {
                 {
                     level: "02",
 
-                    title: isEn
-                        ? "Verified Company"
-                        : "Perusahaan Terverifikasi",
+                    title: "Digital Company Passport™",
 
                     subtitle: isEn
-                        ? "Strengthen Your Business Credibility"
-                        : "Perkuat Kredibilitas Bisnis",
+                        ? "Build a Trusted Digital Business Identity"
+                        : "Bangun Identitas Bisnis Digital yang Terpercaya",
 
                     description: isEn
-                        ? "Strengthen buyer and partner confidence by maintaining more complete, accurate, and trusted company information."
-                        : "Tingkatkan kepercayaan buyer dan mitra bisnis melalui informasi perusahaan yang lebih lengkap, akurat, dan terpercaya.",
+                        ? "Transform your structured company information into a professional Digital Company Passport™ representing your company identity, capabilities, products, certifications, and market readiness."
+                        : "Transformasikan informasi perusahaan yang telah terstruktur menjadi Digital Company Passport™ yang profesional untuk merepresentasikan identitas, kapabilitas, produk, sertifikasi, dan kesiapan pasar perusahaan.",
 
                     features: [
                         isEn
-                            ? "Verified Company Status"
-                            : "Status Perusahaan Terverifikasi",
+                            ? "Professional Digital Company Profile"
+                            : "Profil Digital Perusahaan Profesional",
 
                         isEn
-                            ? "Enhanced Digital Company Passport™"
-                            : "Digital Company Passport™ yang Lebih Lengkap",
-
-                        isEn ? "Visibility Score™" : "Visibility Score™",
+                            ? "Digital Company Passport™"
+                            : "Digital Company Passport™",
 
                         isEn
-                            ? "Improved Business Discoverability"
-                            : "Peningkatan Kemudahan Ditemukan",
+                            ? "Company & Product Visibility"
+                            : "Visibilitas Perusahaan & Produk",
+
+                        isEn
+                            ? "Business Contact Visibility"
+                            : "Visibilitas Kontak Bisnis",
                     ],
 
-                    highlight: false,
+                    highlight: true,
                 },
 
                 {
                     level: "03",
 
                     title: isEn
+                        ? "Verified & Visible Company"
+                        : "Perusahaan Terverifikasi & Terlihat",
+
+                    subtitle: isEn
+                        ? "Strengthen Trust and Discoverability"
+                        : "Perkuat Kepercayaan & Discoverability",
+
+                    description: isEn
+                        ? "Strengthen your digital credibility through verified information and improve your company's discoverability across the DIGESTEX ecosystem."
+                        : "Perkuat kredibilitas digital melalui informasi yang terverifikasi dan tingkatkan discoverability perusahaan di dalam ekosistem DIGESTEX.",
+
+                    features: [
+                        isEn
+                            ? "Verified Company Information"
+                            : "Informasi Perusahaan Terverifikasi",
+
+                        isEn ? "Verification Status" : "Status Verifikasi",
+
+                        isEn ? "Visibility Score™" : "Visibility Score™",
+
+                        isEn
+                            ? "Improved Business Discoverability"
+                            : "Discoverability Bisnis yang Lebih Baik",
+                    ],
+
+                    highlight: false,
+                },
+
+                {
+                    level: "04",
+
+                    title: isEn
                         ? "Business Intelligence"
                         : "Business Intelligence",
 
                     subtitle: isEn
-                        ? "Turn Company Data into Business Intelligence"
-                        : "Ubah Data Perusahaan Menjadi Business Intelligence",
+                        ? "Turn Structured Information into Intelligence"
+                        : "Ubah Informasi Terstruktur Menjadi Intelligence",
 
                     description: isEn
-                        ? "Develop a richer company intelligence profile that represents capabilities, markets, production strengths, and business readiness."
-                        : "Bangun profil intelligence perusahaan yang lebih komprehensif untuk menggambarkan kapabilitas, pasar, kekuatan produksi, dan kesiapan bisnis.",
+                        ? "As your company information becomes richer and more structured, it creates a stronger foundation for company intelligence, market insight, and future AI-powered services."
+                        : "Ketika informasi perusahaan menjadi semakin lengkap dan terstruktur, informasi tersebut menjadi fondasi yang lebih kuat untuk company intelligence, market insight, dan layanan berbasis AI di masa depan.",
 
                     features: [
                         isEn
@@ -701,32 +779,32 @@ export function getDirectoryProgramContent(isEn) {
                             : "Sertifikasi & Pasar Ekspor",
 
                         isEn
-                            ? "Business Matching Readiness"
-                            : "Kesiapan Business Matching",
+                            ? "AI Insight™ & Executive Intelligence™"
+                            : "AI Insight™ & Executive Intelligence™",
                     ],
 
-                    highlight: true,
+                    highlight: false,
                 },
 
                 {
-                    level: "04",
+                    level: "05",
 
                     title: isEn
                         ? "Global Business Connectivity"
                         : "Konektivitas Bisnis Global",
 
                     subtitle: isEn
-                        ? "Connect with Future Business Opportunities"
-                        : "Terhubung dengan Peluang Bisnis Masa Depan",
+                        ? "Turn Visibility into Business Opportunities"
+                        : "Ubah Visibilitas Menjadi Peluang Bisnis",
 
                     description: isEn
-                        ? "Expand your company's connectivity across the textile ecosystem and prepare for broader sourcing, partnership, and business opportunities."
-                        : "Perluas konektivitas perusahaan di seluruh ekosistem tekstil dan persiapkan perusahaan untuk peluang sourcing, kemitraan, dan bisnis yang lebih luas.",
+                        ? "A trusted and understandable digital identity creates a stronger foundation for sourcing, Business Matching™, buyer discovery, strategic partnerships, and global business opportunities."
+                        : "Identitas digital yang terpercaya dan mudah dipahami menciptakan fondasi yang lebih kuat untuk sourcing, Business Matching™, buyer discovery, kemitraan strategis, dan peluang bisnis global.",
 
                     features: [
                         isEn
-                            ? "Smart Business Matching"
-                            : "Smart Business Matching",
+                            ? "Smart Business Matching™"
+                            : "Smart Business Matching™",
 
                         isEn
                             ? "Buyer & Supplier Connectivity"
@@ -745,14 +823,16 @@ export function getDirectoryProgramContent(isEn) {
 
             closing: {
                 title: isEn
-                    ? "Start Your DIGESTEX Journey Today"
-                    : "Mulai Perjalanan DIGESTEX Anda Hari Ini",
+                    ? "Your Digital Identity Is the Beginning"
+                    : "Identitas Digital Adalah Awal Perjalanan Anda",
 
                 description: isEn
-                    ? "Your journey begins with a strong digital identity. Build your company presence today and unlock greater visibility, credibility, intelligence, and business connectivity as your company grows within the DIGESTEX ecosystem."
-                    : "Perjalanan dimulai dari identitas digital yang kuat. Bangun kehadiran perusahaan Anda hari ini dan buka peluang menuju visibilitas, kredibilitas, intelligence, serta konektivitas bisnis yang lebih luas bersama ekosistem DIGESTEX.",
+                    ? "DIGESTEX is designed as a continuous journey. Start by building a Readable-AI Profile and Digital Company Passport™, strengthen trust and visibility, and progressively unlock greater access to intelligence, connectivity, and global business opportunities."
+                    : "DIGESTEX dirancang sebagai sebuah perjalanan yang berkelanjutan. Mulailah dengan membangun Readable-AI Profile dan Digital Company Passport™, perkuat kepercayaan dan visibilitas, lalu secara bertahap membuka akses menuju intelligence, konektivitas, dan peluang bisnis global yang lebih besar.",
 
-                button: isEn ? "EXPLORE MEMBERSHIP" : "LIHAT KEANGGOTAAN",
+                button: isEn
+                    ? "START YOUR DIGESTEX JOURNEY"
+                    : "MULAI PERJALANAN DIGESTEX ANDA",
             },
         },
 
@@ -766,56 +846,69 @@ export function getDirectoryProgramContent(isEn) {
             badge: isEn ? "OUR COMMITMENT" : "KOMITMEN KAMI",
 
             title: isEn
-                ? "Building a Trusted Textile Intelligence Ecosystem"
-                : "Membangun Ekosistem Textile Intelligence yang Terpercaya",
+                ? "Building a Trusted Global Textile Intelligence Ecosystem"
+                : "Membangun Global Textile Intelligence Ecosystem yang Terpercaya",
 
             description: isEn
-                ? "DIGESTEX is committed to supporting companies through trusted digital information."
-                : "DIGESTEX berkomitmen membantu perusahaan melalui informasi digital yang terpercaya.",
+                ? "DIGESTEX is committed to helping companies transform business information into structured digital identities that can be understood, discovered, trusted, and connected."
+                : "DIGESTEX berkomitmen membantu perusahaan mengubah informasi bisnis menjadi identitas digital yang terstruktur, dapat dipahami, ditemukan, dipercaya, dan terhubung.",
 
             items: [
                 {
                     icon: "shield",
+
                     title: isEn
-                        ? "Verified Information"
-                        : "Informasi Terverifikasi",
+                        ? "Trusted Information"
+                        : "Informasi Terpercaya",
+
                     description: isEn
-                        ? "Company profiles are continuously maintained."
-                        : "Profil perusahaan terus diperbarui.",
+                        ? "Structured and verified company information creates a stronger foundation for digital trust."
+                        : "Informasi perusahaan yang terstruktur dan terverifikasi menciptakan fondasi yang lebih kuat untuk kepercayaan digital.",
                 },
+
                 {
                     icon: "globe",
+
                     title: isEn ? "Global Visibility" : "Visibilitas Global",
+
                     description: isEn
-                        ? "Reach buyers around the world."
-                        : "Menjangkau buyer di seluruh dunia.",
+                        ? "Help companies become more discoverable to buyers, sourcing teams, investors, and strategic partners."
+                        : "Membantu perusahaan lebih mudah ditemukan oleh buyer, sourcing team, investor, dan mitra strategis.",
                 },
+
                 {
                     icon: "network",
+
                     title: isEn
                         ? "Business Connectivity"
                         : "Konektivitas Bisnis",
+
                     description: isEn
-                        ? "Connecting companies and opportunities."
-                        : "Menghubungkan perusahaan dan peluang.",
+                        ? "Connect trusted company information with relevant people, companies, and future business opportunities."
+                        : "Menghubungkan informasi perusahaan yang terpercaya dengan pihak, perusahaan, dan peluang bisnis yang relevan.",
                 },
+
                 {
                     icon: "sparkles",
+
                     title: isEn
-                        ? "Continuous Innovation"
-                        : "Inovasi Berkelanjutan",
+                        ? "Continuous Intelligence"
+                        : "Intelligence Berkelanjutan",
+
                     description: isEn
-                        ? "New intelligence features will continue to grow."
-                        : "Fitur intelligence akan terus berkembang.",
+                        ? "Continuously develop new intelligence and AI-enabled services that create greater value from structured business information."
+                        : "Terus mengembangkan layanan intelligence dan AI yang menciptakan nilai lebih besar dari informasi bisnis yang terstruktur.",
                 },
             ],
 
             signature: {
                 title: "DIGESTEX",
+
                 subtitle: "Global Textile Intelligence Ecosystem",
+
                 quote: isEn
-                    ? "Together we build a more connected textile industry."
-                    : "Bersama membangun industri tekstil yang lebih terhubung.",
+                    ? "Transforming structured company information into visibility, intelligence, and global business opportunities."
+                    : "Mengubah informasi perusahaan yang terstruktur menjadi visibilitas, intelligence, dan peluang bisnis global.",
 
                 button: isEn ? "JOIN THE PROGRAM" : "IKUTI PROGRAM",
             },

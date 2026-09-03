@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Trade;
 
 use App\Http\Controllers\Controller;
-use App\Services\Trade\GarmentTradeIntelligenceService;
 use App\Services\Trade\TradeAvailablePeriodService;
 use App\Services\Trade\TradeReportingPeriod;
 use App\Services\TradeIntelligence\Snapshot\HistoricalSnapshotAssembler;
@@ -34,7 +33,7 @@ class GarmentIntelligenceController extends Controller
     */
 
     public function __construct(
-        protected GarmentTradeIntelligenceService $garmentService,
+          protected SnapshotAssembler $snapshotAssembler,
 
         protected TradeAvailablePeriodService $periodService,
 
@@ -63,6 +62,25 @@ class GarmentIntelligenceController extends Controller
             $this->periodService->forSector(
                 'garment'
             );
+
+\DB::listen(
+    function ($query) {
+
+        $time = (float) $query->time;
+
+        if ($time >= 1000) {
+
+            \Log::warning(
+                'GARMENT SLOW QUERY',
+                [
+                    'time_ms' => $time,
+                    'sql' => $query->sql,
+                    'bindings' => $query->bindings,
+                ]
+            );
+        }
+    }
+);
 
 
         /*
@@ -300,10 +318,25 @@ class GarmentIntelligenceController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            $garment =
-                $this->historicalSnapshotAssembler->assemble(
-                    $period
-                );
+            \Log::info(
+    'GARMENT DEBUG: BEFORE HISTORICAL ASSEMBLE'
+);
+
+$garment =
+    $this->historicalSnapshotAssembler->assemble(
+        $period
+    );
+
+\Log::info(
+    'GARMENT DEBUG: AFTER HISTORICAL ASSEMBLE'
+);
+
+\Log::info(
+    'GARMENT DEBUG: HISTORICAL DATA KEYS',
+    [
+        'keys' => array_keys($garment),
+    ]
+);
 
         } else {
 
@@ -533,109 +566,222 @@ class GarmentIntelligenceController extends Controller
                 );
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Resolve SnapshotAssembler Lazily
-            |--------------------------------------------------------------------------
-            |
-            | IMPORTANT:
-            |
-            | Do NOT put SnapshotAssembler in the constructor.
-            |
-            | Laravel would immediately resolve:
-            |
-            | SnapshotAssembler
-            |     -> SnapshotMetadataBuilder
-            |         -> string $sector
-            |
-            | and fail before historical routing occurs.
-            |
-            */
+           /*
+|--------------------------------------------------------------------------
+| Existing Garment Current / Selected Period Pipeline
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+|
+| Preserve the proven GarmentTradeIntelligenceService pipeline.
+|
+| The historical 2019-2024 yearly path is handled separately
+| above by HistoricalSnapshotAssembler.
+|
+| For current / selected periods, GarmentTradeIntelligenceService
+| remains the authoritative business-logic pipeline.
+|
+*/
+$debugStart = microtime(true);
 
-            $snapshotAssembler =
-                app(
-                    SnapshotAssembler::class
-                );
+\Log::info(
+    'GARMENT DEBUG: BEFORE CURRENT ASSEMBLE',
+    [
+        'period' =>
+            $period->snapshotKey(),
 
+        'year' =>
+            $year,
 
-            /*
-            |--------------------------------------------------------------------------
-            | Existing Single Period Pipeline
-            |--------------------------------------------------------------------------
-            */
+        'month' =>
+            $month,
 
-            $garment =
-                $snapshotAssembler->assemble(
-                    [],
-                    $period
-                );
+        'compare_year' =>
+            $compareYear,
+
+        'compare_month' =>
+            $compareMonth,
+
+        'mode' =>
+            $mode,
+    ]
+);
+
+$garment =
+    $this->snapshotAssembler->assemble(
+        [],
+        $period
+    );
+
+\Log::info(
+    'GARMENT DEBUG: AFTER CURRENT ASSEMBLE',
+    [
+        'seconds' =>
+            round(
+                microtime(true) - $debugStart,
+                3
+            ),
+
+        'garment_keys' =>
+            is_array($garment)
+                ? array_keys($garment)
+                : 'NOT_ARRAY',
+    ]
+);
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Render
-        |--------------------------------------------------------------------------
-        */
+     /*
+|--------------------------------------------------------------------------
+| Render
+|--------------------------------------------------------------------------
+*/
 
-        return Inertia::render(
-            'Trade/GarmentIntelligence',
-            [
+\Log::info(
+    'GARMENT DEBUG: BEFORE RESPONSE',
+    [
+        'garment_keys' =>
+            array_keys($garment),
 
-                'garment' =>
-                    $garment,
+        'memory_mb' =>
+            round(
+                memory_get_usage(true) / 1024 / 1024,
+                2
+            ),
+
+        'peak_memory_mb' =>
+            round(
+                memory_get_peak_usage(true) / 1024 / 1024,
+                2
+            ),
+
+        'overview_count' =>
+            is_countable($garment['overview'] ?? null)
+                ? count($garment['overview'])
+                : null,
+
+        'by_subsector_count' =>
+            is_countable($garment['by_subsector'] ?? null)
+                ? count($garment['by_subsector'])
+                : null,
+
+        'by_flow_count' =>
+            is_countable($garment['by_flow'] ?? null)
+                ? count($garment['by_flow'])
+                : null,
+
+        'monthly_trend_count' =>
+            is_countable($garment['monthly_trend'] ?? null)
+                ? count($garment['monthly_trend'])
+                : null,
+
+        'yearly_trend_count' =>
+            is_countable($garment['yearly_trend'] ?? null)
+                ? count($garment['yearly_trend'])
+                : null,
+
+        'hs8_products_count' =>
+            is_countable($garment['hs8_products'] ?? null)
+                ? count($garment['hs8_products'])
+                : null,
+    ]
+);
+
+\Log::info(
+    'GARMENT DEBUG: BEFORE INERTIA RENDER',
+    [
+        'memory_mb' =>
+            round(
+                memory_get_usage(true) / 1024 / 1024,
+                2
+            ),
+
+        'peak_memory_mb' =>
+            round(
+                memory_get_peak_usage(true) / 1024 / 1024,
+                2
+            ),
+    ]
+);
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | Period Selection
-                |--------------------------------------------------------------------------
-                */
+$response =
+    Inertia::render(
+        'Trade/GarmentIntelligence',
+        [
 
-                'periodSelection' => [
+            'garment' =>
+                $garment,
 
-                    'year' =>
-                        $year,
+            /*
+            |--------------------------------------------------------------------------
+            | Period Selection
+            |--------------------------------------------------------------------------
+            */
 
-                    'month' =>
-                        $month,
+            'periodSelection' => [
 
-                    'compare_year' =>
-                        $compareYear,
+                'year' =>
+                    $year,
 
-                    'compare_month' =>
-                        $compareMonth,
+                'month' =>
+                    $month,
 
-                    'mode' =>
-                        $mode,
-                ],
+                'compare_year' =>
+                    $compareYear,
+
+                'compare_month' =>
+                    $compareMonth,
+
+                'mode' =>
+                    $mode,
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Available Periods
+            |--------------------------------------------------------------------------
+            */
+
+            'availablePeriods' =>
+                $available,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Page
+            |--------------------------------------------------------------------------
+            */
+
+            'page' => [
+
+                'title' =>
+                    'Garment Intelligence',
+
+                'description' =>
+                    'Garment Trade Intelligence',
+            ],
+        ]
+    );
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | Available Periods
-                |--------------------------------------------------------------------------
-                */
+\Log::info(
+    'GARMENT DEBUG: AFTER INERTIA RENDER',
+    [
+        'memory_mb' =>
+            round(
+                memory_get_usage(true) / 1024 / 1024,
+                2
+            ),
 
-                'availablePeriods' =>
-                    $available,
+        'peak_memory_mb' =>
+            round(
+                memory_get_peak_usage(true) / 1024 / 1024,
+                2
+            ),
+    ]
+);
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | Page
-                |--------------------------------------------------------------------------
-                */
-
-                'page' => [
-
-                    'title' =>
-                        'Garment Intelligence',
-
-                    'description' =>
-                        'Garment Trade Intelligence',
-                ],
-            ]
-        );
+return $response;
     }
 }

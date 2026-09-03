@@ -779,6 +779,10 @@ Route::get(
 |--------------------------------------------------------------------------
 */
 // Coats
+Route::get('/intelligence/trade/landing', function () {
+    return Inertia::render('Trade/IntelligenceLanding');
+})->name('intelligence.trade.landing');
+
 Route::get(
     '/intelligence/thread',
     [ThreadIntelligenceController::class, 'index']

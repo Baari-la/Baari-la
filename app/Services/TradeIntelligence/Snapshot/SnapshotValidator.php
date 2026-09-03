@@ -2,7 +2,7 @@
 
 namespace App\Services\TradeIntelligence\Snapshot;
 
-use App\Services\TradeIntelligence\Support\TradeReportingPeriod;
+use App\Services\Trade\TradeReportingPeriod;
 
 class SnapshotValidator
 {

@@ -241,6 +241,14 @@ class CurrentProductBuilder
                 $first['subsector']
                     ?? null,
 
+            'label_en' =>
+                $first['label_en']
+                    ?? null,
+
+            'label_id' =>
+                $first['label_id']
+                    ?? null,
+                    
             'flow' =>
                 $flow,
 

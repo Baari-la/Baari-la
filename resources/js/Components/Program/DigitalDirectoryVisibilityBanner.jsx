@@ -118,7 +118,7 @@ export default function DigitalDirectoryVisibilityBanner({
                             leading-tight
                         "
                     >
-                        DIGESTEX Strategic Industry
+                        DIGESTEX Readable-AI Profile
                         <br />& Visibility Program
                     </h1>
                     <p

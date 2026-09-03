@@ -2,7 +2,7 @@
 
 namespace App\Services\TradeIntelligence\Snapshot;
 
-use App\Services\TradeIntelligence\Period\TradeReportingPeriod;
+use App\Services\Trade\TradeReportingPeriod;
 use Carbon\CarbonInterface;
 
 class SnapshotMetadataBuilder

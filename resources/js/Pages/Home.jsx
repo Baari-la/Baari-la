@@ -1,38 +1,16 @@
 import WebsiteLayout from "@/Layouts/WebsiteLayout";
 import React, { useState, useEffect } from "react";
 import { Head, router, Link, usePage } from "@inertiajs/react";
-import Navbar from "@/Components/Navbar";
-import Footer from "@/Components/Footer";
-import NewsSection from "@/Components/Home/NewsSection";
-import PartnerLogo from "@/Components/Home/PartnerLogo";
-import VissionMission from "@/Components/Home/VissionMission";
-import LocalSolutions from "@/Components/Home/LocalSolutions";
-import EventSpotlight from "@/Components/EventSpotlight";
-import BenefitsSection from "@/Components/Home/BenefitsSection";
-import PartnerSponsorship from "@/Components/PartnerSponsorship";
-import SponsorSlider from "@/Components/SponsorSlider";
-import StockTicker from "@/Components/StockTicker";
-import InaugurationPopup from "@/Components/InaugurationPopup";
-import GarmentExportTable from "@/Components/Home/GarmentExportTable";
-import CottonCurrencyTrendChart from "@/Components/CottonCurrencyTrendChart";
-import FiberComparisonChart from "@/Components/FiberComparisonChart";
-import IndustryDirectorySnapshot from "@/Components/Home/IndustryDirectorySnapshot";
-import SourcingHubPreview from "@/Components/Home/SourcingHubPreview";
-import FeaturedPartnerBanner from "@/Components/Home/FeaturedPartnerBanner";
-import IndustrySolutionsSection from "@/Components/Home/IndustrySolutionsSection";
-import SponsoredInsightSection from "@/Components/Home/SponsoredInsightSection";
 import MarketTicker from "@/Components/MarketTicker";
-import LatestIntelligence from "@/Components/Home/LatestIntelligence";
-import IntelligenceOverview from "@/Components/Home/IntelligenceOverview";
-import HeroSection from "@/Components/Home/Hero/HeroSection";
-import ExecutiveReport from "@/Components/Trade/ExecutiveReport";
-import TodaysIndustrySnapshot from "@/Components/Home/TodaysIndustrySnapshot";
-import ExecutivePerformanceTable from "@/Components/Trade/ExecutiveReport/Summary/ExecutivePerformanceTable";
 import DigitalDirectoryVisibilityBanner from "@/Components/Program/DigitalDirectoryVisibilityBanner";
-import ThreePillarsSection from "@/Components/Home/ThreePillarsSection";
-import WeeklyIntelligenceBanner from "@/Components/Home/WeeklyIntelligenceBanner";
-import DigestexSolutions from "@/Components/Home/DigestexSolutions";
 import UpcomingPreview from "@/Components/Home/UpcomingPreview";
+import GlobalEcosystemHero from "@/Components/Home/GlobalEcosystemHero";
+import EcosystemPositioning from "@/Components/Home/EcosystemPositioning";
+import IndustryTradeIntelligence from "@/Components/Home/IndustryTradeIntelligence";
+import TechnologySolutions from "@/Components/Home/TechnologySolutions";
+import SourcingBusinessConnectivity from "@/Components/Home/SourcingBusinessConnectivity";
+import StrategicEcosystemPartners from "@/Components/Home/StrategicEcosystemPartners";
+import FinalEcosystemCTA from "@/Components/Home/FinalEcosystemCTA";
 
 export default function Home(props) {
     // 1. Ambil data trade mentah
@@ -124,6 +102,14 @@ export default function Home(props) {
                 />
 
                 <main className="flex-1 overflow-hidden relative">
+                    <GlobalEcosystemHero isEn={isEn} />
+
+                    {/* =====================================================
+    ECOSYSTEM POSITIONING
+===================================================== */}
+
+                    <EcosystemPositioning isEn={isEn} />
+
                     {/* <Navbar auth={auth} /> */}
                     <DigitalDirectoryVisibilityBanner
                         participatingCompanies={0}
@@ -134,334 +120,19 @@ export default function Home(props) {
                     <div className="px-11">
                         <UpcomingPreview />
                     </div>
-                    {/* THREE PILLARS */}
-
-                    <ThreePillarsSection />
-
-                    {/* EXECUTIVE */}
-
-                    <TodaysIndustrySnapshot />
-                    {/* 
-                    <ExecutiveReport report={props.report} />
-                    <InaugurationPopup isEn={isEn} />
-                    <StockTicker topStocks={topStocks} />
-                    <HeroSection />
-                    <TodaysIndustrySnapshot /> */}
-
-                    <ExecutiveReport
-                        report={props.report}
-                        executiveTrade={props.executiveTrade}
-                    />
-                    <WeeklyIntelligenceBanner />
-                    <DigestexSolutions />
-                    <div id="industry-snapshot" />
-                    {/* <MaterialExchangePreview /> */}
-                    {/* --- SECTION: HERO & SEARCH --- */}
-                    <div className="px-6 pt-20 pb-16 text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
-                        <h1 className="text-6xl md:text-8xl font-black mb-6 leading-none uppercase tracking-tighter italic relative z-10">
-                            {isEn
-                                ? "Global Textile Industry"
-                                : "Ekosistem Industri Tekstil"}
-
-                            <span className="text-yellow-500 leading-none block md:inline">
-                                {isEn ? " Ecosystem" : " Global"}
-                            </span>
-                        </h1>
-                        <div className="max-w-4xl mx-auto mb-12 relative z-10">
-                            <p className=" text-white text-lg md:text-2xl font-bold leading-relaxed tracking-tight">
-                                {isEn
-                                    ? "Connecting manufacturers, suppliers, buyers, market intelligence, and business opportunities throughout the global textile value chain."
-                                    : "Menghubungkan produsen, pemasok, pembeli, market intelligence, dan peluang bisnis di seluruh rantai nilai industri tekstil global."}
-                            </p>
-                            <p
-                                className="
-            mt-4
-            text-gray-400
-            text-sm
-            md:text-base
-            leading-relaxed
-            max-w-3xl
-            mx-auto
-        "
-                            >
-                                {isEn
-                                    ? "Built from industry experience. Designed for global textile business."
-                                    : "Dibangun dari pengalaman industri. Dirancang untuk bisnis tekstil global."}
-                            </p>
-                        </div>
-                        <form
-                            onSubmit={handleSearch}
-                            className="max-w-3xl mx-auto mb-10 relative z-10 px-4"
-                        >
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-2 rounded-[30px] shadow-2xl flex items-center group focus-within:border-yellow-500/50 transition-all">
-                                <div className="pl-6 text-yellow-500/50 group-focus-within:text-yellow-500">
-                                    <i className="fas fa-search"></i>
-                                </div>
-                                <input
-                                    type="text"
-                                    value={keyword}
-                                    onChange={(e) => setKeyword(e.target.value)}
-                                    className="block w-full px-6 py-5 bg-transparent border-none text-white text-lg outline-none focus:ring-0 placeholder:text-gray-600"
-                                    placeholder={
-                                        isEn
-                                            ? "Search the global textile intelligence ecosystem..."
-                                            : "Cari 1.982+ industri & berita..."
-                                    }
-                                />
-                                <button className="bg-yellow-500 text-[#0a192f] font-black px-10 py-4 rounded-[22px] text-[10px] uppercase tracking-widest shadow-xl hover:bg-yellow-400 transition-all">
-                                    {isEn ? "EXPLORE" : "JELAJAHI"}
-                                </button>
-                            </div>
-                        </form>
-                        {/* Hero KPI Banner */}
-
-                        <div className="relative z-10 max-w-5xl mx-auto px-4">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-                                <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 text-center">
-                                    <div className="text-yellow-500 text-2xl mb-3">
-                                        <i className="fas fa-building" />
-                                    </div>
-                                    <div className="text-3xl font-black text-yellow-500">
-                                        {Number(
-                                            directoryStats?.companies ?? 0,
-                                        ).toLocaleString()}
-                                        +
-                                    </div>
-
-                                    <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-gray-400 mt-2">
-                                        <span>
-                                            {isEn ? "Companies" : "Perusahaan"}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 text-center">
-                                    <div className="text-yellow-500 text-2xl mb-3">
-                                        <i className="fas fa-box" />
-                                    </div>
-
-                                    <div className="text-3xl font-black text-yellow-500">
-                                        {Number(
-                                            directoryStats?.products ?? 0,
-                                        ).toLocaleString()}
-                                        +
-                                    </div>
-
-                                    <div className="text-xs uppercase tracking-widest text-gray-400 mt-2">
-                                        {isEn ? "Products" : "Produk"}
-                                    </div>
-                                </div>
-
-                                <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 text-center">
-                                    <div className="text-yellow-500 text-2xl mb-3">
-                                        <i className="fas fa-earth-asia" />
-                                    </div>
-
-                                    <div className="text-3xl font-black text-yellow-500">
-                                        {Number(
-                                            directoryStats?.markets ?? 0,
-                                        ).toLocaleString()}
-                                        +
-                                    </div>
-
-                                    <div className="text-xs uppercase tracking-widest text-gray-400 mt-2">
-                                        {isEn ? "Markets" : "Pasar"}
-                                    </div>
-                                </div>
-
-                                <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 text-center">
-                                    <div className="text-yellow-500 text-2xl mb-3">
-                                        <i className="fas fa-ship" />
-                                    </div>
-
-                                    <div className="text-3xl font-black text-yellow-500">
-                                        {Number(
-                                            directoryStats?.exportCompanies ??
-                                                0,
-                                        ).toLocaleString()}
-                                        +
-                                    </div>
-
-                                    <div className="text-xs uppercase tracking-widest text-gray-400 mt-2">
-                                        {isEn ? "Exporters" : "Eksportir"}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* <LatestIntelligence
-                            latestIntelligence={latestIntelligence}
-                            marketIntelligence={marketIntelligence}
-                            tradePolicy={tradePolicy}
-                            sustainability={sustainability}
-                            technology={technology}
-                            industryNews={industryNews}
-                            intelligenceStats={intelligenceStats}
-                        /> */}
-
-                        <IntelligenceOverview isEn={isEn} />
-                    </div>
-                    <div className="mt-10">
-                        <div className="max-w-7xl mx-auto">
-                            <CottonCurrencyTrendChart
-                                data={marketHistory}
-                                isEn={isEn}
-                            />
-                        </div>
-                        <FiberComparisonChart
-                            data={fiberIntelligence}
-                            isEn={isEn}
-                            isLoggedIn={props.isLoggedIn} // <--- Kirim status login di sini
-                        />
-                    </div>
-
-                    <DigestexSolutions />
-
-                    <IndustryDirectorySnapshot
+                    <IndustryTradeIntelligence
                         isEn={isEn}
-                        stats={directoryStats}
-                    />
-
-                    <SourcingHubPreview isEn={isEn} />
-
-                    <SponsoredInsightSection isEn={isEn} />
-                    {/* --- SECTION: TOP PRODUCTS & PAYWALL --- */}
-                    <div className="px-6 mb-24">
-                        <div className="max-w-7xl mx-auto relative">
-                            <div
-                                className={`transition-all duration-700 ${!auth.user ? "blur-sm grayscale-[0.5]" : ""}`}
-                            >
-                                {/* Perbandingan Impor Kapas dan Sintetis */}
-                                <GarmentExportTable
-                                    topProducts={topProducts}
-                                    totalGarment={totalGarment}
-                                    garmentTrade={garmentTrade}
-                                    auth={auth}
-                                    isEn={isEn}
-                                />
-                            </div>
-
-                            {/* Paywall Overlay */}
-                            {!auth.user && (
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-[#0a192f]/80 to-transparent flex flex-col items-center justify-end pb-20 p-6 text-center z-20">
-                                    <div className="bg-[#0f172a]/90 backdrop-blur-2xl p-10 rounded-[40px] border border-white/10 shadow-2xl max-w-lg">
-                                        <div className="bg-yellow-500 w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-yellow-500/20">
-                                            <i className="fas fa-lock text-[#0a192f] text-2xl"></i>
-                                        </div>
-                                        <h4 className="text-2xl font-black text-white uppercase italic tracking-tighter">
-                                            {isEn
-                                                ? "Unlock Industrial Insight"
-                                                : "Buka Wawasan Industri"}
-                                        </h4>
-                                        <p className="text-gray-400 text-sm my-6 leading-relaxed">
-                                            {isEn
-                                                ? "Access 1,200+ HS Codes, complete 30-day historical market trends, and advanced industrial calculators."
-                                                : "Akses 1.200+ HS Code, tren pasar historis 30 hari lengkap, dan kalkulator industri canggih."}
-                                        </p>
-                                        <Link
-                                            href={route("login")}
-                                            className="inline-block bg-yellow-500 text-[#0a192f] px-12 py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-xl"
-                                        >
-                                            {isEn
-                                                ? "Get Premium Access"
-                                                : "Dapatkan Akses Premium"}
-                                        </Link>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <section className="py-4 border-t border-white/5">
-                        <div className="max-w-7xl mx-auto px-6">
-                            <div className="text-center mb-16">
-                                <span className="text-yellow-500 text-xs font-black uppercase tracking-[0.4em]">
-                                    PARTNERS & ECOSYSTEM
-                                </span>
-
-                                <h2 className="text-4xl md:text-6xl font-black text-white mt-4 uppercase">
-                                    Strategic Partners
-                                </h2>
-
-                                <p className="max-w-3xl mx-auto mt-6 text-gray-400">
-                                    Collaborating with industry associations,
-                                    institutions, technology providers, and
-                                    ecosystem stakeholders.
-                                </p>
-                            </div>
-
-                            <div className="grid md:grid-cols-4 gap-6 mb-20">
-                                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
-                                    <i className="fas fa-handshake text-yellow-500 text-4xl mb-5" />
-
-                                    <h3 className="text-white font-black uppercase mb-3">
-                                        Industry Associations
-                                    </h3>
-
-                                    <p className="text-gray-400 text-sm">
-                                        Textile, garment, footwear, and industry
-                                        organizations.
-                                    </p>
-                                </div>
-
-                                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
-                                    <i className="fas fa-graduation-cap text-yellow-500 text-4xl mb-5" />
-
-                                    <h3 className="text-white font-black uppercase mb-3">
-                                        Research & Education
-                                    </h3>
-
-                                    <p className="text-gray-400 text-sm">
-                                        Universities, research centers, and
-                                        training institutions.
-                                    </p>
-                                </div>
-
-                                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
-                                    <i className="fas fa-microchip text-yellow-500 text-4xl mb-5" />
-
-                                    <h3 className="text-white font-black uppercase mb-3">
-                                        Technology Partners
-                                    </h3>
-
-                                    <p className="text-gray-400 text-sm">
-                                        Digital platforms, software providers,
-                                        and innovation partners.
-                                    </p>
-                                </div>
-
-                                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
-                                    <i className="fas fa-globe-asia text-yellow-500 text-4xl mb-5" />
-
-                                    <h3 className="text-white font-black uppercase mb-3">
-                                        Supporting Organizations
-                                    </h3>
-
-                                    <p className="text-gray-400 text-sm">
-                                        Government agencies, NGOs, development
-                                        partners, and institutions.
-                                    </p>
-                                </div>
-                            </div>
-                            {/* <PartnerSponsorship />
-                            <SponsorSlider />
-                            <PartnerLogo /> */}
-                        </div>
-                    </section>
-                    <FeaturedPartnerBanner isEn={isEn} />
-                    {/* <NewsSection latestNews={latestNews} isEn={isEn} /> */}
-                    {/* <EventSpotlight /> */}
-                    {/* <LocalSolutions
-                        materials={props.regulations || []}
-                        inventoryItems={props.inventoryItems || []}
-                        partnershipItems={props.partnershipItems || []}
+                        marketHistory={marketHistory}
+                        fiberIntelligence={fiberIntelligence}
                         isLoggedIn={props.isLoggedIn}
-                        memberStatus={props.auth?.user?.member_status || "Free"}
-                        isEn={isEn}
-                        
-                        auth={props.auth}
-                    /> */}
+                    />
+
+                    <TechnologySolutions isEn={isEn} />
+                    <SourcingBusinessConnectivity isEn={isEn} />
+
+                    <StrategicEcosystemPartners isEn={isEn} />
+
+                    <FinalEcosystemCTA isEn={isEn} />
                 </main>
             </div>
         </WebsiteLayout>

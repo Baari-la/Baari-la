@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\Services\Home;
 
 use App\Repositories\Trade\Dashboard\HomeTradeRepository;
-use App\Services\Trade\Intelligence\Core\PiecesConversionService;
+use App\Services\Trade\GarmentConversionService;
 
 class HomeTradeService
 {
     public function __construct(
-    protected HomeTradeRepository $repository,
-    protected PiecesConversionService $piecesConversionService,
-    protected HomeExecutiveSnapshotService $executiveSnapshotService,
-) {
-}
+        protected HomeTradeRepository $repository,
+        protected GarmentConversionService $garmentConversionService,
+        protected HomeExecutiveSnapshotService $executiveSnapshotService,
+    ) {
+    }
 
     /**
      * --------------------------------------------------------------------------
@@ -42,11 +42,27 @@ class HomeTradeService
 
         /*
         |--------------------------------------------------------------------------
-        | Estimated Pieces
+        | Estimated Garment Pieces
+        |--------------------------------------------------------------------------
+        |
+        | Canonical garment conversion:
+        |
+        | - HS-8 specific
+        | - ACTIVE factor only
+        | - No legacy multiplier
+        | - No fallback multiplier
+        | - KG_TO_PCS only
+        | - HS-8 without an ACTIVE factor are excluded
+        |
+        | This ensures Home Dashboard uses exactly the same
+        | conversion governance as Garment Trade Intelligence.
         |--------------------------------------------------------------------------
         */
 
-        $totalPieces = 0;
+        $totalPieces = 0.0;
+
+        $convertibleHs8Count = 0;
+        $nonConvertibleHs8Count = 0;
 
         foreach ($tradeRows as $row) {
 
@@ -54,10 +70,29 @@ class HomeTradeService
                 continue;
             }
 
-            $totalPieces += $this->piecesConversionService->toPieces(
-                $row->hs_code,
-                (float) $row->vol_2025
+            $hsCode = trim(
+                (string) $row->hs_code
             );
+
+            $tradeVolume = (float) $row->vol_2025;
+
+            $conversion =
+                $this->garmentConversionService->kgToPcs(
+                    $hsCode,
+                    $tradeVolume
+                );
+
+            if (
+                ($conversion['status'] ?? null)
+                === 'CONVERTED'
+            ) {
+                $totalPieces +=
+                    (float) $conversion['output_quantity'];
+
+                $convertibleHs8Count++;
+            } else {
+                $nonConvertibleHs8Count++;
+            }
         }
 
         /*
@@ -66,7 +101,8 @@ class HomeTradeService
         |--------------------------------------------------------------------------
         */
 
-        $heroSummary = $this->repository->heroSummary();
+        $heroSummary =
+            $this->repository->heroSummary();
 
         /*
         |--------------------------------------------------------------------------
@@ -86,33 +122,38 @@ class HomeTradeService
         |--------------------------------------------------------------------------
         */
 
-        $marketHighlights = $this->repository->marketHighlights();
+        $marketHighlights =
+            $this->repository->marketHighlights();
 
         /*
         |--------------------------------------------------------------------------
         | Fiber Intelligence
         |--------------------------------------------------------------------------
+        |
+        | Temporary dataset retained for backward compatibility.
+        |--------------------------------------------------------------------------
         */
 
-        $fiberData = $this->getRawFiberData();
+        $fiberData =
+            $this->getRawFiberData();
 
         if (!auth()->check()) {
 
-            $fiberData = collect($fiberData)
-                ->map(function ($item, $index) {
+            $fiberData =
+                collect($fiberData)
+                    ->map(function ($item, $index) {
 
-                    if ($index > 3) {
+                        if ($index > 3) {
 
-                        $item['cotton_vol'] = 0;
-                        $item['cotton_val'] = 0;
-                        $item['syn_vol'] = 0;
-                        $item['syn_val'] = 0;
-                    }
+                            $item['cotton_vol'] = 0;
+                            $item['cotton_val'] = 0;
+                            $item['syn_vol'] = 0;
+                            $item['syn_val'] = 0;
+                        }
 
-                    return $item;
-
-                })
-                ->all();
+                        return $item;
+                    })
+                    ->all();
         }
 
         /*
@@ -123,29 +164,20 @@ class HomeTradeService
         | IMPORTANT:
         | Do NOT call ExecutiveReportService here.
         |
-        | The previous implementation built four full executive reports:
-        | - fiber
-        | - yarn
-        | - fabric
-        | - apparel
-        |
-        | That caused expensive analytics work during Home cache misses.
-        |
-        | We keep the same frontend contract (`executiveTrade`) for now,
-        | but return lightweight placeholders until the dedicated
-        | HomeExecutiveSnapshotService is introduced.
+        | The Home page should remain lightweight.
         |--------------------------------------------------------------------------
         */
 
-        $executiveSnapshot = $this->executiveSnapshotService->getData();
+        $executiveSnapshot =
+            $this->executiveSnapshotService->getData();
 
-            $executiveTrade = [
-                'summary' => $executiveSnapshot,
-                'fiber' => [],
-                'yarn' => [],
-                'fabric' => [],
-                'apparel' => [],
-            ];
+        $executiveTrade = [
+            'summary' => $executiveSnapshot,
+            'fiber' => [],
+            'yarn' => [],
+            'fabric' => [],
+            'apparel' => [],
+        ];
 
         /*
         |--------------------------------------------------------------------------
@@ -155,17 +187,48 @@ class HomeTradeService
 
         return [
 
-            'heroSummary' => $heroSummary,
+            'heroSummary' =>
+                $heroSummary,
 
-            'garmentTrade' => $tradeRows,
+            'garmentTrade' =>
+                $tradeRows,
 
-            'totalGarment' => $totalPieces,
+            'totalGarment' =>
+                $totalPieces,
 
-            'marketHighlights' => $marketHighlights,
+            /*
+            |--------------------------------------------------------------------------
+            | Conversion Transparency
+            |--------------------------------------------------------------------------
+            |
+            | These fields allow the frontend / AI layer to know
+            | how much of the garment trade volume was actually
+            | convertible using governed HS-8 factors.
+            |--------------------------------------------------------------------------
+            */
 
-            'topProducts' => $topProducts,
+            'garmentConversion' => [
+                'methodology' =>
+                    'KG_PER_PCS',
 
-            'fiberIntelligence' => $fiberData,
+                'direction' =>
+                    'KG_TO_PCS',
+
+                'convertible_hs8_count' =>
+                    $convertibleHs8Count,
+
+                'non_convertible_hs8_count' =>
+                    $nonConvertibleHs8Count,
+            ],
+
+            'marketHighlights' =>
+                $marketHighlights,
+
+            'topProducts' =>
+                $topProducts,
+
+            'fiberIntelligence' =>
+                $fiberData,
 
             /*
             |--------------------------------------------------------------------------
@@ -173,7 +236,8 @@ class HomeTradeService
             |--------------------------------------------------------------------------
             */
 
-            'report' => $executiveTrade['apparel'],
+            'report' =>
+                $executiveTrade['apparel'],
 
             /*
             |--------------------------------------------------------------------------
@@ -181,7 +245,8 @@ class HomeTradeService
             |--------------------------------------------------------------------------
             */
 
-            'executiveTrade' => $executiveTrade,
+            'executiveTrade' =>
+                $executiveTrade,
         ];
     }
 

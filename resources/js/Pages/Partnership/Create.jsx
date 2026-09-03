@@ -150,8 +150,8 @@ export default function Create() {
             <ProgramNavbar />
 
             {/* ==========================================================
-                HERO
-            ========================================================== */}
+    HERO
+========================================================== */}
 
             <section className="relative overflow-hidden bg-slate-950 text-white">
                 <div className="absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-3xl" />
@@ -163,34 +163,59 @@ export default function Create() {
                         <div>
                             <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-amber-300">
                                 <Sparkles className="h-4 w-4" />
-                                Strategic Solution Partner
+
+                                {isEn
+                                    ? "FOUNDING STRATEGIC SOLUTION PARTNER"
+                                    : "FOUNDING STRATEGIC SOLUTION PARTNER"}
                             </div>
 
                             <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
-                                {isEn
-                                    ? "Let's Build the Future of the Textile Industry Together"
-                                    : "Mari Membangun Masa Depan Industri Tekstil Bersama"}
+                                {isEn ? (
+                                    <>
+                                        Build Your Place
+                                        <br />
+                                        in the Next Generation
+                                        <br />
+                                        Textile Ecosystem
+                                    </>
+                                ) : (
+                                    <>
+                                        Bangun Posisi Anda
+                                        <br />
+                                        dalam Generasi Berikutnya
+                                        <br />
+                                        Ekosistem Industri Tekstil
+                                    </>
+                                )}
                             </h1>
 
                             <p className="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
                                 {isEn
-                                    ? "Tell us about your company, solution and partnership objectives. Our team will review your proposal and explore how your organization can contribute to the DIGESTEX ecosystem."
-                                    : "Ceritakan tentang perusahaan, solusi, dan tujuan kemitraan Anda. Tim kami akan meninjau proposal Anda dan mengeksplorasi bagaimana perusahaan Anda dapat berkontribusi dalam ekosistem DIGESTEX."}
+                                    ? "DIGESTEX is building a connected One-Stop Textile Industry Ecosystem — bringing together companies, technologies, solutions, intelligence, sourcing and business opportunities across the textile value chain."
+                                    : "DIGESTEX sedang membangun One-Stop Textile Industry Ecosystem yang terhubung — mempertemukan perusahaan, teknologi, solusi, intelligence, sourcing, dan peluang bisnis di seluruh rantai nilai industri tekstil."}
+                            </p>
+
+                            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-400">
+                                {isEn
+                                    ? "Tell us about your company, capabilities and solutions. Explore how your business can become part of the ecosystem and contribute to the digital infrastructure shaping the next generation of textile industry connectivity."
+                                    : "Ceritakan tentang perusahaan, kapabilitas, dan solusi Anda. Mari eksplorasi bagaimana perusahaan Anda dapat menjadi bagian dari ekosistem dan berkontribusi dalam membangun infrastruktur digital bagi konektivitas industri tekstil generasi berikutnya."}
                             </p>
 
                             <div className="mt-8 flex flex-wrap gap-3">
                                 {(isEn
                                     ? [
-                                          "Global Industry Visibility",
+                                          "Industry Visibility",
                                           "Solution Showcase",
-                                          "Executive Engagement",
-                                          "Business Opportunities",
+                                          "Strategic Positioning",
+                                          "Business Connectivity",
+                                          "Ecosystem Participation",
                                       ]
                                     : [
-                                          "Global Industry Visibility",
+                                          "Industry Visibility",
                                           "Solution Showcase",
-                                          "Executive Engagement",
-                                          "Peluang Bisnis",
+                                          "Strategic Positioning",
+                                          "Konektivitas Bisnis",
+                                          "Partisipasi Ekosistem",
                                       ]
                                 ).map((item) => (
                                     <span
@@ -218,13 +243,13 @@ export default function Create() {
                                 src="/images/digestex/digital-globe.png"
                                 alt="DIGESTEX Global Textile Intelligence Ecosystem"
                                 className="
-                                    relative
-                                    z-10
-                                    h-80
-                                    w-80
-                                    object-contain
-                                    drop-shadow-[0_0_45px_rgba(56,189,248,0.30)]
-                                "
+                        relative
+                        z-10
+                        h-80
+                        w-80
+                        object-contain
+                        drop-shadow-[0_0_45px_rgba(56,189,248,0.30)]
+                    "
                             />
                         </div>
                     </div>
@@ -256,8 +281,8 @@ export default function Create() {
                                     }
                                     description={
                                         isEn
-                                            ? "Tell us about the organization you represent."
-                                            : "Informasikan perusahaan atau organisasi yang Anda wakili."
+                                            ? "Tell us about the company you represent and its role within the textile industry ecosystem."
+                                            : "Informasikan perusahaan yang Anda wakili dan perannya dalam ekosistem industri tekstil."
                                     }
                                 />
 
@@ -307,13 +332,13 @@ export default function Create() {
                                     number="02"
                                     title={
                                         isEn
-                                            ? "Contact Person"
-                                            : "Kontak Perusahaan"
+                                            ? "Executive / Business Contact"
+                                            : "Kontak Eksekutif / Bisnis"
                                     }
                                     description={
                                         isEn
-                                            ? "Please provide the executive or business contact responsible for this inquiry."
-                                            : "Berikan informasi kontak eksekutif atau PIC yang bertanggung jawab atas inquiry ini."
+                                            ? "Provide the contact person responsible for discussing your company's strategic partnership with DIGESTEX."
+                                            : "Berikan informasi kontak yang bertanggung jawab untuk membahas kemitraan strategis perusahaan Anda dengan DIGESTEX."
                                     }
                                 />
 
@@ -344,8 +369,8 @@ export default function Create() {
                                         error={errors.job_title}
                                         placeholder={
                                             isEn
-                                                ? "Managing Director / Business Development"
-                                                : "Managing Director / Business Development"
+                                                ? "Managing Director / Director / Business Development"
+                                                : "Managing Director / Director / Business Development"
                                         }
                                     />
 
@@ -379,7 +404,7 @@ export default function Create() {
                                 </div>
                             </section>
 
-                            {/* Solution */}
+                            {/* Solution & Industry Value */}
 
                             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
                                 <SectionHeader
@@ -387,13 +412,13 @@ export default function Create() {
                                     number="03"
                                     title={
                                         isEn
-                                            ? "Your Solution"
-                                            : "Solusi yang Ditawarkan"
+                                            ? "Solution & Industry Value"
+                                            : "Solusi & Nilai untuk Industri"
                                     }
                                     description={
                                         isEn
-                                            ? "Tell us what your company brings to the textile industry ecosystem."
-                                            : "Jelaskan solusi yang perusahaan Anda tawarkan untuk ekosistem industri tekstil."
+                                            ? "Tell us about the solutions, capabilities and expertise your company can bring to the DIGESTEX textile industry ecosystem."
+                                            : "Jelaskan solusi, kapabilitas, dan keahlian yang dapat perusahaan Anda hadirkan ke dalam ekosistem industri tekstil DIGESTEX."
                                     }
                                 />
 
@@ -418,21 +443,21 @@ export default function Create() {
                                                 )
                                             }
                                             className="
-                                                mt-2
-                                                w-full
-                                                rounded-2xl
-                                                border
-                                                border-slate-300
-                                                bg-white
-                                                px-4
-                                                py-3.5
-                                                text-sm
-                                                outline-none
-                                                transition
-                                                focus:border-emerald-500
-                                                focus:ring-2
-                                                focus:ring-emerald-500/10
-                                            "
+                    mt-2
+                    w-full
+                    rounded-2xl
+                    border
+                    border-slate-300
+                    bg-white
+                    px-4
+                    py-3.5
+                    text-sm
+                    outline-none
+                    transition
+                    focus:border-emerald-500
+                    focus:ring-2
+                    focus:ring-emerald-500/10
+                "
                                         >
                                             <option value="">
                                                 {isEn
@@ -462,11 +487,11 @@ export default function Create() {
                                     <TextArea
                                         label={
                                             isEn
-                                                ? "Describe Your Solution"
-                                                : "Jelaskan Solusi Anda"
+                                                ? "Describe Your Solution & Industry Value"
+                                                : "Jelaskan Solusi & Nilai untuk Industri"
                                         }
                                         required
-                                        rows={6}
+                                        rows={7}
                                         value={data.solution_description}
                                         onChange={(e) =>
                                             setData(
@@ -477,13 +502,12 @@ export default function Create() {
                                         error={errors.solution_description}
                                         placeholder={
                                             isEn
-                                                ? "Describe your products, technology, services or expertise and how they can support the textile industry..."
-                                                : "Jelaskan produk, teknologi, layanan atau keahlian perusahaan Anda dan bagaimana solusi tersebut dapat mendukung industri tekstil..."
+                                                ? "Describe your products, technologies, services, expertise or capabilities, the industry challenges you address, and the value your company can bring to textile companies and decision makers..."
+                                                : "Jelaskan produk, teknologi, layanan, keahlian atau kapabilitas perusahaan Anda, tantangan industri yang dapat Anda jawab, serta nilai yang dapat diberikan kepada perusahaan tekstil dan decision maker..."
                                         }
                                     />
                                 </div>
                             </section>
-
                             {/* Partnership Opportunity */}
 
                             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -492,13 +516,13 @@ export default function Create() {
                                     number="04"
                                     title={
                                         isEn
-                                            ? "Partnership Opportunity"
-                                            : "Peluang Kemitraan"
+                                            ? "Strategic Partnership Opportunity"
+                                            : "Peluang Kemitraan Strategis"
                                     }
                                     description={
                                         isEn
-                                            ? "Help us understand the type of strategic relationship you would like to explore."
-                                            : "Bantu kami memahami bentuk hubungan strategis yang ingin Anda kembangkan."
+                                            ? "Tell us how your company would like to participate, collaborate and create value within the DIGESTEX ecosystem."
+                                            : "Jelaskan bagaimana perusahaan Anda ingin berpartisipasi, berkolaborasi, dan menciptakan nilai di dalam ekosistem DIGESTEX."
                                     }
                                 />
 
@@ -520,16 +544,16 @@ export default function Create() {
                                         error={errors.partnership_interest}
                                         placeholder={
                                             isEn
-                                                ? "What would you like to explore with DIGESTEX?"
-                                                : "Apa yang ingin Anda eksplorasi bersama DIGESTEX?"
+                                                ? "What type of collaboration would you like to explore with DIGESTEX? For example: solution showcase, industry programs, knowledge initiatives, business connectivity, strategic campaigns, or other opportunities."
+                                                : "Bentuk kolaborasi apa yang ingin Anda kembangkan bersama DIGESTEX? Misalnya: solution showcase, program industri, knowledge initiatives, business connectivity, strategic campaign, atau peluang lainnya."
                                         }
                                     />
 
                                     <TextArea
                                         label={
                                             isEn
-                                                ? "Target Market"
-                                                : "Target Pasar"
+                                                ? "Target Market & Industry Segment"
+                                                : "Target Pasar & Segmen Industri"
                                         }
                                         rows={4}
                                         value={data.target_market}
@@ -542,8 +566,8 @@ export default function Create() {
                                         error={errors.target_market}
                                         placeholder={
                                             isEn
-                                                ? "Indonesia, ASEAN, Asia, Europe, USA, Global, etc."
-                                                : "Indonesia, ASEAN, Asia, Eropa, USA, Global, dll."
+                                                ? "Which markets, countries, textile segments or types of companies would you like to reach?"
+                                                : "Pasar, negara, segmen tekstil, atau jenis perusahaan apa yang ingin Anda jangkau?"
                                         }
                                     />
 
@@ -564,8 +588,8 @@ export default function Create() {
                                         error={errors.proposed_value}
                                         placeholder={
                                             isEn
-                                                ? "How can your company contribute to the DIGESTEX ecosystem?"
-                                                : "Bagaimana perusahaan Anda dapat berkontribusi terhadap ekosistem DIGESTEX?"
+                                                ? "How can your company contribute to the DIGESTEX ecosystem through your expertise, technology, solutions, industry knowledge, network or other capabilities?"
+                                                : "Bagaimana perusahaan Anda dapat berkontribusi pada ekosistem DIGESTEX melalui expertise, teknologi, solusi, industry knowledge, jaringan, atau kapabilitas lainnya?"
                                         }
                                     />
                                 </div>
@@ -579,13 +603,13 @@ export default function Create() {
                                         <h2 className="text-xl font-black">
                                             {isEn
                                                 ? "Ready to Explore a Strategic Partnership?"
-                                                : "Siap Mendiskusikan Kemitraan Strategis?"}
+                                                : "Siap Mengembangkan Kemitraan Strategis?"}
                                         </h2>
 
                                         <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
                                             {isEn
-                                                ? "Submit your inquiry and our team will contact you to discuss the next steps."
-                                                : "Kirim inquiry Anda dan tim kami akan menghubungi Anda untuk mendiskusikan langkah selanjutnya."}
+                                                ? "Submit your partnership proposal and our team will review your company, solution and objectives before discussing the next steps."
+                                                : "Kirim proposal kemitraan Anda dan tim kami akan meninjau perusahaan, solusi, dan tujuan Anda sebelum mendiskusikan langkah selanjutnya."}
                                         </p>
                                     </div>
 
@@ -593,30 +617,30 @@ export default function Create() {
                                         type="submit"
                                         disabled={processing}
                                         className="
-                                            inline-flex
-                                            shrink-0
-                                            items-center
-                                            justify-center
-                                            gap-2
-                                            rounded-2xl
-                                            bg-amber-400
-                                            px-7
-                                            py-4
-                                            font-black
-                                            text-slate-950
-                                            transition
-                                            hover:bg-amber-300
-                                            disabled:cursor-not-allowed
-                                            disabled:opacity-60
-                                        "
+                inline-flex
+                shrink-0
+                items-center
+                justify-center
+                gap-2
+                rounded-2xl
+                bg-amber-400
+                px-7
+                py-4
+                font-black
+                text-slate-950
+                transition
+                hover:bg-amber-300
+                disabled:cursor-not-allowed
+                disabled:opacity-60
+            "
                                     >
                                         {processing
                                             ? isEn
                                                 ? "SUBMITTING..."
                                                 : "MENGIRIM..."
                                             : isEn
-                                              ? "SUBMIT INQUIRY"
-                                              : "KIRIM INQUIRY"}
+                                              ? "SUBMIT PARTNERSHIP PROPOSAL"
+                                              : "KIRIM PERMOHONAN KEMITRAAN"}
 
                                         <Send className="h-5 w-5" />
                                     </button>
@@ -625,8 +649,8 @@ export default function Create() {
                         </div>
 
                         {/* ==================================================
-                            SIDE INFORMATION
-                        ================================================== */}
+    SIDE INFORMATION
+================================================== */}
 
                         <aside className="space-y-6">
                             <div className="sticky top-6 space-y-6">
@@ -641,7 +665,13 @@ export default function Create() {
                                             : "Mengapa Bermitra dengan DIGESTEX?"}
                                     </h3>
 
-                                    <div className="mt-5 space-y-4">
+                                    <p className="mt-3 text-sm leading-6 text-slate-500">
+                                        {isEn
+                                            ? "Become part of a connected textile industry ecosystem designed to make companies, capabilities, solutions and opportunities easier to discover and connect."
+                                            : "Menjadi bagian dari ekosistem industri tekstil yang terhubung untuk membuat perusahaan, kapabilitas, solusi, dan peluang bisnis lebih mudah ditemukan dan dihubungkan."}
+                                    </p>
+
+                                    <div className="mt-6 space-y-4">
                                         <SidePoint
                                             title={
                                                 isEn
@@ -650,34 +680,47 @@ export default function Create() {
                                             }
                                             text={
                                                 isEn
-                                                    ? "Position your solution within a dedicated textile intelligence ecosystem."
-                                                    : "Posisikan solusi Anda dalam ekosistem intelligence industri tekstil."
+                                                    ? "Strengthen your company's presence across the DIGESTEX textile industry ecosystem."
+                                                    : "Memperkuat kehadiran perusahaan Anda di dalam ekosistem industri tekstil DIGESTEX."
                                             }
                                         />
 
                                         <SidePoint
                                             title={
                                                 isEn
-                                                    ? "Executive Engagement"
-                                                    : "Executive Engagement"
+                                                    ? "Digital Discoverability"
+                                                    : "Digital Discoverability"
                                             }
                                             text={
                                                 isEn
-                                                    ? "Connect with decision makers and industry leaders."
-                                                    : "Terhubung dengan pengambil keputusan dan pemimpin industri."
+                                                    ? "Make your company, capabilities and solutions easier for relevant industry audiences to discover and understand."
+                                                    : "Membuat perusahaan, kapabilitas, dan solusi Anda lebih mudah ditemukan dan dipahami oleh audiens industri yang relevan."
                                             }
                                         />
 
                                         <SidePoint
                                             title={
                                                 isEn
-                                                    ? "Solution Showcase"
-                                                    : "Solution Showcase"
+                                                    ? "Solution Positioning"
+                                                    : "Solution Positioning"
                                             }
                                             text={
                                                 isEn
-                                                    ? "Present your technology, expertise and solutions to relevant industry audiences."
-                                                    : "Tampilkan teknologi, keahlian, dan solusi kepada audiens industri yang relevan."
+                                                    ? "Showcase your technology, expertise, products and services in the context of real industry needs."
+                                                    : "Menampilkan teknologi, keahlian, produk, dan layanan Anda dalam konteks kebutuhan nyata industri."
+                                            }
+                                        />
+
+                                        <SidePoint
+                                            title={
+                                                isEn
+                                                    ? "Industry Connectivity"
+                                                    : "Konektivitas Industri"
+                                            }
+                                            text={
+                                                isEn
+                                                    ? "Connect with manufacturers, buyers, suppliers, decision makers and other relevant ecosystem participants."
+                                                    : "Terhubung dengan manufacturer, buyer, supplier, decision maker, dan peserta ekosistem lainnya yang relevan."
                                             }
                                         />
 
@@ -689,8 +732,8 @@ export default function Create() {
                                             }
                                             text={
                                                 isEn
-                                                    ? "Explore opportunities for collaboration, matching and market development."
-                                                    : "Eksplorasi peluang kolaborasi, matching, dan pengembangan pasar."
+                                                    ? "Explore collaboration, sourcing, market development and other relevant business opportunities."
+                                                    : "Mengeksplorasi peluang kolaborasi, sourcing, pengembangan pasar, dan peluang bisnis lainnya yang relevan."
                                             }
                                         />
                                     </div>
@@ -709,8 +752,8 @@ export default function Create() {
 
                                     <p className="mt-3 text-sm leading-6 text-slate-400">
                                         {isEn
-                                            ? "You can also contact the DIGESTEX team directly through WhatsApp."
-                                            : "Anda juga dapat menghubungi tim DIGESTEX secara langsung melalui WhatsApp."}
+                                            ? "You can also speak directly with the DIGESTEX team to explore the most relevant partnership opportunity for your company."
+                                            : "Anda juga dapat berdiskusi langsung dengan tim DIGESTEX untuk mengeksplorasi bentuk kemitraan yang paling relevan bagi perusahaan Anda."}
                                     </p>
 
                                     <a
@@ -722,22 +765,22 @@ export default function Create() {
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="
-                                            mt-5
-                                            inline-flex
-                                            w-full
-                                            items-center
-                                            justify-center
-                                            gap-2
-                                            rounded-2xl
-                                            bg-emerald-500
-                                            px-5
-                                            py-3.5
-                                            text-sm
-                                            font-black
-                                            text-white
-                                            transition
-                                            hover:bg-emerald-400
-                                        "
+                    mt-5
+                    inline-flex
+                    w-full
+                    items-center
+                    justify-center
+                    gap-2
+                    rounded-2xl
+                    bg-emerald-500
+                    px-5
+                    py-3.5
+                    text-sm
+                    font-black
+                    text-white
+                    transition
+                    hover:bg-emerald-400
+                "
                                     >
                                         <Phone className="h-4 w-4" />
 
@@ -750,23 +793,23 @@ export default function Create() {
                                 <Link
                                     href={route("program.digital-directory")}
                                     className="
-                                        inline-flex
-                                        w-full
-                                        items-center
-                                        justify-center
-                                        gap-2
-                                        rounded-2xl
-                                        border
-                                        border-slate-200
-                                        bg-white
-                                        px-5
-                                        py-3.5
-                                        text-sm
-                                        font-bold
-                                        text-slate-700
-                                        transition
-                                        hover:bg-slate-100
-                                    "
+                inline-flex
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-2xl
+                border
+                border-slate-200
+                bg-white
+                px-5
+                py-3.5
+                text-sm
+                font-bold
+                text-slate-700
+                transition
+                hover:bg-slate-100
+            "
                                 >
                                     <ArrowLeft className="h-4 w-4" />
 

@@ -6,138 +6,82 @@ namespace App\Services\Trade;
 
 use App\Models\GarmentConversionEvidence;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class GarmentConversionFactorCalculationService
 {
+    private const METHODOLOGY = 'KG_PER_PCS';
+
+    private const VALIDATED = 'VALIDATED';
+
     /**
-     * Calculate a candidate garment conversion factor from
-     * VALIDATED database evidence.
+     * Canonical calculation:
      *
-     * CANONICAL METHODOLOGY:
-     *
-     * KG_PER_PCS
-     *
-     * Meaning:
-     *
-     *     1 PCS garment = X KG
-     *
-     * Example:
-     *
-     *     KG_PER_PCS = 0.193333
-     *
-     * This factor is later used to convert official trade
-     * quantity reported in KG into estimated garment quantity
-     * in PCS:
+     *     KG_PER_PCS = average KG per garment PCS
      *
      *     PCS = KG / KG_PER_PCS
      *
-     * IMPORTANT:
-     * - Read-only.
-     * - Does not modify database records.
-     * - Does not approve a factor.
-     * - Does not activate a factor.
-     * - Only VALIDATED evidence is eligible.
-     * - Does not perform KG_TO_PCS conversion itself.
+     * Priority:
+     *
+     * 1. HS-specific validated evidence
+     * 2. Validated subgroup benchmark
+     * 3. Validated group benchmark
+     * 4. Validated universal garment benchmark
+     * 5. No recommendation
+     *
+     * This service is READ-ONLY.
      */
     public function calculate(
         string $hsCode
     ): array {
         $hsCode = trim($hsCode);
 
-        if ($hsCode === '') {
-            throw new InvalidArgumentException(
-                'HS-8 code is required.'
-            );
-        }
+        $this->validateHsCode($hsCode);
 
+        /*
+         * ---------------------------------------------------------------
+         * 1. HS-SPECIFIC VALIDATED EVIDENCE
+         * ---------------------------------------------------------------
+         */
         $evidence = GarmentConversionEvidence::query()
             ->where('hs_code', $hsCode)
-            ->where('validation_status', 'VALIDATED')
+            ->where('validation_status', self::VALIDATED)
+            ->where('methodology', self::METHODOLOGY)
             ->orderBy('id')
             ->get();
 
-        if ($evidence->isEmpty()) {
-            return [
-                'status' => 'NO_VALIDATED_EVIDENCE',
-
-                'hs_code' => $hsCode,
-
-                'candidate_factor' => null,
-
-                'evidence_count' => 0,
-
-                'total_sample_size' => 0,
-
-                'methodology' => null,
-
-                'evidence_type' => null,
-
-                'weight_unit' => null,
-
-                'calculation_method' => null,
-
-                'observed_minimum' => null,
-
-                'observed_maximum' => null,
-
-                'evidence_references' => [],
-
-                'reason' =>
-                    'No VALIDATED evidence is available for this HS-8.',
-            ];
+        if ($evidence->isNotEmpty()) {
+            return $this->calculateValidatedCollection(
+                $hsCode,
+                $evidence
+            );
         }
 
-        return $this->calculateValidatedCollection(
-            $hsCode,
-            $evidence
-        );
+        /*
+         * ---------------------------------------------------------------
+         * 2. GOVERNED FALLBACK
+         * ---------------------------------------------------------------
+         */
+        return $this->calculateFallback($hsCode);
     }
 
     /**
-     * Calculate candidate factor from an explicitly supplied
-     * evidence collection.
+     * Calculate directly from supplied evidence.
      *
-     * Useful for unit testing and controlled calculations
-     * without database persistence.
+     * Kept as the controlled calculation entry point for tests
+     * and evidence workflows.
      */
     public function calculateFromEvidence(
         Collection $evidence
     ): array {
         if ($evidence->isEmpty()) {
-            return [
-                'status' => 'NO_VALIDATED_EVIDENCE',
-
-                'candidate_factor' => null,
-
-                'evidence_count' => 0,
-
-                'total_sample_size' => 0,
-
-                'methodology' => null,
-
-                'evidence_type' => null,
-
-                'weight_unit' => null,
-
-                'calculation_method' => null,
-
-                'observed_minimum' => null,
-
-                'observed_maximum' => null,
-
-                'evidence_references' => [],
-
-                'reason' =>
-                    'No evidence is available for calculation.',
-            ];
+            return $this->noRecommendation(
+                null,
+                'NO_VALIDATED_EVIDENCE',
+                'No evidence is available for calculation.'
+            );
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | HS-8 Consistency
-        |--------------------------------------------------------------------------
-        */
 
         $hsCodes = $evidence
             ->pluck('hs_code')
@@ -148,69 +92,19 @@ class GarmentConversionFactorCalculationService
         if ($hsCodes->count() !== 1) {
             return [
                 'status' => 'REVIEW',
-
                 'candidate_factor' => null,
-
                 'evidence_count' => $evidence->count(),
-
                 'total_sample_size' => 0,
-
                 'methodology' => null,
-
                 'evidence_type' => null,
-
                 'weight_unit' => null,
-
                 'calculation_method' => null,
-
+                'observed_minimum' => null,
+                'observed_maximum' => null,
                 'evidence_references' =>
                     $this->buildEvidenceReferences($evidence),
-
                 'reason' =>
                     'Evidence collection contains multiple HS-8 codes.',
-            ];
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Only VALIDATED Evidence
-        |--------------------------------------------------------------------------
-        */
-
-        $invalidStatuses = $evidence->filter(
-            fn ($item) =>
-                strtoupper(
-                    trim(
-                        (string) $item->validation_status
-                    )
-                ) !== 'VALIDATED'
-        );
-
-        if ($invalidStatuses->isNotEmpty()) {
-            return [
-                'status' => 'REVIEW',
-
-                'hs_code' => (string) $hsCodes->first(),
-
-                'candidate_factor' => null,
-
-                'evidence_count' => $evidence->count(),
-
-                'total_sample_size' => 0,
-
-                'methodology' => null,
-
-                'evidence_type' => null,
-
-                'weight_unit' => null,
-
-                'calculation_method' => null,
-
-                'evidence_references' =>
-                    $this->buildEvidenceReferences($evidence),
-
-                'reason' =>
-                    'Candidate calculation requires VALIDATED evidence only.',
             ];
         }
 
@@ -221,28 +115,277 @@ class GarmentConversionFactorCalculationService
     }
 
     /**
-     * Perform the actual candidate calculation after
-     * all eligibility checks have passed.
+     * Governed fallback hierarchy.
+     *
+     * The factor itself is never invented here.
+     *
+     * The benchmark must already exist as VALIDATED evidence.
+     */
+    protected function calculateFallback(
+        string $hsCode
+    ): array {
+        /*
+         * ---------------------------------------------------------------
+         * Resolve the existing Garment classification.
+         *
+         * The classification already exists in the project and is
+         * represented by product_family / conversion subgroup data.
+         * ---------------------------------------------------------------
+         */
+        $classification = $this->resolveClassification($hsCode);
+
+        /*
+         * ---------------------------------------------------------------
+         * SUBGROUP
+         * ---------------------------------------------------------------
+         */
+        $subgroup = $classification['subgroup'] ?? null;
+
+        if ($subgroup !== null) {
+            $result = $this->calculateFromBenchmark(
+                $hsCode,
+                'SUBGROUP',
+                $subgroup
+            );
+
+            if ($result !== null) {
+                return $result;
+            }
+        }
+
+        /*
+         * ---------------------------------------------------------------
+         * GROUP
+         * ---------------------------------------------------------------
+         */
+        $group = $classification['group'] ?? null;
+
+        if ($group !== null) {
+            $result = $this->calculateFromBenchmark(
+                $hsCode,
+                'GROUP',
+                $group
+            );
+
+            if ($result !== null) {
+                return $result;
+            }
+        }
+
+        /*
+         * ---------------------------------------------------------------
+         * HS UNIVERSAL
+         * ---------------------------------------------------------------
+         *
+         * Universal is the final governed garment benchmark.
+         *
+         * It is not an arbitrary factor copied from another HS.
+         */
+        $result = $this->calculateFromUniversalBenchmark(
+            $hsCode
+        );
+
+        if ($result !== null) {
+            return $result;
+        }
+
+        return $this->noRecommendation(
+            $hsCode,
+            'NO_GOVERNED_BENCHMARK',
+            'No HS-specific evidence and no validated subgroup, group, or universal garment benchmark is available.'
+        );
+    }
+
+    /**
+     * Resolve existing garment classification.
+     *
+     * IMPORTANT:
+     *
+     * This method intentionally does not create a new taxonomy.
+     *
+     * It expects the existing garment classification fields to be
+     * available in the canonical HS master data.
+     */
+    protected function resolveClassification(
+        string $hsCode
+    ): array {
+        $master = DB::table('mst_hscode')
+            ->where('hs_code', $hsCode)
+            ->first();
+
+        if ($master === null) {
+            return [];
+        }
+
+        /*
+         * Prefer explicit conversion subgroup/group fields when they
+         * already exist.
+         */
+        return [
+            'subgroup' =>
+                $this->firstExistingProperty(
+                    $master,
+                    [
+                        'conversion_subgroup',
+                        'conversion_sub_group',
+                        'subgroup',
+                        'sub_group',
+                    ]
+                ),
+
+            'group' =>
+                $this->firstExistingProperty(
+                    $master,
+                    [
+                        'conversion_group',
+                        'group',
+                    ]
+                ),
+
+            'product_family' =>
+                $this->firstExistingProperty(
+                    $master,
+                    [
+                        'product_family',
+                    ]
+                ),
+        ];
+    }
+
+    /**
+     * Calculate from a validated benchmark represented by evidence.
+     *
+     * A benchmark may be represented by multiple validated evidence
+     * records. The same sample-size-weighted calculation is used.
+     */
+    protected function calculateFromBenchmark(
+        string $hsCode,
+        string $scope,
+        string $scopeValue
+    ): ?array {
+        $scopeValue = trim($scopeValue);
+
+        if ($scopeValue === '') {
+            return null;
+        }
+
+        /*
+         * Benchmark evidence is identified by source_reference /
+         * source_type metadata rather than by copying another HS factor.
+         *
+         * This query deliberately uses only VALIDATED evidence.
+         */
+        $evidence = GarmentConversionEvidence::query()
+            ->where('validation_status', self::VALIDATED)
+            ->where('methodology', self::METHODOLOGY)
+            ->where(function ($query) use ($scope, $scopeValue) {
+                $query
+                    ->where(function ($q) use ($scopeValue) {
+                        $q->where(
+                            'source_reference',
+                            'LIKE',
+                            '%SUBGROUP:' . $scopeValue . '%'
+                        );
+                    })
+                    ->orWhere(function ($q) use ($scope, $scopeValue) {
+                        $q->where(
+                            'source_reference',
+                            'LIKE',
+                            '%GROUP:' . $scopeValue . '%'
+                        );
+                    });
+            })
+            ->orderBy('id')
+            ->get();
+
+        if ($evidence->isEmpty()) {
+            return null;
+        }
+
+        $calculated = $this->calculateValidatedCollection(
+            $hsCode,
+            $evidence
+        );
+
+        if (
+            ($calculated['candidate_factor'] ?? null) === null
+        ) {
+            return null;
+        }
+
+        return array_merge(
+            $calculated,
+            [
+                'status' => 'RECOMMENDED',
+                'resolution_scope' => $scope,
+                'resolution_key' => $scopeValue,
+                'reason' =>
+                    sprintf(
+                        'KG_PER_PCS recommendation derived from validated %s benchmark: %s.',
+                        strtolower($scope),
+                        $scopeValue
+                    ),
+            ]
+        );
+    }
+
+    /**
+     * Universal garment benchmark.
+     *
+     * Universal evidence is explicitly identified as:
+     *
+     *     source_reference = HS_UNIVERSAL:...
+     *
+     * Only VALIDATED evidence is eligible.
+     */
+    protected function calculateFromUniversalBenchmark(
+        string $hsCode
+    ): ?array {
+        $evidence = GarmentConversionEvidence::query()
+            ->where('validation_status', self::VALIDATED)
+            ->where('methodology', self::METHODOLOGY)
+            ->where(
+                'source_reference',
+                'LIKE',
+                'HS_UNIVERSAL:%'
+            )
+            ->orderBy('id')
+            ->get();
+
+        if ($evidence->isEmpty()) {
+            return null;
+        }
+
+        $calculated = $this->calculateValidatedCollection(
+            $hsCode,
+            $evidence
+        );
+
+        if (
+            ($calculated['candidate_factor'] ?? null) === null
+        ) {
+            return null;
+        }
+
+        return array_merge(
+            $calculated,
+            [
+                'status' => 'RECOMMENDED',
+                'resolution_scope' => 'HS_UNIVERSAL',
+                'resolution_key' => 'HS_UNIVERSAL',
+                'reason' =>
+                    'KG_PER_PCS recommendation derived from the validated HS Universal garment benchmark.',
+            ]
+        );
+    }
+
+    /**
+     * Existing weighted-average calculation.
      */
     protected function calculateValidatedCollection(
         string $hsCode,
         Collection $evidence
     ): array {
-        /*
-        |--------------------------------------------------------------------------
-        | Methodology Consistency
-        |--------------------------------------------------------------------------
-        |
-        | Canonical methodology:
-        |
-        |     KG_PER_PCS
-        |
-        | Meaning:
-        |
-        |     average KG per garment PCS
-        |
-        */
-
         $methodologies = $evidence
             ->pluck('methodology')
             ->filter()
@@ -253,77 +396,16 @@ class GarmentConversionFactorCalculationService
             ->unique()
             ->values();
 
-        if ($methodologies->count() !== 1) {
-            return [
-                'status' => 'REVIEW',
-
-                'hs_code' => $hsCode,
-
-                'candidate_factor' => null,
-
-                'evidence_count' => $evidence->count(),
-
-                'total_sample_size' =>
-                    $this->totalSampleSize($evidence),
-
-                'methodology' => $methodologies->all(),
-
-                'evidence_type' => null,
-
-                'weight_unit' => null,
-
-                'calculation_method' => null,
-
-                'evidence_references' =>
-                    $this->buildEvidenceReferences($evidence),
-
-                'reason' =>
-                    'Validated evidence contains conflicting conversion methodologies.',
-            ];
+        if (
+            $methodologies->count() !== 1
+            || $methodologies->first() !== self::METHODOLOGY
+        ) {
+            return $this->invalidEvidence(
+                $hsCode,
+                $evidence,
+                'Evidence must use KG_PER_PCS methodology.'
+            );
         }
-
-        $methodology = $methodologies->first();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Canonical Methodology Gate
-        |--------------------------------------------------------------------------
-        */
-
-        if ($methodology !== 'KG_PER_PCS') {
-            return [
-                'status' => 'REVIEW',
-
-                'hs_code' => $hsCode,
-
-                'candidate_factor' => null,
-
-                'evidence_count' => $evidence->count(),
-
-                'total_sample_size' =>
-                    $this->totalSampleSize($evidence),
-
-                'methodology' => $methodology,
-
-                'evidence_type' => null,
-
-                'weight_unit' => null,
-
-                'calculation_method' => null,
-
-                'evidence_references' =>
-                    $this->buildEvidenceReferences($evidence),
-
-                'reason' =>
-                    'Only KG_PER_PCS is supported as the canonical garment conversion factor methodology.',
-            ];
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Evidence Type Consistency
-        |--------------------------------------------------------------------------
-        */
 
         $evidenceTypes = $evidence
             ->pluck('evidence_type')
@@ -335,77 +417,17 @@ class GarmentConversionFactorCalculationService
             ->unique()
             ->values();
 
-        if ($evidenceTypes->count() !== 1) {
-            return [
-                'status' => 'REVIEW',
-
-                'hs_code' => $hsCode,
-
-                'candidate_factor' => null,
-
-                'evidence_count' => $evidence->count(),
-
-                'total_sample_size' =>
-                    $this->totalSampleSize($evidence),
-
-                'methodology' => $methodology,
-
-                'evidence_type' => $evidenceTypes->all(),
-
-                'weight_unit' => null,
-
-                'calculation_method' => null,
-
-                'evidence_references' =>
-                    $this->buildEvidenceReferences($evidence),
-
-                'reason' =>
-                    'Validated evidence contains conflicting evidence types.',
-            ];
+        if (
+            $evidenceTypes->count() !== 1
+            || $evidenceTypes->first() !==
+                'AVERAGE_WEIGHT_PER_PIECE'
+        ) {
+            return $this->invalidEvidence(
+                $hsCode,
+                $evidence,
+                'KG_PER_PCS requires AVERAGE_WEIGHT_PER_PIECE evidence.'
+            );
         }
-
-        $evidenceType = $evidenceTypes->first();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Canonical Evidence Type
-        |--------------------------------------------------------------------------
-        */
-
-        if ($evidenceType !== 'AVERAGE_WEIGHT_PER_PIECE') {
-            return [
-                'status' => 'REVIEW',
-
-                'hs_code' => $hsCode,
-
-                'candidate_factor' => null,
-
-                'evidence_count' => $evidence->count(),
-
-                'total_sample_size' =>
-                    $this->totalSampleSize($evidence),
-
-                'methodology' => $methodology,
-
-                'evidence_type' => $evidenceType,
-
-                'weight_unit' => null,
-
-                'calculation_method' => null,
-
-                'evidence_references' =>
-                    $this->buildEvidenceReferences($evidence),
-
-                'reason' =>
-                    'KG_PER_PCS requires AVERAGE_WEIGHT_PER_PIECE evidence.',
-            ];
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Weight Unit Consistency
-        |--------------------------------------------------------------------------
-        */
 
         $weightUnits = $evidence
             ->pluck('weight_unit')
@@ -421,39 +443,12 @@ class GarmentConversionFactorCalculationService
             $weightUnits->count() !== 1
             || $weightUnits->first() !== 'KG'
         ) {
-            return [
-                'status' => 'REVIEW',
-
-                'hs_code' => $hsCode,
-
-                'candidate_factor' => null,
-
-                'evidence_count' => $evidence->count(),
-
-                'total_sample_size' =>
-                    $this->totalSampleSize($evidence),
-
-                'methodology' => $methodology,
-
-                'evidence_type' => $evidenceType,
-
-                'weight_unit' => $weightUnits->all(),
-
-                'calculation_method' => null,
-
-                'evidence_references' =>
-                    $this->buildEvidenceReferences($evidence),
-
-                'reason' =>
-                    'KG_PER_PCS evidence must use one consistent weight unit: KG.',
-            ];
+            return $this->invalidEvidence(
+                $hsCode,
+                $evidence,
+                'KG_PER_PCS evidence must use KG.'
+            );
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Quantitative Validation
-        |--------------------------------------------------------------------------
-        */
 
         foreach ($evidence as $item) {
             if (
@@ -463,7 +458,7 @@ class GarmentConversionFactorCalculationService
                 return $this->invalidEvidence(
                     $hsCode,
                     $evidence,
-                    'Validated evidence contains an invalid sample size.'
+                    'Evidence contains an invalid sample size.'
                 );
             }
 
@@ -475,30 +470,10 @@ class GarmentConversionFactorCalculationService
                 return $this->invalidEvidence(
                     $hsCode,
                     $evidence,
-                    'Validated evidence contains an invalid average weight.'
+                    'Evidence contains an invalid average weight.'
                 );
             }
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Sample-Size Weighted Average
-        |--------------------------------------------------------------------------
-        |
-        | Example:
-        |
-        | Evidence A:
-        |   10 samples × 0.180 KG
-        |
-        | Evidence B:
-        |   20 samples × 0.200 KG
-        |
-        | Result:
-        |
-        |   (10 × 0.180 + 20 × 0.200) / 30
-        |   = 0.193333 KG_PER_PCS
-        |
-        */
 
         $totalSampleSize =
             $this->totalSampleSize($evidence);
@@ -521,12 +496,6 @@ class GarmentConversionFactorCalculationService
             $weightedWeightTotal
             / $totalSampleSize;
 
-        /*
-        |--------------------------------------------------------------------------
-        | Observed Range
-        |--------------------------------------------------------------------------
-        */
-
         $observedMinimum = $evidence->min(
             fn ($item) =>
                 (float) $item->average_weight
@@ -537,31 +506,10 @@ class GarmentConversionFactorCalculationService
                 (float) $item->average_weight
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Candidate Result
-        |--------------------------------------------------------------------------
-        */
-
         return [
             'status' => 'CANDIDATE',
 
             'hs_code' => $hsCode,
-
-            /*
-            |--------------------------------------------------------------------------
-            | Canonical Factor
-            |--------------------------------------------------------------------------
-            |
-            | Unit:
-            |
-            |     KG_PER_PCS
-            |
-            | Meaning:
-            |
-            |     KG per one garment PCS
-            |
-            */
 
             'candidate_factor' =>
                 round($candidateFactor, 6),
@@ -573,10 +521,10 @@ class GarmentConversionFactorCalculationService
                 $totalSampleSize,
 
             'methodology' =>
-                'KG_PER_PCS',
+                self::METHODOLOGY,
 
             'evidence_type' =>
-                $evidenceType,
+                $evidenceTypes->first(),
 
             'weight_unit' =>
                 'KG',
@@ -590,25 +538,46 @@ class GarmentConversionFactorCalculationService
             'observed_maximum' =>
                 round((float) $observedMaximum, 6),
 
-            /*
-            |--------------------------------------------------------------------------
-            | Traceability
-            |--------------------------------------------------------------------------
-            */
-
             'evidence_references' =>
                 $this->buildEvidenceReferences($evidence),
 
             'reason' =>
-                'Candidate KG_PER_PCS factor calculated from VALIDATED evidence using sample-size-weighted average. Factor is not approved.',
+                'Candidate KG_PER_PCS factor calculated using validated sample-size-weighted evidence.',
         ];
     }
 
-    /**
-     * Build auditable evidence references.
-     *
-     * Works both with persisted and unsaved model instances.
-     */
+    protected function firstExistingProperty(
+        object $object,
+        array $properties
+    ): ?string {
+        foreach ($properties as $property) {
+            if (
+                isset($object->{$property})
+                && trim((string) $object->{$property}) !== ''
+            ) {
+                return trim((string) $object->{$property});
+            }
+        }
+
+        return null;
+    }
+
+    protected function validateHsCode(
+        string $hsCode
+    ): void {
+        if ($hsCode === '') {
+            throw new InvalidArgumentException(
+                'HS-8 code is required.'
+            );
+        }
+
+        if (!preg_match('/^\d{8}$/', $hsCode)) {
+            throw new InvalidArgumentException(
+                'A valid HS-8 code is required.'
+            );
+        }
+    }
+
     protected function buildEvidenceReferences(
         Collection $evidence
     ): array {
@@ -638,10 +607,10 @@ class GarmentConversionFactorCalculationService
                             ),
 
                         'sample_size' =>
-                            $item->sample_size,
+                            (int) $item->sample_size,
 
                         'average_weight' =>
-                            $item->average_weight,
+                            (float) $item->average_weight,
 
                         'weight_unit' =>
                             strtoupper(
@@ -668,9 +637,6 @@ class GarmentConversionFactorCalculationService
             ->all();
     }
 
-    /**
-     * Calculate total sample size.
-     */
     protected function totalSampleSize(
         Collection $evidence
     ): int {
@@ -680,9 +646,6 @@ class GarmentConversionFactorCalculationService
         );
     }
 
-    /**
-     * Invalid evidence helper.
-     */
     protected function invalidEvidence(
         string $hsCode,
         Collection $evidence,
@@ -690,28 +653,42 @@ class GarmentConversionFactorCalculationService
     ): array {
         return [
             'status' => 'REVIEW',
-
             'hs_code' => $hsCode,
-
             'candidate_factor' => null,
-
             'evidence_count' =>
                 $evidence->count(),
-
             'total_sample_size' =>
                 $this->totalSampleSize($evidence),
-
-            'methodology' => null,
-
+            'methodology' => self::METHODOLOGY,
             'evidence_type' => null,
-
-            'weight_unit' => null,
-
+            'weight_unit' => 'KG',
             'calculation_method' => null,
-
+            'observed_minimum' => null,
+            'observed_maximum' => null,
             'evidence_references' =>
                 $this->buildEvidenceReferences($evidence),
+            'reason' => $reason,
+        ];
+    }
 
+    protected function noRecommendation(
+        ?string $hsCode,
+        string $code,
+        string $reason
+    ): array {
+        return [
+            'status' => 'NO_RECOMMENDATION',
+            'hs_code' => $hsCode,
+            'candidate_factor' => null,
+            'evidence_count' => 0,
+            'total_sample_size' => 0,
+            'methodology' => self::METHODOLOGY,
+            'evidence_type' => null,
+            'weight_unit' => 'KG',
+            'calculation_method' => $code,
+            'observed_minimum' => null,
+            'observed_maximum' => null,
+            'evidence_references' => [],
             'reason' => $reason,
         ];
     }

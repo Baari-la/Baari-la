@@ -10,6 +10,8 @@ import {
     Check,
     ChevronRight,
     Globe2,
+    Zap,
+    Network,
     Handshake,
     Lightbulb,
     Megaphone,
@@ -32,101 +34,113 @@ export default function Index() {
     const categories = isEn
         ? [
               {
-                  title: "Testing & Certification",
+                  title: "Testing, Certification & Compliance",
                   description:
-                      "Testing, certification, compliance, sustainability and laboratory solutions.",
+                      "Testing laboratories, certification bodies, compliance, sustainability, quality assurance and technical verification services.",
                   icon: FlaskConical,
               },
               {
-                  title: "Technology Solutions",
+                  title: "Technology & Digital Transformation",
                   description:
-                      "Digital transformation, PLM, software, automation and advanced technology solutions.",
+                      "AI, software, ERP, PLM, automation, digital transformation, digital printing and technologies shaping the future of textile manufacturing.",
                   icon: Lightbulb,
               },
               {
-                  title: "Industrial Machinery",
+                  title: "Industrial Machinery & Manufacturing",
                   description:
-                      "Machinery, production equipment, automation and manufacturing technologies.",
+                      "Spinning, weaving, knitting, dyeing, finishing, garment, printing, automation and other manufacturing technologies.",
                   icon: Factory,
               },
               {
-                  title: "Raw Materials",
+                  title: "Raw Materials & Textile Inputs",
                   description:
-                      "Fibers, yarns, chemicals, materials and other industrial inputs.",
+                      "Fibers, yarns, fabrics, dyes, chemicals, auxiliaries and other materials supporting the textile value chain.",
                   icon: Sparkles,
+              },
+              {
+                  title: "Energy, Utilities & Sustainability",
+                  description:
+                      "Energy, water, waste management, renewable solutions, resource efficiency and technologies supporting sustainable manufacturing.",
+                  icon: Zap,
               },
               {
                   title: "Logistics & Supply Chain",
                   description:
-                      "Logistics, warehousing, freight and supply chain solutions.",
+                      "Freight, warehousing, logistics, customs, supply chain management and trade facilitation solutions.",
                   icon: Truck,
               },
               {
-                  title: "Trade Finance",
+                  title: "Trade Finance & Insurance",
                   description:
-                      "Financial services, trade finance and business transaction solutions.",
+                      "Trade finance, banking, insurance, payment solutions and financial services supporting international business.",
                   icon: WalletCards,
               },
               {
-                  title: "Exhibitions & Events",
+                  title: "Exhibitions, Events & Industry Platforms",
                   description:
-                      "Industry exhibitions, conferences, seminars and business events.",
+                      "Trade fairs, exhibitions, conferences, seminars, industry events and platforms that connect the textile business community.",
                   icon: CalendarDays,
               },
               {
-                  title: "Research & Education",
+                  title: "Research, Education & Knowledge",
                   description:
-                      "Research institutions, education, training and industry knowledge.",
+                      "Universities, research institutions, training organizations, industry experts and knowledge providers.",
                   icon: GraduationCap,
               },
           ]
         : [
               {
-                  title: "Testing & Certification",
+                  title: "Testing, Certification & Compliance",
                   description:
-                      "Testing, sertifikasi, compliance, sustainability dan solusi laboratorium.",
+                      "Laboratorium testing, lembaga sertifikasi, compliance, sustainability, quality assurance, dan layanan verifikasi teknis.",
                   icon: FlaskConical,
               },
               {
-                  title: "Technology Solutions",
+                  title: "Technology & Digital Transformation",
                   description:
-                      "Transformasi digital, PLM, software, automation dan solusi teknologi.",
+                      "AI, software, ERP, PLM, automation, transformasi digital, digital printing, dan teknologi masa depan industri tekstil.",
                   icon: Lightbulb,
               },
               {
-                  title: "Industrial Machinery",
+                  title: "Industrial Machinery & Manufacturing",
                   description:
-                      "Mesin, peralatan produksi, automation dan teknologi manufaktur.",
+                      "Teknologi spinning, weaving, knitting, dyeing, finishing, garment, printing, automation, dan teknologi manufaktur lainnya.",
                   icon: Factory,
               },
               {
-                  title: "Raw Materials",
+                  title: "Raw Materials & Textile Inputs",
                   description:
-                      "Serat, benang, bahan kimia, material dan input industri lainnya.",
+                      "Serat, benang, kain, dyes, chemicals, auxiliaries, dan berbagai material pendukung rantai nilai tekstil.",
                   icon: Sparkles,
+              },
+              {
+                  title: "Energy, Utilities & Sustainability",
+                  description:
+                      "Energi, water, waste management, renewable solutions, efisiensi sumber daya, dan teknologi manufaktur berkelanjutan.",
+                  icon: Zap,
               },
               {
                   title: "Logistics & Supply Chain",
                   description:
-                      "Logistik, pergudangan, freight dan solusi supply chain.",
+                      "Freight, pergudangan, logistik, customs, supply chain management, dan solusi fasilitasi perdagangan.",
                   icon: Truck,
               },
               {
-                  title: "Trade Finance",
+                  title: "Trade Finance & Insurance",
                   description:
-                      "Layanan keuangan, trade finance dan solusi transaksi bisnis.",
+                      "Trade finance, banking, insurance, payment solutions, dan layanan keuangan yang mendukung bisnis internasional.",
                   icon: WalletCards,
               },
               {
-                  title: "Exhibitions & Events",
+                  title: "Exhibitions, Events & Industry Platforms",
                   description:
-                      "Pameran industri, konferensi, seminar dan business events.",
+                      "Pameran dagang, exhibitions, konferensi, seminar, industry events, dan platform yang menghubungkan komunitas bisnis tekstil.",
                   icon: CalendarDays,
               },
               {
-                  title: "Research & Education",
+                  title: "Research, Education & Knowledge",
                   description:
-                      "Lembaga riset, pendidikan, training dan industry knowledge.",
+                      "Universitas, lembaga riset, organisasi training, industry experts, dan knowledge providers.",
                   icon: GraduationCap,
               },
           ];
@@ -137,25 +151,25 @@ export default function Index() {
                   icon: Megaphone,
                   title: "Industry Visibility",
                   description:
-                      "Increase visibility across the Indonesia and global textile industry ecosystem.",
+                      "Increase your visibility across a connected textile industry ecosystem and become easier for relevant companies and decision makers to discover.",
               },
               {
                   icon: Lightbulb,
                   title: "Thought Leadership",
                   description:
-                      "Share expertise, innovation, technology and industry knowledge with decision makers.",
+                      "Share your expertise, technology, innovation, and industry knowledge with companies and decision makers facing real industry challenges.",
               },
               {
                   icon: Handshake,
                   title: "Business Opportunities",
                   description:
-                      "Connect with manufacturers, buyers, suppliers and strategic industry stakeholders.",
+                      "Create opportunities to connect your solutions with manufacturers, buyers, suppliers, brands, and other relevant industry stakeholders.",
               },
               {
                   icon: Target,
                   title: "Strategic Positioning",
                   description:
-                      "Position your organization as a relevant solution provider within the textile ecosystem.",
+                      "Establish your organization as a relevant solution provider within the broader textile industry ecosystem, not simply as a standalone vendor.",
               },
           ]
         : [
@@ -163,84 +177,123 @@ export default function Index() {
                   icon: Megaphone,
                   title: "Industry Visibility",
                   description:
-                      "Meningkatkan visibilitas di dalam ekosistem industri tekstil Indonesia dan global.",
+                      "Meningkatkan visibilitas perusahaan dalam ekosistem industri tekstil yang terhubung dan membuat solusi Anda lebih mudah ditemukan oleh perusahaan serta decision maker yang relevan.",
               },
               {
                   icon: Lightbulb,
                   title: "Thought Leadership",
                   description:
-                      "Membagikan expertise, inovasi, teknologi dan pengetahuan industri kepada decision makers.",
+                      "Membagikan keahlian, teknologi, inovasi, dan pengetahuan industri kepada perusahaan serta decision maker yang menghadapi kebutuhan nyata industri.",
               },
               {
                   icon: Handshake,
                   title: "Business Opportunities",
                   description:
-                      "Terhubung dengan manufacturer, buyer, supplier dan stakeholder industri strategis.",
+                      "Membuka peluang untuk menghubungkan solusi perusahaan dengan manufacturer, buyer, supplier, brand, dan stakeholder industri lainnya yang relevan.",
               },
               {
                   icon: Target,
                   title: "Strategic Positioning",
                   description:
-                      "Memposisikan organisasi sebagai solution provider yang relevan dalam ekosistem tekstil.",
+                      "Membangun posisi perusahaan sebagai solution provider yang relevan dalam ekosistem industri tekstil, bukan sekadar sebagai vendor yang berdiri sendiri.",
+              },
+              {
+                  icon: BarChart3,
+                  title: "Industry Intelligence",
+                  description:
+                      "Memperkuat posisi organisasi dalam ekosistem industri yang semakin didorong oleh structured industry data, market intelligence, dan digital discovery.",
+              },
+              {
+                  icon: Network,
+                  title: "Ecosystem Influence",
+                  description:
+                      "Berpartisipasi dalam pengembangan platform industri terhubung yang dirancang untuk mempertemukan kapabilitas, solusi, dan peluang bisnis.",
               },
           ];
 
     const partnerFeatures = isEn
         ? [
               "Strategic Solution Partner positioning",
-              "Dedicated Solution Profile",
-              "Industry Solutions Directory placement",
+              "Dedicated Solution / Company Profile",
+              "Industry Solutions Directory presence",
               "Enhanced ecosystem visibility",
               "Thought Leadership opportunities",
-              "Partner Insights publication",
+              "Partner Insights & Industry Content",
+              "Technology & Solution Showcase",
               "Industry campaign opportunities",
-              "Strategic business introductions",
-              "Ecosystem engagement opportunities",
-              "Priority consideration for relevant DIGESTEX initiatives",
+              "Business connectivity opportunities",
+              "Strategic introductions where relevant",
+              "Participation in selected DIGESTEX initiatives",
+              "Long-term ecosystem partnership opportunities",
           ]
         : [
               "Positioning sebagai Strategic Solution Partner",
-              "Dedicated Solution Profile",
-              "Placement di Industry Solutions Directory",
+              "Dedicated Solution / Company Profile",
+              "Kehadiran dalam Industry Solutions Directory",
               "Enhanced ecosystem visibility",
               "Kesempatan Thought Leadership",
-              "Publikasi Partner Insights",
+              "Partner Insights & Industry Content",
+              "Technology & Solution Showcase",
               "Kesempatan industry campaign",
-              "Strategic business introductions",
-              "Kesempatan ecosystem engagement",
-              "Prioritas untuk inisiatif DIGESTEX yang relevan",
+              "Peluang business connectivity",
+              "Strategic introductions apabila relevan",
+              "Partisipasi dalam inisiatif DIGESTEX tertentu",
+              "Peluang kemitraan ekosistem jangka panjang",
           ];
 
     const solutionExamples = isEn
         ? [
               {
                   title: "Technology & Digital Transformation",
-                  text: "Digital printing, PLM, ERP, automation, AI and other technologies that improve industry performance.",
+                  text: "AI, ERP, PLM, automation, digital printing, software and other technologies helping textile companies become more productive, connected and digitally ready.",
               },
               {
                   title: "Testing, Certification & Compliance",
-                  text: "Testing laboratories, certification, sustainability, quality assurance and compliance solutions.",
+                  text: "Testing laboratories, certification bodies, sustainability, quality assurance and compliance solutions supporting trusted international business.",
               },
               {
                   title: "Machinery & Manufacturing Solutions",
-                  text: "Production machinery, equipment, automation and manufacturing technologies.",
+                  text: "Spinning, weaving, knitting, dyeing, finishing, garment, printing, automation and other technologies improving manufacturing performance.",
+              },
+              {
+                  title: "Energy, Sustainability & Circularity",
+                  text: "Energy efficiency, renewable energy, water, waste, recycling, circularity and sustainability solutions for the future textile industry.",
+              },
+              {
+                  title: "Logistics, Trade & Finance",
+                  text: "Logistics, supply chain, trade finance, insurance and other services enabling more efficient international textile business.",
+              },
+              {
+                  title: "Industry Knowledge & Market Development",
+                  text: "Research, education, exhibitions, events, consulting and knowledge platforms that strengthen industry capability and market connectivity.",
               },
           ]
         : [
               {
                   title: "Technology & Digital Transformation",
-                  text: "Digital printing, PLM, ERP, automation, AI dan teknologi lainnya yang meningkatkan kinerja industri.",
+                  text: "AI, ERP, PLM, automation, digital printing, software, dan teknologi lainnya yang membantu perusahaan tekstil menjadi lebih produktif, terhubung, dan siap menghadapi era digital.",
               },
               {
                   title: "Testing, Certification & Compliance",
-                  text: "Laboratorium testing, certification, sustainability, quality assurance dan compliance.",
+                  text: "Laboratorium testing, lembaga sertifikasi, sustainability, quality assurance, dan compliance yang mendukung bisnis internasional yang terpercaya.",
               },
               {
                   title: "Machinery & Manufacturing Solutions",
-                  text: "Mesin produksi, equipment, automation dan teknologi manufaktur.",
+                  text: "Spinning, weaving, knitting, dyeing, finishing, garment, printing, automation, dan teknologi lainnya yang meningkatkan kinerja manufaktur.",
+              },
+              {
+                  title: "Energy, Sustainability & Circularity",
+                  text: "Energy efficiency, renewable energy, water, waste, recycling, circularity, dan sustainability solutions untuk masa depan industri tekstil.",
+              },
+              {
+                  title: "Logistics, Trade & Finance",
+                  text: "Logistik, supply chain, trade finance, insurance, dan layanan lainnya yang mendukung bisnis tekstil internasional secara lebih efisien.",
+              },
+              {
+                  title: "Industry Knowledge & Market Development",
+                  text: "Riset, pendidikan, exhibition, event, consulting, dan knowledge platform yang memperkuat kapabilitas industri dan konektivitas pasar.",
               },
           ];
-
     return (
         <>
             <Head
@@ -272,14 +325,14 @@ export default function Index() {
 
                                 <h1 className="mt-8 text-5xl font-black uppercase leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl">
                                     {isEn
-                                        ? "PUT YOUR SOLUTION IN FRONT OF THE TEXTILE INDUSTRY"
-                                        : "HADIRKAN SOLUSI ANDA DI DEPAN INDUSTRI TEKSTIL"}
+                                        ? "POSITION YOUR SOLUTION IN THE TEXTILE INDUSTRY ECOSYSTEM"
+                                        : "POSISIKAN SOLUSI ANDA DALAM EKOSISTEM INDUSTRI TEKSTIL"}
                                 </h1>
 
                                 <p className="mt-8 max-w-3xl text-lg leading-8 text-slate-300 lg:text-xl">
                                     {isEn
-                                        ? "Become a DIGESTEX Solution Partner and position your technology, expertise and solutions within a connected, one-stop textile industry ecosystem — from upstream to downstream."
-                                        : "Jadilah Mitra soluasi dan posisikan teknologi, expertise dan solusi perusahaan Anda di dalam ekosistem industri tekstil yang terhubung dan menjadi one-stop ecosystem — dari hulu sampai hilir."}
+                                        ? "Become a DIGESTEX Strategic Solution Partner and position your technology, expertise and solutions within a connected, one-stop textile industry ecosystem — connecting the industry from upstream to downstream."
+                                        : "Jadilah Strategic Solution Partner DIGESTEX dan posisikan teknologi, expertise, serta solusi perusahaan Anda dalam one-stop ecosystem industri tekstil yang terhubung — menghubungkan industri dari hulu hingga hilir."}
                                 </p>
 
                                 <div className="mt-10 flex flex-wrap gap-4">
@@ -333,28 +386,28 @@ export default function Index() {
                     </section>
 
                     {/* =====================================================
-                        EXAMPLES
-                    ===================================================== */}
+    EXAMPLES
+===================================================== */}
 
                     <section className="border-b border-white/5 py-20 lg:py-24">
                         <div className="mx-auto max-w-7xl px-6">
-                            <div className="mb-12 max-w-3xl">
+                            <div className="mb-12 max-w-4xl">
                                 <span className="text-xs font-black uppercase tracking-[0.3em] text-amber-400">
                                     {isEn
                                         ? "SOLUTION ECOSYSTEM"
-                                        : "SOLUTION ECOSYSTEM"}
+                                        : "EKOSISTEM SOLUSI"}
                                 </span>
 
                                 <h2 className="mt-4 text-4xl font-black uppercase tracking-tight">
                                     {isEn
-                                        ? "Bring Solutions To The Industry"
-                                        : "Membawa Solusi Untuk Industri"}
+                                        ? "Connect Your Solution With Industry Needs"
+                                        : "Hubungkan Solusi Anda Dengan Kebutuhan Industri"}
                                 </h2>
 
-                                <p className="mt-5 text-slate-400">
+                                <p className="mt-5 text-lg leading-8 text-slate-400">
                                     {isEn
-                                        ? "DIGESTEX provides a platform for solution providers to communicate how their technologies and services solve real industry challenges."
-                                        : "DIGESTEX menyediakan platform bagi solution provider untuk menjelaskan bagaimana teknologi dan layanan mereka menjawab kebutuhan nyata industri."}
+                                        ? "DIGESTEX connects relevant technologies, expertise, services, and industrial solutions with companies and decision makers across the textile value chain — from raw materials and manufacturing to trade, sustainability, digital transformation, and supporting industries."
+                                        : "DIGESTEX menghubungkan teknologi, expertise, layanan, dan solusi industri yang relevan dengan perusahaan serta decision maker di seluruh rantai nilai industri tekstil — mulai dari bahan baku dan manufaktur hingga perdagangan, sustainability, transformasi digital, dan supporting industries."}
                                 </p>
                             </div>
 
@@ -394,13 +447,13 @@ export default function Index() {
                                 <span className="text-xs font-black uppercase tracking-[0.3em] text-amber-400">
                                     {isEn
                                         ? "STRATEGIC PARTNER VALUE"
-                                        : "NILAI STRATEGIC PARTNER"}
+                                        : "NILAI KEMITRAAN STRATEGIS"}
                                 </span>
 
                                 <h2 className="mt-4 text-4xl font-black uppercase tracking-tight sm:text-5xl">
                                     {isEn
-                                        ? "Grow With The Ecosystem"
-                                        : "Tumbuh Bersama Ekosistem"}
+                                        ? "Become Part of the One-Stop Textile Industry Ecosystem"
+                                        : "Menjadi Bagian dari One-Stop Ecosystem Industri Tekstil"}
                                 </h2>
                             </div>
 
@@ -444,9 +497,15 @@ export default function Index() {
 
                                 <h2 className="mt-4 text-4xl font-black uppercase tracking-tight sm:text-5xl">
                                     {isEn
-                                        ? "Where Your Solution Fits"
-                                        : "Tempat Solusi Anda Berada"}
+                                        ? "Where Your Expertise Connects With The Industry"
+                                        : "Di Mana Keahlian Anda Terhubung Dengan Industri"}
                                 </h2>
+
+                                <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-slate-400">
+                                    {isEn
+                                        ? "DIGESTEX welcomes solution providers across the textile value chain and supporting industries — creating a connected environment where expertise, technology, services, and industry needs can meet."
+                                        : "DIGESTEX membuka ruang bagi solution provider di seluruh rantai nilai industri tekstil dan supporting industries — menciptakan lingkungan yang terhubung tempat keahlian, teknologi, layanan, dan kebutuhan industri dapat dipertemukan."}
+                                </p>
                             </div>
 
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -490,14 +549,20 @@ export default function Index() {
 
                                     <h2 className="mt-4 text-4xl font-black uppercase tracking-tight sm:text-5xl">
                                         {isEn
-                                            ? "YOUR SOLUTION. FULLY EXPLAINED"
-                                            : "Tampilkan Lebih Dari Sekadar Perusahaan"}
+                                            ? "Turn Your Expertise Into Industry Value"
+                                            : "Ubah Keahlian Anda Menjadi Nilai Bagi Industri"}
                                     </h2>
 
                                     <p className="mt-6 leading-8 text-slate-400">
                                         {isEn
-                                            ? "A DIGESTEX Solution Partner profile goes beyond company information. Your solution can explain the industry challenge, technology, applications, technical specifications, key benefits and business value — helping decision makers understand your solution before making contact"
-                                            : "Profil DIGESTEX Solution Partner tidak berhenti pada informasi perusahaan. Solusi Anda dapat menjelaskan industry challenge, technology, applications, technical specifications, key benefits dan business value — membantu decision makers memahami solusi Anda sebelum melakukan kontak"}
+                                            ? "A DIGESTEX Strategic Solution Partner profile goes beyond presenting your company. It gives your technology, expertise, services, and solutions a structured place within the textile industry ecosystem — helping decision makers understand what you solve, how you solve it, and where your solution creates value."
+                                            : "Profil DIGESTEX Strategic Solution Partner tidak hanya menampilkan perusahaan Anda. Profil ini memberikan ruang terstruktur bagi teknologi, keahlian, layanan, dan solusi Anda di dalam ekosistem industri tekstil — membantu decision maker memahami kebutuhan yang Anda jawab, bagaimana solusi Anda bekerja, dan di mana solusi tersebut menciptakan nilai."}
+                                    </p>
+
+                                    <p className="mt-5 leading-8 text-slate-400">
+                                        {isEn
+                                            ? "From testing and certification to machinery, digital transformation, logistics, finance, sustainability, and other supporting industries, DIGESTEX connects relevant solutions with the companies and industry needs they are designed to serve."
+                                            : "Mulai dari testing dan certification hingga machinery, transformasi digital, logistik, finance, sustainability, dan berbagai supporting industries lainnya, DIGESTEX menghubungkan solusi yang relevan dengan perusahaan serta kebutuhan industri yang ingin dilayani."}
                                     </p>
                                 </div>
 
@@ -506,8 +571,8 @@ export default function Index() {
                                         number="01"
                                         title={
                                             isEn
-                                                ? "Industry Challenge"
-                                                : "Industry Challenge"
+                                                ? "Industry Need"
+                                                : "Kebutuhan Industri"
                                         }
                                     />
 
@@ -515,8 +580,8 @@ export default function Index() {
                                         number="02"
                                         title={
                                             isEn
-                                                ? "Your Solution"
-                                                : "Solusi Anda"
+                                                ? "Your Expertise & Solution"
+                                                : "Keahlian & Solusi Anda"
                                         }
                                     />
 
@@ -524,8 +589,8 @@ export default function Index() {
                                         number="03"
                                         title={
                                             isEn
-                                                ? "Business Value"
-                                                : "Business Value"
+                                                ? "Business & Industry Value"
+                                                : "Nilai Bisnis & Industri"
                                         }
                                     />
 
@@ -533,8 +598,8 @@ export default function Index() {
                                         number="04"
                                         title={
                                             isEn
-                                                ? "Industry Connection"
-                                                : "Industry Connection"
+                                                ? "Connection With The Ecosystem"
+                                                : "Koneksi Dengan Ekosistem"
                                         }
                                         last
                                     />
@@ -559,18 +624,20 @@ export default function Index() {
                                                 <ShieldCheck className="h-4 w-4" />
 
                                                 {isEn
-                                                    ? "STRATEGIC PARTNERSHIP"
-                                                    : "STRATEGIC PARTNERSHIP"}
+                                                    ? "STRATEGIC SOLUTION PARTNER"
+                                                    : "STRATEGIC SOLUTION PARTNER"}
                                             </span>
 
                                             <h2 className="mt-6 text-3xl font-black uppercase sm:text-4xl">
-                                                Strategic Solution Partner
+                                                {isEn
+                                                    ? "Become Part of the Connected Textile Industry Ecosystem"
+                                                    : "Menjadi Bagian dari Ekosistem Industri Tekstil yang Terhubung"}
                                             </h2>
 
-                                            <p className="mt-4 max-w-2xl text-slate-400">
+                                            <p className="mt-4 max-w-2xl text-lg leading-7 text-slate-400">
                                                 {isEn
-                                                    ? "Designed for established corporations, global technology companies and strategic solution providers."
-                                                    : "Dirancang untuk corporate besar, perusahaan teknologi global dan strategic solution provider."}
+                                                    ? "Designed for established corporations, technology companies, solution providers and industry companies whose expertise can create value across the textile value chain."
+                                                    : "Dirancang untuk perusahaan besar, perusahaan teknologi, solution provider, dan perusahaan industri yang keahliannya dapat menciptakan nilai di seluruh rantai nilai industri tekstil."}{" "}
                                             </p>
                                         </div>
 
@@ -578,7 +645,7 @@ export default function Index() {
                                             <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
                                                 {isEn
                                                     ? "ANNUAL PARTNERSHIP"
-                                                    : "PARTNERSHIP TAHUNAN"}
+                                                    : "KEMITRAAN TAHUNAN"}
                                             </p>
 
                                             <p className="mt-2 text-4xl font-black text-white">
@@ -586,9 +653,17 @@ export default function Index() {
                                             </p>
 
                                             <p className="text-sm text-slate-500">
-                                                / year
+                                                {isEn ? "/ year" : "/ tahun"}
                                             </p>
                                         </div>
+                                    </div>
+
+                                    <div className="mt-8">
+                                        <p className="max-w-3xl text-sm leading-7 text-slate-300">
+                                            {isEn
+                                                ? "Your company is positioned not simply as a sponsor, but as a Strategic Solution Partner within the DIGESTEX ecosystem — where technologies, expertise, services and solutions can be discovered by companies and decision makers with relevant industry needs."
+                                                : "Perusahaan Anda diposisikan bukan sekadar sebagai sponsor, tetapi sebagai Strategic Solution Partner dalam ekosistem DIGESTEX — tempat teknologi, keahlian, layanan, dan solusi dapat ditemukan oleh perusahaan serta decision maker yang memiliki kebutuhan industri yang relevan."}{" "}
+                                        </p>
                                     </div>
 
                                     <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -612,25 +687,25 @@ export default function Index() {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="
-        inline-flex
-        items-center
-        gap-3
-        rounded-2xl
-        bg-amber-400
-        px-7
-        py-4
-        text-sm
-        font-black
-        uppercase
-        tracking-wide
-        text-slate-950
-        transition
-        hover:bg-amber-300
-    "
+                            inline-flex
+                            items-center
+                            gap-3
+                            rounded-2xl
+                            bg-amber-400
+                            px-7
+                            py-4
+                            text-sm
+                            font-black
+                            uppercase
+                            tracking-wide
+                            text-slate-950
+                            transition
+                            hover:bg-amber-300
+                        "
                                         >
                                             {isEn
                                                 ? "DISCUSS STRATEGIC PARTNERSHIP"
-                                                : "DISKUSIKAN STRATEGIC PARTNERSHIP"}
+                                                : "DISKUSIKAN KEMITRAAN STRATEGIS"}
 
                                             <ArrowRight className="h-5 w-5" />
                                         </a>
@@ -641,8 +716,8 @@ export default function Index() {
                     </section>
 
                     {/* =====================================================
-                        FOUNDING PARTNER BENEFITS
-                    ===================================================== */}
+    FOUNDING PARTNER BENEFITS
+===================================================== */}
 
                     <section className="border-b border-white/5 py-20 lg:py-24">
                         <div className="mx-auto max-w-7xl px-6">
@@ -655,14 +730,14 @@ export default function Index() {
 
                                 <h2 className="mt-4 text-4xl font-black uppercase tracking-tight sm:text-5xl">
                                     {isEn
-                                        ? "Why Join Early"
-                                        : "Mengapa Bergabung Lebih Awal"}
+                                        ? "Why Build With DIGESTEX From The Beginning"
+                                        : "Mengapa Membangun Bersama DIGESTEX Sejak Awal"}
                                 </h2>
 
-                                <p className="mx-auto mt-6 max-w-3xl text-slate-400">
+                                <p className="mx-auto mt-6 max-w-3xl leading-7 text-slate-400">
                                     {isEn
-                                        ? "Become part of the ecosystem from the beginning and help shape future industry collaboration, knowledge sharing and digital transformation."
-                                        : "Menjadi bagian dari ekosistem sejak awal dan ikut membentuk kolaborasi industri, knowledge sharing dan transformasi digital di masa depan."}
+                                        ? "Founding Partners have the opportunity to participate in the early development of a connected textile industry ecosystem — helping shape how companies, solutions, intelligence, sourcing and business opportunities connect across the value chain."
+                                        : "Founding Partner memiliki kesempatan untuk berpartisipasi dalam tahap awal pembangunan ekosistem industri tekstil yang terhubung — ikut membentuk bagaimana perusahaan, solusi, intelligence, sourcing, dan peluang bisnis saling terhubung di seluruh rantai nilai industri."}
                                 </p>
                             </div>
 
@@ -676,8 +751,8 @@ export default function Index() {
                                     }
                                     text={
                                         isEn
-                                            ? "Increase visibility through industry directories, solution categories and ecosystem partner pages."
-                                            : "Meningkatkan visibilitas melalui directory industri, kategori solusi dan halaman ecosystem partner."
+                                            ? "Strengthen your company's visibility within the DIGESTEX ecosystem and become easier to discover by relevant companies, decision makers and industry stakeholders."
+                                            : "Memperkuat visibilitas perusahaan dalam ekosistem DIGESTEX dan membuat perusahaan lebih mudah ditemukan oleh perusahaan, decision maker, dan stakeholder industri yang relevan."
                                     }
                                 />
 
@@ -685,13 +760,13 @@ export default function Index() {
                                     icon={Lightbulb}
                                     title={
                                         isEn
-                                            ? "Thought Leadership"
-                                            : "Thought Leadership"
+                                            ? "Solution & Expertise Showcase"
+                                            : "Showcase Solusi & Keahlian"
                                     }
                                     text={
                                         isEn
-                                            ? "Share expertise, innovation, compliance updates, research and industry knowledge."
-                                            : "Membagikan expertise, inovasi, compliance updates, research dan industry knowledge."
+                                            ? "Present your technologies, solutions, expertise, capabilities and industry knowledge in a structured environment designed for business discovery."
+                                            : "Menampilkan teknologi, solusi, keahlian, kapabilitas, dan pengetahuan industri dalam lingkungan terstruktur yang dirancang untuk business discovery."
                                     }
                                 />
 
@@ -699,13 +774,13 @@ export default function Index() {
                                     icon={Handshake}
                                     title={
                                         isEn
-                                            ? "Strategic Collaboration"
-                                            : "Strategic Collaboration"
+                                            ? "Strategic Industry Connectivity"
+                                            : "Konektivitas Strategis Industri"
                                     }
                                     text={
                                         isEn
-                                            ? "Connect with manufacturers, exporters, suppliers, institutions and solution providers."
-                                            : "Terhubung dengan manufacturer, exporter, supplier, institution dan solution provider."
+                                            ? "Build relationships with manufacturers, suppliers, buyers, technology companies, solution providers and other relevant industry stakeholders."
+                                            : "Membangun hubungan dengan manufacturer, supplier, buyer, perusahaan teknologi, solution provider, dan stakeholder industri lainnya yang relevan."
                                     }
                                 />
 
@@ -713,13 +788,13 @@ export default function Index() {
                                     icon={BarChart3}
                                     title={
                                         isEn
-                                            ? "Market Intelligence Exposure"
-                                            : "Market Intelligence Exposure"
+                                            ? "Industry Intelligence Engagement"
+                                            : "Industry Intelligence Engagement"
                                     }
                                     text={
                                         isEn
-                                            ? "Participate in industry discussions, market insights and ecosystem knowledge initiatives."
-                                            : "Berpartisipasi dalam industry discussion, market insight dan ecosystem knowledge initiatives."
+                                            ? "Participate in industry knowledge, market insight, technology and ecosystem initiatives that contribute to a more informed textile industry."
+                                            : "Berpartisipasi dalam knowledge, market insight, teknologi, dan ecosystem initiatives yang mendukung industri tekstil yang semakin informed."
                                     }
                                 />
 
@@ -727,13 +802,13 @@ export default function Index() {
                                     icon={BadgeCheck}
                                     title={
                                         isEn
-                                            ? "Early Ecosystem Recognition"
-                                            : "Early Ecosystem Recognition"
+                                            ? "Founding Ecosystem Recognition"
+                                            : "Pengakuan sebagai Founding Ecosystem Partner"
                                     }
                                     text={
                                         isEn
-                                            ? "Be recognized as an organization supporting the development of the DIGESTEX ecosystem from its early stage."
-                                            : "Diakui sebagai organisasi yang mendukung pengembangan ekosistem DIGESTEX sejak tahap awal."
+                                            ? "Establish your company as an early strategic partner contributing to the development of the DIGESTEX Global Textile Intelligence Ecosystem."
+                                            : "Menempatkan perusahaan sebagai strategic partner sejak tahap awal yang berkontribusi dalam pengembangan DIGESTEX Global Textile Intelligence Ecosystem."
                                     }
                                 />
 
@@ -741,13 +816,13 @@ export default function Index() {
                                     icon={Globe2}
                                     title={
                                         isEn
-                                            ? "Long-Term Partnership"
-                                            : "Long-Term Partnership"
+                                            ? "Long-Term Ecosystem Opportunities"
+                                            : "Peluang Ekosistem Jangka Panjang"
                                     }
                                     text={
                                         isEn
-                                            ? "Explore future collaboration across solutions, sourcing, intelligence and ecosystem initiatives."
-                                            : "Membuka peluang kolaborasi jangka panjang dalam solutions, sourcing, intelligence dan ecosystem initiatives."
+                                            ? "Explore future opportunities across solutions, sourcing, intelligence, digital visibility, business connectivity and other DIGESTEX ecosystem initiatives."
+                                            : "Membuka peluang jangka panjang dalam solutions, sourcing, intelligence, digital visibility, konektivitas bisnis, dan berbagai inisiatif ekosistem DIGESTEX lainnya."
                                     }
                                 />
                             </div>
@@ -755,8 +830,8 @@ export default function Index() {
                     </section>
 
                     {/* =====================================================
-                        FOUNDING PARTNERS
-                    ===================================================== */}
+    FOUNDING STRATEGIC PARTNERS
+===================================================== */}
 
                     <section className="border-b border-white/5 py-20 lg:py-24">
                         <div className="mx-auto max-w-6xl px-6 text-center">
@@ -768,64 +843,95 @@ export default function Index() {
 
                             <h2 className="mt-4 text-4xl font-black uppercase tracking-tight sm:text-5xl">
                                 {isEn
-                                    ? "Industry Leaders Joining Soon"
-                                    : "Industry Leaders Segera Bergabung"}
+                                    ? "Building The Ecosystem Together"
+                                    : "Membangun Ekosistem Bersama"}
                             </h2>
 
                             <p className="mx-auto mt-6 max-w-3xl leading-7 text-slate-400">
                                 {isEn
-                                    ? "DIGESTEX is engaging with technology providers, testing and certification organizations, machinery suppliers, financial institutions, logistics providers, exhibition organizers and research institutions across the textile ecosystem."
-                                    : "DIGESTEX sedang membangun engagement dengan technology provider, organisasi testing dan certification, machinery supplier, financial institution, logistics provider, exhibition organizer dan research institution di seluruh ekosistem tekstil."}
+                                    ? "DIGESTEX is engaging with leading companies and institutions across the textile value chain — from manufacturers, raw materials and machinery to technology, testing and certification, logistics, finance, exhibitions, research and education."
+                                    : "DIGESTEX sedang membangun engagement dengan perusahaan dan institusi terkemuka di seluruh rantai nilai industri tekstil — mulai dari manufacturer, bahan baku, mesin, teknologi, testing dan certification, logistik, finance, pameran, hingga riset dan pendidikan."}
                             </p>
 
                             <div className="mt-12 rounded-[40px] border border-dashed border-amber-400/20 bg-white/5 p-12 backdrop-blur-xl">
                                 <Sparkles className="mx-auto h-10 w-10 text-amber-400" />
 
                                 <p className="mt-5 text-lg font-black uppercase tracking-[0.25em] text-amber-300">
-                                    {isEn ? "COMING SOON" : "SEGERA HADIR"}
+                                    {isEn
+                                        ? "FOUNDING PARTNERS — COMING SOON"
+                                        : "FOUNDING PARTNERS — SEGERA HADIR"}
                                 </p>
 
                                 <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-500">
                                     {isEn
-                                        ? "Strategic partner announcements will be published as partnerships are formally confirmed."
-                                        : "Pengumuman strategic partner akan dipublikasikan setelah partnership dikonfirmasi secara resmi."}
+                                        ? "Founding Partner announcements will be published as strategic partnerships are formally established."
+                                        : "Pengumuman Founding Partner akan dipublikasikan setelah strategic partnership secara resmi terbentuk."}
                                 </p>
                             </div>
                         </div>
                     </section>
-
                     {/* =====================================================
-                        FINAL CTA
-                    ===================================================== */}
+    FINAL CTA
+===================================================== */}
 
                     <section className="py-24 lg:py-32">
                         <div className="mx-auto max-w-5xl px-6 text-center">
                             <span className="text-xs font-black uppercase tracking-[0.3em] text-amber-400">
-                                {isEn ? "READY TO JOIN?" : "SIAP BERGABUNG?"}
+                                {isEn
+                                    ? "BUILD THE ECOSYSTEM WITH DIGESTEX"
+                                    : "BANGUN EKOSISTEM BERSAMA DIGESTEX"}
                             </span>
 
                             <h2 className="mt-5 text-4xl font-black uppercase tracking-tight sm:text-5xl lg:text-6xl">
-                                {isEn
-                                    ? "YOUR SOLUTION BELONGS IN THE ECOSYSTEM"
-                                    : "SOLUSI ANDA ADALAH BAGIAN DARI EKOSISTEM"}
+                                {isEn ? (
+                                    <>
+                                        Your Solution.
+                                        <br />
+                                        Your Expertise.
+                                        <br />
+                                        Your Place In The Ecosystem.
+                                    </>
+                                ) : (
+                                    <>
+                                        Solusi Anda.
+                                        <br />
+                                        Keahlian Anda.
+                                        <br />
+                                        Tempat Anda Dalam Ekosistem.
+                                    </>
+                                )}
                             </h2>
 
                             <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-slate-400">
                                 {isEn
-                                    ? "Join DIGESTEX as a Strategic Solution Partner and position your technology, expertise and solutions within a connected textile industry ecosystem"
-                                    : "Bergabunglah sebagai Strategic Solution Partner DIGESTEX dan posisikan teknologi, expertise dan solusi perusahaan Anda di dalam ekosistem industri tekstil yang terhubung"}
+                                    ? "Join DIGESTEX as a Strategic Solution Partner and bring your technology, expertise, capabilities and solutions into a connected One-Stop Textile Industry Ecosystem — connecting industry needs with relevant solutions, intelligence and business opportunities."
+                                    : "Bergabunglah sebagai Strategic Solution Partner DIGESTEX dan hadirkan teknologi, keahlian, kapabilitas, serta solusi perusahaan Anda ke dalam One-Stop Textile Industry Ecosystem yang terhubung — mempertemukan kebutuhan industri dengan solusi, intelligence, dan peluang bisnis yang relevan."}
                             </p>
 
-                            <Link
-                                href={route("strategic-partnership.create")}
-                                className="inline-flex items-center gap-3 rounded-2xl bg-amber-400 px-7 py-4 text-sm font-black uppercase tracking-wide text-slate-950 transition hover:bg-amber-300"
-                            >
+                            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-500">
                                 {isEn
-                                    ? "BECOME A STRATEGIC SOLUTION PARTNER"
-                                    : "JADI STRATEGIC SOLUTION PARTNER"}
+                                    ? "This is more than visibility. It is an opportunity to participate in building the digital infrastructure of the next generation textile industry."
+                                    : "Ini lebih dari sekadar visibility. Ini adalah kesempatan untuk ikut membangun infrastruktur digital bagi generasi berikutnya industri tekstil."}
+                            </p>
 
-                                <ArrowRight className="h-5 w-5" />
-                            </Link>
+                            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                                <Link
+                                    href={route("strategic-partnership.create")}
+                                    className="inline-flex items-center gap-3 rounded-2xl bg-amber-400 px-8 py-4 text-sm font-black uppercase tracking-wide text-slate-950 transition hover:bg-amber-300"
+                                >
+                                    {isEn
+                                        ? "BECOME A STRATEGIC SOLUTION PARTNER"
+                                        : "JADI STRATEGIC SOLUTION PARTNER"}
+
+                                    <ArrowRight className="h-5 w-5" />
+                                </Link>
+                            </div>
+
+                            <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-slate-600">
+                                {isEn
+                                    ? "Founding-Stage Strategic Partnership Opportunities"
+                                    : "Peluang Strategic Partnership Tahap Awal"}
+                            </p>
                         </div>
                     </section>
                 </div>
